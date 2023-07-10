@@ -27,4 +27,5 @@ coverage
 build
 
 # Miscellaneous
+/src/zTodo.txt
 *.local
