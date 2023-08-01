@@ -5,6 +5,8 @@ import MuiModal from "@mui/material/Modal"
 import Typography from "@mui/material/Typography"
 import { useEffect, useState } from "react"
 import useTheme from "../common/useTheme"
+import { Button } from "./button"
+import Icon, { IconNames } from "./icon"
 /*
 
 
@@ -16,7 +18,7 @@ type ModalProps = {
   open: boolean
   heading: string
   body: React.ReactElement
-  footer: React.ReactElement
+  actions: { iconName: IconNames; handleClick: Function }[]
   onClose: Function
 }
 export default function Modal(props: ModalProps) {
@@ -24,9 +26,7 @@ export default function Modal(props: ModalProps) {
   const [open, setOpen] = useState(false)
   /*
   
-  
-  
-  
+
   */
   function handleClose() {
     setOpen(false)
@@ -34,9 +34,7 @@ export default function Modal(props: ModalProps) {
   }
   /*
   
-  
-  
-  
+
   */
   useEffect(() => {
     setOpen(props.open)
@@ -82,10 +80,27 @@ export default function Modal(props: ModalProps) {
           <Stack alignItems={"center"} padding={theme.module[4]}>
             {props.body}
           </Stack>
-          <Stack alignItems={"center"} padding={theme.module[4]} paddingTop={0}>
-            {props.footer}
+          <Stack
+            direction={"row"}
+            padding={theme.module[4]}
+            paddingTop={0}
+            gap={theme.module[4]}
+            boxSizing={"border-box"}
+            width={"100%"}
+          >
+            {props.actions.map((action, index) => (
+              <Button
+                variation={"modal"}
+                key={index}
+                onClick={action.handleClick}
+              >
+                <Icon variation={action.iconName} />
+              </Button>
+            ))}
+            {/* {props.footer} */}
           </Stack>
         </Stack>
+        {/* </Stack> */}
       </Fade>
     </MuiModal>
   )

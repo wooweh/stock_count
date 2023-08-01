@@ -1,7 +1,7 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit"
 import { RootState } from "../../app/store"
 
-export type NotificationTypes = "success" | "info" | "error"
+export type NotificationTypes = "success" | "info" | "warning" | "error"
 export type NotificationProps = {
   uuid: string
   type: NotificationTypes

@@ -1,7 +1,7 @@
 import { bootSystem } from "../features/core/coreSlice"
 import { setUser } from "../features/user/userSlice"
-import { auth } from "../remote_config"
-import { getUserFromDB, setNewUserOnDB } from "./remote"
+import { auth } from "../remote"
+import { getUserFromDB, setNewUserOnDB } from "../features/user/userRemote"
 import { store } from "./store"
 /*
 

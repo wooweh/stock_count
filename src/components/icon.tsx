@@ -1,31 +1,39 @@
+import AddOrgIcon from "@mui/icons-material/AddBusinessRounded"
 import AddIcon from "@mui/icons-material/AddRounded"
+import AdminIcon from "@mui/icons-material/AdminPanelSettingsRounded"
+import ArrowBackIcon from "@mui/icons-material/ArrowBackRounded"
+import UncheckedIcon from "@mui/icons-material/CheckBoxOutlineBlankRounded"
+import CheckedIcon from "@mui/icons-material/CheckBoxRounded"
+import ClearIcon from "@mui/icons-material/ClearRounded"
+import CopyIcon from "@mui/icons-material/ContentCopy"
 import DarkModeIcon from "@mui/icons-material/DarkModeOutlined"
+import DeleteIcon from "@mui/icons-material/DeleteRounded"
 import GroupIcon from "@mui/icons-material/Diversity3Rounded"
+import DoneIcon from "@mui/icons-material/DoneRounded"
+import EditIcon from "@mui/icons-material/EditRounded"
+import InviteIcon from "@mui/icons-material/EmailRounded"
 import HistoryIcon from "@mui/icons-material/HistoryRounded"
 import HomeIcon from "@mui/icons-material/HomeRounded"
 import SignOutIcon from "@mui/icons-material/LogoutRounded"
+import LeaveIcon from "@mui/icons-material/MeetingRoomRounded"
 import MenuIcon from "@mui/icons-material/MenuRounded"
+import OptionsIcon from "@mui/icons-material/MoreVert"
 import ProfileIcon from "@mui/icons-material/PersonRounded"
+import SearchIcon from "@mui/icons-material/SearchRounded"
 import SettingsIcon from "@mui/icons-material/Settings"
+import OrgIcon from "@mui/icons-material/StoreRounded"
 import TimelineIcon from "@mui/icons-material/TimelineRounded"
+import UploadIcon from "@mui/icons-material/UploadRounded"
 import ListIcon from "@mui/icons-material/ViewListRounded"
+import VisibilityIcon from "@mui/icons-material/Visibility"
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff"
+import KeyIcon from "@mui/icons-material/VpnKey"
 import LightModeIcon from "@mui/icons-material/WbSunnyRounded"
 import StockIcon from "@mui/icons-material/WidgetsRounded"
+import DownloadIcon from "@mui/icons-material/DownloadRounded"
 import { useAppSelector } from "../app/hooks"
 import { SxProps } from "../common/types"
 import useTheme from "../common/useTheme"
-import EditIcon from "@mui/icons-material/EditRounded"
-import DoneIcon from "@mui/icons-material/DoneRounded"
-import ClearIcon from "@mui/icons-material/ClearRounded"
-import DeleteIcon from "@mui/icons-material/DeleteRounded"
-import LeaveIcon from "@mui/icons-material/MeetingRoomRounded"
-import InviteIcon from "@mui/icons-material/EmailRounded"
-import OptionsIcon from "@mui/icons-material/MoreVert"
-import CopyIcon from "@mui/icons-material/ContentCopy"
-import KeyIcon from "@mui/icons-material/VpnKey"
-import AdminIcon from "@mui/icons-material/AdminPanelSettingsRounded"
-import VisibilityIcon from "@mui/icons-material/Visibility"
-import VisibilityOffIcon from "@mui/icons-material/VisibilityOff"
 import { selectIsDarkmode } from "../features/core/coreSlice"
 /*
 
@@ -47,6 +55,7 @@ export type IconNames =
   | "profile"
   | "signOut"
   | "group"
+  | "joinGroup"
   | "edit"
   | "done"
   | "cancel"
@@ -59,6 +68,14 @@ export type IconNames =
   | "admin"
   | "visible"
   | "notVisible"
+  | "upload"
+  | "download"
+  | "search"
+  | "backArrow"
+  | "checked"
+  | "unchecked"
+  | "org"
+  | "addOrg"
 
 type IconProps = {
   variation: IconNames
@@ -97,7 +114,6 @@ export default function Icon(props: IconProps) {
     list: <ListIcon fontSize={fontSize} sx={{ ...styles }} />,
     profile: <ProfileIcon fontSize={fontSize} sx={{ ...styles }} />,
     signOut: <SignOutIcon fontSize={fontSize} sx={{ ...styles }} />,
-    group: <GroupIcon fontSize={fontSize} sx={{ ...styles }} />,
     invite: <InviteIcon fontSize={fontSize} sx={{ ...styles }} />,
     edit: <EditIcon fontSize={fontSize} sx={{ ...styles }} />,
     options: <OptionsIcon fontSize={fontSize} sx={{ ...styles }} />,
@@ -106,6 +122,36 @@ export default function Icon(props: IconProps) {
     admin: <AdminIcon fontSize={fontSize} sx={{ ...styles }} />,
     visible: <VisibilityIcon fontSize={fontSize} sx={{ ...styles }} />,
     notVisible: <VisibilityOffIcon fontSize={fontSize} sx={{ ...styles }} />,
+    upload: <UploadIcon fontSize={fontSize} sx={{ ...styles }} />,
+    search: <SearchIcon fontSize={fontSize} sx={{ ...styles }} />,
+    backArrow: <ArrowBackIcon fontSize={fontSize} sx={{ ...styles }} />,
+    org: <OrgIcon fontSize={fontSize} sx={{ ...styles }} />,
+    group: <GroupIcon fontSize={fontSize} sx={{ ...styles }} />,
+    download: <DownloadIcon fontSize={fontSize} sx={{ ...styles }} />,
+    joinGroup: (
+      <GroupIcon
+        fontSize={fontSize}
+        sx={{ ...styles, color: theme.scale.green[6] }}
+      />
+    ),
+    addOrg: (
+      <AddOrgIcon
+        fontSize={fontSize}
+        sx={{ ...styles, color: theme.scale.green[6] }}
+      />
+    ),
+    checked: (
+      <CheckedIcon
+        fontSize={fontSize}
+        sx={{ ...styles, color: theme.scale.blue[6] }}
+      />
+    ),
+    unchecked: (
+      <UncheckedIcon
+        fontSize={fontSize}
+        sx={{ ...styles, color: theme.scale.blue[8] }}
+      />
+    ),
     done: (
       <DoneIcon
         fontSize={fontSize}

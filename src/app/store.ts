@@ -8,6 +8,7 @@ import { listenerMiddleware } from "./middleware"
 import userReducer from "../features/user/userSlice"
 import coreReducer from "../features/core/coreSlice"
 import organisationReducer from "../features/organisation/organisationSlice"
+import stockReducer from "../features/stock/stockSlice"
 import { persistReducer, persistStore } from "redux-persist"
 import storageSession from "redux-persist/lib/storage/session"
 import thunk from "redux-thunk"
@@ -22,6 +23,7 @@ const rootReducer = combineReducers({
   core: coreReducer,
   user: userReducer,
   organisation: organisationReducer,
+  stock: stockReducer,
 })
 
 const persistConfig = {

@@ -1,6 +1,7 @@
 import ButtonBase from "@mui/material/ButtonBase"
+import { useState } from "react"
+import { SxProps } from "../common/types"
 import useTheme from "../common/useTheme"
-import { useEffect, useState } from "react"
 /*
 
 
@@ -13,14 +14,18 @@ type AnimationDurations = 150 | 200
 type ButtonProps = {
   variation: ButtonVariations
   animationDuration?: AnimationDurations
-  children: string | React.ReactElement
+  children: any
   onClick: any
+  disabled?: boolean
+  sx?: SxProps
 }
 export function Button(props: ButtonProps) {
   const theme = useTheme()
   const [isPressed, setIsPressed] = useState(false)
   const [isThrottled, setIsThrottled] = useState(false)
-  const duration = props.animationDuration ? props.animationDuration : 250
+  const duration = props.animationDuration ? props.animationDuration : 200
+
+  if (isThrottled) setTimeout(() => setIsThrottled(false), duration)
   /*
 
 
@@ -30,17 +35,13 @@ export function Button(props: ButtonProps) {
       setIsThrottled(true)
       setIsPressed(true)
       setTimeout(() => setIsPressed(false), duration / 2)
-      setTimeout(() => props.onClick(), 250)
+      setTimeout(() => props.onClick(), duration + 50)
     }
   }
   /*
 
 
 */
-  useEffect(() => {
-    if (isThrottled) setTimeout(() => setIsThrottled(false), 350)
-  }, [isThrottled])
-
   const commonStyles = {
     transition: `transform ${duration / 2}ms, box-shadow ${duration / 2}ms`,
   }
@@ -55,6 +56,7 @@ export function Button(props: ButtonProps) {
       outline: `2px solid ${theme.scale.gray[7]} !important`,
       transform: `scale(${isPressed ? 0.975 : 1})`,
       ...commonStyles,
+      ...props.sx,
     },
     modal: {
       width: "100%",
@@ -64,16 +66,18 @@ export function Button(props: ButtonProps) {
       borderRadius: theme.module[3],
       transform: `scale(${isPressed ? 0.975 : 1})`,
       ...commonStyles,
+      ...props.sx,
     },
     home: {
       background: theme.scale.gray[8],
       width: "100%",
       borderRadius: theme.module[3],
-      boxShadow: theme.shadow.neo[isPressed ? 5 : 6],
+      boxShadow: theme.shadow.neo[isPressed ? 4 : 6],
       overflow: "hidden",
       justifyContent: "flex-start",
       transform: `scale(${isPressed ? 0.975 : 1})`,
       ...commonStyles,
+      ...props.sx,
     },
     icon: {
       borderRadius: theme.module[5],
@@ -81,13 +85,19 @@ export function Button(props: ButtonProps) {
       transform: `scale(${isPressed ? 0.8 : 1})`,
       ...commonStyles,
       transition: "transform 250ms",
+      ...props.sx,
     },
   }
 
   const styles = VARIATIONS[props.variation as keyof typeof VARIATIONS]
 
   return (
-    <ButtonBase disableRipple onMouseDown={handleClick} sx={styles}>
+    <ButtonBase
+      disableRipple
+      onMouseDown={handleClick}
+      disabled={props.disabled ? props.disabled : false}
+      sx={styles}
+    >
       {props.children}
     </ButtonBase>
   )

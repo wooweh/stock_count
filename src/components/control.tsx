@@ -73,14 +73,18 @@ export function Control(props: ControlsProps) {
         onChange={props.onChange}
         value={props.value}
         disabled={props.disabled}
-        sx={{ ...props.sx, transition: "background 250ms" }}
+        sx={{
+          ...props.sx,
+          transition: "background 250ms",
+          paddingRight: theme.module[1],
+        }}
         endAdornment={
           props.type === "password" ? (
             <InputAdornment position="end">
               <Button variation="icon" onClick={handleClickShowPassword}>
                 <Icon
                   variation={showPassword ? "notVisible" : "visible"}
-                  color={theme.scale.gray[5]}
+                  color={theme.scale.gray[6]}
                 />
               </Button>
             </InputAdornment>

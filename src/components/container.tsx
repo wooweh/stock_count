@@ -21,7 +21,6 @@ export default function Container(props: ContainerProps) {
       width={"100vw"}
       height={"100vh"}
       paddingTop={theme.module[6]}
-      paddingBottom={theme.module[6]}
       bgcolor={theme.scale.gray[8]}
       bottom={0}
       alignItems="center"

@@ -1,22 +1,25 @@
+import { onAuthStateChanged } from "firebase/auth"
 import _ from "lodash"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useResizeDetector } from "react-resize-detector"
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import Container from "../../components/container"
+import { auth } from "../../remote"
 import { Organisation } from "../organisation/organisation"
-import { SignInWithCredentials, SigningIn } from "../user/authentication"
-import UserProfile from "../user/user"
-import { selectIsLoggedIn } from "../user/userSlice"
-import { Bar } from "./bar"
+import { Stock } from "../stock/stock"
 import {
-  selectIsMobile,
-  selectIsSystemBooted,
-  toggleIsMobile,
-} from "./coreSlice"
+  SignInWithCredentials,
+  SigningIn,
+  VerifyEmail,
+} from "../user/authentication"
+import UserProfile from "../user/user"
+import { selectIsLoggedIn, signOut } from "../user/userSlice"
+import { Bar } from "./bar"
+import { selectIsMobile, toggleIsMobile } from "./coreSlice"
 import { DBListeners } from "./dbListeners"
 import { Home } from "./home"
-import { Notification } from "./notification"
+import { Notifications } from "./notifications"
 /*
 
 
@@ -28,46 +31,61 @@ export const routes = [
   {
     name: "Sign in",
     path: "/sign_in",
+    requiresAuth: false,
     element: <SignInWithCredentials />,
+  },
+  {
+    name: "Verify email",
+    path: "/verify_email",
+    requiresAuth: false,
+    element: <VerifyEmail />,
   },
   {
     name: "Signing in",
     path: "/signing_in",
+    requiresAuth: false,
     element: <SigningIn />,
   },
   {
     name: "Home",
     path: "/",
+    requiresAuth: true,
     element: <Home />,
   },
   {
     name: "New count",
     path: "/new_count",
+    requiresAuth: true,
     element: <div>New count</div>,
   },
   {
-    name: "Stock list",
-    path: "/stock_list",
-    element: <div>Stock list</div>,
+    name: "Stock",
+    path: "/stock",
+    requiresAuth: true,
+    element: <Stock />,
   },
   {
     name: "History",
     path: "/history",
+    requiresAuth: true,
     element: <div>History</div>,
   },
   {
     name: "Analysis",
     path: "/analysis",
+    requiresAuth: true,
     element: <div>Analysis</div>,
   },
   {
     name: "Organisation",
     path: "/organisation",
+    requiresAuth: true,
     element: <Organisation />,
   },
   {
     name: "Profile",
     path: "/profile",
+    requiresAuth: true,
     element: <UserProfile />,
   },
 ]
@@ -100,6 +118,16 @@ export const routePaths = getRoutePaths()
 
 
 */
+function getPublicPaths() {
+  return _.filter(routes, (route) => !route.requiresAuth)
+}
+/*
+
+
+
+
+
+*/
 function updateMobile(
   dispatch: Function,
   width: number | undefined,
@@ -120,32 +148,45 @@ export default function Core() {
   const dispatch = useAppDispatch()
   const isMobile = useAppSelector(selectIsMobile)
   const isLoggedIn = useAppSelector(selectIsLoggedIn)
-  const isSystemBooted = useAppSelector(selectIsSystemBooted)
   const navigate = useNavigate()
   const location = useLocation()
+  const [isAuthorised, setIsAuthorised] = useState(false)
   const { width, ref } = useResizeDetector()
-
-  const unAuthorised =
-    !isLoggedIn && location.pathname !== routePaths.signingIn.path
-  const atSignUp = location.pathname === routePaths.signIn.path
 
   useEffect(() => {
     updateMobile(dispatch, width, isMobile)
   }, [width, isMobile, dispatch])
 
   useEffect(() => {
-    if (unAuthorised) navigate(routePaths.signIn.path)
-  }, [unAuthorised, navigate])
+    const publicPaths = getPublicPaths()
+    const isPublicPath =
+      _.findIndex(publicPaths, (path) => path.path === location.pathname) !== -1
+
+    onAuthStateChanged(auth, (user) => {
+      setIsAuthorised(!!user && isLoggedIn)
+      if (user && !isLoggedIn) {
+        dispatch(signOut)
+        navigate(routePaths.signIn.path)
+      }
+      if (!user && !isPublicPath) {
+        dispatch(signOut)
+        navigate(routePaths.signIn.path)
+      }
+      if (user && isLoggedIn && isPublicPath) {
+        navigate(routePaths.home.path)
+      }
+    })
+  }, [navigate, location.pathname, dispatch, isLoggedIn])
 
   return (
     <>
       <Bar />
-      <DBListeners isSystemBooted={isSystemBooted} />
-      <Notification />
+      <DBListeners />
+      <Notifications />
       <Container resizeRef={ref}>
         <Routes>
           {routes.map((route: any, index: number) => {
-            return unAuthorised && !atSignUp ? null : (
+            return !isAuthorised && route.requiresAuth ? null : (
               <Route path={route.path} element={route.element} key={index} />
             )
           })}

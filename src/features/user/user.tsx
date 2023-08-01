@@ -1,13 +1,25 @@
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
-import { createContext, useContext, useEffect, useState } from "react"
+import { User } from "firebase/auth"
+import { useEffect, useState } from "react"
+import { create } from "zustand"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { Button } from "../../components/button"
-import { Control } from "../../components/control"
+import { Control, ControlNames } from "../../components/control"
 import Icon from "../../components/icon"
 import Modal from "../../components/modal"
 import { ProfileSurface } from "../../components/profileSurface"
+import { auth } from "../../remote"
+import {
+  generateErrorNotification,
+  generateNotification,
+} from "../core/notifications"
+import {
+  PasswordValidationCheck,
+  getPasswordValidation,
+} from "./authentication"
+import { reauthenticateUser, updateUserPassword } from "./userRemote"
 import {
   deleteUser,
   selectUser,
@@ -22,47 +34,42 @@ import {
 
 
 */
-type UserProfileContextProps = {
-  isEditing?: boolean
-  setIsEditing?: any
-  isDeleting?: boolean
-  setIsDeleting?: any
-  isSubmitted?: boolean
-  setIsSubmitted?: any
+type UseUserState = {
+  isEditing: boolean
+  isDeleting: boolean
+  isChangingPassword: boolean
+  name: string
+  surname: string
+  email: string
 }
-const UserProfileContext = createContext({})
+type UseUserKeys = keyof UseUserState
 
+const useUserStore = create<UseUserState>()((set) => ({
+  isEditing: false,
+  isDeleting: false,
+  isChangingPassword: false,
+  name: "",
+  surname: "",
+  email: "",
+}))
+
+function setUseUser(path: UseUserKeys, value: boolean | string) {
+  useUserStore.setState({ [path]: value })
+}
+/*
+
+
+
+
+
+*/
 export default function UserProfile() {
-  const [isEditing, setIsEditing] = useState(false)
-  const [isDeleting, setIsDeleting] = useState(false)
-  const [isSubmitted, setIsSubmitted] = useState(false)
-  const [context, setContext] = useState({
-    isEditing: isEditing,
-    setIsEditing: setIsEditing,
-    isDeleting: isDeleting,
-    setIsDeleting: setIsDeleting,
-    isSubmitted: isSubmitted,
-    setIsSubmitted: setIsSubmitted,
-  })
-
-  useEffect(() => {
-    setContext({
-      isEditing: isEditing,
-      setIsEditing: setIsEditing,
-      isDeleting: isDeleting,
-      setIsDeleting: setIsDeleting,
-      isSubmitted: isSubmitted,
-      setIsSubmitted: setIsSubmitted,
-    })
-  }, [isEditing, isDeleting, isSubmitted])
-
   return (
     <ProfileSurface>
-      <UserProfileContext.Provider value={context}>
-        <ProfileItems />
-        <ButtonTray />
-        <DeleteProfileConfirmation />
-      </UserProfileContext.Provider>
+      <ProfileFields />
+      <ButtonTray />
+      <ChangePassword />
+      <DeleteProfileConfirmation />
     </ProfileSurface>
   )
 }
@@ -73,37 +80,42 @@ export default function UserProfile() {
 
 
 */
-function ProfileItems() {
+function ProfileFields() {
   const theme = useTheme()
-  const dispatch = useAppDispatch()
   const user = useAppSelector(selectUser)
 
-  const profileItems = [
+  useEffect(() => {
+    setUseUser("name", user.name ?? "")
+    setUseUser("surname", user.surname ?? "")
+    setUseUser("email", user.email ?? "")
+  }, [user.email, user.name, user.surname])
+
+  const fields = [
     {
       label: "Name",
-      value: user.name,
-      onSubmit: (name: string) => dispatch(setUserName(name)),
+      value: useUserStore((state: any) => state.name),
+      handleChange: (event: any) => setUseUser("name", event.target.value),
     },
     {
       label: "Surname",
-      value: user.surname,
-      onSubmit: (surname: string) => dispatch(setUserSurname(surname)),
+      value: useUserStore((state: any) => state.surname),
+      handleChange: (event: any) => setUseUser("surname", event.target.value),
     },
     {
       label: "Email",
-      value: user.email,
-      onSubmit: (email: string) => dispatch(setUserEmail(email)),
+      value: useUserStore((state: any) => state.email),
+      handleChange: (event: any) => setUseUser("email", event.target.value),
     },
   ]
 
   return (
     <Stack gap={theme.module[5]}>
-      {profileItems.map((item: any, index: number) => {
+      {fields.map((field: any, index: number) => {
         return (
-          <ProfileItem
-            label={item.label}
-            value={item.value ?? ""}
-            onSubmit={item.onSubmit}
+          <ProfileField
+            label={field.label}
+            value={field.value ?? ""}
+            handleChange={field.handleChange}
             key={index}
           />
         )
@@ -118,36 +130,15 @@ function ProfileItems() {
 
 
 */
-type ProfileItemProps = {
+type ProfileFieldProps = {
   label: string
   value: string
-  onSubmit: Function
+  handleChange: Function
 }
-function ProfileItem(props: ProfileItemProps) {
+function ProfileField(props: ProfileFieldProps) {
   const theme = useTheme()
-  const [value, setValue] = useState(props.value)
-  const context: UserProfileContextProps = useContext(UserProfileContext)
+  const isEditing = useUserStore((state: any) => state.isEditing)
 
-  useEffect(() => {
-    if (context.isSubmitted) {
-      props.onSubmit(value)
-      context.setIsSubmitted(false)
-    }
-    if (!context.isEditing) {
-      setValue(props.value)
-    }
-  }, [props, context, value])
-  /*
-  
-  
-  */
-  function handleChange(event: any) {
-    setValue(event.target.value)
-  }
-  /*
-  
-  
-  */
   return (
     <Stack width={"100%"} alignItems={"flex-start"}>
       <Typography
@@ -165,20 +156,18 @@ function ProfileItem(props: ProfileItemProps) {
       >
         <Control
           variation={"input"}
-          value={value}
+          value={props.value}
           placeholder={
-            value === ""
+            props.value === "" && !isEditing
               ? `Fill in your ${props.label.toLowerCase()}`
               : undefined
           }
-          onChange={handleChange}
-          disabled={context.isEditing ? false : true}
+          onChange={props.handleChange}
+          disabled={isEditing ? false : true}
           sx={{
             fontSize: "1.25rem",
             fontWeight: "bold",
-            background: context.isEditing
-              ? theme.scale.gray[8]
-              : theme.scale.gray[9],
+            background: isEditing ? theme.scale.gray[8] : theme.scale.gray[9],
           }}
         />
       </Stack>
@@ -194,59 +183,79 @@ function ProfileItem(props: ProfileItemProps) {
 */
 function ButtonTray() {
   const theme = useTheme()
-  const context: UserProfileContextProps = useContext(UserProfileContext)
+  const dispatch = useAppDispatch()
+  const isEditing = useUserStore((state: any) => state.isEditing)
+  const name = useUserStore((state: any) => state.name)
+  const surname = useUserStore((state: any) => state.surname)
+  const email = useUserStore((state: any) => state.email)
   /*
   
   
   */
   function handleEdit() {
-    context.setIsEditing(true)
+    setUseUser("isEditing", true)
   }
   /*
   
   
   */
   function handleAccept() {
-    context.setIsSubmitted(true)
-    context.setIsEditing(false)
+    if (!!name && !!surname && !!email) {
+      setUseUser("isEditing", false)
+      dispatch(setUserName(name))
+      dispatch(setUserSurname(surname))
+      dispatch(setUserEmail(email))
+    } else {
+      generateNotification("incompleteProfileDetails")
+    }
   }
   /*
   
   
   */
   function handleCancel() {
-    context.setIsEditing(false)
+    setUseUser("isEditing", false)
   }
   /*
   
   
   */
   function handleDelete() {
-    context.setIsDeleting(true)
+    setUseUser("isDeleting", true)
+  }
+  /*
+  
+  
+  */
+  function handleResetPassword() {
+    setUseUser("isChangingPassword", true)
   }
   /*
   
   
   */
   return (
-    <Stack width={"100%"} paddingTop={theme.module[6]} gap={theme.module[5]}>
+    <Stack width={"100%"} gap={theme.module[5]}>
+      {isEditing ? undefined : (
+        <Button
+          variation={"profile"}
+          onClick={handleResetPassword}
+          sx={{ background: "transparent", height: theme.module[7] }}
+        >
+          <Typography color={theme.scale.gray[5]}>Change Password</Typography>
+        </Button>
+      )}
       <Button
         variation={"profile"}
-        onClick={context.isEditing ? handleAccept : handleEdit}
+        onClick={isEditing ? handleAccept : handleEdit}
       >
-        <Icon
-          variation={context.isEditing ? "done" : "edit"}
-          fontSize={"large"}
-        />
+        <Icon variation={isEditing ? "done" : "edit"} fontSize={"large"} />
       </Button>
       <Button
         variation={"profile"}
-        onClick={context.isEditing ? handleCancel : handleDelete}
+        onClick={isEditing ? handleCancel : handleDelete}
       >
-        <Icon
-          variation={context.isEditing ? "cancel" : "delete"}
-          fontSize={"large"}
-        />
+        <Icon variation={isEditing ? "cancel" : "delete"} fontSize={"large"} />
       </Button>
     </Stack>
   )
@@ -259,30 +268,22 @@ function ButtonTray() {
 
 */
 function DeleteProfileConfirmation() {
-  const theme = useTheme()
   const dispatch = useAppDispatch()
-  const context: UserProfileContextProps = useContext(UserProfileContext)
+  const isDeleting = useUserStore((state: any) => state.isDeleting)
   /*
   
   
   */
   function handleAccept() {
     dispatch(deleteUser())
-    context.setIsDeleting(false)
-  }
-  /*
-  
-  
-  */
-  function handleCancel() {
-    context.setIsDeleting(false)
+    setUseUser("isDeleting", false)
   }
   /*
   
   
   */
   function handleClose() {
-    context.setIsDeleting(false)
+    setUseUser("isDeleting", false)
   }
   /*
   
@@ -290,23 +291,179 @@ function DeleteProfileConfirmation() {
   */
   return (
     <Modal
-      open={context.isDeleting as boolean}
+      open={isDeleting}
       heading={"Delete Profile"}
       body={
         <Typography>Are you sure you want to delete your profile?</Typography>
       }
-      footer={
-        <Stack direction={"row"} gap={theme.module[4]} width={"100%"}>
-          <Button variation={"modal"} onClick={handleCancel}>
-            <Icon variation={"cancel"} />
-          </Button>
-          <Button variation={"modal"} onClick={handleAccept}>
-            <Icon variation={"done"} />
-          </Button>
-        </Stack>
-      }
+      actions={[
+        { iconName: "cancel", handleClick: handleClose },
+        { iconName: "done", handleClick: handleAccept },
+      ]}
       onClose={handleClose}
     />
+  )
+}
+/*
+
+
+
+
+
+*/
+function changeUserPassword(
+  user: User,
+  password: string,
+  newPassword: string,
+  handleClose: Function,
+) {
+  reauthenticateUser(user, password)
+    .then(() => updateUserPassword(user, newPassword))
+    .then(() => {
+      generateNotification("passwordChange")
+      handleClose()
+    })
+    .catch((error) => {
+      console.log(error)
+      generateErrorNotification(error.code)
+    })
+}
+/*
+
+
+
+
+
+*/
+function ChangePassword() {
+  const isChangingPassword = useUserStore(
+    (state: any) => state.isChangingPassword,
+  )
+  const [password, setPassword] = useState("")
+  const [newPassword, setNewPassword] = useState("")
+  const [confirmedNewPassword, setConfiredNewPassword] = useState("")
+
+  const isNewPasswordConfirmed =
+    !!newPassword && newPassword === confirmedNewPassword
+  const isNewPasswordUnique = newPassword !== password
+  const isNewPasswordValid = getPasswordValidation(newPassword).isValid
+  const user = auth.currentUser as User
+  /*
+  
+  
+  */
+  function handleAccept() {
+    if (isNewPasswordValid && isNewPasswordConfirmed && isNewPasswordUnique) {
+      changeUserPassword(user, password, newPassword, handleClose)
+    } else if (!isNewPasswordConfirmed) {
+      generateNotification("newPasswordNotConfirmed")
+    } else if (!isNewPasswordUnique) {
+      generateNotification("newPasswordNotUnique")
+    } else if (!isNewPasswordValid) {
+      generateNotification("newPasswordNotValid")
+    }
+  }
+  /*
+  
+  
+  */
+  function handleClose() {
+    setUseUser("isChangingPassword", false)
+    setTimeout(() => {
+      setPassword("")
+      setNewPassword("")
+      setConfiredNewPassword("")
+    }, 250)
+  }
+  /*
+  
+  
+  */
+  const inputs = [
+    {
+      variation: "input",
+      placeholder: "Password",
+      value: password,
+      onChange: (event: any) => setPassword(event.target.value),
+    },
+    {
+      variation: "input",
+      placeholder: "New password",
+      value: newPassword,
+      onChange: (event: any) => setNewPassword(event.target.value),
+    },
+    {
+      variation: "input",
+      placeholder: "Confirm new password",
+      value: confirmedNewPassword,
+      onChange: (event: any) => setConfiredNewPassword(event.target.value),
+    },
+  ]
+
+  return (
+    <Modal
+      open={isChangingPassword}
+      heading={"Change Password"}
+      body={
+        <PasswordInputs
+          inputs={inputs}
+          isNewPasswordConfirmed={isNewPasswordConfirmed}
+        />
+      }
+      actions={[
+        { iconName: "cancel", handleClick: handleClose },
+        { iconName: "done", handleClick: handleAccept },
+      ]}
+      onClose={handleClose}
+    />
+  )
+}
+/*
+
+
+
+
+
+*/
+function PasswordInputs({
+  inputs,
+  isNewPasswordConfirmed,
+}: {
+  inputs: any
+  isNewPasswordConfirmed: boolean
+}) {
+  const theme = useTheme()
+  const newPassword = inputs[1].value
+
+  return (
+    <Stack gap={theme.module[4]} padding={theme.module[4]}>
+      {inputs.map((input: (typeof inputs)[number], index: number) => {
+        const styles = {
+          background: theme.scale.gray[8],
+          outline:
+            index === 2
+              ? isNewPasswordConfirmed
+                ? `2px solid ${theme.scale.green[6]}`
+                : `2px solid ${theme.scale.red[6]}`
+              : "",
+        }
+        return (
+          <Control
+            variation={input.variation as ControlNames}
+            type={"password"}
+            placeholder={input.placeholder}
+            onChange={input.onChange}
+            value={input.value}
+            sx={{ ...styles }}
+            key={index}
+          />
+        )
+      })}
+      <PasswordValidationCheck
+        validationReport={getPasswordValidation(newPassword)}
+        isActive={true}
+      />
+    </Stack>
   )
 }
 /*

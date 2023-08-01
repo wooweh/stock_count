@@ -1,17 +1,32 @@
 import Input from "@mui/material/InputBase"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
-import { createContext, useContext, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { v4 as uuidv4 } from "uuid"
+import { create } from "zustand"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
+import { makeSentenceCase } from "../../common/utils"
 import { Button } from "../../components/button"
 import { Control } from "../../components/control"
 import Icon, { IconNames } from "../../components/icon"
-import { List, ListFactory, ListGroup, ListItem } from "../../components/list"
+import {
+  List,
+  ListFactory,
+  ListGroup,
+  ListItem,
+  ListItemOptionProps,
+  ListItemWithOptions,
+} from "../../components/list"
+import { Loader } from "../../components/loader"
 import Modal from "../../components/modal"
 import { ProfileSurface } from "../../components/profileSurface"
-import { selectIsUserAdmin, selectUser } from "../user/userSlice"
+import { generateNotification } from "../core/notifications"
+import {
+  selectIsProfileComplete,
+  selectIsUserAdmin,
+  selectUser,
+} from "../user/userSlice"
 import {
   InviteProps,
   MemberProps,
@@ -23,6 +38,8 @@ import {
   joinOrg,
   leaveOrg,
   selectIsJoining,
+  selectIsOrgSetup,
+  selectOrg,
   selectOrgInvites,
   selectOrgMembers,
   selectOrgName,
@@ -30,9 +47,7 @@ import {
   setOrgMemberRole,
   setOrgName,
 } from "./organisationSlice"
-import { Loader } from "../../components/loader"
-import { showNotification } from "../core/coreSlice"
-import { generateNotification } from "../../common/utils"
+import { CompleteProfilePrompt } from "../core/home"
 /*
 
 
@@ -40,88 +55,54 @@ import { generateNotification } from "../../common/utils"
 
 
 */
-type OrganisationContextProps = {
-  isRemoving?: boolean
-  setIsRemoving?: any
-  isEditing?: boolean
-  setIsEditing?: any
-  isJoining?: boolean
-  setIsJoining?: any
-  isCreating?: boolean
-  setIsCreating?: any
-  isInviting?: boolean
-  setIsInviting?: any
-  isViewingMembers?: boolean
-  setIsViewingMembers?: any
-  isViewingInvites?: boolean
-  setIsViewingInvites?: any
+type UseOrgState = {
+  isRemoving: boolean
+  isEditing: boolean
+  isJoining: boolean
+  isCreating: boolean
+  isInviting: boolean
+  idViewingOptions: string | false
+  isViewingMembers: boolean
+  isViewingInvites: boolean
 }
-const OrganisationContext = createContext({})
+type UseOrgKeys = keyof UseOrgState
 
+const useOrgStore = create<UseOrgState>()((set) => ({
+  isRemoving: false,
+  isEditing: false,
+  isJoining: false,
+  isCreating: false,
+  isInviting: false,
+  idViewingOptions: false,
+  isViewingMembers: false,
+  isViewingInvites: false,
+}))
+
+function setUseOrg(path: UseOrgKeys, value: boolean | string) {
+  useOrgStore.setState({ [path]: value })
+}
+/*
+
+
+
+
+
+*/
 export function Organisation() {
-  const orgUuid = useAppSelector(selectOrgUuid)
+  const isProfileComplete = useAppSelector(selectIsProfileComplete)
+  const isOrgSetup = useAppSelector(selectIsOrgSetup)
   const isJoiningOrg = useAppSelector(selectIsJoining)
-  const [isRemoving, setIsRemoving] = useState(false)
-  const [isEditing, setIsEditing] = useState(false)
-  const [isJoining, setIsJoining] = useState(false)
-  const [isCreating, setIsCreating] = useState(false)
-  const [isInviting, setIsInviting] = useState(false)
-  const [isViewingMembers, setIsViewingMembers] = useState(false)
-  const [isViewingInvites, setIsViewingInvites] = useState(false)
-  const [context, setContext] = useState({
-    isRemoving: isRemoving,
-    setIsRemoving: setIsRemoving,
-    isEditing: isEditing,
-    setIsEditing: setIsEditing,
-    isJoining: isJoining,
-    setIsJoining: setIsJoining,
-    isCreating: isCreating,
-    isInviting: isInviting,
-    setIsInviting: setIsInviting,
-    setIsCreating: setIsCreating,
-    isViewingMembers: isViewingMembers,
-    setIsViewingMembers: setIsViewingMembers,
-    isViewingInvites: isViewingInvites,
-    setIsViewingInvites: setIsViewingInvites,
-  })
 
-  useEffect(() => {
-    setContext({
-      isRemoving: isRemoving,
-      setIsRemoving: setIsRemoving,
-      isEditing: isEditing,
-      setIsEditing: setIsEditing,
-      isJoining: isJoining,
-      setIsJoining: setIsJoining,
-      isCreating: isCreating,
-      setIsCreating: setIsCreating,
-      isInviting: isInviting,
-      setIsInviting: setIsInviting,
-      isViewingMembers: isViewingMembers,
-      setIsViewingMembers: setIsViewingMembers,
-      isViewingInvites: isViewingInvites,
-      setIsViewingInvites: setIsViewingInvites,
-    })
-  }, [
-    isRemoving,
-    isEditing,
-    isJoining,
-    isCreating,
-    isViewingMembers,
-    isViewingInvites,
-    isInviting,
-  ])
-
-  return (
-    <OrganisationContext.Provider value={context}>
-      {isJoiningOrg ? (
-        <Loader narration={"joining organisation"} />
-      ) : !!orgUuid ? (
-        <OrgProfile />
-      ) : (
-        <OrgSetup />
-      )}
-    </OrganisationContext.Provider>
+  return isProfileComplete ? (
+    isJoiningOrg ? (
+      <Loader narration={"joining organisation..."} />
+    ) : isOrgSetup ? (
+      <OrgProfile />
+    ) : (
+      <OrgSetup />
+    )
+  ) : (
+    <CompleteProfilePrompt />
   )
 }
 /*
@@ -156,7 +137,7 @@ function OrgNameHeader() {
 
   const orgName = useAppSelector(selectOrgName)
   const isAdmin = useAppSelector(selectIsUserAdmin)
-  const context: OrganisationContextProps = useContext(OrganisationContext)
+  const isEditing = useOrgStore((state: any) => state.isEditing)
   const [newOrgName, setNewOrgName] = useState(orgName)
   /*
   
@@ -170,14 +151,14 @@ function OrgNameHeader() {
   
   */
   function handleEdit() {
-    context.setIsEditing(true)
+    setUseOrg("isEditing", true)
   }
   /*
   
   
   */
   function handleAccept() {
-    context.setIsEditing(false)
+    setUseOrg("isEditing", false)
     if (!!newOrgName) dispatch(setOrgName(newOrgName))
   }
   /*
@@ -189,22 +170,22 @@ function OrgNameHeader() {
       <Stack direction={"row"} alignItems={"center"} gap={theme.module[5]}>
         <Control
           variation={"input"}
-          disabled={!context.isEditing}
+          disabled={!isEditing}
           value={newOrgName}
           onChange={(event: any) => setNewOrgName(event.target.value)}
           sx={{
             fontSize: "1.25rem",
-            background: theme.scale.gray[context.isEditing ? 8 : 9],
-            color: theme.scale.gray[context.isEditing ? 4 : 8],
+            background: theme.scale.gray[isEditing ? 8 : 9],
+            color: theme.scale.gray[isEditing ? 4 : 8],
             fontWeight: "bold",
           }}
         />
         {isAdmin ? (
           <Button
             variation={"icon"}
-            onClick={context.isEditing ? handleAccept : handleEdit}
+            onClick={isEditing ? handleAccept : handleEdit}
           >
-            <Icon variation={context.isEditing ? "done" : "edit"} />
+            <Icon variation={isEditing ? "done" : "edit"} />
           </Button>
         ) : undefined}
       </Stack>
@@ -236,13 +217,12 @@ function ButtonTray() {
   const theme = useTheme()
 
   const isAdmin = useAppSelector(selectIsUserAdmin)
-  const context: OrganisationContextProps = useContext(OrganisationContext)
   /*
   
   
   */
   function handleRemove() {
-    context.setIsRemoving(true)
+    setUseOrg("isRemoving", true)
   }
   /*
   
@@ -252,17 +232,17 @@ function ButtonTray() {
     {
       iconName: "group",
       label: "Members",
-      onClick: () => context.setIsViewingMembers(true),
+      onClick: () => setUseOrg("isViewingMembers", true),
     },
     {
       iconName: "invite",
       label: "Invites",
-      onClick: () => context.setIsViewingInvites(true),
+      onClick: () => setUseOrg("isViewingInvites", true),
     },
     {
       iconName: "add",
       label: "New Invite",
-      onClick: () => context.setIsInviting(true),
+      onClick: () => setUseOrg("isInviting", true),
     },
   ]
 
@@ -315,15 +295,15 @@ function ButtonTray() {
 
 */
 function MembersList() {
-  const theme = useTheme()
   const members = useAppSelector(selectOrgMembers)
-  const context: OrganisationContextProps = useContext(OrganisationContext)
+  const isViewingMembers = useOrgStore((state: any) => state.isViewingMembers)
   /*
   
   
   */
   function handleClose() {
-    context.setIsViewingMembers(false)
+    setUseOrg("isViewingMembers", false)
+    setUseOrg("idViewingOptions", false)
   }
   /*
   
@@ -331,7 +311,7 @@ function MembersList() {
   */
   return (
     <Modal
-      open={context.isViewingMembers as boolean}
+      open={isViewingMembers}
       heading={"Members"}
       body={
         members?.length ? (
@@ -344,13 +324,7 @@ function MembersList() {
           <Typography>No members have been added</Typography>
         )
       }
-      footer={
-        <Stack direction={"row"} gap={theme.module[4]} width={"100%"}>
-          <Button variation={"modal"} onClick={handleClose}>
-            <Icon variation={"cancel"} />
-          </Button>
-        </Stack>
-      }
+      actions={[{ iconName: "cancel", handleClick: handleClose }]}
       onClose={handleClose}
     />
   )
@@ -364,6 +338,7 @@ function MembersList() {
 */
 function MemberListItem({ member }: { member: MemberProps }) {
   const dispatch = useAppDispatch()
+  const idViewingOptions = useOrgStore((state) => state.idViewingOptions)
   const isMemberAdmin = member.role === "admin"
   /*
   
@@ -388,7 +363,7 @@ function MemberListItem({ member }: { member: MemberProps }) {
 
   
   */
-  const options: OptionProps[] = [
+  const options: ListItemOptionProps[] = [
     {
       iconName: isMemberAdmin ? "profile" : "admin",
       onClick: handleAssignRole,
@@ -399,15 +374,18 @@ function MemberListItem({ member }: { member: MemberProps }) {
     },
     {
       iconName: "cancel",
+      onClick: () => setUseOrg("idViewingOptions", false),
     },
   ]
 
   return (
-    <ListItemBase
+    <ListItemWithOptions
       label={`${member.name} ${member.surname}`}
-      description={member.role}
+      description={makeSentenceCase(member.role)}
       iconName={member.role === "admin" ? "admin" : "profile"}
       options={options}
+      showOptions={member.uuid === idViewingOptions}
+      onOptionsClick={() => setUseOrg("idViewingOptions", member.uuid)}
     />
   )
 }
@@ -419,15 +397,15 @@ function MemberListItem({ member }: { member: MemberProps }) {
 
 */
 function InvitesList() {
-  const theme = useTheme()
   const invites = useAppSelector(selectOrgInvites) as InviteProps[]
-  const context: OrganisationContextProps = useContext(OrganisationContext)
+  const isViewingInvites = useOrgStore((state: any) => state.isViewingInvites)
   /*
   
   
   */
   function handleClose() {
-    context.setIsViewingInvites(false)
+    setUseOrg("isViewingInvites", false)
+    setUseOrg("idViewingOptions", false)
   }
   /*
   
@@ -435,7 +413,7 @@ function InvitesList() {
   */
   return (
     <Modal
-      open={context.isViewingInvites as boolean}
+      open={isViewingInvites}
       heading={"Invites"}
       body={
         invites?.length ? (
@@ -448,13 +426,7 @@ function InvitesList() {
           <Typography>No pending invites</Typography>
         )
       }
-      footer={
-        <Stack direction={"row"} gap={theme.module[4]} width={"100%"}>
-          <Button variation={"modal"} onClick={handleClose}>
-            <Icon variation={"cancel"} />
-          </Button>
-        </Stack>
-      }
+      actions={[{ iconName: "cancel", handleClick: handleClose }]}
       onClose={handleClose}
     />
   )
@@ -468,6 +440,7 @@ function InvitesList() {
 */
 function InviteListItem({ invite }: { invite: InviteProps }) {
   const dispatch = useAppDispatch()
+  const idViewingOptions = useOrgStore((state) => state.idViewingOptions)
   /*
   
 
@@ -488,7 +461,7 @@ function InviteListItem({ invite }: { invite: InviteProps }) {
 
   
   */
-  const options: OptionProps[] = [
+  const options: ListItemOptionProps[] = [
     {
       iconName: "copy",
       onClick: handleCopy,
@@ -499,102 +472,19 @@ function InviteListItem({ invite }: { invite: InviteProps }) {
     },
     {
       iconName: "cancel",
+      onClick: () => setUseOrg("idViewingOptions", false),
     },
   ]
 
   return (
-    <ListItemBase
+    <ListItemWithOptions
       label={invite.tempName}
       description={invite.inviteKey}
       iconName={"profile"}
       options={options}
+      showOptions={idViewingOptions === invite.inviteKey}
+      onOptionsClick={() => setUseOrg("idViewingOptions", invite.inviteKey)}
     />
-  )
-}
-/*
-
-
-
-
-
-*/
-type OptionProps = {
-  iconName: IconNames
-  onClick?: Function
-}
-type ListItemBaseProps = {
-  label: string
-  description: string
-  iconName: IconNames
-  options: OptionProps[] | undefined
-}
-function ListItemBase(props: ListItemBaseProps) {
-  const theme = useTheme()
-  const [showOptions, setShowOptions] = useState(false)
-  /*
-  
-
-*/
-  function handleClick() {
-    setShowOptions(true)
-  }
-  /*
-
-
-*/
-  const listItemProps = props.options
-    ? {
-        secondarySlot: (
-          <Button variation={"icon"} onClick={handleClick}>
-            <Icon variation={"options"} />
-          </Button>
-        ),
-        onChange: handleClick,
-        tappable: true,
-      }
-    : {}
-
-  return (
-    <Stack position={"relative"}>
-      <ListItem
-        label={props.label}
-        description={props.description}
-        primarySlot={<Icon variation={props.iconName} />}
-        {...listItemProps}
-      />
-      {showOptions ? (
-        <Stack
-          width={"100%"}
-          height={"100%"}
-          direction={"row"}
-          bgcolor={theme.scale.gray[9]}
-          boxSizing={"border-box"}
-          position={"absolute"}
-          borderRadius={theme.module[3]}
-          justifyContent={"space-between"}
-          alignItems={"center"}
-          padding={`0 ${theme.module[5]}`}
-        >
-          {props.options
-            ? props.options.map((option: OptionProps, index: number) => {
-                /*
-                 */
-                function onClick() {
-                  if (option.onClick) option.onClick()
-                  setShowOptions(false)
-                }
-                /*
-                 */
-                return (
-                  <Button variation={"icon"} onClick={onClick} key={index}>
-                    <Icon variation={option.iconName} fontSize={"medium"} />
-                  </Button>
-                )
-              })
-            : undefined}
-        </Stack>
-      ) : undefined}
-    </Stack>
   )
 }
 /*
@@ -607,7 +497,7 @@ function ListItemBase(props: ListItemBaseProps) {
 function NewInvite() {
   const theme = useTheme()
   const dispatch = useAppDispatch()
-  const context: OrganisationContextProps = useContext(OrganisationContext)
+  const isInviting = useOrgStore((state: any) => state.isInviting)
   const [tempName, setTempName] = useState("")
   const [inviteKey, setInviteKey] = useState("")
   const [isCopied, setIsCopied] = useState(false)
@@ -623,7 +513,7 @@ function NewInvite() {
   
   */
   function handleClose() {
-    context.setIsInviting(false)
+    setUseOrg("isInviting", false)
   }
   /*
   
@@ -636,7 +526,7 @@ function NewInvite() {
         tempName: !!tempName ? tempName : "Unnamed",
       }),
     )
-    context.setIsInviting(false)
+    setUseOrg("isInviting", false)
   }
   /*
   
@@ -653,11 +543,11 @@ function NewInvite() {
   
   */
   useEffect(() => {
-    if (context.isInviting) {
+    if (isInviting) {
       setTempName("")
       setInviteKey(String(uuidv4()))
     }
-  }, [context.isInviting])
+  }, [isInviting])
 
   useEffect(() => {
     if (isCopied) {
@@ -669,7 +559,7 @@ function NewInvite() {
 
   return (
     <Modal
-      open={context.isInviting as boolean}
+      open={isInviting}
       heading={"New Invite"}
       body={
         <Stack width={"100%"} gap={theme.module[4]}>
@@ -714,16 +604,10 @@ function NewInvite() {
           />
         </Stack>
       }
-      footer={
-        <Stack direction={"row"} gap={theme.module[4]} width={"100%"}>
-          <Button variation={"modal"} onClick={handleClose}>
-            <Icon variation={"cancel"} />
-          </Button>
-          <Button variation={"modal"} onClick={handleAccept}>
-            <Icon variation={"done"} />
-          </Button>
-        </Stack>
-      }
+      actions={[
+        { iconName: "cancel", handleClick: handleClose },
+        { iconName: "done", handleClick: handleAccept },
+      ]}
       onClose={handleClose}
     />
   )
@@ -736,24 +620,24 @@ function NewInvite() {
 
 */
 function RemoveOrgConfirmation() {
-  const theme = useTheme()
   const dispatch = useAppDispatch()
+  const org = useAppSelector(selectOrg)
   const isAdmin = useAppSelector(selectIsUserAdmin)
-  const context: OrganisationContextProps = useContext(OrganisationContext)
+  const isRemoving = useOrgStore((state: any) => state.isRemoving)
   /*
   
   
   */
   function handleAccept() {
-    dispatch(isAdmin ? deleteOrg() : leaveOrg())
-    context.setIsRemoving(false)
+    dispatch(isAdmin ? deleteOrg(org) : leaveOrg(org.uuid as string))
+    setUseOrg("isRemoving", false)
   }
   /*
   
   
   */
   function handleClose() {
-    context.setIsRemoving(false)
+    setUseOrg("isRemoving", false)
   }
   /*
   
@@ -761,7 +645,7 @@ function RemoveOrgConfirmation() {
   */
   return (
     <Modal
-      open={context.isRemoving as boolean}
+      open={isRemoving}
       heading={(isAdmin ? "Delete" : "Leave") + " Organisation"}
       body={
         <Typography display={"flex"} justifyContent={"center"}>
@@ -770,16 +654,10 @@ function RemoveOrgConfirmation() {
             " your organisation?"}
         </Typography>
       }
-      footer={
-        <Stack direction={"row"} gap={theme.module[4]} width={"100%"}>
-          <Button variation={"modal"} onClick={handleClose}>
-            <Icon variation={"cancel"} />
-          </Button>
-          <Button variation={"modal"} onClick={handleAccept}>
-            <Icon variation={"done"} />
-          </Button>
-        </Stack>
-      }
+      actions={[
+        { iconName: "cancel", handleClick: handleClose },
+        { iconName: "done", handleClick: handleAccept },
+      ]}
       onClose={handleClose}
     />
   )
@@ -808,7 +686,6 @@ function OrgSetup() {
 
 */
 function OrgSetupActions() {
-  const context: OrganisationContextProps = useContext(OrganisationContext)
   const theme = useTheme()
   return (
     <Stack
@@ -824,16 +701,16 @@ function OrgSetupActions() {
               {
                 label: "Create organisation",
                 description: "Create a new organisation for your team",
-                iconName: "add",
+                iconName: "org",
                 tappable: true,
-                onChange: () => context.setIsCreating(true),
+                onChange: () => setUseOrg("isCreating", true),
               },
               {
                 label: "Join organisation",
                 description: "Join an existing organisation with a key",
                 iconName: "group",
                 tappable: true,
-                onChange: () => context.setIsJoining(true),
+                onChange: () => setUseOrg("isJoining", true),
               },
             ]}
           />
@@ -850,7 +727,7 @@ function OrgSetupActions() {
 
 */
 function CreateOrg() {
-  const context: OrganisationContextProps = useContext(OrganisationContext)
+  const isCreating = useOrgStore((state: any) => state.isCreating)
   const dispatch = useAppDispatch()
   const theme = useTheme()
   const user = useAppSelector(selectUser)
@@ -860,7 +737,7 @@ function CreateOrg() {
   
   */
   function handleClose() {
-    context.setIsCreating(false)
+    setUseOrg("isCreating", false)
   }
   /*
   
@@ -888,7 +765,7 @@ function CreateOrg() {
         },
       }),
     )
-    context.setIsCreating(false)
+    setUseOrg("isCreating", false)
   }
   /*
   
@@ -896,7 +773,7 @@ function CreateOrg() {
   */
   return (
     <Modal
-      open={context.isCreating as boolean}
+      open={isCreating}
       onClose={handleClose}
       heading="Create Organisation"
       body={
@@ -918,11 +795,10 @@ function CreateOrg() {
           />
         </Stack>
       }
-      footer={
-        <Button variation={"modal"} onClick={handleCreate}>
-          Create
-        </Button>
-      }
+      actions={[
+        { iconName: "cancel", handleClick: handleClose },
+        { iconName: "addOrg", handleClick: handleCreate },
+      ]}
     />
   )
 }
@@ -936,14 +812,14 @@ function CreateOrg() {
 function JoinOrg() {
   const theme = useTheme()
   const dispatch = useAppDispatch()
-  const context: OrganisationContextProps = useContext(OrganisationContext)
+  const isJoining = useOrgStore((state: any) => state.isJoining)
   const [inviteKey, setInviteKey] = useState("")
   /*
   
   
   */
   function handleClose() {
-    context.setIsJoining(false)
+    setUseOrg("isJoining", false)
   }
   /*
   
@@ -958,7 +834,7 @@ function JoinOrg() {
   */
   function handleJoin() {
     dispatch(joinOrg(inviteKey))
-    context.setIsJoining(false)
+    setUseOrg("isJoining", false)
   }
   /*
   
@@ -966,7 +842,7 @@ function JoinOrg() {
   */
   return (
     <Modal
-      open={context.isJoining as boolean}
+      open={isJoining}
       onClose={handleClose}
       heading="Join Organisation"
       body={
@@ -988,11 +864,10 @@ function JoinOrg() {
           />
         </Stack>
       }
-      footer={
-        <Button variation={"modal"} onClick={handleJoin}>
-          Join
-        </Button>
-      }
+      actions={[
+        { iconName: "cancel", handleClick: handleClose },
+        { iconName: "joinGroup", handleClick: handleJoin },
+      ]}
     />
   )
 }

@@ -19,7 +19,15 @@ export default function GlobalStyles() {
           background: transparent; /* Optional: just make scrollbar invisible */
         }
         ::-webkit-scrollbar-thumb {
-          background: ${theme.scale.purple[6]};
+          background: ${theme.scale.blue[8]};
+        }
+        input[type="file"]::file-selector-button {
+          padding: ${theme.module[3]};
+          margin-right: ${theme.module[3]};
+          border-radius: ${theme.module[3]};
+          border: none;
+          background-color: ${theme.scale.blue[6]};
+          color: ${theme.scale.gray[1]};
         }
         .MuiSwitch-root {
           overflow: visible !important;
@@ -129,6 +137,25 @@ export default function GlobalStyles() {
           white-space: nowrap;
           &:focus {
             outline: none;
+          }
+        }
+        .MuiAccordionDetails-root {
+          padding: 0 !important;
+        }
+        .MuiAccordionSummary-root {
+          min-height: ${theme.module[0]} !important;
+          height: ${theme.module[0]} !important;
+        }
+        .MuiAccordion-root {
+          width: 100% !important;
+          background-color: transparent !important;
+          box-shadow: none !important;
+        }
+        .MuiCheckbox-root {
+          padding: 0 !important;
+          color: ${theme.scale.gray[5]} !important;
+          &.Mui-checked {
+            color: ${theme.scale.blue[5]} !important;
           }
         }
       `}

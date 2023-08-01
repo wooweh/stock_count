@@ -1,8 +1,16 @@
-import Button from "@mui/material/ButtonBase"
+import ButtonBase from "@mui/material/ButtonBase"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
-import { createContext, useContext } from "react"
+import {
+  MouseEvent,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react"
+import { useLongPress } from "use-long-press"
 import useTheme from "../common/useTheme"
+import { Button } from "./button"
 import { Control, ControlNames } from "./control"
 import Icon, { IconNames } from "./icon"
 /* 
@@ -16,7 +24,6 @@ import Icon, { IconNames } from "./icon"
 
 */
 export const ListGroupContext = createContext(false)
-export const TappableContext = createContext({ time: undefined })
 /* 
 
 
@@ -188,6 +195,7 @@ export type ListItemProps = {
   primarySlot: PrimarySlotProps
   secondarySlot?: SecondarySlotProps
   onChange?: onChangeProps
+  onLongPress?: any
   tappable?: TappableProps
   hideBackground?: boolean
 }
@@ -333,11 +341,9 @@ function SecondarySlot(props: {
 function ItemBody(props: {
   label: LabelProps
   description?: DescriptionProps
+  secondarySlot?: SecondarySlotProps
 }) {
   const theme = useTheme()
-  const description = props.description
-    ? props.description.charAt(0).toUpperCase() + props.description.slice(1)
-    : undefined
   return !!props.label.length ? (
     <Stack justifyContent={"center"} width={"100%"}>
       <Typography
@@ -351,10 +357,10 @@ function ItemBody(props: {
       <Typography
         variant="body2"
         color={theme.scale.gray[5]}
-        maxWidth={theme.module[9]}
+        maxWidth={props.secondarySlot ? theme.module[9] : "none"}
         noWrap
       >
-        {description}
+        {props.description}
       </Typography>
     </Stack>
   ) : undefined
@@ -369,10 +375,18 @@ function ItemBody(props: {
 function TappableSurface(props: {
   tappable?: TappableProps
   onChange?: onChangeProps
+  onLongPress?: any
 }) {
+  const bind = useLongPress((e: MouseEvent) => {
+    if (props.onLongPress) {
+      props.onLongPress()
+    }
+  })
   return !!props.tappable ? (
-    <Button
-      onMouseDown={props.onChange}
+    <ButtonBase
+      onClick={props.onChange}
+      disableRipple
+      {...bind()}
       sx={{
         background: "none",
         width: "100%",
@@ -408,6 +422,192 @@ export function ListItem(props: ListItemProps) {
       <TappableSurface {...props} />
     </ListItemOuterWrapper>
   )
+}
+/*
+
+
+
+
+
+
+
+
+*/
+export type ListItemOptionProps = {
+  iconName: IconNames
+  onClick?: Function
+}
+export type SelectableListItemWithOptionsProps = {
+  label: string
+  description: string
+  iconName: IconNames
+  options: ListItemOptionProps[]
+  showOptions: boolean
+  onOptionsClick: Function
+  isSelecting: boolean
+  isSelected: boolean
+  onSelection: Function
+  onDeselection: Function
+  onLongPress: Function
+}
+export function SelectableListItemWithOptions(
+  props: SelectableListItemWithOptionsProps,
+) {
+  const theme = useTheme()
+  const [isLongPressing, setIsLongPressing] = useState(true)
+  /*
+  
+
+*/
+  function handleSelectionClick() {
+    console.log("fired")
+    if (props.isSelecting) {
+      if (!props.isSelected) props.onSelection()
+      if (props.isSelected) props.onDeselection()
+    }
+  }
+  /*
+  
+  
+  */
+  function handleLongPress() {
+    console.log("fired")
+    if (!props.isSelecting) {
+      props.onLongPress()
+    }
+  }
+  /*
+  
+  
+  */
+  useEffect(() => {
+    if (!props.isSelecting) setIsLongPressing(true)
+    if (props.isSelecting)
+      setTimeout(() => {
+        setIsLongPressing(false)
+      }, 500)
+  }, [props.isSelecting])
+
+  return props.isSelecting ? (
+    <Stack position={"relative"}>
+      <ListItem
+        label={props.label}
+        description={props.description}
+        primarySlot={
+          <Icon variation={props.isSelected ? "checked" : "unchecked"} />
+        }
+        onChange={isLongPressing ? undefined : handleSelectionClick}
+        tappable={true}
+      />
+    </Stack>
+  ) : (
+    <Stack
+      borderRadius={3}
+      sx={{
+        outline: props.isSelected ? `2px solid ${theme.scale.blue[8]}` : "none",
+      }}
+    >
+      <ListItemWithOptions
+        label={props.label}
+        description={props.description}
+        iconName={props.iconName}
+        options={props.options}
+        showOptions={props.showOptions}
+        onOptionsClick={props.onOptionsClick}
+        onLongPress={handleLongPress}
+      />
+    </Stack>
+  )
+}
+/*
+
+
+
+
+
+
+
+
+*/
+export type ListItemWithOptionsProps = {
+  label: string
+  description: string
+  iconName: IconNames
+  options: ListItemOptionProps[]
+  showOptions: boolean
+  onOptionsClick: Function
+  onLongPress?: Function
+}
+export function ListItemWithOptions(props: ListItemWithOptionsProps) {
+  const [showOptions, setShowOptions] = useState(false)
+
+  useEffect(() => {
+    if (!props.showOptions && showOptions) setShowOptions(false)
+    if (props.showOptions && !showOptions) setShowOptions(true)
+  }, [props.showOptions, showOptions])
+
+  return (
+    <Stack position={"relative"}>
+      <ListItem
+        label={props.label}
+        description={props.description}
+        primarySlot={<Icon variation={props.iconName} />}
+        secondarySlot={
+          <Button variation={"icon"} onClick={props.onOptionsClick}>
+            <Icon variation={"options"} />
+          </Button>
+        }
+        onChange={props.onOptionsClick}
+        onLongPress={props.onLongPress}
+        tappable={true}
+      />
+      <ItemOptions show={showOptions} options={props.options} />
+    </Stack>
+  )
+}
+/*
+
+
+
+
+
+
+
+
+*/
+type ItemOptionsProps = {
+  show: boolean
+  options: ListItemOptionProps[]
+}
+function ItemOptions(props: ItemOptionsProps) {
+  const theme = useTheme()
+
+  return props.show ? (
+    <Stack
+      width={"100%"}
+      height={"100%"}
+      direction={"row"}
+      bgcolor={theme.scale.gray[9]}
+      boxSizing={"border-box"}
+      position={"absolute"}
+      borderRadius={theme.module[3]}
+      justifyContent={"space-between"}
+      alignItems={"center"}
+      padding={`0 ${theme.module[5]}`}
+    >
+      {props.options.map((option: ListItemOptionProps, index: number) => {
+        function onClick() {
+          if (option.onClick) option.onClick()
+        }
+
+        return (
+          <Button variation={"icon"} onClick={onClick} key={index}>
+            <Icon variation={option.iconName} fontSize={"medium"} />
+          </Button>
+        )
+      })}
+    </Stack>
+  ) : undefined
 }
 /*
 

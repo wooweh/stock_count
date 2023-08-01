@@ -82,5 +82,7 @@ export const selectUserOrgRole = (state: RootState) => state.user.user.orgRole
 export const selectUserOrgUuid = (state: RootState) => state.user.user.orgUuid
 export const selectIsUserAdmin = (state: RootState) =>
   state.user.user.orgRole === "admin"
+export const selectIsProfileComplete = (state: RootState) =>
+  state.user.user.name && state.user.user.surname
 
 export default userSlice.reducer

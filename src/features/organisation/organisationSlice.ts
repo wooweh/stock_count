@@ -58,11 +58,11 @@ export const organisationSlice = createSlice({
     setOrg: (state, action: PayloadAction<OrgProps>) => {
       state.org = action.payload
     },
-    deleteOrg: (state) => {
+    deleteOrg: (state, action: PayloadAction<OrgProps>) => {
       state.org = {}
       state.memberStatus = "notJoined"
     },
-    leaveOrg: (state) => {
+    leaveOrg: (state, action: PayloadAction<string>) => {
       state.org = {}
       state.memberStatus = "notJoined"
     },
@@ -134,8 +134,14 @@ export const {
 export const selectIsJoining = (state: RootState) => {
   return state.organisation.memberStatus === "joining"
 }
+export const selectIsJoined = (state: RootState) => {
+  return state.organisation.memberStatus === "isJoined"
+}
+export const selectOrg = (state: RootState) => state.organisation.org
 export const selectOrgName = (state: RootState) => state.organisation.org.name
 export const selectOrgUuid = (state: RootState) => state.organisation.org.uuid
+export const selectIsOrgSetup = (state: RootState) =>
+  !!state.organisation.org.uuid
 export const selectOrgMembers = (state: RootState) => {
   const members = state.organisation.org.members
   const userUuid = store.getState().user.user.uuid
@@ -160,4 +166,5 @@ export const selectOrgInvites = (state: RootState) => {
     return _.values(modifiedInvites)
   }
 }
+
 export default organisationSlice.reducer

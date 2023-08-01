@@ -27,7 +27,7 @@ describe("user reducer", () => {
       name: "name",
       surname: "surname",
       orgUuid: "orgUuid",
-      orgRole: "orgRole",
+      orgRole: "admin",
     },
   }
 

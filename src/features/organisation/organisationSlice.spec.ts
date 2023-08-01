@@ -140,12 +140,12 @@ describe("organisation reducer", () => {
   })
 
   it("should handle deleteOrg", () => {
-    const actual = organisationReducer(mockState, deleteOrg())
+    const actual = organisationReducer(mockState, deleteOrg(mockState.org))
     expect(actual.org).toEqual({})
   })
 
   it("should handle leaveOrg", () => {
-    const actual = organisationReducer(mockState, leaveOrg())
+    const actual = organisationReducer(mockState, leaveOrg("uuid"))
     expect(actual.org).toEqual({})
   })
 

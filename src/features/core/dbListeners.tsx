@@ -1,15 +1,20 @@
 import { onValue, ref } from "firebase/database"
+import _ from "lodash"
 import { useEffect } from "react"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
-import { dbReal } from "../../remote_config"
-import { OrgProps, leaveOrg, setOrg } from "../organisation/organisationSlice"
+import { dbReal } from "../../remote"
+import { getDBPath } from "../../remote/dbPaths"
 import {
-  UserProps,
-  selectUserOrgRole,
-  selectUserOrgUuid,
-  selectUserUuid,
-  setUserOrgRole,
-} from "../user/userSlice"
+  OrgProps,
+  leaveOrg,
+  selectIsJoined,
+  selectOrg,
+  setMemberStatus,
+  setOrg,
+} from "../organisation/organisationSlice"
+import { StockProps, selectStock, setStock } from "../stock/stockSlice"
+import { UserProps, selectUser, setUser } from "../user/userSlice"
+import { selectIsSystemBooted } from "./coreSlice"
 /*
 
 
@@ -17,68 +22,94 @@ import {
 
 
 */
-export function DBListeners({ isSystemBooted }: { isSystemBooted: boolean }) {
+export function DBListeners() {
   const dispatch = useAppDispatch()
-  const userOrgUuid = useAppSelector(selectUserOrgUuid)
-  const userUuid = useAppSelector(selectUserUuid)
-  const userOrgRole = useAppSelector(selectUserOrgRole)
+  const isSystemBooted = useAppSelector(selectIsSystemBooted)
+  const localUser = useAppSelector(selectUser)
+  const localOrg = useAppSelector(selectOrg)
+  const localStock = useAppSelector(selectStock)
+  const isJoined = useAppSelector(selectIsJoined)
 
   // USER LISTENER
 
   useEffect(() => {
-    if (!!userUuid && isSystemBooted) {
-      const userDBRef = ref(dbReal, `users/${userUuid}`)
-      return onValue(userDBRef, (snapshot) => {
-        const userOnDB: UserProps = snapshot.val()
-        const userOrgRoleOnDB = userOnDB.orgRole
-        if (!!userOrgRoleOnDB && userOrgRole !== userOrgRoleOnDB) {
-          dispatch(setUserOrgRole(userOrgRoleOnDB))
-        }
-
-        const userOrgUuidOnDB = userOnDB.orgUuid
-        if (!!userOrgUuid && !userOrgUuidOnDB) {
-          dispatch(leaveOrg())
+    if (!!localUser && isSystemBooted) {
+      const dbUserRef = ref(
+        dbReal,
+        getDBPath.user(localUser.uuid as string).user,
+      )
+      onValue(dbUserRef, (snapshot) => {
+        const dbUser: UserProps = snapshot.val()
+        if (!_.isEqual(localUser, dbUser)) {
+          dispatch(setUser(dbUser))
         }
       })
     }
-  }, [userOrgRole, dispatch, userUuid, userOrgUuid, isSystemBooted])
+  }, [dispatch, localUser, isSystemBooted])
 
   // ORG SET & LISTENER
 
   useEffect(() => {
-    if (!!userOrgUuid && isSystemBooted) {
-      const orgDBRef = ref(dbReal, `organisations/${userOrgUuid}`)
-      return onValue(orgDBRef, (snapshot) => {
-        const orgOnDB: OrgProps = snapshot.val()
-        if (orgOnDB) dispatch(setOrg(orgOnDB))
-        if (!orgOnDB) dispatch(leaveOrg())
+    if (!!localUser && isSystemBooted) {
+      const localUserOrgDetails = !!localUser.orgRole && !!localUser.orgUuid
+
+      const dbOrgRef = ref(
+        dbReal,
+        getDBPath.org(localUser.orgUuid as string).org,
+      )
+      onValue(dbOrgRef, (snapshot) => {
+        const dbOrg: OrgProps = snapshot.val()
+        if (
+          !!dbOrg &&
+          !_.isEqual(localOrg, dbOrg) &&
+          localUserOrgDetails &&
+          localUser.uuid! in dbOrg.members!
+        ) {
+          dispatch(setOrg(dbOrg))
+          dispatch(setMemberStatus("isJoined"))
+        }
+        if (
+          (!dbOrg || !(localUser.uuid! in dbOrg.members!)) &&
+          localUserOrgDetails
+        ) {
+          dispatch(leaveOrg(localOrg.uuid as string))
+        }
       })
     }
-  }, [dispatch, userOrgUuid, isSystemBooted])
+  }, [dispatch, localUser, localOrg, isSystemBooted])
 
   // STOCK SET & LISTENER
 
   useEffect(() => {
-    if (!!userOrgUuid && isSystemBooted) {
-      // TODO
+    if (!!localUser && isSystemBooted) {
+      const dbStockRef = ref(
+        dbReal,
+        getDBPath.stock(localUser.orgUuid as string).stock,
+      )
+      onValue(dbStockRef, (snapshot) => {
+        const dbStock: StockProps = snapshot.val()
+        if (!!dbStock && !_.isEqual(localStock, dbStock)) {
+          dispatch(setStock(dbStock))
+        }
+      })
     }
-  }, [dispatch, userOrgUuid, isSystemBooted])
+  }, [dispatch, localUser, localStock, isSystemBooted])
 
   // HISTORY SET & LISTENER
 
   useEffect(() => {
-    if (!!userOrgUuid && isSystemBooted) {
+    if (!!localUser && isSystemBooted) {
       // TODO
     }
-  }, [dispatch, userOrgUuid, isSystemBooted])
+  }, [dispatch, localUser, isSystemBooted, isJoined])
 
   // COUNT SET & LISTENER
 
   useEffect(() => {
-    if (!!userOrgUuid && isSystemBooted) {
+    if (!!localUser && isSystemBooted) {
       // TODO
     }
-  }, [dispatch, userOrgUuid, isSystemBooted])
+  }, [dispatch, localUser, isSystemBooted, isJoined])
 
   return undefined
 }

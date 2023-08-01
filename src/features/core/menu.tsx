@@ -23,18 +23,13 @@ export function Menu() {
   const navigate = useNavigate()
   const [anchorEl, setAnchorEl] = useState(null)
   const isDarkmode = useAppSelector(selectIsDarkmode)
-  const open = Boolean(anchorEl)
-  const buttonStyles = {
-    borderRadius: theme.module[5],
-    padding: theme.module[2],
-  }
   /*
   
   
   
   
   */
-  function handleButtonClick(event: any) {
+  function handleOpenMenu(event: any) {
     setAnchorEl(event.currentTarget)
   }
   /*
@@ -73,9 +68,16 @@ export function Menu() {
   
   */
   const origin: PopoverOrigin = { vertical: "top", horizontal: "left" }
+  const open = Boolean(anchorEl)
+
+  const buttonStyles = {
+    borderRadius: theme.module[5],
+    padding: theme.module[2],
+  }
+
   return (
     <>
-      <ButtonBase disableRipple sx={buttonStyles} onClick={handleButtonClick}>
+      <ButtonBase disableRipple sx={buttonStyles} onClick={handleOpenMenu}>
         <Icon variation="menu" />
       </ButtonBase>
       <MuiMenu
@@ -112,7 +114,7 @@ export function Menu() {
                 },
                 {
                   label: "Organisation",
-                  iconName: "settings",
+                  iconName: "org",
                   tappable: true,
                   onChange: () =>
                     handleMenuItemClick(routePaths.organisation.path),
