@@ -1,7 +1,7 @@
 import { Global, css } from "@emotion/react"
 import { useAppSelector } from "../app/hooks"
-import useTheme from "./useTheme"
 import { selectIsMobile } from "../features/core/coreSlice"
+import useTheme from "./useTheme"
 
 export default function GlobalStyles() {
   const theme = useTheme()
@@ -23,11 +23,20 @@ export default function GlobalStyles() {
         }
         input[type="file"]::file-selector-button {
           padding: ${theme.module[3]};
+          box-sizing: border-box;
+          margin: ${theme.module[0]};
           margin-right: ${theme.module[3]};
-          border-radius: ${theme.module[3]};
+          border-radius: ${theme.module[2]};
           border: none;
-          background-color: ${theme.scale.blue[6]};
-          color: ${theme.scale.gray[1]};
+          box-shadow: ${theme.shadow.neo[4]};
+          background-color: ${theme.scale.blue[8]};
+          outline: 1px solid ${theme.scale.blue[7]};
+          outline-offset: -1px;
+          cursor: pointer;
+          color: ${theme.scale.gray[2]};
+        }
+        input[type="file"] {
+          color: ${theme.scale.gray[4]};
         }
         .MuiSwitch-root {
           overflow: visible !important;

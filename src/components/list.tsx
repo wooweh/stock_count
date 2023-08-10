@@ -460,7 +460,6 @@ export function SelectableListItemWithOptions(
 
 */
   function handleSelectionClick() {
-    console.log("fired")
     if (props.isSelecting) {
       if (!props.isSelected) props.onSelection()
       if (props.isSelected) props.onDeselection()
@@ -471,7 +470,6 @@ export function SelectableListItemWithOptions(
   
   */
   function handleLongPress() {
-    console.log("fired")
     if (!props.isSelecting) {
       props.onLongPress()
     }

@@ -2,7 +2,6 @@ import Paper from "@mui/material/Paper"
 import Table from "@mui/material/Table"
 import TableBody from "@mui/material/TableBody"
 import TableCell from "@mui/material/TableCell"
-import TableContainer from "@mui/material/TableContainer"
 import TableHead from "@mui/material/TableHead"
 import TableRow from "@mui/material/TableRow"
 import * as React from "react"
@@ -36,18 +35,29 @@ export default function VirtualizedTable(props: VirtualizedTableProps) {
     TableHead,
     TableRow: ({ item: _item, ...props }) => <TableRow {...props} />,
     TableBody: React.forwardRef<HTMLTableSectionElement>((props, ref) => (
-      <TableBody {...props} ref={ref} />
+      <TableBody
+        {...props}
+        sx={{ paddingTop: theme.module[0], overflow: "hidden" }}
+        ref={ref}
+      />
     )),
   }
 
   function fixedHeaderContent(columns: ColumnData[]) {
     return (
-      <TableRow>
+      <TableRow
+        sx={{
+          width: "100%",
+          borderRadius: `${theme.module[3]} 0 0 ${theme.module[3]}`,
+          outline: `1px solid ${theme.scale.gray[9]}`,
+        }}
+      >
         {columns.map((column, index) => (
           <TableCell
             variant="head"
             align={"left"}
             sx={{
+              boxSizing: "border-box",
               width: "min-content",
               padding: theme.module[2],
               color: theme.scale.gray[4],
@@ -95,6 +105,7 @@ export default function VirtualizedTable(props: VirtualizedTableProps) {
         width: "100%",
         background: theme.scale.gray[9],
         outline: `1px solid ${theme.scale.gray[9]}`,
+        overflow: "hidden",
       }}
     >
       <TableVirtuoso

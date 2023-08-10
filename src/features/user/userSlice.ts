@@ -1,24 +1,44 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit"
 import { RootState } from "../../app/store"
 
-export type UserOnBootProps = UserProps
+export type UpdateDB = { updateDB: boolean }
 export type UserOrgRoles = "admin" | "member"
 export type UserProps = {
   uuid?: string
   email?: string
   name?: string
   surname?: string
-  orgUuid?: string | undefined
-  orgRole?: UserOrgRoles | undefined
+  orgUuid?: string
+  orgRole?: UserOrgRoles
+}
+export type PasswordChangeStatuses =
+  | "notChanged"
+  | "isPending"
+  | "isSuccess"
+  | "isFailed"
+export type UserFullNameProps = {
+  name: string
+  surname: string
+}
+export type UserOrgDetailsProps = UpdateDB & {
+  orgUuid: string
+  orgRole: UserOrgRoles
+}
+
+export type ChangeUserPasswordProps = {
+  password: string
+  newPassword: string
 }
 
 export interface UserState {
-  isLoggedIn: boolean
+  isSignedIn: boolean
+  passwordChangeStatus: PasswordChangeStatuses
   user: UserProps
 }
 
 const initialState: UserState = {
-  isLoggedIn: false,
+  isSignedIn: false,
+  passwordChangeStatus: "notChanged",
   user: {},
 }
 
@@ -28,10 +48,10 @@ export const userSlice = createSlice({
   reducers: {
     signIn: (state) => {
       console.log("signed in")
-      state.isLoggedIn = true
+      state.isSignedIn = true
     },
     signOut: (state) => {
-      state.isLoggedIn = false
+      state.isSignedIn = false
     },
     setUser: (state, action: PayloadAction<UserProps>) => {
       state.user = action.payload
@@ -39,26 +59,35 @@ export const userSlice = createSlice({
     setUserEmail: (state, action: PayloadAction<string>) => {
       state.user.email = action.payload
     },
-    setUserName: (state, action: PayloadAction<string>) => {
-      state.user.name = action.payload
+    setUserFullName: (state, action: PayloadAction<UserFullNameProps>) => {
+      const name = action.payload.name
+      const surname = action.payload.surname
+      state.user.name = name
+      state.user.surname = surname
     },
-    setUserSurname: (state, action: PayloadAction<string>) => {
-      state.user.surname = action.payload
+    setUserOrgDetails: (state, action: PayloadAction<UserOrgDetailsProps>) => {
+      const orgUuid = action.payload.orgUuid
+      const orgRole = action.payload.orgRole
+      state.user.orgUuid = orgUuid
+      state.user.orgRole = orgRole
     },
-    setUserOrgUuid: (state, action: PayloadAction<string>) => {
-      state.user.orgUuid = action.payload
-    },
-    setUserOrgRole: (state, action: PayloadAction<UserOrgRoles>) => {
-      state.user.orgRole = action.payload
-    },
-    deleteUserOrgDetails: (state) => {
+    deleteUserOrgDetails: (state, action: PayloadAction<UpdateDB>) => {
       delete state.user.orgRole
       delete state.user.orgUuid
     },
-    deleteUser: (state) => {
-      state.isLoggedIn = false
-      state.user = {}
+    changeUserPassword: (
+      state,
+      action: PayloadAction<ChangeUserPasswordProps>,
+    ) => {
+      state.passwordChangeStatus = "isPending"
     },
+    setPasswordChangeStatus: (
+      state,
+      action: PayloadAction<PasswordChangeStatuses>,
+    ) => {
+      state.passwordChangeStatus = action.payload
+    },
+    deleteUser: (state, action: PayloadAction<string>) => {},
   },
 })
 
@@ -67,19 +96,28 @@ export const {
   signOut,
   setUser,
   setUserEmail,
-  setUserName,
-  setUserOrgUuid,
-  setUserOrgRole,
-  setUserSurname,
+  setUserFullName,
+  setUserOrgDetails,
   deleteUserOrgDetails,
+  changeUserPassword,
+  setPasswordChangeStatus,
   deleteUser,
 } = userSlice.actions
 
-export const selectIsLoggedIn = (state: RootState) => state.user.isLoggedIn
+export const selectIsSignedIn = (state: RootState) => state.user.isSignedIn
 export const selectUser = (state: RootState) => state.user.user
+export const selectUserName = (state: RootState) => state.user.user.name
+export const selectUserSurname = (state: RootState) => state.user.user.surname
+export const selectUserEmail = (state: RootState) => state.user.user.email
 export const selectUserUuid = (state: RootState) => state.user.user.uuid
 export const selectUserOrgRole = (state: RootState) => state.user.user.orgRole
 export const selectUserOrgUuid = (state: RootState) => state.user.user.orgUuid
+export const selectIsPasswordChangeFailed = (state: RootState) =>
+  state.user.passwordChangeStatus === "isFailed"
+export const selectIsPasswordChangeSuccess = (state: RootState) =>
+  state.user.passwordChangeStatus === "isSuccess"
+export const selectIsPasswordChangePending = (state: RootState) =>
+  state.user.passwordChangeStatus === "isPending"
 export const selectIsUserAdmin = (state: RootState) =>
   state.user.user.orgRole === "admin"
 export const selectIsProfileComplete = (state: RootState) =>

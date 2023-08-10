@@ -25,7 +25,7 @@ export const stockSlice = createSlice({
     addStockItem: (state, action: PayloadAction<StockItemProps>) => {
       state.stock[action.payload.id] = action.payload
     },
-    addStockBatch: (state, action: PayloadAction<StockProps>) => {
+    addStockList: (state, action: PayloadAction<StockProps>) => {
       state.stock = action.payload
     },
     editStockItem: (state, action: PayloadAction<StockItemProps>) => {
@@ -48,7 +48,7 @@ export const stockSlice = createSlice({
 
 export const {
   addStockItem,
-  addStockBatch,
+  addStockList,
   editStockItem,
   setStockItem,
   deleteStockItem,

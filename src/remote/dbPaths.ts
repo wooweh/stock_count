@@ -124,7 +124,6 @@ function invitePaths(inviteKey: string): InvitePathsReturnProps {
 
 
 */
-// TODO: Count paths
 type StockItemReturnProps = { item: string }
 type StockPathsReturnProps = {
   stock: string
@@ -158,7 +157,7 @@ function stockPaths(orgUuid: string): StockPathsReturnProps {
 
 
 */
-// TODO: History paths
+// TODO: Count paths
 /*
 
 
@@ -167,7 +166,7 @@ function stockPaths(orgUuid: string): StockPathsReturnProps {
 
 
 */
-// TODO: stock paths
+// TODO: History paths
 /*
 
 

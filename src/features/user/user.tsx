@@ -1,6 +1,5 @@
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
-import { User } from "firebase/auth"
 import { useEffect, useState } from "react"
 import { create } from "zustand"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
@@ -10,23 +9,25 @@ import { Control, ControlNames } from "../../components/control"
 import Icon from "../../components/icon"
 import Modal from "../../components/modal"
 import { ProfileSurface } from "../../components/profileSurface"
-import { auth } from "../../remote"
-import {
-  generateErrorNotification,
-  generateNotification,
-} from "../core/notifications"
+import { generateNotification } from "../core/notifications"
 import {
   PasswordValidationCheck,
   getPasswordValidation,
 } from "./authentication"
-import { reauthenticateUser, updateUserPassword } from "./userRemote"
 import {
+  changeUserPassword,
   deleteUser,
-  selectUser,
+  selectIsPasswordChangeFailed,
+  selectIsPasswordChangePending,
+  selectIsPasswordChangeSuccess,
+  selectUserEmail,
+  selectUserName,
+  selectUserSurname,
+  setPasswordChangeStatus,
   setUserEmail,
-  setUserName,
-  setUserSurname,
+  setUserFullName,
 } from "./userSlice"
+import { Loader } from "../../components/loader"
 /*
 
 
@@ -43,18 +44,24 @@ type UseUserState = {
   email: string
 }
 type UseUserKeys = keyof UseUserState
-
-const useUserStore = create<UseUserState>()((set) => ({
+const initialState: UseUserState = {
   isEditing: false,
   isDeleting: false,
   isChangingPassword: false,
   name: "",
   surname: "",
   email: "",
+}
+const useUserStore = create<UseUserState>()((set) => ({
+  ...initialState,
 }))
 
 function setUseUser(path: UseUserKeys, value: boolean | string) {
   useUserStore.setState({ [path]: value })
+}
+
+export function resetUseUser() {
+  useUserStore.setState(initialState)
 }
 /*
 
@@ -82,28 +89,34 @@ export default function UserProfile() {
 */
 function ProfileFields() {
   const theme = useTheme()
-  const user = useAppSelector(selectUser)
+  const name = useAppSelector(selectUserName)
+  const surname = useAppSelector(selectUserSurname)
+  const email = useAppSelector(selectUserEmail)
+  const isEditing = useUserStore((state: any) => state.isEditing)
+  const editableName = useUserStore((state: any) => state.name)
+  const editableSurname = useUserStore((state: any) => state.surname)
+  const editableEmail = useUserStore((state: any) => state.email)
 
   useEffect(() => {
-    setUseUser("name", user.name ?? "")
-    setUseUser("surname", user.surname ?? "")
-    setUseUser("email", user.email ?? "")
-  }, [user.email, user.name, user.surname])
+    if (name) setUseUser("name", name)
+    if (surname) setUseUser("surname", surname)
+    if (email) setUseUser("email", email)
+  }, [isEditing, name, surname, email])
 
   const fields = [
     {
       label: "Name",
-      value: useUserStore((state: any) => state.name),
+      value: editableName ? editableName : name,
       handleChange: (event: any) => setUseUser("name", event.target.value),
     },
     {
       label: "Surname",
-      value: useUserStore((state: any) => state.surname),
+      value: editableSurname ? editableSurname : surname,
       handleChange: (event: any) => setUseUser("surname", event.target.value),
     },
     {
       label: "Email",
-      value: useUserStore((state: any) => state.email),
+      value: editableEmail ? editableEmail : email,
       handleChange: (event: any) => setUseUser("email", event.target.value),
     },
   ]
@@ -187,7 +200,8 @@ function ButtonTray() {
   const isEditing = useUserStore((state: any) => state.isEditing)
   const name = useUserStore((state: any) => state.name)
   const surname = useUserStore((state: any) => state.surname)
-  const email = useUserStore((state: any) => state.email)
+  const newEmail = useUserStore((state: any) => state.email)
+  const oldEmail = useAppSelector(selectUserEmail)
   /*
   
   
@@ -200,11 +214,10 @@ function ButtonTray() {
   
   */
   function handleAccept() {
-    if (!!name && !!surname && !!email) {
+    if (!!name && !!surname && !!newEmail) {
       setUseUser("isEditing", false)
-      dispatch(setUserName(name))
-      dispatch(setUserSurname(surname))
-      dispatch(setUserEmail(email))
+      dispatch(setUserFullName({ name: name, surname: surname }))
+      if (newEmail !== oldEmail) dispatch(setUserEmail(newEmail))
     } else {
       generateNotification("incompleteProfileDetails")
     }
@@ -268,15 +281,16 @@ function ButtonTray() {
 
 */
 function DeleteProfileConfirmation() {
+  const theme = useTheme()
   const dispatch = useAppDispatch()
   const isDeleting = useUserStore((state: any) => state.isDeleting)
+  const [password, setPassword] = useState("")
   /*
   
   
   */
   function handleAccept() {
-    dispatch(deleteUser())
-    setUseUser("isDeleting", false)
+    dispatch(deleteUser(password))
   }
   /*
   
@@ -294,8 +308,18 @@ function DeleteProfileConfirmation() {
       open={isDeleting}
       heading={"Delete Profile"}
       body={
-        <Typography>Are you sure you want to delete your profile?</Typography>
+        <Stack gap={theme.module[4]}>
+          <Typography>Are you sure you want to delete your profile?</Typography>
+          <Control
+            variation="input"
+            placeholder="Enter your password to confirm"
+            value={password}
+            onChange={(e: any) => setPassword(e.target.value)}
+            type="password"
+          />
+        </Stack>
       }
+      show="actions"
       actions={[
         { iconName: "cancel", handleClick: handleClose },
         { iconName: "done", handleClick: handleAccept },
@@ -311,31 +335,8 @@ function DeleteProfileConfirmation() {
 
 
 */
-function changeUserPassword(
-  user: User,
-  password: string,
-  newPassword: string,
-  handleClose: Function,
-) {
-  reauthenticateUser(user, password)
-    .then(() => updateUserPassword(user, newPassword))
-    .then(() => {
-      generateNotification("passwordChange")
-      handleClose()
-    })
-    .catch((error) => {
-      console.log(error)
-      generateErrorNotification(error.code)
-    })
-}
-/*
-
-
-
-
-
-*/
 function ChangePassword() {
+  const dispatch = useAppDispatch()
   const isChangingPassword = useUserStore(
     (state: any) => state.isChangingPassword,
   )
@@ -347,14 +348,25 @@ function ChangePassword() {
     !!newPassword && newPassword === confirmedNewPassword
   const isNewPasswordUnique = newPassword !== password
   const isNewPasswordValid = getPasswordValidation(newPassword).isValid
-  const user = auth.currentUser as User
+
+  const isPasswordChangeSuccess = useAppSelector(selectIsPasswordChangeSuccess)
+  const isPasswordChangeFailed = useAppSelector(selectIsPasswordChangeFailed)
+  const isPasswordChangePending = useAppSelector(selectIsPasswordChangePending)
+
+  useEffect(() => {
+    if (isPasswordChangeSuccess) handleClose()
+    if (isPasswordChangeFailed) {
+      dispatch(setPasswordChangeStatus("notChanged"))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPasswordChangeSuccess, isPasswordChangeFailed])
   /*
   
   
   */
   function handleAccept() {
     if (isNewPasswordValid && isNewPasswordConfirmed && isNewPasswordUnique) {
-      changeUserPassword(user, password, newPassword, handleClose)
+      dispatch(changeUserPassword({ password, newPassword }))
     } else if (!isNewPasswordConfirmed) {
       generateNotification("newPasswordNotConfirmed")
     } else if (!isNewPasswordUnique) {
@@ -370,6 +382,7 @@ function ChangePassword() {
   function handleClose() {
     setUseUser("isChangingPassword", false)
     setTimeout(() => {
+      dispatch(setPasswordChangeStatus("notChanged"))
       setPassword("")
       setNewPassword("")
       setConfiredNewPassword("")
@@ -405,11 +418,17 @@ function ChangePassword() {
       open={isChangingPassword}
       heading={"Change Password"}
       body={
-        <PasswordInputs
-          inputs={inputs}
-          isNewPasswordConfirmed={isNewPasswordConfirmed}
-        />
+        <>
+          <PasswordInputs
+            inputs={inputs}
+            isNewPasswordConfirmed={isNewPasswordConfirmed}
+          />
+          {isPasswordChangePending || isPasswordChangeSuccess ? (
+            <Loader narration="Changing password..." />
+          ) : undefined}
+        </>
       }
+      show="actions"
       actions={[
         { iconName: "cancel", handleClick: handleClose },
         { iconName: "done", handleClick: handleAccept },
@@ -434,6 +453,7 @@ function PasswordInputs({
 }) {
   const theme = useTheme()
   const newPassword = inputs[1].value
+  const validationReport = getPasswordValidation(newPassword)
 
   return (
     <Stack gap={theme.module[4]} padding={theme.module[4]}>
@@ -460,7 +480,7 @@ function PasswordInputs({
         )
       })}
       <PasswordValidationCheck
-        validationReport={getPasswordValidation(newPassword)}
+        validationReport={validationReport}
         isActive={true}
       />
     </Stack>

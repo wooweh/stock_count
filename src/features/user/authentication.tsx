@@ -4,24 +4,237 @@ import AccordionDetails from "@mui/material/AccordionDetails"
 import AccordionSummary from "@mui/material/AccordionSummary"
 import Button from "@mui/material/ButtonBase"
 import Stack from "@mui/material/Stack"
-import { onAuthStateChanged } from "firebase/auth"
-import { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { useAppDispatch, useAppSelector } from "../../app/hooks"
+import { useEffect } from "react"
+import { Route, useNavigate } from "react-router-dom"
+import { create } from "zustand"
+import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { Control } from "../../components/control"
 import Icon from "../../components/icon"
 import { Loader } from "../../components/loader"
-import { auth } from "../../remote"
+import { routePaths } from "../core/core"
+import { selectIsSystemActive, selectIsSystemBooted } from "../core/coreSlice"
+import { generateNotification } from "../core/notifications"
 import {
   registerUserOnAuth,
   resetUserPassword,
   signInUserOnAuth,
 } from "./userRemote"
-import { routePaths } from "../core/core"
-import { generateNotification } from "../core/notifications"
-import { selectIsLoggedIn, signIn } from "./userSlice"
-import { selectIsSystemBooted } from "../core/coreSlice"
+import { selectIsSignedIn } from "./userSlice"
+import { Home } from "../core/home"
+/*
+
+
+
+
+
+*/
+type UseAuthState = {
+  isSigningIn: boolean
+  isVerifying: boolean
+  email: string
+  password: string
+  passwordValidation: PasswordValidationReturnProps
+}
+type UseAuthKeys = keyof UseAuthState
+const initialState: UseAuthState = {
+  isSigningIn: false,
+  isVerifying: false,
+  email: "",
+  password: "",
+  passwordValidation: {} as PasswordValidationReturnProps,
+}
+const useAuthStore = create<UseAuthState>()((set) => ({
+  ...initialState,
+}))
+
+function setUseAuth(path: UseAuthKeys, value: any) {
+  useAuthStore.setState({ [path]: value })
+}
+
+export function resetUseAuth() {
+  useAuthStore.setState(initialState)
+}
+/*
+
+
+
+
+
+*/
+export function WithAuth({ route }: { route: any }) {
+  // TODO
+  const isSignedIn = useAppSelector(selectIsSignedIn)
+  const isSystemBooted = useAppSelector(selectIsSystemBooted)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (isSystemBooted && isSignedIn && !route.requiresAuth) {
+      navigate(routePaths.home.path)
+    }
+  }, [isSystemBooted, route, navigate, isSignedIn])
+
+  useEffect(() => {
+    if (!isSignedIn && route.requiresAuth) {
+      navigate(routePaths.signIn.path)
+    }
+  }, [isSignedIn, route, navigate])
+
+  if (isSystemBooted && !route.requiresAuth) {
+    return <Home />
+  } else if (!isSignedIn && route.requiresAuth) {
+    return <Authentication isRegistering={false} />
+  } else {
+    return route.element
+  }
+}
+/*
+
+
+
+
+
+*/
+export function Authentication({ isRegistering }: { isRegistering: boolean }) {
+  // const navigate = useNavigate()
+  // const isSignedIn = useAppSelector(selectIsSignedIn)
+  // const isSystemBooted = useAppSelector(selectIsSystemBooted)
+
+  // useEffect(() => {
+  //   if (isSystemBooted && isSignedIn) {
+  //     navigate(routePaths.home.path)
+  //   }
+  // }, [isSystemBooted, isSignedIn, navigate])
+
+  return (
+    <>
+      <AuthenticationInput isRegistering={isRegistering} />
+      <SigningIn />
+      <VerifyEmail />
+    </>
+  )
+}
+/*
+
+
+
+
+
+*/
+function AuthenticationInput({ isRegistering }: { isRegistering: boolean }) {
+  const isSigningIn = useAuthStore((state) => state.isSigningIn)
+  const isVerifying = useAuthStore((state) => state.isVerifying)
+  const validationReport = useAuthStore((state) => state.passwordValidation)
+
+  return !isSigningIn && !isVerifying ? (
+    <Outer>
+      <Logo />
+      <CredentialInputs />
+      <ButtonTray isRegistering={isRegistering} />
+      <PasswordValidationCheck
+        isActive={isRegistering}
+        validationReport={validationReport}
+      />
+      <ForgotPassword isRegistering={isRegistering} />
+    </Outer>
+  ) : undefined
+}
+/*
+
+
+
+
+
+*/
+function Outer({ children }: { children: any }) {
+  const theme = useTheme()
+  return (
+    <Stack
+      width={"100%"}
+      maxWidth={`calc(${theme.module[9]} * 1.75)`}
+      gap={theme.module[4]}
+      padding={theme.module[5]}
+      paddingTop={0}
+      boxSizing={"border-box"}
+      alignItems={"center"}
+    >
+      {children}
+    </Stack>
+  )
+}
+/*
+
+
+
+
+
+*/
+function Logo() {
+  const theme = useTheme()
+  return (
+    <Stack
+      width={"100%"}
+      direction={"row"}
+      alignItems={"center"}
+      gap={theme.module[3]}
+    >
+      <Icon variation="stock" />
+      <Typography variant="h5" justifyContent={"flex-end"}>
+        StockCount
+      </Typography>
+    </Stack>
+  )
+}
+/*
+
+
+
+
+
+*/
+function CredentialInputs() {
+  const theme = useTheme()
+  const email = useAuthStore((state) => state.email)
+  const password = useAuthStore((state) => state.password)
+  /*
+
+
+*/
+  function handleEmailChange(event: any) {
+    setUseAuth("email", event.target.value)
+  }
+  /*
+
+
+*/
+  function handlePasswordChange(event: any) {
+    const passwordValidation = getPasswordValidation(event.target.value)
+    setUseAuth("passwordValidation", passwordValidation)
+    setUseAuth("password", event.target.value)
+  }
+  /*
+
+  
+  */
+
+  return (
+    <Stack width={"100%"} gap={theme.module[4]}>
+      <Control
+        variation={"input"}
+        placeholder={"Email"}
+        onChange={handleEmailChange}
+        value={email}
+      />
+      <Control
+        variation={"input"}
+        placeholder={"Password"}
+        type={"password"}
+        onChange={handlePasswordChange}
+        value={password}
+      />
+    </Stack>
+  )
+}
 /*
 
 
@@ -71,180 +284,37 @@ export function getPasswordValidation(
 
 
 */
-export function SignInWithCredentials() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [isRegistering, setIsRegistering] = useState(false)
-  const [passwordValidation, setPasswordValidation] = useState(
-    {} as PasswordValidationReturnProps,
-  )
-
-  return (
-    <Outer>
-      <Logo />
-      <CredentialInputs
-        email={email}
-        setEmail={setEmail}
-        password={password}
-        setPassword={setPassword}
-        setPasswordValidation={setPasswordValidation}
-      />
-      <ButtonTray
-        email={email}
-        password={password}
-        passwordValidation={passwordValidation}
-        isRegistering={isRegistering}
-        setIsRegistering={setIsRegistering}
-      />
-      <PasswordValidationCheck
-        validationReport={passwordValidation}
-        isActive={isRegistering}
-      />
-      {!isRegistering ? <ForgotPassword email={email} /> : undefined}
-    </Outer>
-  )
-}
-/*
-
-
-
-
-
-*/
-function Outer({ children }: { children: any }) {
-  const theme = useTheme()
-  return (
-    <Stack
-      width={"100%"}
-      maxWidth={`calc(${theme.module[9]} * 1.75)`}
-      gap={theme.module[4]}
-      padding={theme.module[5]}
-      boxSizing={"border-box"}
-      alignItems={"center"}
-    >
-      {children}
-    </Stack>
-  )
-}
-/*
-
-
-
-
-
-*/
-function Logo() {
-  const theme = useTheme()
-  return (
-    <Stack
-      width={"100%"}
-      direction={"row"}
-      alignItems={"center"}
-      gap={theme.module[3]}
-    >
-      <Icon variation="stock" />
-      <Typography variant="h5" justifyContent={"flex-end"}>
-        StockCount
-      </Typography>
-    </Stack>
-  )
-}
-/*
-
-
-
-
-
-*/
-type CredentialInputProps = {
-  email: string
-  setEmail: Function
-  password: string
-  setPassword: Function
-  setPasswordValidation: Function
-}
-function CredentialInputs(props: CredentialInputProps) {
-  const theme = useTheme()
-  /*
-
-
-*/
-  function handleEmailChange(event: any) {
-    props.setEmail(event.target.value)
-  }
-  /*
-
-
-*/
-  function handlePasswordChange(event: any) {
-    props.setPasswordValidation(getPasswordValidation(event.target.value))
-    props.setPassword(event.target.value)
-  }
-  /*
-
-  
-  */
-
-  return (
-    <Stack width={"100%"} gap={theme.module[4]}>
-      <Control
-        variation={"input"}
-        placeholder={"Email"}
-        onChange={handleEmailChange}
-        value={props.email}
-      />
-      <Control
-        variation={"input"}
-        placeholder={"Password"}
-        type={"password"}
-        onChange={handlePasswordChange}
-        value={props.password}
-      />
-    </Stack>
-  )
-}
-/*
-
-
-
-
-
-*/
-type ButtonTrayProps = {
-  email: string
-  password: string
-  passwordValidation: PasswordValidationReturnProps
-  isRegistering: boolean
-  setIsRegistering: Function
-}
-function ButtonTray(props: ButtonTrayProps) {
+function ButtonTray({ isRegistering }: { isRegistering: boolean }) {
   const theme = useTheme()
   const navigate = useNavigate()
-  const dispatch = useAppDispatch()
 
-  const isPasswordValid = props.passwordValidation.isValid
+  const email = useAuthStore((state) => state.email)
+  const password = useAuthStore((state) => state.password)
+  const passwordValidation = useAuthStore((state) => state.passwordValidation)
+  const isPasswordValid = passwordValidation.isValid
+  const isButtonDisabled =
+    (isRegistering && !isPasswordValid) || !email || !password
   /*
 
   
   */
   function handleClick() {
-    if (!!props.email && !!props.password) {
-      if (props.isRegistering && isPasswordValid) {
-        navigate(routePaths.verifyEmail.path)
-        registerUserOnAuth(props.email, props.password, dispatch, navigate)
+    if (!!email && !!password) {
+      if (isRegistering && isPasswordValid) {
+        setUseAuth("isVerifying", true)
+        registerUserOnAuth(email, password)
       } else {
-        navigate(routePaths.signingIn.path)
-        signInUserOnAuth(props.email, props.password, dispatch, navigate)
+        setUseAuth("isSigningIn", true)
+        signInUserOnAuth(email, password)
       }
+      setUseAuth("email", "")
+      setUseAuth("password", "")
     }
   }
   /*
   
   
   */
-  const isButtonDisabled =
-    (props.isRegistering && !isPasswordValid) || !props.email || !props.password
-
   return (
     <Stack
       width={"100%"}
@@ -262,15 +332,16 @@ function ButtonTray(props: ButtonTrayProps) {
           color: isButtonDisabled ? theme.scale.gray[4] : theme.scale.gray[3],
         }}
       >
-        {props.isRegistering ? "Register" : "Sign in"}
+        {isRegistering ? "Register" : "Sign in"}
       </Button>
       <Button
         onClick={() =>
-          props.setIsRegistering(props.isRegistering ? false : true)
+          navigate(routePaths[isRegistering ? "signIn" : "register"].path)
         }
         sx={{ color: theme.scale.gray[5] }}
+        key={isRegistering ? "register" : "signIn"}
       >
-        {props.isRegistering ? "Sign in?" : "Register?"}
+        {isRegistering ? "Sign in?" : "Register?"}
       </Button>
     </Stack>
   )
@@ -282,8 +353,13 @@ function ButtonTray(props: ButtonTrayProps) {
 
 
 */
-function ForgotPassword({ email }: { email: string }) {
+function ForgotPassword({ isRegistering }: { isRegistering: boolean }) {
   const theme = useTheme()
+  const email = useAuthStore((state) => state.email)
+  /*
+
+
+*/
   function handleClick() {
     if (!!email) {
       resetUserPassword(email)
@@ -291,6 +367,10 @@ function ForgotPassword({ email }: { email: string }) {
       generateNotification("invalidEmail")
     }
   }
+  /*
+    
+    
+    */
   return (
     <Stack
       width={"100%"}
@@ -299,8 +379,9 @@ function ForgotPassword({ email }: { email: string }) {
     >
       <Button
         onClick={handleClick}
+        disabled={isRegistering}
         sx={{
-          color: theme.scale.gray[5],
+          color: isRegistering ? "transparent" : theme.scale.gray[5],
           width: "min-content",
         }}
       >
@@ -317,14 +398,15 @@ function ForgotPassword({ email }: { email: string }) {
 
 */
 export function PasswordValidationCheck({
-  validationReport,
   isActive,
+  validationReport,
 }: {
-  validationReport: PasswordValidationReturnProps
   isActive: boolean
+  validationReport: PasswordValidationReturnProps
 }) {
   const theme = useTheme()
-  const CHECKS = [
+
+  const checks = [
     {
       isValid: validationReport.minCharCount,
       description: "At least 6 characters long",
@@ -364,35 +446,9 @@ export function PasswordValidationCheck({
           >
             Password Check:
           </Typography>
-          {CHECKS.map(
-            (
-              check: { isValid: boolean; description: string },
-              index: number,
-            ) => {
-              return (
-                <Stack
-                  width={"100%"}
-                  direction={"row"}
-                  gap={theme.module[4]}
-                  justifyItems={"center"}
-                  key={index}
-                >
-                  <Box
-                    width={theme.module[4]}
-                    height={theme.module[4]}
-                    borderRadius={theme.module[1]}
-                    bgcolor={
-                      check.isValid ? theme.scale.green[5] : theme.scale.red[6]
-                    }
-                    sx={{ transition: "background 350ms" }}
-                  />
-                  <Typography color={theme.scale.gray[4]} variant="body2">
-                    {check.description}
-                  </Typography>
-                </Stack>
-              )
-            },
-          )}
+          {checks.map((check: (typeof checks)[number], index: number) => {
+            return <CheckLineItem key={index} check={check} />
+          })}
         </Stack>
       </AccordionDetails>
     </Accordion>
@@ -405,14 +461,44 @@ export function PasswordValidationCheck({
 
 
 */
-export function SigningIn() {
-  const isSystemBooted = useAppSelector(selectIsSystemBooted)
-  const navigate = useNavigate()
-  useEffect(() => {
-    if (isSystemBooted) setTimeout(() => navigate(routePaths.home.path), 1000)
-  }, [isSystemBooted, navigate])
+function CheckLineItem({
+  check,
+}: {
+  check: { isValid: boolean; description: string }
+}) {
+  const theme = useTheme()
+  return (
+    <Stack
+      width={"100%"}
+      direction={"row"}
+      gap={theme.module[4]}
+      justifyItems={"center"}
+    >
+      <Box
+        width={theme.module[4]}
+        height={theme.module[4]}
+        borderRadius={theme.module[1]}
+        bgcolor={check.isValid ? theme.scale.green[5] : theme.scale.red[6]}
+        sx={{ transition: "background 350ms" }}
+      />
+      <Typography color={theme.scale.gray[4]} variant="body2">
+        {check.description}
+      </Typography>
+    </Stack>
+  )
+}
+/*
 
-  return <Loader narration="signing in..." />
+
+
+
+
+*/
+export function SigningIn() {
+  const isSigningIn = useAuthStore((state) => state.isSigningIn)
+
+  // return <Loader narration="signing in..." />
+  return isSigningIn ? <Loader narration="signing in..." /> : undefined
 }
 /*
 
@@ -423,26 +509,29 @@ export function SigningIn() {
 */
 export function VerifyEmail() {
   const theme = useTheme()
-  const dispatch = useAppDispatch()
-  const navigate = useNavigate()
-  const isLoggedIn = useAppSelector(selectIsLoggedIn)
 
-  useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      if (!!user && user.emailVerified && !isLoggedIn) {
-        dispatch(signIn())
-        navigate(routePaths.home.path)
-      }
-    })
-  })
+  const isVerifying = useAuthStore((state) => state.isVerifying)
 
-  return (
-    <Stack padding={theme.module[4]} boxSizing={"border-box"}>
+  return isVerifying ? (
+    <Stack
+      width={"100%"}
+      height={"100%"}
+      gap={theme.module[4]}
+      justifyContent={"center"}
+      alignContent={"center"}
+      position={"absolute"}
+      zIndex={100}
+      padding={theme.module[4]}
+      boxSizing={"border-box"}
+    >
       <Typography>
         An email has been sent to you. Click the link to verify your account.
       </Typography>
+      <Button onClick={() => setUseAuth("isVerifying", false)}>
+        Back to sign in
+      </Button>
     </Stack>
-  )
+  ) : undefined
 }
 /*
 

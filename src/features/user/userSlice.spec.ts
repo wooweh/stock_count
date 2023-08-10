@@ -15,12 +15,12 @@ import userReducer, {
 
 describe("user reducer", () => {
   const initialState: UserState = {
-    isLoggedIn: false,
+    isSignedIn: false,
     user: {},
   }
 
   const mockState: UserState = {
-    isLoggedIn: true,
+    isSignedIn: true,
     user: {
       uuid: "uuid",
       email: "email",
@@ -33,19 +33,19 @@ describe("user reducer", () => {
 
   it("should handle initial state", () => {
     expect(userReducer(undefined, { type: "unknown" })).toEqual({
-      isLoggedIn: false,
+      isSignedIn: false,
       user: {},
     })
   })
 
   it("should handle signIn", () => {
     const actual = userReducer(initialState, signIn())
-    expect(actual.isLoggedIn).toEqual(true)
+    expect(actual.isSignedIn).toEqual(true)
   })
 
   it("should handle signOut", () => {
     const actual = userReducer(initialState, signOut())
-    expect(actual.isLoggedIn).toEqual(false)
+    expect(actual.isSignedIn).toEqual(false)
   })
 
   it("should handle setUserEmail", () => {

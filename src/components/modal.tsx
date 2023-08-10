@@ -5,6 +5,7 @@ import MuiModal from "@mui/material/Modal"
 import Typography from "@mui/material/Typography"
 import { useEffect, useState } from "react"
 import useTheme from "../common/useTheme"
+import Animation from "./animation"
 import { Button } from "./button"
 import Icon, { IconNames } from "./icon"
 /*
@@ -14,16 +15,24 @@ import Icon, { IconNames } from "./icon"
 
 
 */
+export type ModalActionProps = {
+  iconName: IconNames
+  handleClick: Function
+}
 type ModalProps = {
   open: boolean
   heading: string
   body: React.ReactElement
-  actions: { iconName: IconNames; handleClick: Function }[]
+  show?: "footer" | "actions"
+  footer?: React.ReactElement
+  actions?: ModalActionProps[]
   onClose: Function
 }
 export default function Modal(props: ModalProps) {
   const theme = useTheme()
   const [open, setOpen] = useState(false)
+  const showFooter = props.show === "footer"
+  const showActions = props.show === "actions"
   /*
   
 
@@ -71,36 +80,52 @@ export default function Modal(props: ModalProps) {
           sx={styles}
         >
           <Stack
+            width={"100%"}
             alignItems={"center"}
             padding={theme.module[3]}
             bgcolor={theme.scale.gray[8]}
+            boxShadow={theme.shadow.neo[4]}
+            boxSizing={"border-box"}
           >
             <Typography>{props.heading}</Typography>
           </Stack>
-          <Stack alignItems={"center"} padding={theme.module[4]}>
+          <Stack
+            alignItems={"center"}
+            padding={theme.module[4]}
+            boxSizing={"border-box"}
+          >
             {props.body}
           </Stack>
           <Stack
             direction={"row"}
-            padding={theme.module[4]}
+            padding={!showActions && !showFooter ? 0 : theme.module[4]}
             paddingTop={0}
             gap={theme.module[4]}
             boxSizing={"border-box"}
             width={"100%"}
+            overflow={"visible"}
           >
-            {props.actions.map((action, index) => (
-              <Button
-                variation={"modal"}
-                key={index}
-                onClick={action.handleClick}
-              >
-                <Icon variation={action.iconName} />
-              </Button>
-            ))}
-            {/* {props.footer} */}
+            {showActions &&
+              props.actions &&
+              props.actions.map((action, index) => (
+                <Animation
+                  from={{ opacity: 0 }}
+                  to={{ opacity: 1 }}
+                  start={true}
+                  key={index}
+                >
+                  <Button variation={"modal"} onClick={action.handleClick}>
+                    <Icon variation={action.iconName} />
+                  </Button>
+                </Animation>
+              ))}
+            {showFooter && (
+              <Animation from={{ opacity: 0 }} to={{ opacity: 1 }} start={true}>
+                {props.footer}
+              </Animation>
+            )}
           </Stack>
         </Stack>
-        {/* </Stack> */}
       </Fade>
     </MuiModal>
   )

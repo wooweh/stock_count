@@ -1,16 +1,17 @@
 import { useEffect } from "react"
 import { useDispatch } from "react-redux"
-import { ToastContainer, toast } from "react-toastify"
-import { v4 as uuidv4 } from "uuid"
-import { store } from "../../app/store"
-import { NotificationProps, showNotification } from "./coreSlice"
+import { Slide, ToastContainer, toast } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
+import { v4 as uuidv4 } from "uuid"
 import { useAppSelector } from "../../app/hooks"
+import { store } from "../../app/store"
 import {
+  NotificationProps,
   hideNotification,
   selectIsDarkmode,
   selectNotification,
   selectShowNotification,
+  showNotification,
 } from "./coreSlice"
 /*
 
@@ -37,6 +38,7 @@ type NotificationsProps = {
   newPasswordNotUnique: Notification
   newPasswordNotValid: Notification
   incompleteProfileDetails: Notification
+  noFileChosen: Notification
 }
 type NotificationNames = keyof NotificationsProps
 export function generateNotification(notification: NotificationNames) {
@@ -106,6 +108,10 @@ export function generateNotification(notification: NotificationNames) {
       type: "error",
       message: "Complete all profile details.",
     },
+    noFileChosen: {
+      type: "error",
+      message: "Choose a file for upload.",
+    },
   }
   const payload: NotificationProps = {
     uuid: uuidv4(),
@@ -162,7 +168,9 @@ export function Notifications() {
       newestOnTop={false}
       closeOnClick
       rtl={false}
+      closeButton={false}
       pauseOnFocusLoss
+      transition={Slide}
       draggable
       pauseOnHover
       theme={isDarkmode ? "dark" : "light"}

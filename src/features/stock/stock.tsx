@@ -10,24 +10,24 @@ import useTheme from "../../common/useTheme"
 import Animation from "../../components/animation"
 import { Button } from "../../components/button"
 import { Control } from "../../components/control"
+import { CSVParser, generateCSV } from "../../components/csvParser"
 import Icon from "../../components/icon"
 import {
   ListItemOptionProps,
   SelectableListItemWithOptions,
 } from "../../components/list"
-import Modal from "../../components/modal"
+import Modal, { ModalActionProps } from "../../components/modal"
+import VirtualizedTable, { ColumnData } from "../../components/table"
 import {
   StockItemProps,
-  addStockBatch,
   addStockItem,
+  addStockList,
   deleteStock,
   deleteStockItem,
   editStockItem,
   selectStockIdList,
   selectStockList,
 } from "./stockSlice"
-import { CSVParser, generateCSV } from "../../components/csvParser"
-import VirtualizedTable, { ColumnData } from "../../components/table"
 /*
 
 
@@ -46,8 +46,7 @@ type UseStockState = {
   selectedItems: string[]
 }
 type UseStockKeys = keyof UseStockState
-
-const useStockStore = create<UseStockState>()((set) => ({
+const initialState: UseStockState = {
   isAdding: false,
   isEditing: false,
   isUploading: false,
@@ -55,6 +54,9 @@ const useStockStore = create<UseStockState>()((set) => ({
   idViewingOptions: false,
   scrollIndex: 0,
   selectedItems: [],
+}
+const useStockStore = create<UseStockState>()((set) => ({
+  ...initialState,
 }))
 
 function setUseStock(path: UseStockKeys, value: any) {
@@ -74,6 +76,9 @@ function removeUseStockSelectedItem(id: string) {
   const newSelectedItems = [...selectedItems]
   newSelectedItems.splice(indexToRemove, 1)
   useStockStore.setState({ selectedItems: newSelectedItems })
+}
+export function resetUseStock() {
+  useStockStore.setState(initialState)
 }
 /*
 
@@ -155,9 +160,9 @@ function SearchBar() {
     setIsSearching(!isSearching)
   }
   /*
+  
 
-
-*/
+  */
   function handleClickAway() {
     setIsSearching(false)
   }
@@ -171,6 +176,7 @@ function SearchBar() {
       (stockItem) => stockItem.id === item.id,
     )
     setUseStock("scrollIndex", index)
+    setIsSearching(false)
   }
   /*
 
@@ -602,6 +608,7 @@ function AddItem() {
           </Stack>
         </Stack>
       }
+      show={"actions"}
       actions={[
         { iconName: "cancel", handleClick: handleClose },
         { iconName: "done", handleClick: handleAccept },
@@ -628,9 +635,9 @@ function UploadItems() {
   */
   function handleAccept() {
     setUseStock("isUploading", false)
-    const stockBatch = {}
-    _.forEach(data, (item) => _.set(stockBatch, item.id, item))
-    dispatch(addStockBatch(stockBatch))
+    const stockList = {}
+    _.forEach(data, (item) => _.set(stockList, item.id, item))
+    dispatch(addStockList(stockList))
   }
   /*
   
@@ -694,6 +701,12 @@ function UploadItems() {
     },
   ]
 
+  const modalActions: ModalActionProps[] = [
+    { iconName: "cancel", handleClick: handleClose },
+  ]
+  if (data.length)
+    modalActions.push({ iconName: "done", handleClick: handleAccept })
+
   return (
     <Modal
       open={isUploading}
@@ -701,7 +714,6 @@ function UploadItems() {
       body={
         <Stack
           width={"100%"}
-          padding={theme.module[1]}
           boxSizing={"border-box"}
           justifyContent={"center"}
         >
@@ -709,12 +721,11 @@ function UploadItems() {
             <Stack width={"100%"} gap={theme.module[4]}>
               <CSVParser onComplete={handleOnComplete} />
               <Button
-                variation={"icon"}
+                variation={"modal"}
                 onClick={handleDownload}
                 sx={{
-                  background: theme.scale.gray[8],
-                  padding: theme.module[3],
-                  borderRadius: theme.module[3],
+                  background: theme.scale.gray[7],
+                  boxShadow: theme.shadow.neo[3],
                 }}
               >
                 <Stack direction={"row"} gap={theme.module[3]}>
@@ -735,10 +746,8 @@ function UploadItems() {
           )}
         </Stack>
       }
-      actions={[
-        { iconName: "cancel", handleClick: handleClose },
-        { iconName: "done", handleClick: handleAccept },
-      ]}
+      show={"actions"}
+      actions={modalActions}
       onClose={handleClose}
     />
   )
@@ -797,6 +806,7 @@ function EditItem() {
         }),
       )
       setUseStock("isEditing", false)
+      setUseStock("idViewingOptions", false)
     }
   }
   /*
@@ -805,6 +815,7 @@ function EditItem() {
   */
   function handleClose(event: any) {
     setUseStock("isEditing", false)
+    setUseStock("idViewingOptions", false)
   }
   /*
   
@@ -847,6 +858,7 @@ function EditItem() {
           </Stack>
         </Stack>
       }
+      show="actions"
       actions={[
         { iconName: "cancel", handleClick: handleClose },
         { iconName: "done", handleClick: handleAccept },
@@ -855,13 +867,6 @@ function EditItem() {
     />
   )
 }
-/*
-
-
-
-
-
-*/
 /*
 
 

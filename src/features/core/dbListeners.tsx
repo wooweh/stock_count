@@ -14,7 +14,12 @@ import {
 } from "../organisation/organisationSlice"
 import { StockProps, selectStock, setStock } from "../stock/stockSlice"
 import { UserProps, selectUser, setUser } from "../user/userSlice"
-import { selectIsSystemBooted } from "./coreSlice"
+import {
+  selectIsSystemActive,
+  selectIsSystemBooted,
+  selectIsSystemBooting,
+  setSystemStatus,
+} from "./coreSlice"
 /*
 
 
@@ -24,16 +29,26 @@ import { selectIsSystemBooted } from "./coreSlice"
 */
 export function DBListeners() {
   const dispatch = useAppDispatch()
-  const isSystemBooted = useAppSelector(selectIsSystemBooted)
+  const isSystemActive = useAppSelector(selectIsSystemActive)
+  const isSystemBooting = useAppSelector(selectIsSystemBooting)
   const localUser = useAppSelector(selectUser)
   const localOrg = useAppSelector(selectOrg)
   const localStock = useAppSelector(selectStock)
   const isJoined = useAppSelector(selectIsJoined)
 
+  useEffect(() => {
+    if (isSystemBooting && localUser.orgUuid && localOrg.uuid) {
+      dispatch(setSystemStatus("isBooted"))
+    }
+    if (isSystemBooting && !localUser.orgUuid) {
+      dispatch(setSystemStatus("isBooted"))
+    }
+  }, [isSystemBooting, dispatch, localUser, localOrg])
+
   // USER LISTENER
 
   useEffect(() => {
-    if (!!localUser && isSystemBooted) {
+    if (!!localUser && isSystemActive) {
       const dbUserRef = ref(
         dbReal,
         getDBPath.user(localUser.uuid as string).user,
@@ -45,13 +60,14 @@ export function DBListeners() {
         }
       })
     }
-  }, [dispatch, localUser, isSystemBooted])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, localUser, isSystemActive])
 
   // ORG SET & LISTENER
 
   useEffect(() => {
-    if (!!localUser && isSystemBooted) {
-      const localUserOrgDetails = !!localUser.orgRole && !!localUser.orgUuid
+    if (!!localUser && isSystemActive) {
+      const isLocalUserOrgDetails = !!localUser.orgRole && !!localUser.orgUuid
 
       const dbOrgRef = ref(
         dbReal,
@@ -62,7 +78,7 @@ export function DBListeners() {
         if (
           !!dbOrg &&
           !_.isEqual(localOrg, dbOrg) &&
-          localUserOrgDetails &&
+          isLocalUserOrgDetails &&
           localUser.uuid! in dbOrg.members!
         ) {
           dispatch(setOrg(dbOrg))
@@ -70,18 +86,18 @@ export function DBListeners() {
         }
         if (
           (!dbOrg || !(localUser.uuid! in dbOrg.members!)) &&
-          localUserOrgDetails
+          isLocalUserOrgDetails
         ) {
           dispatch(leaveOrg(localOrg.uuid as string))
         }
       })
     }
-  }, [dispatch, localUser, localOrg, isSystemBooted])
+  }, [dispatch, localUser, localOrg, isSystemActive])
 
   // STOCK SET & LISTENER
 
   useEffect(() => {
-    if (!!localUser && isSystemBooted) {
+    if (!!localUser && isSystemActive) {
       const dbStockRef = ref(
         dbReal,
         getDBPath.stock(localUser.orgUuid as string).stock,
@@ -93,23 +109,23 @@ export function DBListeners() {
         }
       })
     }
-  }, [dispatch, localUser, localStock, isSystemBooted])
+  }, [dispatch, localUser, localStock, isSystemActive])
 
   // HISTORY SET & LISTENER
 
   useEffect(() => {
-    if (!!localUser && isSystemBooted) {
+    if (!!localUser && isSystemActive) {
       // TODO
     }
-  }, [dispatch, localUser, isSystemBooted, isJoined])
+  }, [dispatch, localUser, isSystemActive, isJoined])
 
   // COUNT SET & LISTENER
 
   useEffect(() => {
-    if (!!localUser && isSystemBooted) {
+    if (!!localUser && isSystemActive) {
       // TODO
     }
-  }, [dispatch, localUser, isSystemBooted, isJoined])
+  }, [dispatch, localUser, isSystemActive, isJoined])
 
   return undefined
 }

@@ -1,6 +1,6 @@
 import stockReducer, {
   StockState,
-  addStockBatch,
+  addStockList,
   addStockItem,
   deleteStock,
   deleteStockItem,
@@ -60,8 +60,8 @@ describe("stock reducer", () => {
     expect(actual.stock["stock_id"]).toEqual(mockStockItemPayload)
   })
 
-  it("should handle addStockBatch", () => {
-    const actual = stockReducer(initialState, addStockBatch(mockStockPayload))
+  it("should handle addStockList", () => {
+    const actual = stockReducer(initialState, addStockList(mockStockPayload))
     expect(actual.stock["stock_id"]).toEqual(mockStockItemPayload)
   })
 

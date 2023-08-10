@@ -31,6 +31,9 @@ import KeyIcon from "@mui/icons-material/VpnKey"
 import LightModeIcon from "@mui/icons-material/WbSunnyRounded"
 import StockIcon from "@mui/icons-material/WidgetsRounded"
 import DownloadIcon from "@mui/icons-material/DownloadRounded"
+import ArrowRightIcon from "@mui/icons-material/ArrowForwardIosRounded"
+import ArrowLeftIcon from "@mui/icons-material/ArrowBackIosNewRounded"
+import SubmitIcon from "@mui/icons-material/Publish"
 import { useAppSelector } from "../app/hooks"
 import { SxProps } from "../common/types"
 import useTheme from "../common/useTheme"
@@ -76,6 +79,9 @@ export type IconNames =
   | "unchecked"
   | "org"
   | "addOrg"
+  | "arrowRight"
+  | "arrowLeft"
+  | "submit"
 
 type IconProps = {
   variation: IconNames
@@ -128,6 +134,9 @@ export default function Icon(props: IconProps) {
     org: <OrgIcon fontSize={fontSize} sx={{ ...styles }} />,
     group: <GroupIcon fontSize={fontSize} sx={{ ...styles }} />,
     download: <DownloadIcon fontSize={fontSize} sx={{ ...styles }} />,
+    arrowRight: <ArrowRightIcon fontSize={fontSize} sx={{ ...styles }} />,
+    arrowLeft: <ArrowLeftIcon fontSize={fontSize} sx={{ ...styles }} />,
+    submit: <SubmitIcon fontSize={fontSize} sx={{ ...styles }} />,
     joinGroup: (
       <GroupIcon
         fontSize={fontSize}

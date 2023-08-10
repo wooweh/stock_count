@@ -1,15 +1,14 @@
 import { Typography } from "@mui/material"
-import { Button } from "../../components/button"
 import Stack from "@mui/material/Stack"
 import Grid from "@mui/material/Unstable_Grid2"
 import { useNavigate } from "react-router-dom"
-import useTheme from "../../common/useTheme"
-import Icon, { IconNames } from "../../components/icon"
-import { routePaths } from "./core"
-import { selectIsProfileComplete, selectIsUserAdmin } from "../user/userSlice"
 import { useAppSelector } from "../../app/hooks"
+import useTheme from "../../common/useTheme"
+import { Button } from "../../components/button"
+import Icon, { IconNames } from "../../components/icon"
 import { selectIsOrgSetup } from "../organisation/organisationSlice"
-import { selectIsSystemBooted } from "./coreSlice"
+import { selectIsProfileComplete, selectIsUserAdmin } from "../user/userSlice"
+import { routePaths } from "./core"
 /*
 
 
@@ -128,7 +127,7 @@ function HomeButtons() {
   const isAdmin = useAppSelector(selectIsUserAdmin)
 
   const adminButtons: HomeButton[] = [
-    { label: "New Count", icon: "add", path: routePaths.newCount.path },
+    { label: "New Count", icon: "add", path: routePaths.count.path },
     { label: "Stock", icon: "list", path: routePaths.stock.path },
     { label: "History", icon: "history", path: routePaths.history.path },
     { label: "Analysis", icon: "timeline", path: routePaths.analysis.path },

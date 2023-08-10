@@ -9,18 +9,6 @@ export type OrgProps = {
   members?: MembersProps
   invites?: InvitesProps
 }
-export type MemberRoleProps = {
-  uuid: string
-  role: UserOrgRoles
-}
-export type MemberNameProps = {
-  uuid: string
-  name: string
-}
-export type MemberSurnameProps = {
-  uuid: string
-  surname: string
-}
 export type MemberProps = {
   name: string
   surname: string
@@ -69,31 +57,20 @@ export const organisationSlice = createSlice({
     setOrgName: (state, action: PayloadAction<string>) => {
       state.org.name = action.payload
     },
-    setOrgMemberName: (state, action: PayloadAction<MemberNameProps>) => {
+    setOrgMember: (state, action: PayloadAction<MemberProps>) => {
       const memberUuid = action.payload.uuid
-      const name = action.payload.name
-      if (state.org.members) {
-        state.org.members[memberUuid].name = name
-      }
-    },
-    setOrgMemberSurname: (state, action: PayloadAction<MemberSurnameProps>) => {
-      const memberUuid = action.payload.uuid
-      const surname = action.payload.surname
-      if (state.org.members) {
-        state.org.members[memberUuid].surname = surname
-      }
-    },
-    setOrgMemberRole: (state, action: PayloadAction<MemberRoleProps>) => {
-      const memberUuid = action.payload.uuid
-      const memberRole = action.payload.role
-      if (state.org.members) {
-        state.org.members[memberUuid].role = memberRole
+      const members = state.org.members
+      const member = action.payload
+
+      if (members) {
+        members[memberUuid] = member
       }
     },
     deleteOrgMember: (state, action: PayloadAction<string>) => {
       const memberUuid = action.payload
       const members = state.org.members
-      if (members && memberUuid in members) {
+
+      if (members) {
         delete members[memberUuid]
       }
     },
@@ -120,9 +97,7 @@ export const {
   joinOrg,
   setOrg,
   setOrgName,
-  setOrgMemberName,
-  setOrgMemberSurname,
-  setOrgMemberRole,
+  setOrgMember,
   deleteOrgMember,
   setMemberStatus,
   deleteOrg,

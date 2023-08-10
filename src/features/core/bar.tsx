@@ -5,10 +5,9 @@ import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { Button } from "../../components/button"
 import Icon from "../../components/icon"
-import { selectIsLoggedIn } from "../user/userSlice"
 import { routePaths, routes } from "./core"
+import { selectIsSystemBooted } from "./coreSlice"
 import { Menu } from "./menu"
-
 /*
 
 
@@ -19,7 +18,7 @@ import { Menu } from "./menu"
 export function Bar() {
   const theme = useTheme()
   const location = useLocation()
-  const isLoggedIn = useAppSelector(selectIsLoggedIn)
+  const isSystemBooted = useAppSelector(selectIsSystemBooted)
   const locationName = _.find(routes, { path: location.pathname })?.name
   const navigate = useNavigate()
   /*
@@ -37,7 +36,7 @@ export function Bar() {
   
 
   */
-  return isLoggedIn ? (
+  return isSystemBooted ? (
     <Stack
       direction={"row"}
       position={"absolute"}
@@ -63,5 +62,5 @@ export function Bar() {
         <Menu />
       </Stack>
     </Stack>
-  ) : null
+  ) : undefined
 }

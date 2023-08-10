@@ -46,7 +46,13 @@ export default function Animation(props: AnimationProps) {
 
   return (
     <animated.div
-      style={{ width: "100%", height: "100%", ...props.sx, ...springs }}
+      style={{
+        width: "100%",
+        height: "100%",
+        overflow: "visible",
+        ...props.sx,
+        ...springs,
+      }}
     >
       {props.children}
     </animated.div>

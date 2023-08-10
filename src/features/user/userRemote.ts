@@ -11,15 +11,14 @@ import {
   updatePassword,
 } from "firebase/auth"
 import { child, get, ref, remove, set } from "firebase/database"
-import { auth, dbReal } from "../../remote"
 import { store } from "../../app/store"
-import { UserOrgRoles, UserProps, signIn } from "./userSlice"
+import { auth, dbReal } from "../../remote"
 import { getDBPath } from "../../remote/dbPaths"
 import {
   generateErrorNotification,
   generateNotification,
 } from "../core/notifications"
-import { routePaths } from "../core/core"
+import { UserOrgRoles, UserProps, signIn } from "./userSlice"
 /*
 
 
@@ -46,6 +45,7 @@ export async function setUserEmailOnAuth(email: string) {
 */
 export async function deleteUserOnAuth() {
   const authUser = auth.currentUser
+  console.log(authUser)
   if (!!authUser) {
     deleteUser(authUser).catch((error) => {
       console.log(error)
@@ -69,11 +69,11 @@ export async function updateUserPassword(user: User, newPassword: string) {
 
 
 */
+const actionCodeSettings = {
+  url: "http://localhost:5173/sign_in",
+  handleCodeInApp: false,
+}
 export function resetUserPassword(email: string) {
-  const actionCodeSettings = {
-    url: "http://localhost:5173/sign_in",
-    handleCodeInApp: false,
-  }
   sendPasswordResetEmail(auth, email, actionCodeSettings)
     .then(() => {
       generateNotification("passwordReset")
@@ -101,25 +101,15 @@ export async function reauthenticateUser(user: User, password: string) {
 
 
 */
-export function registerUserOnAuth(
-  email: string,
-  password: string,
-  dispatch: any,
-  navigate: any,
-) {
-  const actionCodeSettings = {
-    url: "http://localhost:5173/signing_in",
-    handleCodeInApp: false,
-  }
-  createUserWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      const signedIn = store.getState().user.isLoggedIn
-      if (!!userCredential.user && !signedIn) {
-        sendEmailVerification(userCredential.user, actionCodeSettings)
+export async function registerUserOnAuth(email: string, password: string) {
+  return createUserWithEmailAndPassword(auth, email, password)
+    .then((credential) => {
+      if (!!credential.user) {
+        console.log("email sent")
+        sendEmailVerification(credential.user, actionCodeSettings)
       }
     })
     .catch((error) => {
-      navigate(routePaths.signIn)
       generateErrorNotification(error.code)
       console.log(error)
     })
@@ -131,21 +121,14 @@ export function registerUserOnAuth(
 
 
 */
-export async function signInUserOnAuth(
-  email: string,
-  password: string,
-  dispatch: any,
-  navigate: any,
-) {
+export async function signInUserOnAuth(email: string, password: string) {
   return signInWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
-      const signedIn = store.getState().user.isLoggedIn
-      if (!!userCredential.user && !signedIn) {
-        dispatch(signIn())
+      if (!!userCredential.user) {
+        store.dispatch(signIn())
       }
     })
     .catch((error) => {
-      navigate(routePaths.signIn)
       generateErrorNotification(error.code)
       console.log(error.code)
     })
@@ -194,24 +177,12 @@ export async function setNewUserOnDB() {
 
 
 */
-export async function setUserNameOnDB(name: string) {
+export async function setUserFullNameOnDB(name: string, surname: string) {
   const userUuid = store.getState().user.user.uuid
   if (!!userUuid) {
     set(ref(dbReal, getDBPath.user(userUuid).name), name).catch((error) => {
       console.log(error)
     })
-  }
-}
-/*
-
-
-
-
-
-*/
-export async function setUserSurnameOnDB(surname: string) {
-  const userUuid = store.getState().user.user.uuid
-  if (!!userUuid) {
     set(ref(dbReal, getDBPath.user(userUuid).surname), surname).catch(
       (error) => {
         console.log(error)
@@ -241,40 +212,21 @@ export async function setUserEmailOnDB(email: string) {
 
 
 */
-export async function setUserOrgUuidOnDB(uuid: string | undefined) {
+export async function setUserOrgDetailsOnDB(
+  orgUuid: string,
+  orgRole: UserOrgRoles,
+) {
   const userUuid = store.getState().user.user.uuid
   if (!!userUuid) {
-    set(ref(dbReal, getDBPath.user(userUuid).orgUuid), uuid).catch((error) => {
-      console.log(error)
-    })
-  }
-}
-/*
-
-
-
-
-
-*/
-export async function setUserOrgRoleOnDB(userUuid: string, role: UserOrgRoles) {
-  if (!!userUuid) {
-    set(ref(dbReal, getDBPath.user(userUuid).orgRole), role).catch((error) => {
-      console.log(error)
-    })
-  }
-}
-/*
-
-
-
-
-
-*/
-export async function deleteUserOnDB() {
-  const userUuid = auth.currentUser?.uid
-  if (!!userUuid) {
-    remove(ref(dbReal, getDBPath.user(userUuid).user)).catch((error) =>
-      console.log(error),
+    set(ref(dbReal, getDBPath.user(userUuid).orgUuid), orgUuid).catch(
+      (error) => {
+        console.log(error)
+      },
+    )
+    set(ref(dbReal, getDBPath.user(userUuid).orgRole), orgRole).catch(
+      (error) => {
+        console.log(error)
+      },
     )
   }
 }
@@ -292,6 +244,21 @@ export async function deleteUserOrgDetailsOnDB(userUuid: string) {
   remove(ref(dbReal, getDBPath.user(userUuid).orgUuid)).catch((error) =>
     console.log(error),
   )
+}
+/*
+
+
+
+
+
+*/
+export async function deleteUserOnDB() {
+  const userUuid = auth.currentUser?.uid
+  if (!!userUuid) {
+    remove(ref(dbReal, getDBPath.user(userUuid).user)).catch((error) =>
+      console.log(error),
+    )
+  }
 }
 /*
 

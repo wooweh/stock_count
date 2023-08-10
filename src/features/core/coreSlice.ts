@@ -1,4 +1,4 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit"
+import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit"
 import { RootState } from "../../app/store"
 
 export type NotificationTypes = "success" | "info" | "warning" | "error"
@@ -7,9 +7,10 @@ export type NotificationProps = {
   type: NotificationTypes
   message: string
 }
+export type SystemStatusProps = "notBooted" | "isBooting" | "isBooted"
 
 export interface CoreState {
-  isSystemBooted: boolean
+  systemStatus: SystemStatusProps
   isDarkmode: boolean
   isMobile: boolean
   showNotification: boolean
@@ -17,7 +18,7 @@ export interface CoreState {
 }
 
 const initialState: CoreState = {
-  isSystemBooted: false,
+  systemStatus: "notBooted",
   isDarkmode: true,
   isMobile: false,
   showNotification: false,
@@ -28,11 +29,11 @@ export const coreSlice = createSlice({
   name: "core",
   initialState,
   reducers: {
-    bootSystem: (state) => {
-      state.isSystemBooted = true
+    setSystemStatus: (state, action: PayloadAction<SystemStatusProps>) => {
+      state.systemStatus = action.payload
     },
     resetSystem: (state) => {
-      state.isSystemBooted = false
+      state.systemStatus = "notBooted"
     },
     toggleIsDarkmode: (state) => {
       state.isDarkmode = !state.isDarkmode
@@ -52,7 +53,7 @@ export const coreSlice = createSlice({
 })
 
 export const {
-  bootSystem,
+  setSystemStatus,
   resetSystem,
   toggleIsDarkmode,
   toggleIsMobile,
@@ -66,6 +67,14 @@ export const selectShowNotification = (state: RootState) =>
   state.core.showNotification
 export const selectNotification = (state: RootState) => state.core.notificaiton
 export const selectIsSystemBooted = (state: RootState) =>
-  state.core.isSystemBooted
+  state.core.systemStatus === "isBooted"
+export const selectIsSystemBooting = (state: RootState) =>
+  state.core.systemStatus === "isBooting"
+export const selectIsSystemActive = createSelector(
+  [selectIsSystemBooted, selectIsSystemBooting],
+  (isBooted, isBooting) => {
+    return isBooted || isBooting
+  },
+)
 
 export default coreSlice.reducer

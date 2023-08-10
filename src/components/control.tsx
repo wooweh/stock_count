@@ -4,9 +4,9 @@ import Slider from "@mui/material/Slider"
 import Switch from "@mui/material/Switch"
 import { useState } from "react"
 import { SxProps } from "../common/types"
+import useTheme from "../common/useTheme"
 import { Button } from "./button"
 import Icon from "./icon"
-import useTheme from "../common/useTheme"
 /*
 
 
@@ -77,6 +77,11 @@ export function Control(props: ControlsProps) {
           ...props.sx,
           transition: "background 250ms",
           paddingRight: theme.module[1],
+          paddingBottom: theme.module[1],
+          boxShadow: theme.shadow.neo[2],
+          "&.Mui-disabled": {
+            boxShadow: "none",
+          },
         }}
         endAdornment={
           props.type === "password" ? (

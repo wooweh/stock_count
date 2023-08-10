@@ -20,7 +20,19 @@ export function Loader({ narration }: { narration: string }) {
   const firstChar = narration.charAt(0).toUpperCase()
   const modifiedNarration = firstChar + narration.slice(1)
   return (
-    <Stack gap={theme.module[5]} alignItems={"center"}>
+    <Stack
+      width={"100%"}
+      height={"100%"}
+      flexShrink={0}
+      top={0}
+      bgcolor={theme.scale.gray[8]}
+      position={"absolute"}
+      justifyContent={"center"}
+      alignContent={"center"}
+      zIndex={100}
+      gap={theme.module[5]}
+      alignItems={"center"}
+    >
       <SquareLoader
         color={theme.scale.gray[8]}
         loading={true}

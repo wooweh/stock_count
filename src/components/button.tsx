@@ -1,6 +1,5 @@
 import ButtonBase from "@mui/material/ButtonBase"
 import { useState } from "react"
-import { SxProps } from "../common/types"
 import useTheme from "../common/useTheme"
 /*
 
@@ -9,7 +8,7 @@ import useTheme from "../common/useTheme"
 
 
 */
-type ButtonVariations = "profile" | "modal" | "icon" | "home"
+type ButtonVariations = "profile" | "modal" | "icon" | "home" | "navigation"
 type AnimationDurations = 150 | 200
 type ButtonProps = {
   variation: ButtonVariations
@@ -17,7 +16,7 @@ type ButtonProps = {
   children: any
   onClick: any
   disabled?: boolean
-  sx?: SxProps
+  sx?: any
 }
 export function Button(props: ButtonProps) {
   const theme = useTheme()
@@ -53,7 +52,7 @@ export function Button(props: ButtonProps) {
       color: theme.scale.gray[3],
       borderRadius: theme.module[3],
       width: "100%",
-      outline: `2px solid ${theme.scale.gray[7]} !important`,
+      outline: `1px solid ${theme.scale.gray[7]} !important`,
       transform: `scale(${isPressed ? 0.975 : 1})`,
       ...commonStyles,
       ...props.sx,
@@ -62,8 +61,9 @@ export function Button(props: ButtonProps) {
       width: "100%",
       padding: theme.module[3],
       color: theme.scale.gray[4],
-      background: theme.scale.gray[9],
+      background: theme.scale.gray[8],
       borderRadius: theme.module[3],
+      boxShadow: theme.shadow.neo[3],
       transform: `scale(${isPressed ? 0.975 : 1})`,
       ...commonStyles,
       ...props.sx,
@@ -72,10 +72,10 @@ export function Button(props: ButtonProps) {
       background: theme.scale.gray[8],
       width: "100%",
       borderRadius: theme.module[3],
-      boxShadow: theme.shadow.neo[isPressed ? 4 : 6],
+      boxShadow: theme.shadow.neo[isPressed ? 3 : 6],
       overflow: "hidden",
       justifyContent: "flex-start",
-      transform: `scale(${isPressed ? 0.975 : 1})`,
+      transform: `scale(${isPressed ? 0.99 : 1})`,
       ...commonStyles,
       ...props.sx,
     },
@@ -85,6 +85,18 @@ export function Button(props: ButtonProps) {
       transform: `scale(${isPressed ? 0.8 : 1})`,
       ...commonStyles,
       transition: "transform 250ms",
+      ...props.sx,
+    },
+    navigation: {
+      width: "100%",
+      padding: theme.module[3],
+      boxSizing: "border-box",
+      color: theme.scale.gray[4],
+      background: theme.scale.gray[7],
+      borderRadius: theme.module[2],
+      outline: `1px solid ${theme.scale.gray[6]} !important`,
+      transform: `scale(${isPressed ? 0.99 : 1})`,
+      ...commonStyles,
       ...props.sx,
     },
   }

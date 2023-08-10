@@ -21,6 +21,7 @@ import {
 import { Loader } from "../../components/loader"
 import Modal from "../../components/modal"
 import { ProfileSurface } from "../../components/profileSurface"
+import { CompleteProfilePrompt } from "../core/home"
 import { generateNotification } from "../core/notifications"
 import {
   selectIsProfileComplete,
@@ -43,11 +44,9 @@ import {
   selectOrgInvites,
   selectOrgMembers,
   selectOrgName,
-  selectOrgUuid,
-  setOrgMemberRole,
   setOrgName,
 } from "./organisationSlice"
-import { CompleteProfilePrompt } from "../core/home"
+import { setOrgMember } from "./organisationSlice"
 /*
 
 
@@ -66,8 +65,7 @@ type UseOrgState = {
   isViewingInvites: boolean
 }
 type UseOrgKeys = keyof UseOrgState
-
-const useOrgStore = create<UseOrgState>()((set) => ({
+const initialState: UseOrgState = {
   isRemoving: false,
   isEditing: false,
   isJoining: false,
@@ -76,10 +74,17 @@ const useOrgStore = create<UseOrgState>()((set) => ({
   idViewingOptions: false,
   isViewingMembers: false,
   isViewingInvites: false,
+}
+const useOrgStore = create<UseOrgState>()((set) => ({
+  ...initialState,
 }))
 
 function setUseOrg(path: UseOrgKeys, value: boolean | string) {
   useOrgStore.setState({ [path]: value })
+}
+
+export function resetUseOrg() {
+  useOrgStore.setState(initialState)
 }
 /*
 
@@ -324,6 +329,7 @@ function MembersList() {
           <Typography>No members have been added</Typography>
         )
       }
+      show="actions"
       actions={[{ iconName: "cancel", handleClick: handleClose }]}
       onClose={handleClose}
     />
@@ -346,8 +352,8 @@ function MemberListItem({ member }: { member: MemberProps }) {
 */
   function handleAssignRole() {
     dispatch(
-      setOrgMemberRole({
-        uuid: member.uuid as string,
+      setOrgMember({
+        ...member,
         role: isMemberAdmin ? "member" : "admin",
       }),
     )
@@ -357,7 +363,7 @@ function MemberListItem({ member }: { member: MemberProps }) {
   
   */
   function handleDelete() {
-    dispatch(deleteOrgMember(member.uuid as string))
+    dispatch(deleteOrgMember(member.uuid))
   }
   /*
 
@@ -426,6 +432,7 @@ function InvitesList() {
           <Typography>No pending invites</Typography>
         )
       }
+      show="actions"
       actions={[{ iconName: "cancel", handleClick: handleClose }]}
       onClose={handleClose}
     />
@@ -604,6 +611,7 @@ function NewInvite() {
           />
         </Stack>
       }
+      show="actions"
       actions={[
         { iconName: "cancel", handleClick: handleClose },
         { iconName: "done", handleClick: handleAccept },
@@ -654,6 +662,7 @@ function RemoveOrgConfirmation() {
             " your organisation?"}
         </Typography>
       }
+      show="actions"
       actions={[
         { iconName: "cancel", handleClick: handleClose },
         { iconName: "done", handleClick: handleAccept },
@@ -795,6 +804,7 @@ function CreateOrg() {
           />
         </Stack>
       }
+      show="actions"
       actions={[
         { iconName: "cancel", handleClick: handleClose },
         { iconName: "addOrg", handleClick: handleCreate },
@@ -864,6 +874,7 @@ function JoinOrg() {
           />
         </Stack>
       }
+      show="actions"
       actions={[
         { iconName: "cancel", handleClick: handleClose },
         { iconName: "joinGroup", handleClick: handleJoin },

@@ -1,4 +1,4 @@
-import { bootSystem } from "../features/core/coreSlice"
+import { bootSystem, setSystemStatus } from "../features/core/coreSlice"
 import { setUser } from "../features/user/userSlice"
 import { auth } from "../remote"
 import { getUserFromDB, setNewUserOnDB } from "../features/user/userRemote"
@@ -15,6 +15,7 @@ import { store } from "./store"
 export async function syncUserDetails() {
   const authUser = auth.currentUser
   const isSystemBooted = store.getState().core.isSystemBooted
+
   if (!!authUser && !isSystemBooted) {
     const newUser = {
       uuid: authUser.uid,
@@ -33,10 +34,12 @@ export async function syncUserDetails() {
         }
       })
       .then(() => {
-        console.log("System booted")
-        store.dispatch(bootSystem())
+        store.dispatch(setSystemStatus("isBooting"))
+        console.log("System booting")
       })
       .catch((error) => {
+        store.dispatch(setSystemStatus("notBooted"))
+        console.log("System booting stopped")
         console.error(error)
       })
   }

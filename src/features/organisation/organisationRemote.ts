@@ -1,14 +1,9 @@
 import { child, get, ref, remove, set } from "firebase/database"
-import { dbReal } from "../../remote"
-import { store } from "../../app/store"
-import {
-  InvitesProps,
-  MemberProps,
-  OrgProps,
-} from "./organisationSlice"
-import { UserOrgRoles } from "../user/userSlice"
-import { getDBPath } from "../../remote/dbPaths"
 import _ from "lodash"
+import { store } from "../../app/store"
+import { dbReal } from "../../remote"
+import { getDBPath } from "../../remote/dbPaths"
+import { InvitesProps, MemberProps, OrgProps } from "./organisationSlice"
 /*
 
 
@@ -112,13 +107,10 @@ export async function setNewOrgOnDB(payload: OrgProps) {
 
 
 */
-export async function deleteOrgOnDB(uuid: string) {
-  const orgUuid = uuid
-  if (!!orgUuid) {
-    remove(ref(dbReal, getDBPath.org(orgUuid).org)).catch((error) => {
-      console.log(error)
-    })
-  }
+export async function deleteOrgOnDB(orgUuid: string) {
+  remove(ref(dbReal, getDBPath.org(orgUuid).org)).catch((error) => {
+    console.log(error)
+  })
 }
 /*
 
@@ -127,82 +119,18 @@ export async function deleteOrgOnDB(uuid: string) {
 
 
 */
-export async function setNewOrgMemberOnDB(orgUuid: string) {
-  const userUuid = store.getState().user.user.uuid
-  const userName = store.getState().user.user.name as string
-  const userSurname = store.getState().user.user.surname as string
-  const newMember: MemberProps = {
-    name: userName,
-    surname: userSurname,
-    role: "member",
-    uuid: userUuid as string,
-  }
-  if (!!orgUuid && !!userUuid) {
-    set(
-      ref(dbReal, getDBPath.org(orgUuid).member(userUuid).member),
-      newMember,
-    ).catch((error) => {
-      console.log(error)
-    })
-  }
-}
-/*
-
-
-
-
-
-*/
-export async function setOrgMemberNameOnDB(name: string) {
-  const userUuid = store.getState().user.user.uuid
-  const orgUuid = store.getState().user.user.orgUuid
-  if (!!orgUuid && !!userUuid) {
-    set(ref(dbReal, getDBPath.org(orgUuid).member(userUuid).name), name).catch(
-      (error) => {
-        console.log(error)
-      },
-    )
-  }
-}
-/*
-
-
-
-
-
-*/
-export async function setOrgMemberSurnameOnDB(surname: string) {
-  const userUuid = store.getState().user.user.uuid
-  const orgUuid = store.getState().user.user.orgUuid
-  if (!!orgUuid && !!userUuid) {
-    set(
-      ref(dbReal, getDBPath.org(orgUuid).member(userUuid).surname),
-      surname,
-    ).catch((error) => {
-      console.log(error)
-    })
-  }
-}
-/*
-
-
-
-
-
-*/
-export async function setOrgMemberRoleOnDB(
-  memberUuid: string,
-  role: UserOrgRoles,
+export async function setOrgMemberOnDB(
+  orgUuid: string,
+  orgMember: MemberProps,
 ) {
-  const orgUuid = store.getState().user.user.orgUuid
-  if (!!orgUuid) {
-    set(
-      ref(dbReal, getDBPath.org(orgUuid).member(memberUuid).role),
-      role,
-    ).catch((error) => {
-      console.log(error)
-    })
-  }
+  const memberUuid = orgMember.uuid
+
+  set(
+    ref(dbReal, getDBPath.org(orgUuid).member(memberUuid).member),
+    orgMember,
+  ).catch((error) => {
+    console.log(error)
+  })
 }
 /*
 

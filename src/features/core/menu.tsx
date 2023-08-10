@@ -8,7 +8,11 @@ import useTheme from "../../common/useTheme"
 import Icon from "../../components/icon"
 import { List, ListFactory } from "../../components/list"
 import { signOut } from "../user/userSlice"
-import { selectIsDarkmode, toggleIsDarkmode } from "./coreSlice"
+import {
+  selectIsDarkmode,
+  setSystemStatus,
+  toggleIsDarkmode,
+} from "./coreSlice"
 import { routePaths } from "./core"
 /*
 
@@ -26,8 +30,6 @@ export function Menu() {
   /*
   
   
-  
-  
   */
   function handleOpenMenu(event: any) {
     setAnchorEl(event.currentTarget)
@@ -35,15 +37,11 @@ export function Menu() {
   /*
   
   
-  
-  
   */
   function handleClose() {
     setAnchorEl(null)
   }
   /*
-  
-  
   
   
   */
@@ -54,16 +52,12 @@ export function Menu() {
   /*
   
   
-  
-  
   */
   function handleMenuItemClick(path: string) {
     setAnchorEl(null)
     navigate(path)
   }
   /*
-  
-  
   
   
   */

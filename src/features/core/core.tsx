@@ -1,25 +1,19 @@
-import { onAuthStateChanged } from "firebase/auth"
 import _ from "lodash"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { useResizeDetector } from "react-resize-detector"
-import { Route, Routes, useLocation, useNavigate } from "react-router-dom"
+import { Route, Routes, useLocation } from "react-router-dom"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import Container from "../../components/container"
-import { auth } from "../../remote"
-import { Organisation } from "../organisation/organisation"
-import { Stock } from "../stock/stock"
-import {
-  SignInWithCredentials,
-  SigningIn,
-  VerifyEmail,
-} from "../user/authentication"
-import UserProfile from "../user/user"
-import { selectIsLoggedIn, signOut } from "../user/userSlice"
+import { Organisation, resetUseOrg } from "../organisation/organisation"
+import { Stock, resetUseStock } from "../stock/stock"
+import { Authentication, WithAuth, resetUseAuth } from "../user/authentication"
+import UserProfile, { resetUseUser } from "../user/user"
 import { Bar } from "./bar"
 import { selectIsMobile, toggleIsMobile } from "./coreSlice"
 import { DBListeners } from "./dbListeners"
 import { Home } from "./home"
 import { Notifications } from "./notifications"
+import { Count } from "../count/count"
 /*
 
 
@@ -32,19 +26,13 @@ export const routes = [
     name: "Sign in",
     path: "/sign_in",
     requiresAuth: false,
-    element: <SignInWithCredentials />,
+    element: <Authentication isRegistering={false} />,
   },
   {
-    name: "Verify email",
-    path: "/verify_email",
+    name: "Register",
+    path: "/register",
     requiresAuth: false,
-    element: <VerifyEmail />,
-  },
-  {
-    name: "Signing in",
-    path: "/signing_in",
-    requiresAuth: false,
-    element: <SigningIn />,
+    element: <Authentication isRegistering={true} />,
   },
   {
     name: "Home",
@@ -53,10 +41,10 @@ export const routes = [
     element: <Home />,
   },
   {
-    name: "New count",
-    path: "/new_count",
+    name: "Count",
+    path: "/count",
     requiresAuth: true,
-    element: <div>New count</div>,
+    element: <Count />,
   },
   {
     name: "Stock",
@@ -118,16 +106,6 @@ export const routePaths = getRoutePaths()
 
 
 */
-function getPublicPaths() {
-  return _.filter(routes, (route) => !route.requiresAuth)
-}
-/*
-
-
-
-
-
-*/
 function updateMobile(
   dispatch: Function,
   width: number | undefined,
@@ -147,37 +125,20 @@ function updateMobile(
 export default function Core() {
   const dispatch = useAppDispatch()
   const isMobile = useAppSelector(selectIsMobile)
-  const isLoggedIn = useAppSelector(selectIsLoggedIn)
-  const navigate = useNavigate()
-  const location = useLocation()
-  const [isAuthorised, setIsAuthorised] = useState(false)
   const { width, ref } = useResizeDetector()
+  const location = useLocation()
 
   useEffect(() => {
     updateMobile(dispatch, width, isMobile)
   }, [width, isMobile, dispatch])
 
   useEffect(() => {
-    const publicPaths = getPublicPaths()
-    const isPublicPath =
-      _.findIndex(publicPaths, (path) => path.path === location.pathname) !== -1
-
-    onAuthStateChanged(auth, (user) => {
-      setIsAuthorised(!!user && isLoggedIn)
-      if (user && !isLoggedIn) {
-        dispatch(signOut)
-        navigate(routePaths.signIn.path)
-      }
-      if (!user && !isPublicPath) {
-        dispatch(signOut)
-        navigate(routePaths.signIn.path)
-      }
-      if (user && isLoggedIn && isPublicPath) {
-        navigate(routePaths.home.path)
-      }
-    })
-  }, [navigate, location.pathname, dispatch, isLoggedIn])
-
+    resetUseAuth()
+    resetUseUser()
+    resetUseOrg()
+    resetUseStock()
+  }, [location])
+  //  TODO
   return (
     <>
       <Bar />
@@ -186,8 +147,12 @@ export default function Core() {
       <Container resizeRef={ref}>
         <Routes>
           {routes.map((route: any, index: number) => {
-            return !isAuthorised && route.requiresAuth ? null : (
-              <Route path={route.path} element={route.element} key={index} />
+            return (
+              <Route
+                path={route.path}
+                element={<WithAuth route={route} />}
+                key={index}
+              />
             )
           })}
         </Routes>
