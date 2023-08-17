@@ -1,10 +1,35 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit"
 import { User, signOut as signOutAuth } from "firebase/auth"
+import _ from "lodash"
 import { resetSystem, setSystemStatus } from "../features/core/coreSlice"
 import {
   generateErrorNotification,
   generateNotification,
 } from "../features/core/notifications"
+import {
+  deleteCountMemberOnDB,
+  deleteCountOnDB,
+  deleteCountResultsItemOnDB,
+  setCountFinalCommentsOnDB,
+  setCountMemberOnDB,
+  setCountMembersOnDB,
+  setCountMetaDataOnDB,
+  setCountPrepCommentsOnDB,
+  setCountResultsItemOnDB,
+} from "../features/count/countRemote"
+import {
+  deleteCount,
+  deleteCountMember,
+  deleteCountResultsItem,
+  setCount,
+  setCountFinalComments,
+  setCountMember,
+  setCountMembers,
+  setCountMetaData,
+  setCountPrepComments,
+  setCountResultsItem,
+  setCountStep,
+} from "../features/count/countSlice"
 import {
   createOrgInviteOnDB,
   deleteAllOrgInvitesOnDB,
@@ -13,8 +38,8 @@ import {
   deleteOrgOnDB,
   getOrgFromDB,
   getOrgUuidWithInviteKeyFromDB,
-  setOrgMemberOnDB,
   setNewOrgOnDB,
+  setOrgMemberOnDB,
   setOrgNameOnDB,
 } from "../features/organisation/organisationRemote"
 import {
@@ -39,11 +64,10 @@ import {
 } from "../features/stock/stockRemote"
 import {
   addStockList,
-  addStockItem,
   deleteStock,
   deleteStockItem,
-  editStockItem,
   setStock,
+  setStockItem,
 } from "../features/stock/stockSlice"
 import {
   deleteUserOnAuth,
@@ -90,8 +114,8 @@ listenerMiddleware.startListening({
     store.dispatch(setUser({}))
     store.dispatch(setOrg({}))
     store.dispatch(setStock({}))
+    store.dispatch(setCount({}))
     // TODO: History
-    // TODO: Count
   },
 })
 /*
@@ -444,7 +468,7 @@ listenerMiddleware.startListening({
 
 */
 listenerMiddleware.startListening({
-  actionCreator: addStockItem,
+  actionCreator: setStockItem,
   effect: async (action) => {
     const stockId = action.payload.id
     const stockItem = action.payload
@@ -461,23 +485,8 @@ listenerMiddleware.startListening({
 listenerMiddleware.startListening({
   actionCreator: addStockList,
   effect: async (action) => {
-    const stock = action.payload
-    setStockOnDB(stock)
-  },
-})
-/*
-
-
-
-
-
-*/
-listenerMiddleware.startListening({
-  actionCreator: editStockItem,
-  effect: async (action) => {
-    const stockId = action.payload.id
-    const stockItem = action.payload
-    setStockItemOnDB(stockId, stockItem)
+    const stockList = action.payload
+    setStockOnDB(stockList)
   },
 })
 /*
@@ -506,6 +515,158 @@ listenerMiddleware.startListening({
   effect: async () => {
     const orgUuid = store.getState().organisation.org.uuid
     if (!!orgUuid) deleteStockOnDB(orgUuid)
+  },
+})
+/*
+
+
+
+
+
+*/
+listenerMiddleware.startListening({
+  actionCreator: setCountStep,
+  effect: async (action) => {
+    const members = store.getState().count.count.members
+    const memberUuid = store.getState().user.user.uuid
+    const step = action.payload
+    if (!!members && !!memberUuid) {
+      const member = { ...members[memberUuid], step }
+      store.dispatch(setCountMember({ member, updateDB: true }))
+    }
+  },
+})
+/*
+
+
+
+
+
+*/
+listenerMiddleware.startListening({
+  actionCreator: setCountMember,
+  effect: async (action) => {
+    const orgUuid = store.getState().organisation.org.uuid
+    const members = store.getState().count.count.members
+    const updateDB = action.payload.updateDB
+    const member = action.payload.member
+    if (!!orgUuid && !!members && !!updateDB) {
+      setCountMemberOnDB(member)
+    }
+  },
+})
+/*
+
+
+
+
+
+*/
+listenerMiddleware.startListening({
+  actionCreator: deleteCountMember,
+  effect: async (action) => {
+    const memberUuid = action.payload
+    deleteCountMemberOnDB(memberUuid)
+  },
+})
+/*
+
+
+
+
+
+*/
+listenerMiddleware.startListening({
+  actionCreator: setCountResultsItem,
+  effect: async (action) => {
+    const payload = action.payload
+    setCountResultsItemOnDB(payload)
+  },
+})
+/*
+
+
+
+
+
+*/
+listenerMiddleware.startListening({
+  actionCreator: deleteCountResultsItem,
+  effect: async (action) => {
+    const payload = action.payload
+    deleteCountResultsItemOnDB(payload)
+  },
+})
+/*
+
+
+
+
+
+*/
+listenerMiddleware.startListening({
+  actionCreator: setCountMembers,
+  effect: async (action) => {
+    const updateDB = action.payload.updateDB
+    const members = action.payload.members
+    if (updateDB) setCountMembersOnDB(members)
+  },
+})
+/*
+
+
+
+
+
+*/
+listenerMiddleware.startListening({
+  actionCreator: setCountMetaData,
+  effect: async (action) => {
+    const updateDB = action.payload.updateDB
+    const metadata = action.payload.metadata
+    if (updateDB) setCountMetaDataOnDB(metadata)
+  },
+})
+/*
+
+
+
+
+
+*/
+listenerMiddleware.startListening({
+  actionCreator: setCountPrepComments,
+  effect: async (action) => {
+    const comments = action.payload
+    setCountPrepCommentsOnDB(comments)
+  },
+})
+/*
+
+
+
+
+
+*/
+listenerMiddleware.startListening({
+  actionCreator: setCountFinalComments,
+  effect: async (action) => {
+    const comments = action.payload
+    setCountFinalCommentsOnDB(comments)
+  },
+})
+/*
+
+
+
+
+
+*/
+listenerMiddleware.startListening({
+  actionCreator: deleteCount,
+  effect: async (action) => {
+    const orgUuid = store.getState().organisation.org.uuid
+    if (!!orgUuid) deleteCountOnDB(orgUuid)
   },
 })
 /*

@@ -1,18 +1,18 @@
-import Input from "@mui/material/InputBase"
+// import Input from "@mui/material/InputBase"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 import { useEffect, useState } from "react"
 import { v4 as uuidv4 } from "uuid"
 import { create } from "zustand"
+import { createJSONStorage, persist } from "zustand/middleware"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { makeSentenceCase } from "../../common/utils"
 import { Button } from "../../components/button"
-import { Control } from "../../components/control"
+import { Input } from "../../components/control"
 import Icon, { IconNames } from "../../components/icon"
 import {
   List,
-  ListFactory,
   ListGroup,
   ListItem,
   ListItemOptionProps,
@@ -41,12 +41,12 @@ import {
   selectIsJoining,
   selectIsOrgSetup,
   selectOrg,
-  selectOrgInvites,
-  selectOrgMembers,
+  selectOrgInvitesList,
+  selectOtherOrgMembersList,
   selectOrgName,
+  setOrgMember,
   setOrgName,
 } from "./organisationSlice"
-import { setOrgMember } from "./organisationSlice"
 /*
 
 
@@ -75,9 +75,17 @@ const initialState: UseOrgState = {
   isViewingMembers: false,
   isViewingInvites: false,
 }
-const useOrgStore = create<UseOrgState>()((set) => ({
-  ...initialState,
-}))
+const useOrgStore = create<UseOrgState>()(
+  persist(
+    (set) => ({
+      ...initialState,
+    }),
+    {
+      name: "organisation-storage",
+      storage: createJSONStorage(() => sessionStorage),
+    },
+  ),
+)
 
 function setUseOrg(path: UseOrgKeys, value: boolean | string) {
   useOrgStore.setState({ [path]: value })
@@ -139,8 +147,7 @@ function OrgProfile() {
 function OrgNameHeader() {
   const theme = useTheme()
   const dispatch = useAppDispatch()
-
-  const orgName = useAppSelector(selectOrgName)
+  const orgName = useAppSelector(selectOrgName) as string
   const isAdmin = useAppSelector(selectIsUserAdmin)
   const isEditing = useOrgStore((state: any) => state.isEditing)
   const [newOrgName, setNewOrgName] = useState(orgName)
@@ -173,8 +180,7 @@ function OrgNameHeader() {
   return (
     <Stack width={"100%"} gap={theme.module[3]}>
       <Stack direction={"row"} alignItems={"center"} gap={theme.module[5]}>
-        <Control
-          variation={"input"}
+        <Input
           disabled={!isEditing}
           value={newOrgName}
           onChange={(event: any) => setNewOrgName(event.target.value)}
@@ -185,14 +191,13 @@ function OrgNameHeader() {
             fontWeight: "bold",
           }}
         />
-        {isAdmin ? (
+        {isAdmin && (
           <Button
-            variation={"icon"}
+            variation={"pill"}
             onClick={isEditing ? handleAccept : handleEdit}
-          >
-            <Icon variation={isEditing ? "done" : "edit"} />
-          </Button>
-        ) : undefined}
+            iconName={isEditing ? "done" : "edit"}
+          />
+        )}
       </Stack>
       <Stack
         direction={"row"}
@@ -220,7 +225,6 @@ function OrgNameHeader() {
 type OrgItems = { iconName: IconNames; label: string; onClick: Function }[]
 function ButtonTray() {
   const theme = useTheme()
-
   const isAdmin = useAppSelector(selectIsUserAdmin)
   /*
   
@@ -260,35 +264,25 @@ function ButtonTray() {
         paddingTop={theme.module[3]}
         boxSizing={"border-box"}
       >
-        {isAdmin
-          ? orgItems.map((item: any, index: number) => {
-              return (
-                <Button
-                  variation={"profile"}
-                  onClick={item.onClick}
-                  key={index}
-                >
-                  <Stack
-                    width={"100%"}
-                    height={"100%"}
-                    direction={"row"}
-                    alignItems={"center"}
-                    alignContent={"center"}
-                    gap={theme.module[4]}
-                  >
-                    <Icon variation={item.iconName} fontSize={"large"} />
-                    <Typography variant="h6" color={theme.scale.gray[4]}>
-                      {item.label}
-                    </Typography>
-                  </Stack>
-                </Button>
-              )
-            })
-          : undefined}
+        {isAdmin &&
+          orgItems.map((item: any, index: number) => {
+            return (
+              <Button
+                variation={"profile"}
+                label={item.label}
+                iconName={item.iconName}
+                onClick={item.onClick}
+                key={index}
+              />
+            )
+          })}
       </Stack>
-      <Button variation={"profile"} onClick={handleRemove}>
-        <Icon variation={isAdmin ? "delete" : "leave"} fontSize={"large"} />
-      </Button>
+      <Button
+        variation={"profile"}
+        onClick={handleRemove}
+        iconName={isAdmin ? "delete" : "leave"}
+        justifyCenter
+      />
     </>
   )
 }
@@ -300,7 +294,7 @@ function ButtonTray() {
 
 */
 function MembersList() {
-  const members = useAppSelector(selectOrgMembers)
+  const members = useAppSelector(selectOtherOrgMembersList)
   const isViewingMembers = useOrgStore((state: any) => state.isViewingMembers)
   /*
   
@@ -403,7 +397,7 @@ function MemberListItem({ member }: { member: MemberProps }) {
 
 */
 function InvitesList() {
-  const invites = useAppSelector(selectOrgInvites) as InviteProps[]
+  const invites = useAppSelector(selectOrgInvitesList) as InviteProps[]
   const isViewingInvites = useOrgStore((state: any) => state.isViewingInvites)
   /*
   
@@ -579,8 +573,7 @@ function NewInvite() {
             boxSizing={"border-box"}
           >
             <Typography>Name:</Typography>
-            <Control
-              variation={"input"}
+            <Input
               placeholder={"(optional)"}
               onChange={handleChange}
               value={tempName}
@@ -599,12 +592,11 @@ function NewInvite() {
               />
             }
             secondarySlot={
-              <Button variation={"icon"} onClick={handleCopy}>
-                <Icon
-                  variation={isCopied ? "done" : "copy"}
-                  fontSize={"small"}
-                />
-              </Button>
+              <Button
+                variation={"pill"}
+                onClick={handleCopy}
+                iconName={isCopied ? "done" : "copy"}
+              />
             }
             onChange={handleCopy}
             tappable
@@ -694,37 +686,50 @@ function OrgSetup() {
 
 
 */
+type ActionItemProps = {
+  label: string
+  description: string
+  iconName: IconNames
+  onChange: () => void
+}
 function OrgSetupActions() {
   const theme = useTheme()
+
+  const actionItems: ActionItemProps[] = [
+    {
+      label: "Create organisation",
+      description: "Create a new organisation for your team",
+      iconName: "org",
+      onChange: () => setUseOrg("isCreating", true),
+    },
+    {
+      label: "Join organisation",
+      description: "Join an existing organisation with a key",
+      iconName: "group",
+      onChange: () => setUseOrg("isJoining", true),
+    },
+  ]
+
   return (
     <Stack
       padding={theme.module[3]}
       width={"100%"}
       height={"100%"}
       boxSizing={"border-box"}
+      justifyContent={"flex-start"}
     >
-      <List>
-        <ListGroup>
-          <ListFactory
-            items={[
-              {
-                label: "Create organisation",
-                description: "Create a new organisation for your team",
-                iconName: "org",
-                tappable: true,
-                onChange: () => setUseOrg("isCreating", true),
-              },
-              {
-                label: "Join organisation",
-                description: "Join an existing organisation with a key",
-                iconName: "group",
-                tappable: true,
-                onChange: () => setUseOrg("isJoining", true),
-              },
-            ]}
+      <ListGroup>
+        {actionItems.map((item: ActionItemProps, index) => (
+          <ListItem
+            label={item.label}
+            description={item.description}
+            primarySlot={<Icon variation={item.iconName} />}
+            onChange={item.onChange}
+            tappable
+            key={index}
           />
-        </ListGroup>
-      </List>
+        ))}
+      </ListGroup>
     </Stack>
   )
 }
@@ -793,8 +798,7 @@ function CreateOrg() {
           gap={theme.module[3]}
         >
           <Typography>Name:</Typography>
-          <Control
-            variation={"input"}
+          <Input
             placeholder={"Organisation name"}
             onChange={handleChange}
             value={orgName}
@@ -864,7 +868,6 @@ function JoinOrg() {
         >
           <Typography>Key:</Typography>
           <Input
-            fullWidth={true}
             placeholder="Invite key"
             onChange={handleChange}
             value={inviteKey}

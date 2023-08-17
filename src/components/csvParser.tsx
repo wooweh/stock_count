@@ -1,6 +1,5 @@
 import Papa from "papaparse"
 import { StockItemProps } from "../features/stock/stockSlice"
-import useTheme from "../common/useTheme"
 /*
 
 
@@ -13,8 +12,6 @@ export function CSVParser({
 }: {
   onComplete: (results: StockItemProps[]) => void
 }) {
-  const theme = useTheme()
-
   function handleOnChange(event: any) {
     Papa.parse(event.target.files[0], {
       header: true,
@@ -36,6 +33,25 @@ export function CSVParser({
 */
 export function generateCSV(data: { [key: string]: string }[]) {
   return Papa.unparse(data)
+}
+/*
+
+
+
+
+
+*/
+export function downloadCSVTemplate(data: { [key: string]: string }[]) {
+  const csv = generateCSV(data)
+  const downloadLink = document.createElement("a")
+  const blob = new Blob(["\ufeff", csv])
+  const url = URL.createObjectURL(blob)
+  downloadLink.href = url
+  downloadLink.download = "stock_uplaod_template.csv"
+
+  document.body.appendChild(downloadLink)
+  downloadLink.click()
+  document.body.removeChild(downloadLink)
 }
 /*
 

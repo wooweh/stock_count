@@ -13,9 +13,9 @@ export default function GlobalStyles() {
           height: 0;
           display: flex;
           flex-shrink: 0;
-          width: ${isMobile
-            ? theme.module[0]
-            : theme.module[2]}; /* Remove scrollbar space */
+          width: ${
+            isMobile ? theme.module[0] : theme.module[2]
+          }; /* Remove scrollbar space */
           background: transparent; /* Optional: just make scrollbar invisible */
         }
         ::-webkit-scrollbar-thumb {
@@ -75,12 +75,16 @@ export default function GlobalStyles() {
             display: none !important;
           }
         }
-        ,
         .MuiInputBase-root {
           background: ${theme.scale.gray[7]};
           color: ${theme.scale.gray[3]} !important;
-          padding: ${theme.module[1]} ${theme.module[3]};
+          padding: ${theme.module[1]};
+          padding-left: ${theme.module[3]};
           border-radius: ${theme.module[2]};
+          box-shadow: ${theme.shadow.neo[2]} !important;
+          &.Mui-disabled {
+            box-shadow: none !important;
+          }
         }
         .MuiInputBase-input {
           &.Mui-disabled {
@@ -89,7 +93,6 @@ export default function GlobalStyles() {
         }
         .MuiMenu-paper {
           background: ${theme.scale.gray[7]} !important;
-          border-radius: ${theme.module[3]} !important;
           box-sizing: border-box;
         }
         .MuiMenu-list {

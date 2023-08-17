@@ -29,7 +29,7 @@ export async function getOrgFromDB(orgUuid: string) {
 
 */
 export async function getOrgUuidWithInviteKeyFromDB(inviteKey: string) {
-  return get(child(ref(dbReal), getDBPath.invite(inviteKey)))
+  return get(child(ref(dbReal), getDBPath.invite(inviteKey).invite))
     .then((snapshot) => {
       const uuid = snapshot.val()
       return uuid
@@ -48,12 +48,13 @@ export async function getOrgUuidWithInviteKeyFromDB(inviteKey: string) {
 export async function createOrgInviteOnDB(inviteKey: string, tempName: string) {
   const orgUuid = store.getState().organisation.org.uuid
   if (!!orgUuid) {
-    set(ref(dbReal, getDBPath.invite(inviteKey)), orgUuid).catch((error) =>
-      console.log(error),
-    )
-    set(ref(dbReal, getDBPath.org(orgUuid).invite(inviteKey)), tempName).catch(
+    set(ref(dbReal, getDBPath.invite(inviteKey).invite), orgUuid).catch(
       (error) => console.log(error),
     )
+    set(
+      ref(dbReal, getDBPath.org(orgUuid).invite(inviteKey).invite),
+      tempName,
+    ).catch((error) => console.log(error))
   }
 }
 /*
@@ -64,11 +65,11 @@ export async function createOrgInviteOnDB(inviteKey: string, tempName: string) {
 
 */
 export async function deleteOrgInviteOnDB(orgUuid: string, inviteKey: string) {
-  remove(ref(dbReal, getDBPath.invite(inviteKey))).catch((error) =>
+  remove(ref(dbReal, getDBPath.invite(inviteKey).invite)).catch((error) =>
     console.log(error),
   )
-  remove(ref(dbReal, getDBPath.org(orgUuid).invite(inviteKey))).catch((error) =>
-    console.log(error),
+  remove(ref(dbReal, getDBPath.org(orgUuid).invite(inviteKey).invite)).catch(
+    (error) => console.log(error),
   )
 }
 /*
@@ -80,7 +81,7 @@ export async function deleteOrgInviteOnDB(orgUuid: string, inviteKey: string) {
 */
 export async function deleteAllOrgInvitesOnDB(invites: InvitesProps) {
   _.forEach(invites, (value, key) =>
-    remove(ref(dbReal, getDBPath.invite(key))).catch((error) =>
+    remove(ref(dbReal, getDBPath.invite(key).invite)).catch((error) =>
       console.log(error),
     ),
   )

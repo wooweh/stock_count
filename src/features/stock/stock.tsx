@@ -5,12 +5,13 @@ import { useEffect, useRef, useState } from "react"
 import { ReactSearchAutocomplete } from "react-search-autocomplete"
 import { Virtuoso } from "react-virtuoso"
 import { create } from "zustand"
+import { createJSONStorage, persist } from "zustand/middleware"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import Animation from "../../components/animation"
 import { Button } from "../../components/button"
-import { Control } from "../../components/control"
-import { CSVParser, generateCSV } from "../../components/csvParser"
+import { Input } from "../../components/control"
+import { CSVParser, downloadCSVTemplate } from "../../components/csvParser"
 import Icon from "../../components/icon"
 import {
   ListItemOptionProps,
@@ -20,13 +21,12 @@ import Modal, { ModalActionProps } from "../../components/modal"
 import VirtualizedTable, { ColumnData } from "../../components/table"
 import {
   StockItemProps,
-  addStockItem,
-  addStockList,
   deleteStock,
   deleteStockItem,
-  editStockItem,
   selectStockIdList,
   selectStockList,
+  setStock,
+  setStockItem,
 } from "./stockSlice"
 /*
 
@@ -55,9 +55,14 @@ const initialState: UseStockState = {
   scrollIndex: 0,
   selectedItems: [],
 }
-const useStockStore = create<UseStockState>()((set) => ({
-  ...initialState,
-}))
+const useStockStore = create<UseStockState>()(
+  persist(
+    (set) => ({
+      ...initialState,
+    }),
+    { name: "stock-storage", storage: createJSONStorage(() => sessionStorage) },
+  ),
+)
 
 function setUseStock(path: UseStockKeys, value: any) {
   useStockStore.setState({ [path]: value })
@@ -234,22 +239,17 @@ function SearchBar() {
         <Stack
           position={"absolute"}
           justifyContent={"flex-end"}
-          paddingBottom={theme.module[0]}
+          paddingBottom={"1px"}
         >
           <Button
-            variation={"icon"}
+            variation={"pill"}
+            iconName={isSearching ? "cancel" : "search"}
             onClick={handleIconClick}
-            sx={{
-              background: theme.scale.gray[9],
-              padding: theme.module[3],
-              outline: `1px solid ${theme.scale.gray[7]} !important`,
-            }}
-          >
-            <Icon
-              variation={isSearching ? "cancel" : "search"}
-              fontSize={"small"}
-            />
-          </Button>
+            outlineColor={theme.scale.gray[7]}
+            bgColor={theme.scale.gray[9]}
+            iconSize={"small"}
+            sx={{ padding: theme.module[3] }}
+          />
         </Stack>
       </Stack>
     </ClickAwayListener>
@@ -318,26 +318,21 @@ function SelectionBar() {
         gap={theme.module[4]}
         alignItems={"center"}
       >
-        <Button variation={"icon"} onClick={handleBack}>
-          <Icon variation={"backArrow"} />
-        </Button>
+        <Button
+          variation={"pill"}
+          onClick={handleBack}
+          iconName={"backArrow"}
+        />
         <Typography>{selectedItems.length}</Typography>
       </Stack>
       <Button
-        variation={"icon"}
+        variation={"pill"}
+        label={"Select All"}
         onClick={handleSelectAll}
-        sx={{
-          color: theme.scale.gray[3],
-          background: theme.scale.gray[7],
-          padding: `${theme.module[2]} ${theme.module[3]}`,
-        }}
-      >
-        Select All
-      </Button>
+        bgColor={theme.scale.gray[7]}
+      />
       <Stack width={theme.module[7]} alignItems={"flex-end"}>
-        <Button variation={"icon"} onClick={handleDelete}>
-          <Icon variation={"delete"} />
-        </Button>
+        <Button variation={"pill"} iconName={"delete"} onClick={handleDelete} />
       </Stack>
     </Stack>
   )
@@ -405,7 +400,7 @@ function Body() {
             style={{
               height: "100%",
               width: "100%",
-              borderRadius: theme.module[4],
+              borderRadius: theme.module[3],
             }}
             totalCount={stockList.length}
             itemContent={(index) => {
@@ -425,7 +420,7 @@ function Body() {
                 },
               ]
               return (
-                <Stack padding={theme.module[1]} boxSizing={"border-box"}>
+                <Stack padding={theme.module[0]} boxSizing={"border-box"}>
                   <SelectableListItemWithOptions
                     label={item.name}
                     description={item.description}
@@ -491,18 +486,18 @@ function ButtonTray() {
     >
       <Button
         variation={"profile"}
+        iconName={"add"}
         onClick={handleAddClick}
-        sx={{ background: theme.scale.gray[9] }}
-      >
-        <Icon variation={"add"} />
-      </Button>
+        bgColor={theme.scale.gray[9]}
+        justifyCenter
+      />
       <Button
         variation={"profile"}
+        iconName={"upload"}
         onClick={handleIsUploading}
-        sx={{ background: theme.scale.gray[9] }}
-      >
-        <Icon variation={"upload"} />
-      </Button>
+        bgColor={theme.scale.gray[9]}
+        justifyCenter
+      />
     </Stack>
   )
 }
@@ -545,7 +540,7 @@ function AddItem() {
   function handleAccept(event: any) {
     if (id && name) {
       dispatch(
-        addStockItem({
+        setStockItem({
           id: id,
           name: name,
           description: description,
@@ -594,10 +589,9 @@ function AddItem() {
                   <Typography width={theme.module[7]}>
                     {input.label}:
                   </Typography>
-                  <Control
-                    variation={"input"}
-                    onChange={input.onChange}
+                  <Input
                     value={input.value}
+                    onChange={input.onChange}
                     sx={{
                       background: theme.scale.gray[8],
                     }}
@@ -627,17 +621,17 @@ function AddItem() {
 function UploadItems() {
   const theme = useTheme()
   const dispatch = useAppDispatch()
-  const [data, setData]: any = useState([])
   const isUploading = useStockStore((state: any) => state.isUploading)
+  const [data, setData]: any = useState([])
   /*
   
   
   */
   function handleAccept() {
-    setUseStock("isUploading", false)
     const stockList = {}
     _.forEach(data, (item) => _.set(stockList, item.id, item))
-    dispatch(addStockList(stockList))
+    dispatch(setStock(stockList))
+    handleClose()
   }
   /*
   
@@ -658,22 +652,8 @@ function UploadItems() {
   
   */
   function handleDownload() {
-    const csv = generateCSV([
-      {
-        id: "",
-        name: "",
-        description: "",
-      },
-    ])
-    const downloadLink = document.createElement("a")
-    const blob = new Blob(["\ufeff", csv])
-    const url = URL.createObjectURL(blob)
-    downloadLink.href = url
-    downloadLink.download = "stock_uplaod_template.csv"
-
-    document.body.appendChild(downloadLink)
-    downloadLink.click()
-    document.body.removeChild(downloadLink)
+    const data = [{ id: "", name: "", description: "" }]
+    downloadCSVTemplate(data)
   }
   /*
   
@@ -722,17 +702,11 @@ function UploadItems() {
               <CSVParser onComplete={handleOnComplete} />
               <Button
                 variation={"modal"}
+                label={"CSV Template"}
+                iconName={"download"}
+                bgColor={theme.scale.gray[7]}
                 onClick={handleDownload}
-                sx={{
-                  background: theme.scale.gray[7],
-                  boxShadow: theme.shadow.neo[3],
-                }}
-              >
-                <Stack direction={"row"} gap={theme.module[3]}>
-                  <Icon variation={"download"} />
-                  <Typography>CSV Template</Typography>
-                </Stack>
-              </Button>
+              />
             </Stack>
           ) : (
             <Stack
@@ -799,21 +773,20 @@ function EditItem() {
   function handleAccept(event: any) {
     if (id && name) {
       dispatch(
-        editStockItem({
+        setStockItem({
           id: id,
           name: name,
           description: description,
         }),
       )
-      setUseStock("isEditing", false)
-      setUseStock("idViewingOptions", false)
+      handleClose()
     }
   }
   /*
   
   
   */
-  function handleClose(event: any) {
+  function handleClose() {
     setUseStock("isEditing", false)
     setUseStock("idViewingOptions", false)
   }
@@ -844,8 +817,7 @@ function EditItem() {
                   <Typography width={theme.module[7]}>
                     {input.label}:
                   </Typography>
-                  <Control
-                    variation={"input"}
+                  <Input
                     onChange={input.onChange}
                     value={input.value}
                     sx={{

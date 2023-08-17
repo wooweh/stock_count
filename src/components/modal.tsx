@@ -57,6 +57,8 @@ export default function Modal(props: ModalProps) {
     <MuiModal
       open={open}
       onClose={handleClose}
+      disablePortal
+      disableAutoFocus
       closeAfterTransition
       slots={{ backdrop: Backdrop }}
       slotProps={{
@@ -114,9 +116,11 @@ export default function Modal(props: ModalProps) {
                   start={true}
                   key={index}
                 >
-                  <Button variation={"modal"} onClick={action.handleClick}>
-                    <Icon variation={action.iconName} />
-                  </Button>
+                  <Button
+                    variation={"modal"}
+                    iconName={action.iconName}
+                    onClick={action.handleClick}
+                  />
                 </Animation>
               ))}
             {showFooter && (

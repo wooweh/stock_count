@@ -1,9 +1,9 @@
 import coreReducer, {
   CoreState,
   NotificationProps,
-  bootSystem,
   hideNotification,
   resetSystem,
+  setSystemStatus,
   showNotification,
   toggleIsDarkmode,
   toggleIsMobile,
@@ -12,7 +12,7 @@ import { v4 as uuidv4 } from "uuid"
 
 describe("core reducer", () => {
   const initialState: CoreState = {
-    isSystemBooted: false,
+    systemStatus: "notBooted",
     isDarkmode: true,
     isMobile: false,
     showNotification: false,
@@ -20,7 +20,7 @@ describe("core reducer", () => {
   }
   it("should handle initial state", () => {
     expect(coreReducer(undefined, { type: "unknown" })).toEqual({
-      isSystemBooted: false,
+      systemStatus: "notBooted",
       isDarkmode: true,
       isMobile: false,
       showNotification: false,
@@ -28,14 +28,14 @@ describe("core reducer", () => {
     })
   })
 
-  it("should handle bootSystem", () => {
-    const actual = coreReducer(initialState, bootSystem())
-    expect(actual.isSystemBooted).toEqual(true)
+  it("should handle setSystemStatus", () => {
+    const actual = coreReducer(initialState, setSystemStatus("isBooted"))
+    expect(actual.systemStatus).toEqual("isBooted")
   })
 
   it("should handle resetSystem", () => {
     const actual = coreReducer(initialState, resetSystem())
-    expect(actual.isSystemBooted).toEqual(false)
+    expect(actual.systemStatus).toEqual("notBooted")
   })
 
   it("should handle toggleIsDarkmode", () => {

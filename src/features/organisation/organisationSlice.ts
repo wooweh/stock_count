@@ -1,7 +1,8 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit"
+import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit"
 import _ from "lodash"
 import { RootState, store } from "../../app/store"
 import { UserOrgRoles } from "../user/userSlice"
+import { selectCountMembers } from "../count/countSlice"
 
 export type OrgProps = {
   name?: string
@@ -117,19 +118,26 @@ export const selectOrgName = (state: RootState) => state.organisation.org.name
 export const selectOrgUuid = (state: RootState) => state.organisation.org.uuid
 export const selectIsOrgSetup = (state: RootState) =>
   !!state.organisation.org.uuid
-export const selectOrgMembers = (state: RootState) => {
+export const selectOrgMembers = (state: RootState) =>
+  state.organisation.org.members
+export const selectOtherOrgMembers = (state: RootState) => {
   const members = state.organisation.org.members
-  const userUuid = store.getState().user.user.uuid
-  const modifiedMembers = {}
-  if (!!members) {
-    _.forIn(members, (value, key) => {
-      if (key !== userUuid) {
-        _.set(modifiedMembers, key, value)
-      }
-    })
-    return _.values(modifiedMembers)
-  }
+  const userUuid = store.getState().user.user.uuid as string
+  const otherMembers = _.omit(members, userUuid)
+  return otherMembers
 }
+export const selectOrgMembersList = createSelector(
+  [selectOrgMembers],
+  (members) => {
+    return _.values(members)
+  },
+)
+export const selectOtherOrgMembersList = createSelector(
+  [selectOtherOrgMembers],
+  (otherMembers) => {
+    return _.values(otherMembers)
+  },
+)
 export const selectOrgInvites = (state: RootState) => {
   const invites = state.organisation.org.invites
   const modifiedInvites = {}
@@ -138,8 +146,14 @@ export const selectOrgInvites = (state: RootState) => {
       _.set(modifiedInvites, `${key}.tempName`, value)
       _.set(modifiedInvites, `${key}.inviteKey`, key)
     })
-    return _.values(modifiedInvites)
+    return modifiedInvites
   }
 }
+export const selectOrgInvitesList = createSelector(
+  [selectOrgInvites],
+  (invites) => {
+    return _.values(invites)
+  },
+)
 
 export default organisationSlice.reducer

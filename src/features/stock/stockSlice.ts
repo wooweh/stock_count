@@ -1,17 +1,17 @@
 import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit"
-import { RootState } from "../../app/store"
 import _ from "lodash"
+import { RootState } from "../../app/store"
 
-export type StockItemProps = {
-  id: string
-  name: string
-  description: string
+export interface StockState {
+  stock: StockProps
 }
 export type StockProps = {
   [key: string]: StockItemProps
 }
-export interface StockState {
-  stock: StockProps
+export type StockItemProps = {
+  id: string
+  name: string
+  description: string
 }
 
 const initialState: StockState = {
@@ -22,20 +22,14 @@ export const stockSlice = createSlice({
   name: "stock",
   initialState,
   reducers: {
-    addStockItem: (state, action: PayloadAction<StockItemProps>) => {
-      state.stock[action.payload.id] = action.payload
-    },
-    addStockList: (state, action: PayloadAction<StockProps>) => {
-      state.stock = action.payload
-    },
-    editStockItem: (state, action: PayloadAction<StockItemProps>) => {
-      state.stock[action.payload.id] = action.payload
-    },
     setStockItem: (state, action: PayloadAction<StockItemProps>) => {
       state.stock[action.payload.id] = action.payload
     },
     deleteStockItem: (state, action: PayloadAction<string>) => {
       delete state.stock[action.payload]
+    },
+    addStockList: (state, action: PayloadAction<StockProps>) => {
+      state.stock = action.payload
     },
     setStock: (state, action: PayloadAction<StockProps>) => {
       state.stock = action.payload
@@ -47,11 +41,9 @@ export const stockSlice = createSlice({
 })
 
 export const {
-  addStockItem,
-  addStockList,
-  editStockItem,
   setStockItem,
   deleteStockItem,
+  addStockList,
   setStock,
   deleteStock,
 } = stockSlice.actions

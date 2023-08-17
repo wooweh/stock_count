@@ -2,26 +2,27 @@ import { Box, Typography } from "@mui/material"
 import Accordion from "@mui/material/Accordion"
 import AccordionDetails from "@mui/material/AccordionDetails"
 import AccordionSummary from "@mui/material/AccordionSummary"
-import Button from "@mui/material/ButtonBase"
 import Stack from "@mui/material/Stack"
 import { useEffect } from "react"
-import { Route, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { create } from "zustand"
+import { createJSONStorage, persist } from "zustand/middleware"
 import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
-import { Control } from "../../components/control"
+import { Button } from "../../components/button"
+import { Input } from "../../components/control"
 import Icon from "../../components/icon"
 import { Loader } from "../../components/loader"
-import { routePaths } from "../core/core"
-import { selectIsSystemActive, selectIsSystemBooted } from "../core/coreSlice"
+import { selectIsSystemBooted } from "../core/coreSlice"
+import { Home } from "../core/home"
 import { generateNotification } from "../core/notifications"
+import { routePaths } from "../core/pages"
 import {
   registerUserOnAuth,
   resetUserPassword,
   signInUserOnAuth,
 } from "./userRemote"
 import { selectIsSignedIn } from "./userSlice"
-import { Home } from "../core/home"
 /*
 
 
@@ -44,9 +45,14 @@ const initialState: UseAuthState = {
   password: "",
   passwordValidation: {} as PasswordValidationReturnProps,
 }
-const useAuthStore = create<UseAuthState>()((set) => ({
-  ...initialState,
-}))
+const useAuthStore = create<UseAuthState>()(
+  persist(
+    (set) => ({
+      ...initialState,
+    }),
+    { name: "auth-storage", storage: createJSONStorage(() => sessionStorage) },
+  ),
+)
 
 function setUseAuth(path: UseAuthKeys, value: any) {
   useAuthStore.setState({ [path]: value })
@@ -63,7 +69,6 @@ export function resetUseAuth() {
 
 */
 export function WithAuth({ route }: { route: any }) {
-  // TODO
   const isSignedIn = useAppSelector(selectIsSignedIn)
   const isSystemBooted = useAppSelector(selectIsSystemBooted)
   const navigate = useNavigate()
@@ -83,7 +88,7 @@ export function WithAuth({ route }: { route: any }) {
   if (isSystemBooted && !route.requiresAuth) {
     return <Home />
   } else if (!isSignedIn && route.requiresAuth) {
-    return <Authentication isRegistering={false} />
+    return <Authentication />
   } else {
     return route.element
   }
@@ -95,17 +100,11 @@ export function WithAuth({ route }: { route: any }) {
 
 
 */
-export function Authentication({ isRegistering }: { isRegistering: boolean }) {
-  // const navigate = useNavigate()
-  // const isSignedIn = useAppSelector(selectIsSignedIn)
-  // const isSystemBooted = useAppSelector(selectIsSystemBooted)
-
-  // useEffect(() => {
-  //   if (isSystemBooted && isSignedIn) {
-  //     navigate(routePaths.home.path)
-  //   }
-  // }, [isSystemBooted, isSignedIn, navigate])
-
+export function Authentication({
+  isRegistering = false,
+}: {
+  isRegistering?: boolean
+}) {
   return (
     <>
       <AuthenticationInput isRegistering={isRegistering} />
@@ -219,16 +218,10 @@ function CredentialInputs() {
 
   return (
     <Stack width={"100%"} gap={theme.module[4]}>
-      <Control
-        variation={"input"}
-        placeholder={"Email"}
-        onChange={handleEmailChange}
-        value={email}
-      />
-      <Control
-        variation={"input"}
+      <Input placeholder={"Email"} onChange={handleEmailChange} value={email} />
+      <Input
+        isPassword
         placeholder={"Password"}
-        type={"password"}
         onChange={handlePasswordChange}
         value={password}
       />
@@ -292,7 +285,7 @@ function ButtonTray({ isRegistering }: { isRegistering: boolean }) {
   const password = useAuthStore((state) => state.password)
   const passwordValidation = useAuthStore((state) => state.passwordValidation)
   const isPasswordValid = passwordValidation.isValid
-  const isButtonDisabled =
+  const isDetailsIncomplete =
     (isRegistering && !isPasswordValid) || !email || !password
   /*
 
@@ -318,31 +311,25 @@ function ButtonTray({ isRegistering }: { isRegistering: boolean }) {
   return (
     <Stack
       width={"100%"}
-      gap={theme.module[4]}
       direction={"row"}
       justifyContent={"space-between"}
-      paddingLeft={theme.module[3]}
-      paddingRight={theme.module[3]}
       boxSizing={"border-box"}
     >
       <Button
+        variation={"pill"}
+        label={isRegistering ? "Register" : "Sign in"}
         onClick={handleClick}
-        disabled={isButtonDisabled}
-        sx={{
-          color: isButtonDisabled ? theme.scale.gray[4] : theme.scale.gray[3],
-        }}
-      >
-        {isRegistering ? "Register" : "Sign in"}
-      </Button>
+        disabled={isDetailsIncomplete}
+        color={theme.scale.gray[isDetailsIncomplete ? 4 : 3]}
+      />
       <Button
+        variation={"pill"}
+        label={isRegistering ? "Sign in?" : "Register?"}
         onClick={() =>
           navigate(routePaths[isRegistering ? "signIn" : "register"].path)
         }
-        sx={{ color: theme.scale.gray[5] }}
-        key={isRegistering ? "register" : "signIn"}
-      >
-        {isRegistering ? "Sign in?" : "Register?"}
-      </Button>
+        color={theme.scale.gray[5]}
+      />
     </Stack>
   )
 }
@@ -375,18 +362,15 @@ function ForgotPassword({ isRegistering }: { isRegistering: boolean }) {
     <Stack
       width={"100%"}
       alignItems={"flex-start"}
-      paddingLeft={theme.module[4]}
+      paddingLeft={theme.module[0]}
     >
       <Button
+        variation={"pill"}
+        label={"Forgot password"}
         onClick={handleClick}
         disabled={isRegistering}
-        sx={{
-          color: isRegistering ? "transparent" : theme.scale.gray[5],
-          width: "min-content",
-        }}
-      >
-        {"Forgot password"}
-      </Button>
+        color={isRegistering ? "transparent" : theme.scale.gray[5]}
+      />
     </Stack>
   )
 }
@@ -497,7 +481,6 @@ function CheckLineItem({
 export function SigningIn() {
   const isSigningIn = useAuthStore((state) => state.isSigningIn)
 
-  // return <Loader narration="signing in..." />
   return isSigningIn ? <Loader narration="signing in..." /> : undefined
 }
 /*
@@ -512,26 +495,30 @@ export function VerifyEmail() {
 
   const isVerifying = useAuthStore((state) => state.isVerifying)
 
-  return isVerifying ? (
-    <Stack
-      width={"100%"}
-      height={"100%"}
-      gap={theme.module[4]}
-      justifyContent={"center"}
-      alignContent={"center"}
-      position={"absolute"}
-      zIndex={100}
-      padding={theme.module[4]}
-      boxSizing={"border-box"}
-    >
-      <Typography>
-        An email has been sent to you. Click the link to verify your account.
-      </Typography>
-      <Button onClick={() => setUseAuth("isVerifying", false)}>
-        Back to sign in
-      </Button>
-    </Stack>
-  ) : undefined
+  return (
+    isVerifying && (
+      <Stack
+        width={"100%"}
+        height={"100%"}
+        gap={theme.module[4]}
+        justifyContent={"center"}
+        alignContent={"center"}
+        position={"absolute"}
+        zIndex={100}
+        padding={theme.module[4]}
+        boxSizing={"border-box"}
+      >
+        <Typography>
+          An email has been sent to you. Click the link to verify your account.
+        </Typography>
+        <Button
+          variation={"pill"}
+          label={"Back to sign in"}
+          onClick={() => setUseAuth("isVerifying", false)}
+        />
+      </Stack>
+    )
+  )
 }
 /*
 

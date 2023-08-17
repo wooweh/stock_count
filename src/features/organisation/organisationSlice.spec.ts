@@ -1,15 +1,9 @@
 import organisationReducer, {
-  MemberNameProps,
-  MemberRoleProps,
-  MemberSurnameProps,
   MembersProps,
   OrgProps,
   OrganisationState,
   createOrg,
   deleteOrg,
-  setOrgMemberName,
-  setOrgMemberRole,
-  setOrgMemberSurname,
   setOrgName,
   setOrg,
   setMemberStatus,
@@ -20,6 +14,8 @@ import organisationReducer, {
   InvitesProps,
   deleteInvite,
   deleteOrgMember,
+  MemberProps,
+  setOrgMember,
 } from "./organisationSlice"
 import { v4 as uuidv4 } from "uuid"
 
@@ -79,28 +75,16 @@ describe("organisation reducer", () => {
     expect(actual.org.name).toEqual(mockData)
   })
 
-  it("should handle setOrgMemberName", () => {
-    const mockData: MemberNameProps = { uuid: "mockUuid", name: "mockData" }
-    const actual = organisationReducer(mockState, setOrgMemberName(mockData))
+  it("should handle setOrgMember", () => {
+    const mockData: MemberProps = {
+      uuid: "mockUuid",
+      name: "mockName",
+      surname: "mockSurname",
+      role: "admin",
+    }
+    const actual = organisationReducer(mockState, setOrgMember(mockData))
     const members = actual.org.members as MembersProps
     expect(members[mockData.uuid].name).toEqual(mockData.name)
-  })
-
-  it("should handle setOrgMemberSurname", () => {
-    const mockData: MemberSurnameProps = {
-      uuid: "mockUuid",
-      surname: "mockData",
-    }
-    const actual = organisationReducer(mockState, setOrgMemberSurname(mockData))
-    const members = actual.org.members as MembersProps
-    expect(members[mockData.uuid].surname).toEqual(mockData.surname)
-  })
-
-  it("should handle setOrgMemberRole", () => {
-    const mockData: MemberRoleProps = { uuid: "mockUuid", role: "member" }
-    const actual = organisationReducer(mockState, setOrgMemberRole(mockData))
-    const members = actual.org.members as MembersProps
-    expect(members[mockData.uuid].role).toEqual(mockData.role)
   })
 
   it("should handle deleteOrgMember", () => {

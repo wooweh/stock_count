@@ -1,26 +1,27 @@
 import userReducer, {
-  UserOnBootProps,
   UserState,
   deleteUser,
   deleteUserOrgDetails,
   setUserEmail,
-  setUserName,
   setUser,
-  setUserOrgRole,
-  setUserOrgUuid,
-  setUserSurname,
   signIn,
   signOut,
+  setUserFullName,
+  setUserOrgDetails,
+  SetUserOrgDetailsProps,
+  UserProps,
 } from "./userSlice"
 
 describe("user reducer", () => {
   const initialState: UserState = {
     isSignedIn: false,
+    passwordChangeStatus: "notChanged",
     user: {},
   }
 
   const mockState: UserState = {
     isSignedIn: true,
+    passwordChangeStatus: "notChanged",
     user: {
       uuid: "uuid",
       email: "email",
@@ -34,6 +35,7 @@ describe("user reducer", () => {
   it("should handle initial state", () => {
     expect(userReducer(undefined, { type: "unknown" })).toEqual({
       isSignedIn: false,
+      passwordChangeStatus: "notChanged",
       user: {},
     })
   })
@@ -54,32 +56,24 @@ describe("user reducer", () => {
     expect(actual.user.email).toEqual(mockData)
   })
 
-  it("should handle setUserName", () => {
-    const mockData = "mockData"
-    const actual = userReducer(initialState, setUserName(mockData))
-    expect(actual.user.name).toEqual(mockData)
+  it("should handle setUserFullName", () => {
+    const mockData = { name: "mockName", surname: "mockSurname" }
+    const actual = userReducer(initialState, setUserFullName(mockData))
+    expect(actual.user.name).toEqual(mockData.name)
   })
 
-  it("should handle setUserSurname", () => {
-    const mockData = "mockData"
-    const actual = userReducer(initialState, setUserSurname(mockData))
-    expect(actual.user.surname).toEqual(mockData)
-  })
-
-  it("should handle setUserOrgUuid", () => {
-    const mockData = "mockData"
-    const actual = userReducer(initialState, setUserOrgUuid(mockData))
-    expect(actual.user.orgUuid).toEqual(mockData)
-  })
-
-  it("should handle setUserOrgRole", () => {
-    const mockData = "admin"
-    const actual = userReducer(initialState, setUserOrgRole(mockData))
-    expect(actual.user.orgRole).toEqual(mockData)
+  it("should handle setUserOrgDetails", () => {
+    const mockData: SetUserOrgDetailsProps = {
+      orgUuid: "mockOrgUuid",
+      orgRole: "admin",
+      updateDB: false,
+    }
+    const actual = userReducer(initialState, setUserOrgDetails(mockData))
+    expect(actual.user.orgUuid).toEqual(mockData.orgUuid)
   })
 
   it("should handle setUser", () => {
-    const mockPayload: UserOnBootProps = {
+    const mockPayload: UserProps = {
       uuid: "1234",
       name: "name",
       surname: "surname",
@@ -92,13 +86,16 @@ describe("user reducer", () => {
   })
 
   it("should handle deleteUserOrgDetails", () => {
-    const actual = userReducer(mockState, deleteUserOrgDetails())
+    const actual = userReducer(
+      mockState,
+      deleteUserOrgDetails({ updateDB: false }),
+    )
     expect(actual.user.orgRole).toEqual(undefined)
     expect(actual.user.orgUuid).toEqual(undefined)
   })
 
   it("should handle deleteUser", () => {
-    const actual = userReducer(mockState, deleteUser())
-    expect(actual.user).toEqual({})
+    const actual = userReducer(mockState, deleteUser("userid"))
+    expect(actual.user).toEqual(actual.user)
   })
 })

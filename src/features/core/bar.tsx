@@ -5,7 +5,7 @@ import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { Button } from "../../components/button"
 import Icon from "../../components/icon"
-import { routePaths, routes } from "./core"
+import { routePaths, routes } from "./pages"
 import { selectIsSystemBooted } from "./coreSlice"
 import { Menu } from "./menu"
 /*
@@ -51,9 +51,11 @@ export function Bar() {
       boxSizing={"border-box"}
     >
       <Stack>
-        <Button variation={"icon"} onClick={handleClick}>
-          <Icon variation="home" />
-        </Button>
+        <Button
+          variation={"pill"}
+          onClick={handleClick}
+          iconName={"home"}
+        />
       </Stack>
       <Typography fontWeight={"bold"} color={theme.scale.gray[4]}>
         {locationName}

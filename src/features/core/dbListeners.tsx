@@ -13,7 +13,12 @@ import {
   setOrg,
 } from "../organisation/organisationSlice"
 import { StockProps, selectStock, setStock } from "../stock/stockSlice"
-import { UserProps, selectUser, setUser } from "../user/userSlice"
+import {
+  UserProps,
+  selectIsLocalUserOrgDetails,
+  selectUser,
+  setUser,
+} from "../user/userSlice"
 import {
   selectIsSystemActive,
   selectIsSystemBooted,
@@ -35,6 +40,7 @@ export function DBListeners() {
   const localOrg = useAppSelector(selectOrg)
   const localStock = useAppSelector(selectStock)
   const isJoined = useAppSelector(selectIsJoined)
+  const isLocalUserOrgDetails = useAppSelector(selectIsLocalUserOrgDetails)
 
   useEffect(() => {
     if (isSystemBooting && localUser.orgUuid && localOrg.uuid) {
@@ -67,8 +73,6 @@ export function DBListeners() {
 
   useEffect(() => {
     if (!!localUser && isSystemActive) {
-      const isLocalUserOrgDetails = !!localUser.orgRole && !!localUser.orgUuid
-
       const dbOrgRef = ref(
         dbReal,
         getDBPath.org(localUser.orgUuid as string).org,
@@ -92,7 +96,7 @@ export function DBListeners() {
         }
       })
     }
-  }, [dispatch, localUser, localOrg, isSystemActive])
+  }, [dispatch, localUser, localOrg, isSystemActive, isLocalUserOrgDetails])
 
   // STOCK SET & LISTENER
 

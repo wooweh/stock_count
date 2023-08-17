@@ -8,7 +8,7 @@ import { Button } from "../../components/button"
 import Icon, { IconNames } from "../../components/icon"
 import { selectIsOrgSetup } from "../organisation/organisationSlice"
 import { selectIsProfileComplete, selectIsUserAdmin } from "../user/userSlice"
-import { routePaths } from "./core"
+import { routePaths } from "./pages"
 /*
 
 
@@ -56,17 +56,13 @@ export function CompleteProfilePrompt() {
       </Typography>
       <Button
         variation={"profile"}
+        label={"Profile"}
+        iconName={"profile"}
+        iconColor={theme.scale.blue[5]}
+        outlineColor={theme.scale.blue[5]}
         onClick={() => navigate(routePaths.profile.path)}
-        sx={{
-          outline: `2px solid ${theme.scale.blue[5]} !important`,
-        }}
-      >
-        <Icon
-          variation={"profile"}
-          fontSize={"large"}
-          color={theme.scale.blue[5]}
-        />
-      </Button>
+        justifyCenter
+      />
     </Stack>
   )
 }
@@ -95,17 +91,13 @@ function OrgSetupPrompt() {
       </Typography>
       <Button
         variation={"profile"}
+        label={"Organisation"}
+        iconName={"org"}
+        iconColor={theme.scale.blue[5]}
+        outlineColor={theme.scale.blue[5]}
+        justifyCenter
         onClick={() => navigate(routePaths.organisation.path)}
-        sx={{
-          outline: `2px solid ${theme.scale.blue[5]} !important`,
-        }}
-      >
-        <Icon
-          variation={"org"}
-          fontSize={"large"}
-          color={theme.scale.blue[5]}
-        />
-      </Button>
+      />
     </Stack>
   )
 }
@@ -148,35 +140,11 @@ function HomeButtons() {
             <Grid width={"100%"} key={index}>
               <Button
                 variation={"home"}
+                label={button.label}
+                iconName={button.icon}
                 onClick={handleClick}
                 animationDuration={150}
-              >
-                <Stack
-                  width={"100%"}
-                  direction={"row"}
-                  gap={theme.module[5]}
-                  alignItems={"center"}
-                  padding={theme.module[2]}
-                  boxSizing={"border-box"}
-                >
-                  <Stack
-                    bgcolor={theme.scale.gray[9]}
-                    borderRadius={theme.module[2]}
-                    padding={theme.module[5]}
-                  >
-                    <Icon
-                      color={theme.scale.gray[5]}
-                      variation={button.icon}
-                      fontSize="large"
-                    />
-                  </Stack>
-                  <Stack>
-                    <Typography color={theme.scale.gray[5]} variant="h5">
-                      {button.label}
-                    </Typography>
-                  </Stack>
-                </Stack>
-              </Button>
+              />
             </Grid>
           )
         })}

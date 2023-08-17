@@ -1,4 +1,4 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit"
+import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit"
 import { RootState } from "../../app/store"
 
 export type UpdateDB = { updateDB: boolean }
@@ -20,7 +20,7 @@ export type UserFullNameProps = {
   name: string
   surname: string
 }
-export type UserOrgDetailsProps = UpdateDB & {
+export type SetUserOrgDetailsProps = UpdateDB & {
   orgUuid: string
   orgRole: UserOrgRoles
 }
@@ -65,7 +65,10 @@ export const userSlice = createSlice({
       state.user.name = name
       state.user.surname = surname
     },
-    setUserOrgDetails: (state, action: PayloadAction<UserOrgDetailsProps>) => {
+    setUserOrgDetails: (
+      state,
+      action: PayloadAction<SetUserOrgDetailsProps>,
+    ) => {
       const orgUuid = action.payload.orgUuid
       const orgRole = action.payload.orgRole
       state.user.orgUuid = orgUuid
@@ -112,6 +115,12 @@ export const selectUserEmail = (state: RootState) => state.user.user.email
 export const selectUserUuid = (state: RootState) => state.user.user.uuid
 export const selectUserOrgRole = (state: RootState) => state.user.user.orgRole
 export const selectUserOrgUuid = (state: RootState) => state.user.user.orgUuid
+export const selectIsLocalUserOrgDetails = createSelector(
+  [selectUserOrgRole, selectUserOrgUuid],
+  (orgRole: any, orgUuid: any) => {
+    return !!orgRole && !!orgUuid
+  },
+)
 export const selectIsPasswordChangeFailed = (state: RootState) =>
   state.user.passwordChangeStatus === "isFailed"
 export const selectIsPasswordChangeSuccess = (state: RootState) =>

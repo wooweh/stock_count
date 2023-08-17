@@ -2,11 +2,12 @@ import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 import { useEffect, useState } from "react"
 import { create } from "zustand"
+import { createJSONStorage, persist } from "zustand/middleware"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { Button } from "../../components/button"
-import { Control, ControlNames } from "../../components/control"
-import Icon from "../../components/icon"
+import { Input } from "../../components/control"
+import { Loader } from "../../components/loader"
 import Modal from "../../components/modal"
 import { ProfileSurface } from "../../components/profileSurface"
 import { generateNotification } from "../core/notifications"
@@ -27,7 +28,6 @@ import {
   setUserEmail,
   setUserFullName,
 } from "./userSlice"
-import { Loader } from "../../components/loader"
 /*
 
 
@@ -52,9 +52,14 @@ const initialState: UseUserState = {
   surname: "",
   email: "",
 }
-const useUserStore = create<UseUserState>()((set) => ({
-  ...initialState,
-}))
+const useUserStore = create<UseUserState>()(
+  persist(
+    (set) => ({
+      ...initialState,
+    }),
+    { name: "user-storage", storage: createJSONStorage(() => sessionStorage) },
+  ),
+)
 
 function setUseUser(path: UseUserKeys, value: boolean | string) {
   useUserStore.setState({ [path]: value })
@@ -89,9 +94,11 @@ export default function UserProfile() {
 */
 function ProfileFields() {
   const theme = useTheme()
+
   const name = useAppSelector(selectUserName)
   const surname = useAppSelector(selectUserSurname)
   const email = useAppSelector(selectUserEmail)
+
   const isEditing = useUserStore((state: any) => state.isEditing)
   const editableName = useUserStore((state: any) => state.name)
   const editableSurname = useUserStore((state: any) => state.surname)
@@ -150,7 +157,12 @@ type ProfileFieldProps = {
 }
 function ProfileField(props: ProfileFieldProps) {
   const theme = useTheme()
+
   const isEditing = useUserStore((state: any) => state.isEditing)
+  const placeholder =
+    props.value === "" && !isEditing
+      ? `Fill in your ${props.label.toLowerCase()}`
+      : undefined
 
   return (
     <Stack width={"100%"} alignItems={"flex-start"}>
@@ -167,14 +179,9 @@ function ProfileField(props: ProfileFieldProps) {
         justifyContent={"space-between"}
         gap={theme.module[3]}
       >
-        <Control
-          variation={"input"}
+        <Input
           value={props.value}
-          placeholder={
-            props.value === "" && !isEditing
-              ? `Fill in your ${props.label.toLowerCase()}`
-              : undefined
-          }
+          placeholder={placeholder}
           onChange={props.handleChange}
           disabled={isEditing ? false : true}
           sx={{
@@ -197,11 +204,13 @@ function ProfileField(props: ProfileFieldProps) {
 function ButtonTray() {
   const theme = useTheme()
   const dispatch = useAppDispatch()
+
+  const oldEmail = useAppSelector(selectUserEmail)
+
   const isEditing = useUserStore((state: any) => state.isEditing)
   const name = useUserStore((state: any) => state.name)
   const surname = useUserStore((state: any) => state.surname)
   const newEmail = useUserStore((state: any) => state.email)
-  const oldEmail = useAppSelector(selectUserEmail)
   /*
   
   
@@ -249,27 +258,27 @@ function ButtonTray() {
   */
   return (
     <Stack width={"100%"} gap={theme.module[5]}>
-      {isEditing ? undefined : (
+      {!isEditing && (
         <Button
           variation={"profile"}
+          label={"Change Password"}
           onClick={handleResetPassword}
-          sx={{ background: "transparent", height: theme.module[7] }}
-        >
-          <Typography color={theme.scale.gray[5]}>Change Password</Typography>
-        </Button>
+          color={theme.scale.gray[5]}
+          justifyCenter
+        />
       )}
       <Button
         variation={"profile"}
+        iconName={isEditing ? "done" : "edit"}
         onClick={isEditing ? handleAccept : handleEdit}
-      >
-        <Icon variation={isEditing ? "done" : "edit"} fontSize={"large"} />
-      </Button>
+        justifyCenter
+      />
       <Button
         variation={"profile"}
+        iconName={isEditing ? "cancel" : "delete"}
         onClick={isEditing ? handleCancel : handleDelete}
-      >
-        <Icon variation={isEditing ? "cancel" : "delete"} fontSize={"large"} />
-      </Button>
+        justifyCenter
+      />
     </Stack>
   )
 }
@@ -283,7 +292,9 @@ function ButtonTray() {
 function DeleteProfileConfirmation() {
   const theme = useTheme()
   const dispatch = useAppDispatch()
+
   const isDeleting = useUserStore((state: any) => state.isDeleting)
+
   const [password, setPassword] = useState("")
   /*
   
@@ -310,12 +321,11 @@ function DeleteProfileConfirmation() {
       body={
         <Stack gap={theme.module[4]}>
           <Typography>Are you sure you want to delete your profile?</Typography>
-          <Control
-            variation="input"
+          <Input
             placeholder="Enter your password to confirm"
             value={password}
             onChange={(e: any) => setPassword(e.target.value)}
-            type="password"
+            isPassword
           />
         </Stack>
       }
@@ -337,9 +347,14 @@ function DeleteProfileConfirmation() {
 */
 function ChangePassword() {
   const dispatch = useAppDispatch()
+  const isPasswordChangeSuccess = useAppSelector(selectIsPasswordChangeSuccess)
+  const isPasswordChangeFailed = useAppSelector(selectIsPasswordChangeFailed)
+  const isPasswordChangePending = useAppSelector(selectIsPasswordChangePending)
+
   const isChangingPassword = useUserStore(
     (state: any) => state.isChangingPassword,
   )
+
   const [password, setPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [confirmedNewPassword, setConfiredNewPassword] = useState("")
@@ -348,10 +363,6 @@ function ChangePassword() {
     !!newPassword && newPassword === confirmedNewPassword
   const isNewPasswordUnique = newPassword !== password
   const isNewPasswordValid = getPasswordValidation(newPassword).isValid
-
-  const isPasswordChangeSuccess = useAppSelector(selectIsPasswordChangeSuccess)
-  const isPasswordChangeFailed = useAppSelector(selectIsPasswordChangeFailed)
-  const isPasswordChangePending = useAppSelector(selectIsPasswordChangePending)
 
   useEffect(() => {
     if (isPasswordChangeSuccess) handleClose()
@@ -392,21 +403,18 @@ function ChangePassword() {
   
   
   */
-  const inputs = [
+  const inputs: InputsProps[] = [
     {
-      variation: "input",
       placeholder: "Password",
       value: password,
       onChange: (event: any) => setPassword(event.target.value),
     },
     {
-      variation: "input",
       placeholder: "New password",
       value: newPassword,
       onChange: (event: any) => setNewPassword(event.target.value),
     },
     {
-      variation: "input",
       placeholder: "Confirm new password",
       value: confirmedNewPassword,
       onChange: (event: any) => setConfiredNewPassword(event.target.value),
@@ -423,9 +431,10 @@ function ChangePassword() {
             inputs={inputs}
             isNewPasswordConfirmed={isNewPasswordConfirmed}
           />
-          {isPasswordChangePending || isPasswordChangeSuccess ? (
-            <Loader narration="Changing password..." />
-          ) : undefined}
+          {isPasswordChangePending ||
+            (isPasswordChangeSuccess && (
+              <Loader narration="Changing password..." />
+            ))}
         </>
       }
       show="actions"
@@ -444,33 +453,39 @@ function ChangePassword() {
 
 
 */
+type InputsProps = {
+  placeholder: string
+  value: string
+  onChange: (event: any) => void
+}
 function PasswordInputs({
   inputs,
   isNewPasswordConfirmed,
 }: {
-  inputs: any
+  inputs: InputsProps[]
   isNewPasswordConfirmed: boolean
 }) {
   const theme = useTheme()
+
   const newPassword = inputs[1].value
   const validationReport = getPasswordValidation(newPassword)
 
   return (
     <Stack gap={theme.module[4]} padding={theme.module[4]}>
-      {inputs.map((input: (typeof inputs)[number], index: number) => {
+      {inputs.map((input: InputsProps, index: number) => {
         const styles = {
           background: theme.scale.gray[8],
           outline:
-            index === 2
+            index === 2 && input.value !== ""
               ? isNewPasswordConfirmed
                 ? `2px solid ${theme.scale.green[6]}`
                 : `2px solid ${theme.scale.red[6]}`
               : "",
         }
+
         return (
-          <Control
-            variation={input.variation as ControlNames}
-            type={"password"}
+          <Input
+            isPassword
             placeholder={input.placeholder}
             onChange={input.onChange}
             value={input.value}

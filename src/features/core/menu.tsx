@@ -5,15 +5,13 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
-import Icon from "../../components/icon"
-import { List, ListFactory } from "../../components/list"
+import Icon, { IconNames } from "../../components/icon"
+import { List, ListFactory, ListItem } from "../../components/list"
 import { signOut } from "../user/userSlice"
-import {
-  selectIsDarkmode,
-  setSystemStatus,
-  toggleIsDarkmode,
-} from "./coreSlice"
-import { routePaths } from "./core"
+import { selectIsDarkmode, toggleIsDarkmode } from "./coreSlice"
+import { routePaths } from "./pages"
+import { Button } from "../../components/button"
+import { Switch } from "../../components/control"
 /*
 
 
@@ -21,46 +19,59 @@ import { routePaths } from "./core"
 
 
 */
+type MenuItemProps = {
+  label: string
+  iconName: IconNames
+  onChange: () => void
+}
 export function Menu() {
   const theme = useTheme()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const [anchorEl, setAnchorEl] = useState(null)
   const isDarkmode = useAppSelector(selectIsDarkmode)
-  /*
-  
-  
-  */
-  function handleOpenMenu(event: any) {
-    setAnchorEl(event.currentTarget)
+
+  function handleOpenMenu(e: any) {
+    setAnchorEl(e.currentTarget)
   }
-  /*
-  
-  
-  */
+
   function handleClose() {
     setAnchorEl(null)
   }
-  /*
-  
-  
-  */
+
   function handleSignOut() {
     setAnchorEl(null)
     dispatch(signOut())
   }
-  /*
-  
-  
-  */
+
   function handleMenuItemClick(path: string) {
     setAnchorEl(null)
     navigate(path)
   }
-  /*
-  
-  
-  */
+
+  const menuItems: MenuItemProps[] = [
+    {
+      label: "Darkmode",
+      iconName: "colorTheme",
+      onChange: () => dispatch(toggleIsDarkmode()),
+    },
+    {
+      label: "Profile",
+      iconName: "profile",
+      onChange: () => handleMenuItemClick(routePaths.profile.path),
+    },
+    {
+      label: "Organisation",
+      iconName: "org",
+      onChange: () => handleMenuItemClick(routePaths.organisation.path),
+    },
+    {
+      label: "Sign out",
+      iconName: "signOut",
+      onChange: handleSignOut,
+    },
+  ]
+
   const origin: PopoverOrigin = { vertical: "top", horizontal: "left" }
   const open = Boolean(anchorEl)
 
@@ -80,50 +91,35 @@ export function Menu() {
         onClose={handleClose}
         anchorOrigin={origin}
         transformOrigin={origin}
+        sx={{
+          "& .MuiPaper-root": {
+            borderRadius: theme.module[3],
+          },
+        }}
       >
         <Stack
           width={"100%"}
           height={"100%"}
           padding={theme.module[2]}
+          justifyContent={"flex-start"}
+          gap={theme.module[3]}
           boxSizing={"border-box"}
         >
-          <List>
-            <ListFactory
-              items={[
-                {
-                  label: "Darkmode",
-                  iconName: "colorTheme",
-                  controlName: "switch",
-                  tappable: true,
-                  value: isDarkmode,
-                  onChange: () => dispatch(toggleIsDarkmode()),
-                  hideBackground: false,
-                },
-                {
-                  label: "Profile",
-                  iconName: "profile",
-                  tappable: true,
-                  onChange: () => handleMenuItemClick(routePaths.profile.path),
-                  hideBackground: true,
-                },
-                {
-                  label: "Organisation",
-                  iconName: "org",
-                  tappable: true,
-                  onChange: () =>
-                    handleMenuItemClick(routePaths.organisation.path),
-                  hideBackground: true,
-                },
-                {
-                  label: "Sign out",
-                  iconName: "signOut",
-                  tappable: true,
-                  onChange: handleSignOut,
-                  hideBackground: true,
-                },
-              ]}
+          {menuItems.map((item: MenuItemProps, index: number) => (
+            <ListItem
+              label={item.label}
+              primarySlot={<Icon variation={item.iconName} />}
+              secondarySlot={
+                !index ? (
+                  <Switch value={isDarkmode} onChange={item.onChange} />
+                ) : undefined
+              }
+              bgColor={theme.scale.gray[!index ? 9 : 7]}
+              onChange={item.onChange}
+              tappable
+              key={index}
             />
-          </List>
+          ))}
         </Stack>
       </MuiMenu>
     </>

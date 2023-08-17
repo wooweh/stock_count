@@ -9,11 +9,14 @@
 type OrgPathsReturnProps = {
   org: string
   invites: string
-  invite: Function
+  invite: (inviteUuid: string) => InviteReturnProps
   members: string
   member: (memberUuid: string) => MemberReturnProps
   name: string
   uuid: string
+}
+type InviteReturnProps = {
+  invite: string
 }
 type MemberReturnProps = {
   member: string
@@ -34,7 +37,7 @@ function orgPaths(orgUuid: string): OrgPathsReturnProps {
   */
   function invite(inviteUuid: string) {
     const invite = `${invites}/${inviteUuid}`
-    return invite
+    return { invite }
   }
   /*
         
@@ -47,11 +50,11 @@ function orgPaths(orgUuid: string): OrgPathsReturnProps {
     const role = `${member}/role`
     const uuid = `${member}/uuid`
     return {
-      member: member,
-      name: name,
-      surname: surname,
-      role: role,
-      uuid: uuid,
+      member,
+      name,
+      surname,
+      role,
+      uuid,
     }
   }
   /*
@@ -59,13 +62,13 @@ function orgPaths(orgUuid: string): OrgPathsReturnProps {
         
         */
   return {
-    org: org,
-    invites: invites,
-    invite: invite,
-    members: members,
-    member: member,
-    name: name,
-    uuid: uuid,
+    org,
+    invites,
+    invite,
+    members,
+    member,
+    name,
+    uuid,
   }
 }
 /*
@@ -95,13 +98,13 @@ function userPaths(userUuid: string): UserPathsReturnProps {
   const orgUuid = `${user}/orgUuid`
 
   return {
-    user: user,
-    name: name,
-    surname: surname,
-    email: email,
-    uuid: uuid,
-    orgRole: orgRole,
-    orgUuid: orgUuid,
+    user,
+    name,
+    surname,
+    email,
+    uuid,
+    orgRole,
+    orgUuid,
   }
 }
 /*
@@ -112,9 +115,10 @@ function userPaths(userUuid: string): UserPathsReturnProps {
 
 
 */
-type InvitePathsReturnProps = string
+type InvitePathsReturnProps = { invite: string }
 function invitePaths(inviteKey: string): InvitePathsReturnProps {
-  return `invites/${inviteKey}`
+  const invite = `invites/${inviteKey}`
+  return { invite }
 }
 /*
 
@@ -137,16 +141,16 @@ function stockPaths(orgUuid: string): StockPathsReturnProps {
 
 */
   function stockItem(stockId: string): StockItemReturnProps {
-    const stockItem = `${stock}/${stockId}`
-    return { item: stockItem }
+    const item = `${stock}/${stockId}`
+    return { item }
   }
   /*
 
 
 */
   return {
-    stock: stock,
-    stockItem: stockItem,
+    stock,
+    stockItem,
   }
 }
 /*
@@ -158,6 +162,57 @@ function stockPaths(orgUuid: string): StockPathsReturnProps {
 
 */
 // TODO: Count paths
+type CountPathsReturnProps = {
+  count: string
+  metadata: string
+  comments: string
+  prepComments: string
+  finalComments: string
+  results: string
+  memberResults: (memberUuid: string) => MemberResultsReturnProps
+  members: string
+  member: (memberUuid: string) => CountMemberReturnProps
+}
+type MemberResultsReturnProps = {
+  results: string
+  resultsItem: (stockId: string) => ResultsItemReturnProps
+}
+type ResultsItemReturnProps = StockItemReturnProps
+type CountMemberReturnProps = { member: string }
+function countPaths(orgUuid: string): CountPathsReturnProps {
+  const count = `count/${orgUuid}`
+  const metadata = `${count}/metadata`
+  const comments = `${count}/comments`
+  const prepComments = `${comments}/preparation`
+  const finalComments = `${comments}/finalization`
+  const results = `${count}/results`
+  function memberResults(memberUuid: string): MemberResultsReturnProps {
+    const memberResults = `${results}/${memberUuid}`
+    return {
+      results: memberResults,
+      resultsItem: (stockId: string) => {
+        const resultsItem = `${memberResults}/${stockId}`
+        return { item: resultsItem }
+      },
+    }
+  }
+  const members = `${count}/members`
+  function member(memberUuid: string) {
+    const member = `${members}/${memberUuid}`
+    return { member }
+  }
+  return {
+    count: count,
+    metadata: metadata,
+    comments: comments,
+    prepComments: prepComments,
+    finalComments: finalComments,
+    results: results,
+    memberResults: memberResults,
+    members: members,
+    member: member,
+  }
+}
 /*
 
 
@@ -179,13 +234,15 @@ type GetDBPathProps = {
   org: (orgUuid: string) => OrgPathsReturnProps
   user: (userUuid: string) => UserPathsReturnProps
   invite: (inviteKey: string) => InvitePathsReturnProps
-  stock: (stockKey: string) => StockPathsReturnProps
+  stock: (orgUuid: string) => StockPathsReturnProps
+  count: (orgUuid: string) => CountPathsReturnProps
 }
 export const getDBPath: GetDBPathProps = {
   org: orgPaths,
   user: userPaths,
   invite: invitePaths,
   stock: stockPaths,
+  count: countPaths,
 }
 /*
 

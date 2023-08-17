@@ -34,6 +34,8 @@ import DownloadIcon from "@mui/icons-material/DownloadRounded"
 import ArrowRightIcon from "@mui/icons-material/ArrowForwardIosRounded"
 import ArrowLeftIcon from "@mui/icons-material/ArrowBackIosNewRounded"
 import SubmitIcon from "@mui/icons-material/Publish"
+import NotificationIcon from "@mui/icons-material/NotificationsActive"
+import AddMembersIcon from "@mui/icons-material/GroupAddRounded"
 import { useAppSelector } from "../app/hooks"
 import { SxProps } from "../common/types"
 import useTheme from "../common/useTheme"
@@ -82,6 +84,8 @@ export type IconNames =
   | "arrowRight"
   | "arrowLeft"
   | "submit"
+  | "notification"
+  | "addMembers"
 
 type IconProps = {
   variation: IconNames
@@ -137,6 +141,8 @@ export default function Icon(props: IconProps) {
     arrowRight: <ArrowRightIcon fontSize={fontSize} sx={{ ...styles }} />,
     arrowLeft: <ArrowLeftIcon fontSize={fontSize} sx={{ ...styles }} />,
     submit: <SubmitIcon fontSize={fontSize} sx={{ ...styles }} />,
+    notification: <NotificationIcon fontSize={fontSize} sx={{ ...styles }} />,
+    addMembers: <AddMembersIcon fontSize={fontSize} sx={{ ...styles }} />,
     joinGroup: (
       <GroupIcon
         fontSize={fontSize}
