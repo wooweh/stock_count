@@ -33,16 +33,21 @@ export const ListGroupContext = createContext(false)
 
 
 */
-export type ListProps = { children: React.ReactElement | React.ReactElement[] }
+export type ListProps = {
+  children: any
+  gapScale?: number
+  maxHeight?: string
+}
 export function List(props: ListProps) {
   const theme = useTheme()
   return (
     <Stack
       width={"100%"}
       height={"100%"}
+      maxHeight={props.maxHeight ?? "100%"}
       boxSizing={"border-box"}
       justifyContent={"flex-start"}
-      gap={theme.module[3]}
+      gap={theme.module[props.gapScale ?? 3]}
       sx={{
         overflowY: "scroll",
       }}
@@ -132,12 +137,15 @@ type TappableProps = boolean
 export type ListItemProps = {
   label: LabelProps
   description?: DescriptionProps
-  primarySlot: PrimarySlotProps
+  primarySlot?: PrimarySlotProps
+  noWrap?: boolean
   secondarySlot?: SecondarySlotProps
+  tertiarySlot?: any
   onChange?: onChangeProps
   onLongPress?: any
   tappable?: TappableProps
   bgColor?: string
+  sx?: any
 }
 export function ListItem(props: ListItemProps) {
   return (
@@ -149,6 +157,7 @@ export function ListItem(props: ListItemProps) {
         </Container>
         <SecondarySlot {...props}>{props.secondarySlot}</SecondarySlot>
       </InnerWrapper>
+      <TertiarySlot>{props.tertiarySlot}</TertiarySlot>
       <TappableSurface {...props} />
     </ListItemOuterWrapper>
   )
@@ -167,6 +176,7 @@ function ListItemOuterWrapper(props: {
   children: any
   tappable?: TappableProps
   bgColor?: string
+  sx?: any
 }) {
   const theme = useTheme()
   const groupContext = useContext(ListGroupContext)
@@ -180,13 +190,32 @@ function ListItemOuterWrapper(props: {
       bgcolor={props.bgColor ?? theme.scale.gray[9]}
       justifyContent={"center"}
       minHeight={theme.module[6]}
-      sx={{
-        width: "100%",
-        padding: `${theme.module[4]} ${theme.module[4]}`,
-      }}
+      width={"100%"}
+      padding={theme.module[4]}
+      sx={props.sx}
     >
       {props.children}
     </Stack>
+  )
+}
+/*
+
+
+
+
+
+*/
+function TertiarySlot(props: { children: any }) {
+  return (
+    !!props.children && (
+      <Stack
+        boxSizing={"border-box"}
+        bgcolor={"none"}
+        justifyContent={"center"}
+      >
+        {props.children}
+      </Stack>
+    )
   )
 }
 /*
@@ -250,12 +279,18 @@ function Container(props: ContainerProps) {
 
 
 */
-function PrimarySlot(props: { children: PrimarySlotProps }) {
-  return !!props.children ? (
-    <Stack boxSizing={"border-box"} bgcolor={"none"} justifyContent={"center"}>
-      {props.children}
-    </Stack>
-  ) : null
+function PrimarySlot(props: { children: PrimarySlotProps | undefined }) {
+  return (
+    !!props.children && (
+      <Stack
+        boxSizing={"border-box"}
+        bgcolor={"none"}
+        justifyContent={"center"}
+      >
+        {props.children}
+      </Stack>
+    )
+  )
 }
 /*
 
@@ -296,30 +331,34 @@ function SecondarySlot(props: {
 */
 function ItemBody(props: {
   label: LabelProps
+  noWrap?: boolean
   description?: DescriptionProps
   secondarySlot?: SecondarySlotProps
 }) {
   const theme = useTheme()
-  return !!props.label.length ? (
-    <Stack justifyContent={"center"} width={"100%"}>
-      <Typography
-        variant="body1"
-        color={theme.scale.gray[3]}
-        maxWidth={`calc(${theme.module[8]} * 2)`}
-        noWrap
-      >
-        {props.label}
-      </Typography>
-      <Typography
-        variant="body2"
-        color={theme.scale.gray[5]}
-        maxWidth={props.secondarySlot ? theme.module[9] : "none"}
-        noWrap
-      >
-        {props.description}
-      </Typography>
-    </Stack>
-  ) : undefined
+  return (
+    !!props.label.length && (
+      <Stack justifyContent={"center"} width={"100%"}>
+        <Typography
+          variant="body1"
+          color={theme.scale.gray[3]}
+          fontWeight={"bold"}
+          maxWidth={props.noWrap ? `calc(${theme.module[8]} * 2)` : "100%"}
+          noWrap={props.noWrap}
+        >
+          {props.label}
+        </Typography>
+        <Typography
+          variant="body2"
+          color={theme.scale.gray[4]}
+          maxWidth={props.secondarySlot ? theme.module[9] : "none"}
+          noWrap
+        >
+          {props.description}
+        </Typography>
+      </Stack>
+    )
+  )
 }
 /*
 

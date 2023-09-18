@@ -15,7 +15,10 @@ import Icon from "../../components/icon"
 import { Loader } from "../../components/loader"
 import { selectIsSystemBooted } from "../core/coreSlice"
 import { Home } from "../core/home"
-import { generateNotification } from "../core/notifications"
+import {
+  generateErrorNotification,
+  generateNotification,
+} from "../core/notifications"
 import { routePaths } from "../core/pages"
 import {
   registerUserOnAuth,
@@ -195,26 +198,16 @@ function CredentialInputs() {
   const theme = useTheme()
   const email = useAuthStore((state) => state.email)
   const password = useAuthStore((state) => state.password)
-  /*
 
-
-*/
   function handleEmailChange(event: any) {
     setUseAuth("email", event.target.value)
   }
-  /*
 
-
-*/
   function handlePasswordChange(event: any) {
     const passwordValidation = getPasswordValidation(event.target.value)
     setUseAuth("passwordValidation", passwordValidation)
     setUseAuth("password", event.target.value)
   }
-  /*
-
-  
-  */
 
   return (
     <Stack width={"100%"} gap={theme.module[4]}>
@@ -287,10 +280,7 @@ function ButtonTray({ isRegistering }: { isRegistering: boolean }) {
   const isPasswordValid = passwordValidation.isValid
   const isDetailsIncomplete =
     (isRegistering && !isPasswordValid) || !email || !password
-  /*
 
-  
-  */
   function handleClick() {
     if (!!email && !!password) {
       if (isRegistering && isPasswordValid) {
@@ -298,7 +288,11 @@ function ButtonTray({ isRegistering }: { isRegistering: boolean }) {
         registerUserOnAuth(email, password)
       } else {
         setUseAuth("isSigningIn", true)
-        signInUserOnAuth(email, password)
+        signInUserOnAuth(email, password).catch((error) => {
+          generateErrorNotification(error.code)
+          setUseAuth("isSigningIn", false)
+          console.log(error.code)
+        })
       }
       setUseAuth("email", "")
       setUseAuth("password", "")
@@ -343,10 +337,7 @@ function ButtonTray({ isRegistering }: { isRegistering: boolean }) {
 function ForgotPassword({ isRegistering }: { isRegistering: boolean }) {
   const theme = useTheme()
   const email = useAuthStore((state) => state.email)
-  /*
 
-
-*/
   function handleClick() {
     if (!!email) {
       resetUserPassword(email)

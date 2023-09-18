@@ -2,13 +2,13 @@ import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit"
 import _ from "lodash"
 import { RootState, store } from "../../app/store"
 import { UserOrgRoles } from "../user/userSlice"
-import { selectCountMembers } from "../count/countSlice"
 
 export type OrgProps = {
   name?: string
   uuid?: string
   members?: MembersProps
   invites?: InvitesProps
+  countChecks?: CountChecksProps
 }
 export type MemberProps = {
   name: string
@@ -22,6 +22,9 @@ export type MembersProps = {
 export type MemberStatusOptions = "notJoined" | "joining" | "isJoined"
 export type InvitesProps = { [key: string]: string }
 export type InviteProps = { inviteKey: string; tempName: string }
+export type CountChecksProps = {
+  [key: string]: string
+}
 
 export interface OrganisationState {
   memberStatus: MemberStatusOptions
@@ -90,6 +93,21 @@ export const organisationSlice = createSlice({
         delete invites[inviteKey]
       }
     },
+    setCountCheck: (
+      state,
+      action: PayloadAction<{ id: string; check: string }>,
+    ) => {
+      const id = action.payload.id
+      const check = action.payload.check
+      _.set(state.org, `countChecks.${id}`, check)
+    },
+    deleteCountCheck: (state, action: PayloadAction<string>) => {
+      const id = action.payload
+      const countChecks = state.org.countChecks
+      if (countChecks) {
+        delete countChecks[id]
+      }
+    },
   },
 })
 
@@ -105,6 +123,8 @@ export const {
   leaveOrg,
   createInvite,
   deleteInvite,
+  setCountCheck,
+  deleteCountCheck,
 } = organisationSlice.actions
 
 export const selectIsJoining = (state: RootState) => {
@@ -118,14 +138,36 @@ export const selectOrgName = (state: RootState) => state.organisation.org.name
 export const selectOrgUuid = (state: RootState) => state.organisation.org.uuid
 export const selectIsOrgSetup = (state: RootState) =>
   !!state.organisation.org.uuid
+export const selectOrgCountChecks = (state: RootState) =>
+  state.organisation.org.countChecks
+export const selectOrgCountChecksList = createSelector(
+  [selectOrgCountChecks],
+  (checks) => {
+    const checkList: any = []
+    _.forIn(checks, (value, key) => {
+      checkList.push({ check: value, id: key })
+    })
+    return checkList
+  },
+)
 export const selectOrgMembers = (state: RootState) =>
   state.organisation.org.members
-export const selectOtherOrgMembers = (state: RootState) => {
-  const members = state.organisation.org.members
-  const userUuid = store.getState().user.user.uuid as string
-  const otherMembers = _.omit(members, userUuid)
-  return otherMembers
-}
+export const selectUserOrgMember = createSelector(
+  [selectOrgMembers],
+  (members) => {
+    const userUuid = store.getState().user.user.uuid as string
+    const userMember = _.pick(members, userUuid)
+    return userMember
+  },
+)
+export const selectOtherOrgMembers = createSelector(
+  [selectOrgMembers],
+  (members) => {
+    const userUuid = store.getState().user.user.uuid as string
+    const otherMembers = _.omit(members, userUuid)
+    return otherMembers
+  },
+)
 export const selectOrgMembersList = createSelector(
   [selectOrgMembers],
   (members) => {

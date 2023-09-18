@@ -19,7 +19,6 @@ type ButtonVariations =
   | "profile"
   | "modal"
   | "pill"
-  | "icon"
   | "home"
   | "navNext"
   | "navPrev"
@@ -124,6 +123,7 @@ function ProfileButton(props: ButtonVariationProps) {
   const theme = useTheme()
 
   const styles = {
+    opacity: props.disabled ? 0.5 : 1,
     background: props.bgColor ?? theme.scale.gray[8],
     height: theme.module[7],
     padding: `${theme.module[4]} ${theme.module[5]}`,
@@ -131,6 +131,7 @@ function ProfileButton(props: ButtonVariationProps) {
     borderRadius: theme.module[3],
     boxShadow: theme.shadow.neo[props.boxShadowScale ?? 3],
     width: "100%",
+    outlineOffset: "-1px",
     outline: `1px solid ${
       props.outlineColor ?? theme.scale.gray[7]
     } !important`,
@@ -152,7 +153,7 @@ function ProfileButton(props: ButtonVariationProps) {
         direction={"row"}
         alignItems={"center"}
         justifyContent={props.justifyCenter ? "center" : "flex-start"}
-        gap={theme.module[5]}
+        gap={props.justifyCenter ? theme.module[4] : theme.module[5]}
       >
         {!!props.iconName && (
           <Icon
@@ -181,6 +182,7 @@ function ModalButton(props: ButtonVariationProps) {
   const theme = useTheme()
 
   const styles = {
+    opacity: props.disabled ? 0.5 : 1,
     width: "100%",
     padding: theme.module[3],
     color: props.color ?? theme.scale.gray[4],
@@ -216,6 +218,7 @@ function ModalButton(props: ButtonVariationProps) {
 function HomeButton(props: ButtonVariationProps) {
   const theme = useTheme()
   const styles = {
+    opacity: props.disabled ? 0.5 : 1,
     background: theme.scale.gray[8],
     width: "100%",
     borderRadius: theme.module[3],
@@ -272,16 +275,22 @@ function PillButton(props: ButtonVariationProps) {
   const theme = useTheme()
 
   const styles = {
+    opacity: props.disabled ? 0.5 : 1,
     borderRadius: theme.module[5],
     background: props.bgColor ?? "transparant",
     padding: props.label
       ? `${theme.module[2]} ${theme.module[3]}`
       : theme.module[2],
+    outlineOffset: "-1px",
     outline: props.outlineColor
       ? `1px solid ${props.outlineColor} !important`
       : 0,
     transform: `scale(${props.isPressed ? 0.9 : 1})`,
     transition: "transform 250ms",
+    boxShadow:
+      props.boxShadowScale !== undefined
+        ? theme.shadow.neo[props.boxShadowScale]
+        : "none",
     ...props.sx,
   }
 
@@ -293,7 +302,7 @@ function PillButton(props: ButtonVariationProps) {
       disableTouchRipple
       sx={styles}
     >
-      <Stack direction={"row"} gap={theme.module[2]}>
+      <Stack direction={"row"} gap={theme.module[2]} alignContent={"center"}>
         {!!props.iconName && (
           <Icon
             variation={props.iconName}
@@ -324,6 +333,7 @@ export function NavigationButton(props: NavigationButtonProps) {
   const theme = useTheme()
 
   const styles = {
+    opacity: props.disabled ? 0.5 : 1,
     width: "100%",
     height: theme.module[7],
     padding: theme.module[3],
@@ -331,6 +341,7 @@ export function NavigationButton(props: NavigationButtonProps) {
     color: theme.scale.gray[4],
     background: theme.scale.gray[7],
     borderRadius: theme.module[3],
+    outlineOffset: "-1px",
     outline: `1px solid ${theme.scale.gray[6]} !important`,
     transform: `scale(${props.isPressed ? 0.99 : 1})`,
     ...props.sx,
@@ -344,7 +355,9 @@ export function NavigationButton(props: NavigationButtonProps) {
       flexShrink={1}
       key={props.label}
     >
-      <Typography color={theme.scale.gray[4]}>{props.label}</Typography>
+      <Typography variant="h6" color={theme.scale.gray[4]}>
+        {props.label}
+      </Typography>
     </Stack>,
   ]
   const buttonElements =

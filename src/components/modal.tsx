@@ -5,9 +5,8 @@ import MuiModal from "@mui/material/Modal"
 import Typography from "@mui/material/Typography"
 import { useEffect, useState } from "react"
 import useTheme from "../common/useTheme"
-import Animation from "./animation"
 import { Button } from "./button"
-import Icon, { IconNames } from "./icon"
+import { IconNames } from "./icon"
 /*
 
 
@@ -23,16 +22,12 @@ type ModalProps = {
   open: boolean
   heading: string
   body: React.ReactElement
-  show?: "footer" | "actions"
-  footer?: React.ReactElement
   actions?: ModalActionProps[]
   onClose: Function
 }
 export default function Modal(props: ModalProps) {
   const theme = useTheme()
   const [open, setOpen] = useState(false)
-  const showFooter = props.show === "footer"
-  const showActions = props.show === "actions"
   /*
   
 
@@ -100,34 +95,22 @@ export default function Modal(props: ModalProps) {
           </Stack>
           <Stack
             direction={"row"}
-            padding={!showActions && !showFooter ? 0 : theme.module[4]}
+            padding={theme.module[4]}
             paddingTop={0}
             gap={theme.module[4]}
             boxSizing={"border-box"}
             width={"100%"}
             overflow={"visible"}
           >
-            {showActions &&
-              props.actions &&
+            {props.actions &&
               props.actions.map((action, index) => (
-                <Animation
-                  from={{ opacity: 0 }}
-                  to={{ opacity: 1 }}
-                  start={true}
+                <Button
+                  variation={"modal"}
+                  iconName={action.iconName}
+                  onClick={action.handleClick}
                   key={index}
-                >
-                  <Button
-                    variation={"modal"}
-                    iconName={action.iconName}
-                    onClick={action.handleClick}
-                  />
-                </Animation>
+                />
               ))}
-            {showFooter && (
-              <Animation from={{ opacity: 0 }} to={{ opacity: 1 }} start={true}>
-                {props.footer}
-              </Animation>
-            )}
           </Stack>
         </Stack>
       </Fade>

@@ -7,7 +7,9 @@ import countReducer, {
   CountState,
   DeleteCountItemProps,
   SetCountResultsItemProps,
+  addCountCheck,
   deleteCount,
+  deleteCountCheck,
   deleteCountMember,
   deleteCountResultsItem,
   setCount,
@@ -24,10 +26,12 @@ import countReducer, {
 
 describe("count reducer", () => {
   const initialState: CountState = {
+    checks: [],
     step: "dashboard",
     count: {},
   }
   const mockState: CountState = {
+    checks: ["mockCheck"],
     step: "dashboard",
     count: {
       metadata: {
@@ -71,7 +75,19 @@ describe("count reducer", () => {
     expect(countReducer(undefined, { type: "unknown" })).toEqual({
       step: "dashboard",
       count: {},
+      checks: [],
     })
+  })
+
+  it("should handle addCountCheck", () => {
+    const mockCheck = "Clean all boxes"
+    const actual = countReducer(initialState, addCountCheck(mockCheck))
+    expect(actual.checks[0]).toEqual(mockCheck)
+  })
+
+  it("should handle deleteCountCheck", () => {
+    const actual = countReducer(initialState, deleteCountCheck(0))
+    expect(actual.checks[0]).toEqual(undefined)
   })
 
   it("should handle setCountStep", () => {

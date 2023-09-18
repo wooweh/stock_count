@@ -171,3 +171,37 @@ export async function setOrgNameOnDB(name: string) {
 
 
 */
+export async function setCountCheckOnDB(check: string, id: string) {
+  const orgUuid = store.getState().organisation.org.uuid
+  if (!!orgUuid) {
+    set(ref(dbReal, getDBPath.org(orgUuid).countCheck(id).check), check).catch(
+      (error) => {
+        console.log(error)
+      },
+    )
+  }
+}
+/*
+
+
+
+
+
+*/
+export async function deleteCountCheckOnDB(id: string) {
+  const orgUuid = store.getState().organisation.org.uuid
+  if (!!orgUuid) {
+    remove(ref(dbReal, getDBPath.org(orgUuid).countCheck(id).check)).catch(
+      (error) => {
+        console.log(error)
+      },
+    )
+  }
+}
+/*
+
+
+
+
+
+*/

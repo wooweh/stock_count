@@ -3,7 +3,6 @@ import { z } from "zod"
 import { useAppSelector } from "../app/hooks"
 import { selectIsDarkmode } from "../features/core/coreSlice"
 import colorScales from "./colorScales"
-import { generateModules } from "./utils"
 
 export const GOLDEN_RATIO = 1.618
 export const SILVER_RATIO = 1.414
@@ -109,3 +108,26 @@ export default function useTheme() {
 
   return generated
 }
+/*
+
+
+
+
+
+*/
+function generateModules(start: number, count: number, ratio: number) {
+  return new Array(count + 1)
+    .fill(true)
+    .map(() => {
+      start *= ratio
+      return Math.round(start * count) / count
+    })
+    .map((module: any) => module + "rem")
+}
+/*
+
+
+
+
+
+*/

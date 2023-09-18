@@ -49,7 +49,10 @@ export default function Animation(props: AnimationProps) {
       style={{
         width: "100%",
         height: "100%",
-        overflow: "visible",
+        overflow: "hidden",
+        alignItems: "center",
+        justifyContent: "center",
+        display: "flex",
         ...props.sx,
         ...springs,
       }}

@@ -13,13 +13,13 @@ export default function GlobalStyles() {
           height: 0;
           display: flex;
           flex-shrink: 0;
-          width: ${
-            isMobile ? theme.module[0] : theme.module[2]
-          }; /* Remove scrollbar space */
+          width: ${isMobile
+            ? theme.module[0]
+            : theme.module[2]}; /* Remove scrollbar space */
           background: transparent; /* Optional: just make scrollbar invisible */
         }
         ::-webkit-scrollbar-thumb {
-          background: ${theme.scale.blue[8]};
+          background: ${theme.scale.blue[9]};
         }
         input[type="file"]::file-selector-button {
           padding: ${theme.module[3]};

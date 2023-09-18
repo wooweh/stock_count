@@ -75,7 +75,7 @@ export function resetUseUser() {
 
 
 */
-export default function UserProfile() {
+export function UserProfile() {
   return (
     <ProfileSurface>
       <ProfileFields />
@@ -329,7 +329,6 @@ function DeleteProfileConfirmation() {
           />
         </Stack>
       }
-      show="actions"
       actions={[
         { iconName: "cancel", handleClick: handleClose },
         { iconName: "done", handleClick: handleAccept },
@@ -437,7 +436,6 @@ function ChangePassword() {
             ))}
         </>
       }
-      show="actions"
       actions={[
         { iconName: "cancel", handleClick: handleClose },
         { iconName: "done", handleClick: handleAccept },

@@ -1,26 +1,38 @@
-import { Stack, Typography } from "@mui/material"
+import { ClickAwayListener, Stack, Typography } from "@mui/material"
 import _ from "lodash"
+import { useEffect, useState } from "react"
 import { create } from "zustand"
 import { createJSONStorage, persist } from "zustand/middleware"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
+import { getTimeStamp } from "../../common/utils"
+import Animation from "../../components/animation"
 import { Button } from "../../components/button"
-import { Select } from "../../components/control"
-import Icon from "../../components/icon"
-import { List, ListItem } from "../../components/list"
+import { IconNames } from "../../components/icon"
 import Modal, { ModalActionProps } from "../../components/modal"
 import {
-  MemberProps,
-  selectOrgMembers,
-} from "../organisation/organisationSlice"
-import { selectIsUserAdmin } from "../user/userSlice"
-import {
   CountSteps,
-  selectAvailableMembersList,
+  CountTypes,
+  deleteCount,
   selectCountStep,
-  selectIsCountInvitePending,
-  setCountStep,
+  selectCountersUuidList,
+  selectIsStockCountCompleted,
+  selectIsUserCounting,
+  selectIsUserOrganiser,
 } from "./countSlice"
+import {
+  createCountMetadata,
+  updateCountComments,
+  updateCountMetadata,
+  updateCountStep,
+  updateUserCountMember,
+} from "./countUtils"
+import { DashboardBody } from "./dashboard"
+import { FinalizationBody } from "./finalization"
+import { PreparationBody } from "./preparation"
+import { ReviewBody } from "./review"
+import { SetupBody } from "./setup"
+import { StockCountBody } from "./stockCount"
 /*
 
 
@@ -30,18 +42,54 @@ import {
 */
 type UseCountState = {
   isSettingUp: boolean
+  isManagingCheckList: boolean
+  isCounterRequirementMet: boolean
   isAddingMembers: boolean
+  isAddingPrepComment: boolean
+  isStartingCount: boolean
+  isAddingStockItem: boolean
+  isReviewMetadataSubmitted: boolean
+  isCountOptionsOpen: boolean
+  isDeletingCount: boolean
+  isLeavingCount: boolean
+  isSubmittingFinalization: boolean
+  currentlyViewedStockItemId: false | string
+  currentlyViewedStockItemUseableCount: number
+  currentlyViewedStockItemDamagedCount: number
+  currentlyViewedStockItemObsoleteCount: number
+  scrollIndex: number
   selectedMemberUuids: string[]
-  countType: string
+  satisfiedCheckUuids: string[]
+  prepCommments: string[]
+  finalComments: string[]
+  tempCountType: string
 }
 type UseCountKeys = keyof UseCountState
 const initialState: UseCountState = {
   isSettingUp: false,
+  isManagingCheckList: false,
+  isCounterRequirementMet: false,
   isAddingMembers: false,
+  isAddingPrepComment: false,
+  isStartingCount: false,
+  isAddingStockItem: false,
+  isReviewMetadataSubmitted: false,
+  isCountOptionsOpen: false,
+  isDeletingCount: false,
+  isLeavingCount: false,
+  isSubmittingFinalization: false,
+  currentlyViewedStockItemId: false,
+  currentlyViewedStockItemUseableCount: 0,
+  currentlyViewedStockItemDamagedCount: 0,
+  currentlyViewedStockItemObsoleteCount: 0,
+  scrollIndex: 0,
   selectedMemberUuids: [],
-  countType: "",
+  satisfiedCheckUuids: [],
+  prepCommments: [],
+  finalComments: [],
+  tempCountType: "",
 }
-const useCountStore = create<UseCountState>()(
+export const useCountStore = create<UseCountState>()(
   persist(
     (set) => ({
       ...initialState,
@@ -50,10 +98,10 @@ const useCountStore = create<UseCountState>()(
   ),
 )
 
-function setUseCount(path: UseCountKeys, value: any) {
+export function setUseCount(path: UseCountKeys, value: any) {
   useCountStore.setState({ [path]: value })
 }
-function addUseCountSelectedMemberUuid(uuid: string) {
+export function addUseCountSelectedMemberUuid(uuid: string) {
   const uuids = useCountStore.getState().selectedMemberUuids
   const index = _.indexOf(uuids, uuid)
   if (index === -1) {
@@ -61,12 +109,65 @@ function addUseCountSelectedMemberUuid(uuid: string) {
     useCountStore.setState({ selectedMemberUuids: newUuids })
   }
 }
-function removeUseCountSelectedMemberUuid(uuid: string) {
+export function removeUseCountSelectedMemberUuid(uuid: string) {
   const uuids = useCountStore.getState().selectedMemberUuids
   const indexToRemove = _.indexOf(uuids, uuid)
   const newUuids = [...uuids]
   newUuids.splice(indexToRemove, 1)
   useCountStore.setState({ selectedMemberUuids: newUuids })
+}
+export function addUseCountSatisfiedCheckUuid(uuid: string) {
+  const uuids = useCountStore.getState().satisfiedCheckUuids
+  const index = _.indexOf(uuids, uuid)
+  if (index === -1) {
+    const newUuids = [uuid, ...uuids]
+    useCountStore.setState({ satisfiedCheckUuids: newUuids })
+  }
+}
+export function removeUseCountSatisfiedCheckUuid(uuid: string) {
+  const uuids = useCountStore.getState().satisfiedCheckUuids
+  const indexToRemove = _.indexOf(uuids, uuid)
+  const newUuids = [...uuids]
+  newUuids.splice(indexToRemove, 1)
+  useCountStore.setState({ satisfiedCheckUuids: newUuids })
+}
+export function addUseCountPrepComment(comment: string) {
+  const comments = useCountStore.getState().prepCommments
+  const newComments = [...comments, comment]
+  useCountStore.setState({ prepCommments: newComments })
+}
+export function editUseCountPrepComment(index: number, comment: string) {
+  const comments = useCountStore.getState().prepCommments
+  if (index >= 0 && index < comments.length) {
+    const newComments = [...comments]
+    newComments[index] = comment
+    useCountStore.setState({ prepCommments: newComments })
+  }
+}
+export function removeUseCountPrepComment(index: number) {
+  const comments = useCountStore.getState().prepCommments
+  const newComments = [...comments]
+  newComments.splice(index, 1)
+  useCountStore.setState({ prepCommments: newComments })
+}
+export function addUseCountFinalComment(comment: string) {
+  const comments = useCountStore.getState().finalComments
+  const newComments = [...comments, comment]
+  useCountStore.setState({ finalComments: newComments })
+}
+export function editUseCountFinalComment(index: number, comment: string) {
+  const comments = useCountStore.getState().finalComments
+  if (index >= 0 && index < comments.length) {
+    const newComments = [...comments]
+    newComments[index] = comment
+    useCountStore.setState({ finalComments: newComments })
+  }
+}
+export function removeUseCountFinalComment(index: number) {
+  const comments = useCountStore.getState().finalComments
+  const newComments = [...comments]
+  newComments.splice(index, 1)
+  useCountStore.setState({ finalComments: newComments })
 }
 export function resetUseCount() {
   useCountStore.setState(initialState)
@@ -94,40 +195,67 @@ type CountStepsPropsCreator<CountStepsProperties extends string> = {
 type CountStepsProps = CountStepsPropsCreator<CountSteps>
 function CountStepsContainer() {
   const theme = useTheme()
-  const dispatch = useAppDispatch()
-  const countStep = useAppSelector(selectCountStep)
 
-  function handleSetupNext() {
-    dispatch(setCountStep("preparation"))
-  }
+  const countStep = useAppSelector(selectCountStep)
+  const counterUuids = useAppSelector(selectCountersUuidList)
+  const isCountCompleted = useAppSelector(selectIsStockCountCompleted)
+  const isOrganiser = useAppSelector(selectIsUserOrganiser)
+  // const isOnlyOrganiser = useAppSelector(selectIsUserOnlyOrganiser)
+
+  const countType = useCountStore((state) => state.tempCountType) as CountTypes
+  const isCounterRequirementMet = useCountStore(
+    (state) => state.isCounterRequirementMet,
+  )
+  const isReviewMetadataSubmitted = useCountStore(
+    (state) => state.isReviewMetadataSubmitted,
+  )
+  const finalComments = useCountStore((state) => state.finalComments)
+
+  useEffect(() => {
+    if (isCountCompleted && isOrganiser && !isReviewMetadataSubmitted) {
+      setUseCount("isReviewMetadataSubmitted", true)
+      updateCountMetadata({ reviewStartTime: getTimeStamp() })
+    }
+  }, [isCountCompleted, isReviewMetadataSubmitted, isOrganiser])
 
   function handleSetupPrev() {
-    dispatch(setCountStep("dashboard"))
+    updateCountStep("dashboard")
+  }
+
+  function handleSetupNext() {
+    createCountMetadata(countType, counterUuids)
+    updateCountStep("preparation")
   }
 
   function handlePreparationPrev() {
-    dispatch(setCountStep("setup"))
+    updateCountStep("setup")
   }
 
   function handlePreparationNext() {
-    dispatch(setCountStep("stockCount"))
+    setUseCount("isStartingCount", true)
   }
 
   function handleStockCountNext() {
-    dispatch(setCountStep("review"))
+    updateCountStep("review", true)
   }
 
   function handleReviewPrev() {
-    dispatch(setCountStep("stockCount"))
+    updateCountStep("stockCount", true)
   }
 
   function handleReviewNext() {
-    dispatch(setCountStep("finalization"))
+    updateCountMetadata({ finalizationStartTime: getTimeStamp() })
+    updateCountStep("finalization", true)
   }
 
   function handleFinalizationSubmit() {
-    dispatch(setCountStep("dashboard"))
+    // setUseCount("isSubmittingFinalization", true)
+    updateCountComments({ finalization: finalComments })
+    updateCountMetadata({ finalSubmissionTime: getTimeStamp() })
+    updateCountStep("review", true)
   }
+
+  const isSetupNextButtonDisabled = !isCounterRequirementMet
 
   const countSteps: CountStepsProps = {
     dashboard: {
@@ -138,13 +266,17 @@ function CountStepsContainer() {
       label: "Setup",
       body: <SetupBody />,
       prevButton: { label: "Dashboard", onClick: handleSetupPrev },
-      nextButton: { label: "Preparation", onClick: handleSetupNext },
+      nextButton: {
+        label: "Preparation",
+        onClick: handleSetupNext,
+        disabled: isSetupNextButtonDisabled,
+      },
     },
     preparation: {
       label: "Preparation",
       body: <PreparationBody />,
       prevButton: { label: "Setup", onClick: handlePreparationPrev },
-      nextButton: { label: "Start Count", onClick: handlePreparationNext },
+      nextButton: { label: "Count", onClick: handlePreparationNext },
     },
     stockCount: {
       label: "Stock Count",
@@ -155,7 +287,11 @@ function CountStepsContainer() {
       label: "Review",
       body: <ReviewBody />,
       prevButton: { label: "Count", onClick: handleReviewPrev },
-      nextButton: { label: "Finalize", onClick: handleReviewNext },
+      nextButton: {
+        label: "Finalize",
+        onClick: handleReviewNext,
+        disabled: !isCountCompleted,
+      },
     },
     finalization: {
       label: "Finalization",
@@ -167,341 +303,14 @@ function CountStepsContainer() {
     <Stack
       width={"100%"}
       height={"100%"}
-      padding={theme.module[3]}
+      padding={theme.module[4]}
       boxSizing={"border-box"}
     >
       <CountStep {...countSteps[countStep]} />
+      <LeaveCountConfirmation />
+      <DeleteCountConfirmation />
     </Stack>
   )
-}
-/*
-
-
-
-
-
-*/
-function DashboardBody() {
-  return (
-    <Stack width={"100%"} height={"100%"} justifyContent={"space-between"}>
-      <Invite />
-      <SetupCountButton />
-    </Stack>
-  )
-}
-/*
-
-
-
-
-
-*/
-function SetupCountButton() {
-  const theme = useTheme()
-  const dispatch = useAppDispatch()
-
-  const isAdmin = useAppSelector(selectIsUserAdmin)
-
-  return (
-    isAdmin && (
-      <Button
-        variation={"profile"}
-        label={"Setup Count"}
-        bgColor={theme.scale.gray[7]}
-        outlineColor={theme.scale.gray[6]}
-        justifyCenter
-        onClick={() => dispatch(setCountStep("setup"))}
-      />
-    )
-  )
-}
-/*
-
-
-
-
-
-*/
-function Invite() {
-  const theme = useTheme()
-
-  const isInvitePending = useAppSelector(selectIsCountInvitePending)
-
-  return isInvitePending ? (
-    <Stack
-      gap={theme.module[4]}
-      borderRadius={theme.module[4]}
-      padding={theme.module[3]}
-      boxSizing={"border-box"}
-      bgcolor={theme.scale.blue[8]}
-      sx={{ outline: `1px solid ${theme.scale.blue[7]}` }}
-    >
-      <Stack
-        width={"100%"}
-        direction={"row"}
-        gap={theme.module[4]}
-        alignItems={"center"}
-        padding={theme.module[3]}
-        boxSizing={"border-box"}
-      >
-        <Icon
-          variation="notification"
-          fontSize="large"
-          color={theme.scale.blue[6]}
-        />
-        <Typography
-          variant={"h6"}
-          color={theme.scale.gray[4]}
-          sx={{ paddingLeft: theme.module[3] }}
-        >
-          You have been invited to a count:
-        </Typography>
-      </Stack>
-      <Button
-        variation="profile"
-        label="Accept"
-        iconName={"done"}
-        justifyCenter
-        bgColor={theme.scale.gray[7]}
-        onClick={() => {}}
-      />
-      <Button
-        variation="profile"
-        label="Decline"
-        iconName={"cancel"}
-        justifyCenter
-        bgColor={theme.scale.gray[7]}
-        onClick={() => {}}
-      />
-    </Stack>
-  ) : (
-    <Typography
-      variant={"h6"}
-      color={theme.scale.gray[4]}
-      sx={{ display: "flex", justifyContent: "center" }}
-    >
-      There are no new counts pending
-    </Typography>
-  )
-}
-/*
-
-
-
-
-
-*/
-function SetupBody() {
-  const theme = useTheme()
-  const dispatch = useAppDispatch()
-
-  const orgMembers = useAppSelector(selectOrgMembers)
-  const countType = useCountStore((state: any) => state.countType)
-  const isAddingMembers = useCountStore((state: any) => state.isAddingMembers)
-  const selectedMemberUuids = useCountStore(
-    (state: any) => state.selectedMemberUuids,
-  )
-
-  const countMembers = _.pick(orgMembers, selectedMemberUuids)
-  //TODO: Create array of count member objects to dispatch (abstract into function)
-
-  const countTypes: any = {
-    solo: "A single counter will count the entire stock holding.",
-    dual: "Two counters will each count the entire stock holding and compare results.",
-    team: "Two or more counters will together count the entire stock holding.",
-  }
-  const options = _.keys(countTypes)
-
-  function handleCountTypeSelect(value: any) {
-    setUseCount("countType", value)
-  }
-
-  const setupOptions = [
-    {
-      label: "Count Type",
-      description: countTypes[countType] ?? "",
-      control: (
-        <Select
-          value={countType}
-          onChange={handleCountTypeSelect}
-          options={options}
-          placeholder="Choose Count Type"
-        />
-      ),
-    },
-    {
-      label: "Choose Team",
-      description: "Select the member(s) to perform the count.",
-      control: (
-        <Button
-          variation={"profile"}
-          label={"Add Member(s)"}
-          iconName={"addMembers"}
-          onClick={() => setUseCount("isAddingMembers", true)}
-          bgColor={theme.scale.gray[7]}
-          outlineColor={theme.scale.gray[6]}
-          justifyCenter
-        />
-      ),
-    },
-  ]
-
-  const modalActions: ModalActionProps[] = [
-    {
-      iconName: "cancel",
-      handleClick: handleCancel,
-    },
-    {
-      iconName: "done",
-      handleClick: handleAccept,
-    },
-  ]
-
-  function handleCancel() {
-    setUseCount("selectedMemberUuids", [])
-    setUseCount("isAddingMembers", false)
-  }
-  function handleAccept() {
-    handleCancel()
-  }
-
-  return (
-    <Stack gap={theme.module[5]}>
-      {setupOptions.map((option: (typeof setupOptions)[number]) => (
-        <SetupOption
-          label={option.label}
-          description={option.description}
-          control={option.control}
-          key={option.label}
-        />
-      ))}
-      <Modal
-        open={isAddingMembers}
-        heading={"Add Members"}
-        body={<MembersList />}
-        actions={modalActions}
-        onClose={() => setUseCount("isAddingMembers", false)}
-      />
-    </Stack>
-  )
-}
-/*
-
-
-
-
-
-*/
-function MembersList() {
-  const availableMembers = useAppSelector(selectAvailableMembersList)
-  const selectedMemberUuids = useCountStore(
-    (state: any) => state.selectedMemberUuids,
-  )
-
-  return (
-    <List>
-      {availableMembers.map((member: MemberProps) => {
-        const fullname = `${member.name} ${member.surname}`
-        const selected = selectedMemberUuids.includes(member.uuid)
-        return (
-          <ListItem
-            label={fullname}
-            primarySlot={
-              <Icon variation={selected ? "checked" : "unchecked"} />
-            }
-            onChange={() =>
-              selected
-                ? removeUseCountSelectedMemberUuid(member.uuid)
-                : addUseCountSelectedMemberUuid(member.uuid)
-            }
-            tappable
-            key={fullname}
-          />
-        )
-      })}
-    </List>
-  )
-}
-/*
-
-
-
-
-
-*/
-type SetupOptionProps = {
-  label: string
-  description?: string
-  control: any
-}
-function SetupOption(props: SetupOptionProps) {
-  const theme = useTheme()
-
-  return (
-    <Stack
-      gap={theme.module[3]}
-      padding={theme.module[3]}
-      boxSizing={"border-box"}
-    >
-      <Stack paddingLeft={theme.module[1]}>
-        <Typography
-          fontSize={"large"}
-          color={theme.scale.gray[4]}
-          fontWeight={"bold"}
-        >
-          {props.label}
-        </Typography>
-      </Stack>
-      <Stack>{props.control}</Stack>
-      {!!props.description && (
-        <Stack paddingLeft={theme.module[1]}>
-          <Typography color={theme.scale.gray[5]}>
-            {props.description}
-          </Typography>
-        </Stack>
-      )}
-    </Stack>
-  )
-}
-/*
-
-
-
-
-
-*/
-function PreparationBody() {
-  return <div>body</div>
-}
-/*
-
-
-
-
-
-*/
-function StockCountBody() {
-  return <div>body</div>
-}
-/*
-
-
-
-
-
-*/
-function ReviewBody() {
-  return <div>body</div>
-}
-/*
-
-
-
-
-
-*/
-function FinalizationBody() {
-  return <div>body</div>
 }
 /*
 
@@ -520,68 +329,85 @@ type CountStepProps = {
 type ButtonProps = {
   label: string
   onClick: any
+  disabled?: boolean
 }
 function CountStep(props: CountStepProps) {
   const theme = useTheme()
-
-  const showButtons = props.nextButton || props.prevButton || props.submitButton
 
   return (
     <Stack
       width={"100%"}
       height={"100%"}
-      gap={theme.module[4]}
+      gap={theme.module[3]}
       alignItems={"center"}
       boxSizing={"border-box"}
-      paddingTop={theme.module[3]}
     >
-      <Stack
-        padding={`${theme.module[2]} ${theme.module[4]}`}
-        alignItems={"center"}
-        boxSizing={"border-box"}
-        bgcolor={theme.scale.gray[9]}
-        borderRadius={theme.module[4]}
-        boxShadow={theme.shadow.neo[3]}
-        sx={{ outline: `1px solid ${theme.scale.gray[7]}` }}
-      >
-        <Typography variant={"subtitle1"}>{props.label}</Typography>
-      </Stack>
-      <Stack
-        width={"100%"}
-        height={"100%"}
-        flexShrink={1}
-        paddingTop={theme.module[4]}
-        boxSizing={"border-box"}
-      >
-        {props.body}
-      </Stack>
-      {showButtons && (
-        <Stack width={"100%"} direction={"row"} gap={theme.module[4]}>
-          {props.prevButton && (
-            <Button
-              variation={"navPrev"}
-              label={props.prevButton.label}
-              onClick={props.prevButton.onClick}
-            />
-          )}
-          {props.nextButton && (
-            <Button
-              variation={"navNext"}
-              label={props.nextButton.label}
-              onClick={props.nextButton.onClick}
-            />
-          )}
-          {props.submitButton && (
-            <Button
-              variation={"profile"}
-              label={props.submitButton.label}
-              onClick={props.submitButton.onClick}
-              bgColor={theme.scale.gray[7]}
-              outlineColor={theme.scale.gray[6]}
-              justifyCenter
-            />
-          )}
-        </Stack>
+      <Header {...props} />
+      <Body {...props} />
+      <ButtonTray {...props} />
+    </Stack>
+  )
+}
+/*
+
+
+
+
+
+*/
+function Header({ label }: { label: string }) {
+  const theme = useTheme()
+
+  const isOptionsOpen = useCountStore((state) => state.isCountOptionsOpen)
+
+  return (
+    <Stack
+      direction={"row"}
+      width={"100"}
+      gap={theme.module[2]}
+      padding={theme.module[2]}
+      boxSizing={"border-box"}
+      bgcolor={theme.scale.gray[9]}
+      borderRadius={theme.module[5]}
+      boxShadow={theme.shadow.neo[3]}
+      sx={{
+        outline: `1px solid ${theme.scale.gray[7]}`,
+      }}
+    >
+      {isOptionsOpen ? <OptionsTray /> : <StepLabel label={label} />}
+    </Stack>
+  )
+}
+/*
+
+
+
+
+
+*/
+function StepLabel({ label }: { label: string }) {
+  const theme = useTheme()
+  const isUserCounting = useAppSelector(selectIsUserCounting)
+  return (
+    <Stack
+      direction={"row"}
+      gap={theme.module[2]}
+      alignItems={"center"}
+      paddingLeft={theme.module[4]}
+      paddingRight={isUserCounting ? 0 : theme.module[4]}
+      boxSizing={"border-box"}
+      width={"100%"}
+      height={"100%"}
+    >
+      <Typography fontWeight={"bold"} variant={"subtitle1"}>
+        {label}
+      </Typography>
+      {isUserCounting && (
+        <Button
+          variation={"pill"}
+          iconName={"options"}
+          onClick={() => setUseCount("isCountOptionsOpen", true)}
+        />
       )}
     </Stack>
   )
@@ -593,3 +419,293 @@ function CountStep(props: CountStepProps) {
 
 
 */
+type CountOptions = {
+  label?: string
+  iconName: IconNames
+  onClick: any
+}
+function OptionsTray() {
+  const theme = useTheme()
+
+  const isOptionsOpen = useCountStore((state) => state.isCountOptionsOpen)
+
+  const [isOpen, setIsOpen] = useState(false)
+
+  function handleCancel() {
+    setIsOpen(false)
+    setTimeout(() => {
+      setUseCount("isCountOptionsOpen", false)
+    }, 150)
+  }
+
+  useEffect(() => {
+    if (!isOpen) {
+      setIsOpen(isOptionsOpen)
+    }
+  }, [isOptionsOpen, isOpen])
+
+  const options: CountOptions[] = [
+    {
+      label: "Leave",
+      iconName: "leave",
+      onClick: () => {
+        setUseCount("isLeavingCount", true)
+        handleCancel()
+      },
+    },
+    {
+      label: "Delete",
+      iconName: "delete",
+      onClick: () => {
+        setUseCount("isDeletingCount", true)
+        handleCancel()
+      },
+    },
+    {
+      iconName: "cancel",
+      onClick: () => {
+        handleCancel()
+      },
+    },
+  ]
+
+  return (
+    <ClickAwayListener onClickAway={handleCancel}>
+      <Stack
+        direction={"row"}
+        gap={theme.module[2]}
+        alignItems={"center"}
+        width={"100%"}
+        height={"100%"}
+        padding={`0 ${theme.module[2]}`}
+      >
+        <Animation
+          from={{ opacity: 0, width: "10rem" }}
+          to={{ opacity: 1, width: "15rem" }}
+          duration={150}
+          start={isOpen}
+        >
+          <Stack
+            direction={"row"}
+            gap={theme.module[2]}
+            alignItems={"center"}
+            justifyContent={"center"}
+            boxSizing={"border-box"}
+          >
+            {options.map((option) => (
+              <Stack
+                direction={"row"}
+                gap={theme.module[1]}
+                alignItems={"center"}
+                key={option.iconName}
+              >
+                <Button
+                  variation={"pill"}
+                  iconName={option.iconName}
+                  iconColor={theme.scale.green[6]}
+                  label={option.label}
+                  onClick={option.onClick}
+                />
+              </Stack>
+            ))}
+          </Stack>
+        </Animation>
+      </Stack>
+    </ClickAwayListener>
+  )
+}
+/*
+
+
+
+
+
+*/
+function Body({ body }: { body: any }) {
+  return (
+    <Stack
+      width={"100%"}
+      height={"100%"}
+      boxSizing={"border-box"}
+      overflow={"hidden"}
+      sx={{ overflowX: "visible", overflowY: "hidden" }}
+    >
+      {body}
+    </Stack>
+  )
+}
+/*
+
+
+
+
+
+*/
+function ButtonTray(props: CountStepProps) {
+  const theme = useTheme()
+  const showButtons = props.nextButton || props.prevButton || props.submitButton
+
+  return (
+    showButtons && (
+      <Stack width={"100%"} direction={"row"} gap={theme.module[4]}>
+        {props.prevButton && (
+          <Button
+            variation={"navPrev"}
+            label={props.prevButton.label}
+            onClick={props.prevButton.onClick}
+            disabled={props.prevButton.disabled}
+          />
+        )}
+        {props.nextButton && (
+          <Button
+            variation={"navNext"}
+            label={props.nextButton.label}
+            onClick={props.nextButton.onClick}
+            disabled={props.nextButton.disabled}
+          />
+        )}
+        {props.submitButton && (
+          <Button
+            variation={"profile"}
+            label={props.submitButton.label}
+            onClick={props.submitButton.onClick}
+            disabled={props.submitButton.disabled}
+            bgColor={theme.scale.gray[7]}
+            outlineColor={theme.scale.gray[6]}
+            justifyCenter
+          />
+        )}
+      </Stack>
+    )
+  )
+}
+/*
+
+
+
+
+
+*/
+function LeaveCountConfirmation() {
+  const isOpen = useCountStore((state) => state.isLeavingCount)
+
+  function handleClose() {
+    setUseCount("isLeavingCount", false)
+  }
+
+  function handleAccept() {
+    updateUserCountMember({ isCounting: false })
+    updateCountStep("dashboard")
+    setUseCount("isLeavingCount", false)
+  }
+
+  const actions: ModalActionProps[] = [
+    {
+      iconName: "cancel",
+      handleClick: handleClose,
+    },
+    {
+      iconName: "done",
+      handleClick: handleAccept,
+    },
+  ]
+
+  return (
+    <Modal
+      open={isOpen}
+      heading={"Leave Count"}
+      body={<LeaveCountConfirmationBody />}
+      actions={actions}
+      onClose={handleClose}
+    />
+  )
+}
+/*
+
+
+
+
+
+*/
+function LeaveCountConfirmationBody() {
+  const theme = useTheme()
+
+  return (
+    <Stack width={"100%"} gap={theme.module[3]} alignItems={"center"}>
+      <Typography textAlign={"center"}>
+        You are leaving the count. You can return using the Dashboard.
+      </Typography>
+      <Typography>Are you sure you want to leave?</Typography>
+    </Stack>
+  )
+}
+/*
+
+
+
+
+
+*/
+function DeleteCountConfirmation() {
+  const dispatch = useAppDispatch()
+
+  const isOpen = useCountStore((state) => state.isDeletingCount)
+
+  function handleClose() {
+    setUseCount("isDeletingCount", false)
+  }
+
+  function handleAccept() {
+    updateCountStep("dashboard")
+    resetUseCount()
+    dispatch(deleteCount())
+    setUseCount("isDeletingCount", false)
+  }
+
+  const actions: ModalActionProps[] = [
+    {
+      iconName: "cancel",
+      handleClick: handleClose,
+    },
+    {
+      iconName: "done",
+      handleClick: handleAccept,
+    },
+  ]
+
+  return (
+    <Modal
+      open={isOpen}
+      heading={"Delete Count"}
+      body={<DeleteCountConfirmationBody />}
+      actions={actions}
+      onClose={handleClose}
+    />
+  )
+}
+/*
+  
+  
+  
+  
+  
+  */
+function DeleteCountConfirmationBody() {
+  const theme = useTheme()
+
+  return (
+    <Stack width={"100%"} gap={theme.module[3]} alignItems={"center"}>
+      <Typography textAlign={"center"}>
+        You are about to delete the count. All count data will be lost.
+      </Typography>
+      <Typography>Are you sure you want to continue?</Typography>
+    </Stack>
+  )
+}
+/*
+ 
+ 
+ 
+ 
+ 
+ */

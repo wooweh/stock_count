@@ -30,12 +30,22 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff"
 import KeyIcon from "@mui/icons-material/VpnKey"
 import LightModeIcon from "@mui/icons-material/WbSunnyRounded"
 import StockIcon from "@mui/icons-material/WidgetsRounded"
+import StepIcon from "@mui/icons-material/LocationOnRounded"
 import DownloadIcon from "@mui/icons-material/DownloadRounded"
 import ArrowRightIcon from "@mui/icons-material/ArrowForwardIosRounded"
 import ArrowLeftIcon from "@mui/icons-material/ArrowBackIosNewRounded"
 import SubmitIcon from "@mui/icons-material/Publish"
 import NotificationIcon from "@mui/icons-material/NotificationsActive"
 import AddMembersIcon from "@mui/icons-material/GroupAddRounded"
+import WarningIcon from "@mui/icons-material/WarningRounded"
+import ObsoleteIcon from "@mui/icons-material/ScheduleRounded"
+import UseableIcon from "@mui/icons-material/SellRounded"
+import DamagedIcon from "@mui/icons-material/BrokenImageRounded"
+import DualIcon from "@mui/icons-material/GroupRounded"
+import CalendarIcon from "@mui/icons-material/CalendarTodayRounded"
+import TimeIcon from "@mui/icons-material/AccessTimeRounded"
+import ClipboardIcon from "@mui/icons-material/ContentPasteRounded"
+import ChecklistIcon from "@mui/icons-material/ChecklistRtlRounded"
 import { useAppSelector } from "../app/hooks"
 import { SxProps } from "../common/types"
 import useTheme from "../common/useTheme"
@@ -86,6 +96,16 @@ export type IconNames =
   | "submit"
   | "notification"
   | "addMembers"
+  | "warning"
+  | "checklist"
+  | "useable"
+  | "obsolete"
+  | "damaged"
+  | "step"
+  | "dual"
+  | "date"
+  | "time"
+  | "clipboard"
 
 type IconProps = {
   variation: IconNames
@@ -143,6 +163,31 @@ export default function Icon(props: IconProps) {
     submit: <SubmitIcon fontSize={fontSize} sx={{ ...styles }} />,
     notification: <NotificationIcon fontSize={fontSize} sx={{ ...styles }} />,
     addMembers: <AddMembersIcon fontSize={fontSize} sx={{ ...styles }} />,
+    obsolete: <ObsoleteIcon fontSize={fontSize} sx={{ ...styles }} />,
+    step: <StepIcon fontSize={fontSize} sx={{ ...styles }} />,
+    dual: <DualIcon fontSize={fontSize} sx={{ ...styles }} />,
+    date: <CalendarIcon fontSize={fontSize} sx={{ ...styles }} />,
+    time: <TimeIcon fontSize={fontSize} sx={{ ...styles }} />,
+    clipboard: <ClipboardIcon fontSize={fontSize} sx={{ ...styles }} />,
+    checklist: <ChecklistIcon fontSize={fontSize} sx={{ ...styles }} />,
+    useable: (
+      <UseableIcon
+        fontSize={fontSize}
+        sx={{ ...styles, color: theme.scale.green[5] }}
+      />
+    ),
+    damaged: (
+      <DamagedIcon
+        fontSize={fontSize}
+        sx={{ ...styles, color: theme.scale.red[5] }}
+      />
+    ),
+    warning: (
+      <WarningIcon
+        fontSize={fontSize}
+        sx={{ ...styles, color: theme.scale.orange[5] }}
+      />
+    ),
     joinGroup: (
       <GroupIcon
         fontSize={fontSize}

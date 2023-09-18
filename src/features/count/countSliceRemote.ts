@@ -4,6 +4,8 @@ import { store } from "../../app/store"
 import { dbReal } from "../../remote"
 import { getDBPath } from "../../remote/dbPaths"
 import {
+  CountCheckProps,
+  CountCommentsProps,
   CountMemberProps,
   CountMembersProps,
   CountMetadataProps,
@@ -58,7 +60,7 @@ export async function setCountResultsItemOnDB(
 ) {
   const orgUuid = store.getState().organisation.org.uuid
   const memberUuid = payload.memberUuid
-  const stockId = payload.stockId
+  const stockId = payload.id
   const item = _.omit(payload, "memberUuid")
   if (orgUuid) {
     set(
@@ -85,7 +87,7 @@ export async function deleteCountResultsItemOnDB(
 ) {
   const orgUuid = store.getState().organisation.org.uuid
   const memberUuid = payload.memberUuid
-  const stockId = payload.stockId
+  const stockId = payload.id
   if (orgUuid) {
     remove(
       ref(
@@ -139,10 +141,10 @@ export async function setCountMetaDataOnDB(payload: CountMetadataProps) {
 
 
 */
-export async function setCountPrepCommentsOnDB(comments: string[]) {
+export async function setCountChecksOnDB(payload: CountCheckProps[]) {
   const orgUuid = store.getState().organisation.org.uuid
   if (orgUuid) {
-    set(ref(dbReal, getDBPath.count(orgUuid).prepComments), comments).catch(
+    set(ref(dbReal, getDBPath.count(orgUuid).checks), payload).catch(
       (error) => {
         console.log(error)
       },
@@ -156,10 +158,10 @@ export async function setCountPrepCommentsOnDB(comments: string[]) {
 
 
 */
-export async function setCountFinalCommentsOnDB(comments: string[]) {
+export async function setCountCommentsOnDB(comments: CountCommentsProps) {
   const orgUuid = store.getState().organisation.org.uuid
   if (orgUuid) {
-    set(ref(dbReal, getDBPath.count(orgUuid).finalComments), comments).catch(
+    set(ref(dbReal, getDBPath.count(orgUuid).comments), comments).catch(
       (error) => {
         console.log(error)
       },

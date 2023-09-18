@@ -122,16 +122,13 @@ export async function registerUserOnAuth(email: string, password: string) {
 
 */
 export async function signInUserOnAuth(email: string, password: string) {
-  return signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
+  return signInWithEmailAndPassword(auth, email, password).then(
+    (userCredential) => {
       if (!!userCredential.user) {
         store.dispatch(signIn())
       }
-    })
-    .catch((error) => {
-      generateErrorNotification(error.code)
-      console.log(error.code)
-    })
+    },
+  )
 }
 /*
 

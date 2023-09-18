@@ -1,16 +1,17 @@
 import _ from "lodash"
 import { useEffect } from "react"
 import { useResizeDetector } from "react-resize-detector"
-import { Route, Routes, useLocation } from "react-router-dom"
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import Container from "../../components/container"
 import { Count, resetUseCount } from "../count/count"
 import { Organisation, resetUseOrg } from "../organisation/organisation"
 import { Stock, resetUseStock } from "../stock/stock"
 import { Authentication, WithAuth, resetUseAuth } from "../user/authentication"
-import UserProfile, { resetUseUser } from "../user/user"
+import { UserProfile, resetUseUser } from "../user/user"
 import { selectIsMobile, toggleIsMobile } from "./coreSlice"
 import { Home } from "./home"
+import { selectIsUserCounting } from "../count/countSlice"
 /*
 
 
@@ -122,8 +123,10 @@ function updateMobile(
 export function Pages() {
   const dispatch = useAppDispatch()
   const isMobile = useAppSelector(selectIsMobile)
+  const isUserCounting = useAppSelector(selectIsUserCounting)
   const { width, ref } = useResizeDetector()
   const location = useLocation()
+  const navigate = useNavigate()
   const path = location.pathname
 
   useEffect(() => {
@@ -143,6 +146,11 @@ export function Pages() {
     if (!isStockPath) resetUseStock()
     if (!isCountPath) resetUseCount()
   }, [path])
+
+  useEffect(() => {
+    const isCountPath = path === routePaths.count.path
+    if (isUserCounting && !isCountPath) navigate(routePaths.count.path)
+  }, [isUserCounting, navigate, path])
 
   return (
     <Container resizeRef={ref}>

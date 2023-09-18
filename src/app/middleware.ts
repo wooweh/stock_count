@@ -1,43 +1,45 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit"
 import { User, signOut as signOutAuth } from "firebase/auth"
-import _ from "lodash"
 import { resetSystem, setSystemStatus } from "../features/core/coreSlice"
 import {
   generateErrorNotification,
   generateNotification,
 } from "../features/core/notifications"
 import {
-  deleteCountMemberOnDB,
-  deleteCountOnDB,
-  deleteCountResultsItemOnDB,
-  setCountFinalCommentsOnDB,
-  setCountMemberOnDB,
-  setCountMembersOnDB,
-  setCountMetaDataOnDB,
-  setCountPrepCommentsOnDB,
-  setCountResultsItemOnDB,
-} from "../features/count/countRemote"
-import {
   deleteCount,
   deleteCountMember,
   deleteCountResultsItem,
   setCount,
-  setCountFinalComments,
+  setCountChecks,
+  setCountComments,
   setCountMember,
   setCountMembers,
   setCountMetaData,
-  setCountPrepComments,
   setCountResultsItem,
   setCountStep,
 } from "../features/count/countSlice"
 import {
+  deleteCountMemberOnDB,
+  deleteCountOnDB,
+  deleteCountResultsItemOnDB,
+  setCountChecksOnDB,
+  setCountCommentsOnDB,
+  setCountMemberOnDB,
+  setCountMembersOnDB,
+  setCountMetaDataOnDB,
+  setCountResultsItemOnDB,
+} from "../features/count/countSliceRemote"
+import { updateUserCountMember } from "../features/count/countUtils"
+import {
   createOrgInviteOnDB,
   deleteAllOrgInvitesOnDB,
+  deleteCountCheckOnDB,
   deleteOrgInviteOnDB,
   deleteOrgMemberOnDB,
   deleteOrgOnDB,
   getOrgFromDB,
   getOrgUuidWithInviteKeyFromDB,
+  setCountCheckOnDB,
   setNewOrgOnDB,
   setOrgMemberOnDB,
   setOrgNameOnDB,
@@ -46,11 +48,13 @@ import {
   OrgProps,
   createInvite,
   createOrg,
+  deleteCountCheck,
   deleteInvite,
   deleteOrg,
   deleteOrgMember,
   joinOrg,
   leaveOrg,
+  setCountCheck,
   setMemberStatus,
   setOrg,
   setOrgMember,
@@ -468,6 +472,50 @@ listenerMiddleware.startListening({
 
 */
 listenerMiddleware.startListening({
+  actionCreator: setCountCheck,
+  effect: async (action) => {
+    const id = action.payload.id
+    const check = action.payload.check
+    setCountCheckOnDB(check, id)
+  },
+})
+/*
+
+
+
+
+
+*/
+listenerMiddleware.startListening({
+  actionCreator: setCountChecks,
+  effect: async (action) => {
+    const checks = action.payload.checks
+    const updateDB = action.payload.updateDB
+    if (updateDB) setCountChecksOnDB(checks)
+  },
+})
+/*
+
+
+
+
+
+*/
+listenerMiddleware.startListening({
+  actionCreator: deleteCountCheck,
+  effect: async (action) => {
+    const id = action.payload
+    deleteCountCheckOnDB(id)
+  },
+})
+/*
+
+
+
+
+
+*/
+listenerMiddleware.startListening({
   actionCreator: setStockItem,
   effect: async (action) => {
     const stockId = action.payload.id
@@ -527,12 +575,10 @@ listenerMiddleware.startListening({
 listenerMiddleware.startListening({
   actionCreator: setCountStep,
   effect: async (action) => {
-    const members = store.getState().count.count.members
-    const memberUuid = store.getState().user.user.uuid
-    const step = action.payload
-    if (!!members && !!memberUuid) {
-      const member = { ...members[memberUuid], step }
-      store.dispatch(setCountMember({ member, updateDB: true }))
+    const updateMember = action.payload.updateMember
+    const step = action.payload.step
+    if (updateMember) {
+      updateUserCountMember({ step })
     }
   },
 })
@@ -635,24 +681,11 @@ listenerMiddleware.startListening({
 
 */
 listenerMiddleware.startListening({
-  actionCreator: setCountPrepComments,
+  actionCreator: setCountComments,
   effect: async (action) => {
-    const comments = action.payload
-    setCountPrepCommentsOnDB(comments)
-  },
-})
-/*
-
-
-
-
-
-*/
-listenerMiddleware.startListening({
-  actionCreator: setCountFinalComments,
-  effect: async (action) => {
-    const comments = action.payload
-    setCountFinalCommentsOnDB(comments)
+    const comments = action.payload.comments
+    const updateDB = action.payload.updateDB
+    if (updateDB) setCountCommentsOnDB(comments)
   },
 })
 /*

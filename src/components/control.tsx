@@ -6,89 +6,8 @@ import MuiSlider from "@mui/material/Slider"
 import MuiSwitch from "@mui/material/Switch"
 import _ from "lodash"
 import { useState } from "react"
-import { SxProps } from "../common/types"
 import useTheme from "../common/useTheme"
 import { Button } from "./button"
-/*
-
-
-
-
-
-*/
-export type ControlNames = "slider" | "switch" | "input"
-export type ControlsProps = {
-  variation: ControlNames
-  value: any
-  onChange: any
-  placeholder?: string
-  disabled?: boolean
-  type?: "password"
-  sx?: SxProps
-}
-export function Control(props: ControlsProps) {
-  const theme = useTheme()
-  const [showPassword, setShowPassword] = useState(false)
-  /*
-
-
-*/
-  function handleClickShowPassword() {
-    setShowPassword((show) => !show)
-  }
-  /*
-
-
-*/
-  const CONTROLS = {
-    slider: (
-      <MuiSlider
-        value={Number(props.value)}
-        onChange={props.onChange}
-        sx={props.sx}
-      />
-    ),
-    switch: (
-      <MuiSwitch
-        value={props.value}
-        checked={Boolean(props.value)}
-        onChange={props.onChange}
-        sx={props.sx}
-      />
-    ),
-    input: (
-      <MuiInput
-        fullWidth={true}
-        type={
-          props.type === "password"
-            ? showPassword
-              ? "text"
-              : "password"
-            : "text"
-        }
-        placeholder={props.placeholder}
-        onChange={props.onChange}
-        value={props.value}
-        disabled={props.disabled}
-        sx={props.sx}
-        endAdornment={
-          props.type === "password" ? (
-            <InputAdornment position="end">
-              <Button
-                variation={"pill"}
-                onClick={handleClickShowPassword}
-                iconName={showPassword ? "notVisible" : "visible"}
-                iconColor={theme.scale.gray[6]}
-              />
-            </InputAdornment>
-          ) : undefined
-        }
-      />
-    ),
-  }
-
-  return CONTROLS[props.variation as keyof typeof CONTROLS]
-}
 /*
 
 
@@ -136,11 +55,18 @@ export function Switch(props: SwitchProps) {
 
 */
 type InputProps = {
-  value: string
+  value: string | number
   onChange: any
   placeholder?: string
   disabled?: boolean
   isPassword?: boolean
+  isNumber?: boolean
+  multiline?: boolean
+  autoFocus?: boolean
+  onFocus?: any
+  onBlur?: any
+  readOnly?: any
+  inputProps?: any
   sx?: any
 }
 export function Input(props: InputProps) {
@@ -152,14 +78,28 @@ export function Input(props: InputProps) {
     setShowPassword((show) => !show)
   }
 
+  const type = props.isNumber
+    ? "number"
+    : props.isPassword
+    ? showPassword
+      ? "text"
+      : "password"
+    : "text"
+
   return (
     <MuiInput
       fullWidth={true}
-      type={props.isPassword ? (showPassword ? "text" : "password") : "text"}
+      autoFocus={props.autoFocus}
+      type={type}
       placeholder={props.placeholder}
       onChange={props.onChange}
       value={props.value}
       disabled={props.disabled}
+      multiline={props.multiline}
+      onFocus={props.onFocus}
+      onBlur={props.onBlur}
+      readOnly={props.readOnly}
+      inputProps={props.inputProps}
       sx={props.sx}
       endAdornment={
         props.isPassword && (
@@ -206,13 +146,18 @@ export function Select(props: SelectProps) {
     borderRadius: isOpen
       ? `${theme.module[3]} ${theme.module[3]} 0 0`
       : `${theme.module[3]}`,
-    transition: "border-radius ease-in 150ms",
+    transition: "border-radius ease-in 50ms",
     background: theme.scale.gray[7],
     color: theme.scale.gray[3],
     padding: 0,
-
+    boxSizing: "border-box",
+    boxShadow: isOpen ? "none !important" : theme.shadow.neo[2],
+    border: `1px solid ${theme.scale.gray[6]}`,
     "& .MuiOutlinedInput-notchedOutline ": {
-      borderColor: theme.scale.gray[8] + "!important",
+      border: "none",
+      borderColor: isOpen
+        ? `${theme.scale.gray[6]} !important`
+        : `${theme.scale.gray[6]} !important`,
     },
     "& .MuiSelect-icon": {
       color: theme.scale.gray[5],
@@ -221,8 +166,8 @@ export function Select(props: SelectProps) {
 
   const paperStyles = {
     borderRadius: `0 0 ${theme.module[3]} ${theme.module[3]}`,
+    border: `1px solid ${theme.scale.gray[6]}`,
     background: theme.scale.gray[7],
-    width: theme.module[8],
     "& .MuiList-root": {
       padding: 0,
     },

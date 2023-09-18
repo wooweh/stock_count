@@ -12,11 +12,17 @@ export type ColumnData = {
   label: string
   dataKey: string
   width: number | string
+  align: "left" | "center" | "right"
 }
-type RowData = { [key: string]: string }
+export type ColumnGroupData = {
+  label: string
+  colSpan: number
+}
+export type RowData = { [key: string]: string }
 type VirtualizedTableProps = {
   rows: RowData[]
   columns: ColumnData[]
+  columnGroups?: ColumnGroupData[]
 }
 export default function VirtualizedTable(props: VirtualizedTableProps) {
   const theme = useTheme()
@@ -43,49 +49,67 @@ export default function VirtualizedTable(props: VirtualizedTableProps) {
     )),
   }
 
-  function fixedHeaderContent(columns: ColumnData[]) {
+  const headerRowStyles = {
+    width: "100%",
+    outline: `1px solid ${theme.scale.gray[8]}`,
+  }
+  const headerCellStyles = {
+    outline: `1px solid ${theme.scale.gray[8]}`,
+    boxSizing: "border-box",
+    width: "min-content",
+    padding: theme.module[2],
+    color: theme.scale.gray[4],
+    background: theme.scale.gray[9],
+    border: 0,
+  }
+  function fixedHeaderContent() {
     return (
-      <TableRow
-        sx={{
-          width: "100%",
-          borderRadius: `${theme.module[3]} 0 0 ${theme.module[3]}`,
-          outline: `1px solid ${theme.scale.gray[9]}`,
-        }}
-      >
-        {columns.map((column, index) => (
-          <TableCell
-            variant="head"
-            align={"left"}
-            sx={{
-              boxSizing: "border-box",
-              width: "min-content",
-              padding: theme.module[2],
-              color: theme.scale.gray[4],
-              background: theme.scale.gray[9],
-              border: 0,
-            }}
-            key={index}
-          >
-            {column.label}
-          </TableCell>
-        ))}
-      </TableRow>
+      <>
+        {!!props.columnGroups && (
+          <TableRow sx={headerRowStyles}>
+            {props.columnGroups.map((columnGroup) => (
+              <TableCell
+                variant="head"
+                align="center"
+                colSpan={columnGroup.colSpan}
+                sx={headerCellStyles}
+                key={columnGroup.label}
+              >
+                {columnGroup.label}
+              </TableCell>
+            ))}
+          </TableRow>
+        )}
+        <TableRow sx={headerRowStyles}>
+          {props.columns.map((column, index) => (
+            <TableCell
+              variant="head"
+              align={column.align}
+              sx={headerCellStyles}
+              key={index}
+            >
+              {column.label}
+            </TableCell>
+          ))}
+        </TableRow>
+      </>
     )
   }
 
-  function rowContent(_index: number, row: RowData, columns: ColumnData[]) {
+  function rowContent(_index: number, row: RowData) {
     return (
       <React.Fragment>
-        {columns.map((column) => (
+        {props.columns.map((column) => (
           <TableCell
             key={column.dataKey}
-            align={"left"}
+            align={column.align}
             padding={"none"}
             width={"min-content"}
             size={"small"}
             sx={{
               whiteSpace: "nowrap",
               color: theme.scale.gray[4],
+              outline: `1px solid ${theme.scale.gray[7]}`,
               padding: theme.module[2],
               border: 0,
             }}
@@ -100,7 +124,7 @@ export default function VirtualizedTable(props: VirtualizedTableProps) {
   return (
     <Paper
       style={{
-        minHeight: 400,
+        minHeight: 100,
         height: "60vh",
         width: "100%",
         background: theme.scale.gray[9],
@@ -111,8 +135,8 @@ export default function VirtualizedTable(props: VirtualizedTableProps) {
       <TableVirtuoso
         data={props.rows}
         components={VirtuosoTableComponents}
-        fixedHeaderContent={() => fixedHeaderContent(props.columns)}
-        itemContent={(_index, row) => rowContent(_index, row, props.columns)}
+        fixedHeaderContent={() => fixedHeaderContent()}
+        itemContent={(_index, row) => rowContent(_index, row)}
       />
     </Paper>
   )

@@ -7,6 +7,7 @@ import { useAppSelector } from "../../app/hooks"
 import { store } from "../../app/store"
 import {
   NotificationProps,
+  NotificationTypes,
   hideNotification,
   selectIsDarkmode,
   selectNotification,
@@ -117,6 +118,24 @@ export function generateNotification(notification: NotificationNames) {
     uuid: uuidv4(),
     type: NOTIFICATIONS[notification].type,
     message: NOTIFICATIONS[notification].message,
+  }
+  store.dispatch(showNotification(payload))
+}
+/*
+
+
+
+
+
+*/
+export async function generateCustomNotification(
+  type: NotificationTypes,
+  message: string,
+) {
+  const payload: NotificationProps = {
+    uuid: uuidv4(),
+    type: type,
+    message: message,
   }
   store.dispatch(showNotification(payload))
 }

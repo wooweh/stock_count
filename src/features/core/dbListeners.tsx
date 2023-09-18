@@ -5,6 +5,25 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import { dbReal } from "../../remote"
 import { getDBPath } from "../../remote/dbPaths"
 import {
+  CountCheckProps,
+  CountCommentsProps,
+  CountMembersProps,
+  CountMetadataProps,
+  CountResultsProps,
+  selectCountChecks,
+  selectCountComments,
+  selectCountMembers,
+  selectCountMetadata,
+  selectCountResults,
+  selectUserCountMemberStep,
+  setCountChecks,
+  setCountComments,
+  setCountMembers,
+  setCountMetaData,
+  setCountResults,
+  setCountStep,
+} from "../count/countSlice"
+import {
   OrgProps,
   leaveOrg,
   selectIsJoined,
@@ -21,7 +40,6 @@ import {
 } from "../user/userSlice"
 import {
   selectIsSystemActive,
-  selectIsSystemBooted,
   selectIsSystemBooting,
   setSystemStatus,
 } from "./coreSlice"
@@ -39,6 +57,12 @@ export function DBListeners() {
   const localUser = useAppSelector(selectUser)
   const localOrg = useAppSelector(selectOrg)
   const localStock = useAppSelector(selectStock)
+  const localCountChecks = useAppSelector(selectCountChecks)
+  const localCountComments = useAppSelector(selectCountComments)
+  const localCountMembers = useAppSelector(selectCountMembers)
+  const localCountMetadata = useAppSelector(selectCountMetadata)
+  const localCountResults = useAppSelector(selectCountResults)
+  const localUserCountStep = useAppSelector(selectUserCountMemberStep)
   const isJoined = useAppSelector(selectIsJoined)
   const isLocalUserOrgDetails = useAppSelector(selectIsLocalUserOrgDetails)
 
@@ -96,7 +120,8 @@ export function DBListeners() {
         }
       })
     }
-  }, [dispatch, localUser, localOrg, isSystemActive, isLocalUserOrgDetails])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, localUser, isSystemActive])
 
   // STOCK SET & LISTENER
 
@@ -113,17 +138,106 @@ export function DBListeners() {
         }
       })
     }
-  }, [dispatch, localUser, localStock, isSystemActive])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, localUser, isSystemActive])
 
-  // HISTORY SET & LISTENER
+  // COUNT SET & LISTENER
 
   useEffect(() => {
     if (!!localUser && isSystemActive) {
-      // TODO
+      const dbCountChecksRef = ref(
+        dbReal,
+        getDBPath.count(localUser.orgUuid as string).checks,
+      )
+      onValue(dbCountChecksRef, (snapshot) => {
+        const dbCountChecks: CountCheckProps[] = snapshot.val()
+        if (!!dbCountChecks && !_.isEqual(localCountChecks, dbCountChecks)) {
+          dispatch(setCountChecks({ checks: dbCountChecks, updateDB: false }))
+        }
+      })
     }
-  }, [dispatch, localUser, isSystemActive, isJoined])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, localUser, isSystemActive])
 
-  // COUNT SET & LISTENER
+  useEffect(() => {
+    if (!!localUser && isSystemActive) {
+      const dbCountCommentsRef = ref(
+        dbReal,
+        getDBPath.count(localUser.orgUuid as string).comments,
+      )
+      onValue(dbCountCommentsRef, (snapshot) => {
+        const dbCountComments: CountCommentsProps = snapshot.val()
+        if (
+          !!dbCountComments &&
+          !_.isEqual(localCountComments, dbCountComments)
+        ) {
+          dispatch(
+            setCountComments({ comments: dbCountComments, updateDB: false }),
+          )
+        }
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, localUser, isSystemActive])
+
+  useEffect(() => {
+    if (!!localUser && isSystemActive) {
+      const dbCountMembersRef = ref(
+        dbReal,
+        getDBPath.count(localUser.orgUuid as string).members,
+      )
+      onValue(dbCountMembersRef, (snapshot) => {
+        const dbCountMembers: CountMembersProps = snapshot.val()
+        if (!!dbCountMembers && !_.isEqual(localCountMembers, dbCountMembers)) {
+          dispatch(
+            setCountMembers({ members: dbCountMembers, updateDB: false }),
+          )
+        }
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, localUser, isSystemActive])
+
+  useEffect(() => {
+    if (!!localUser && isSystemActive) {
+      const dbCountMetadataRef = ref(
+        dbReal,
+        getDBPath.count(localUser.orgUuid as string).metadata,
+      )
+      onValue(dbCountMetadataRef, (snapshot) => {
+        const dbCountMetadata: CountMetadataProps = snapshot.val()
+        if (
+          !!dbCountMetadata &&
+          !_.isEqual(localCountMetadata, dbCountMetadata)
+        ) {
+          dispatch(
+            setCountMetaData({ metadata: dbCountMetadata, updateDB: false }),
+          )
+        }
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, localUser, isSystemActive])
+
+  useEffect(() => {
+    if (!!localUser && isSystemActive) {
+      const dbCountResultsRef = ref(
+        dbReal,
+        getDBPath.count(localUser.orgUuid as string).results,
+      )
+      onValue(dbCountResultsRef, (snapshot) => {
+        const dbCountResults: CountResultsProps = snapshot.val()
+        if (!!dbCountResults && !_.isEqual(localCountResults, dbCountResults)) {
+          dispatch(setCountResults(dbCountResults))
+        } else if (dbCountResults === null) {
+          dispatch(setCountResults({}))
+        }
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, localUser, isSystemActive])
+
+  // HISTORY SET & LISTENER
 
   useEffect(() => {
     if (!!localUser && isSystemActive) {

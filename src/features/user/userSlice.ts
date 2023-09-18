@@ -112,7 +112,8 @@ export const selectUser = (state: RootState) => state.user.user
 export const selectUserName = (state: RootState) => state.user.user.name
 export const selectUserSurname = (state: RootState) => state.user.user.surname
 export const selectUserEmail = (state: RootState) => state.user.user.email
-export const selectUserUuid = (state: RootState) => state.user.user.uuid
+export const selectUserUuid = (state: RootState) =>
+  state.user.user.uuid as string
 export const selectUserOrgRole = (state: RootState) => state.user.user.orgRole
 export const selectUserOrgUuid = (state: RootState) => state.user.user.orgUuid
 export const selectIsLocalUserOrgDetails = createSelector(

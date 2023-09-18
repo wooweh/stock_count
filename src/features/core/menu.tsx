@@ -5,13 +5,12 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
+import { Switch } from "../../components/control"
 import Icon, { IconNames } from "../../components/icon"
-import { List, ListFactory, ListItem } from "../../components/list"
+import { ListItem } from "../../components/list"
 import { signOut } from "../user/userSlice"
 import { selectIsDarkmode, toggleIsDarkmode } from "./coreSlice"
 import { routePaths } from "./pages"
-import { Button } from "../../components/button"
-import { Switch } from "../../components/control"
 /*
 
 
@@ -56,14 +55,14 @@ export function Menu() {
       onChange: () => dispatch(toggleIsDarkmode()),
     },
     {
-      label: "Profile",
-      iconName: "profile",
-      onChange: () => handleMenuItemClick(routePaths.profile.path),
-    },
-    {
       label: "Organisation",
       iconName: "org",
       onChange: () => handleMenuItemClick(routePaths.organisation.path),
+    },
+    {
+      label: "Profile",
+      iconName: "profile",
+      onChange: () => handleMenuItemClick(routePaths.profile.path),
     },
     {
       label: "Sign out",

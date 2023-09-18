@@ -12,6 +12,8 @@ type OrgPathsReturnProps = {
   invite: (inviteUuid: string) => InviteReturnProps
   members: string
   member: (memberUuid: string) => MemberReturnProps
+  countChecks: string
+  countCheck: (id: string) => CountCheckReturnProps
   name: string
   uuid: string
 }
@@ -25,10 +27,14 @@ type MemberReturnProps = {
   role: string
   uuid: string
 }
+type CountCheckReturnProps = {
+  check: string
+}
 function orgPaths(orgUuid: string): OrgPathsReturnProps {
   const org = `organisations/${orgUuid}`
   const invites = `${org}/invites`
   const members = `${org}/members`
+  const countChecks = `${org}/countChecks`
   const name = `${org}/name`
   const uuid = `${org}/uuid`
   /*
@@ -61,11 +67,20 @@ function orgPaths(orgUuid: string): OrgPathsReturnProps {
         
         
         */
+  function countCheck(id: string): CountCheckReturnProps {
+    return { check: `${countChecks}/${id}` }
+  }
+  /*
+        
+        
+        */
   return {
     org,
     invites,
     invite,
     members,
+    countChecks,
+    countCheck,
     member,
     name,
     uuid,
@@ -161,17 +176,15 @@ function stockPaths(orgUuid: string): StockPathsReturnProps {
 
 
 */
-// TODO: Count paths
 type CountPathsReturnProps = {
   count: string
   metadata: string
   comments: string
-  prepComments: string
-  finalComments: string
   results: string
   memberResults: (memberUuid: string) => MemberResultsReturnProps
   members: string
   member: (memberUuid: string) => CountMemberReturnProps
+  checks: string
 }
 type MemberResultsReturnProps = {
   results: string
@@ -180,11 +193,10 @@ type MemberResultsReturnProps = {
 type ResultsItemReturnProps = StockItemReturnProps
 type CountMemberReturnProps = { member: string }
 function countPaths(orgUuid: string): CountPathsReturnProps {
-  const count = `count/${orgUuid}`
+  const count = `counts/${orgUuid}`
   const metadata = `${count}/metadata`
+  const checks = `${count}/checks`
   const comments = `${count}/comments`
-  const prepComments = `${comments}/preparation`
-  const finalComments = `${comments}/finalization`
   const results = `${count}/results`
   function memberResults(memberUuid: string): MemberResultsReturnProps {
     const memberResults = `${results}/${memberUuid}`
@@ -204,9 +216,8 @@ function countPaths(orgUuid: string): CountPathsReturnProps {
   return {
     count: count,
     metadata: metadata,
+    checks: checks,
     comments: comments,
-    prepComments: prepComments,
-    finalComments: finalComments,
     results: results,
     memberResults: memberResults,
     members: members,
