@@ -92,6 +92,7 @@ function Body() {
 
   const isInvitePending = useAppSelector(selectIsCountInvitePending)
   const isAwayFromCount = useAppSelector(selectIsUserAwayFromCount)
+  console.log(isInvitePending)
 
   return (
     <Stack
@@ -105,22 +106,7 @@ function Body() {
       ) : isAwayFromCount ? (
         <Rejoin />
       ) : (
-        <>
-          <Typography
-            variant={"h6"}
-            color={theme.scale.gray[4]}
-            textAlign={"center"}
-          >
-            There are no new counts pending
-          </Typography>
-          <Typography
-            variant={"h6"}
-            color={theme.scale.gray[4]}
-            sx={{ display: "flex", justifyContent: "center" }}
-          >
-            Click + to setup a new count
-          </Typography>
-        </>
+        <CountPrompt />
       )}
     </Stack>
   )
@@ -134,7 +120,8 @@ function Body() {
 */
 function Invite() {
   function handleAccept() {
-    updateUserCountMember({ isCounting: false })
+    updateUserCountMember({ isCounting: true, isJoined: true })
+    updateCountStep("stockCount", true)
   }
 
   function handleDecline() {
@@ -179,6 +166,39 @@ function Rejoin() {
   ]
 
   return <Notification message={"You have left a count"} actions={actions} />
+}
+/*
+
+
+
+
+
+*/
+function CountPrompt() {
+  const theme = useTheme()
+
+  const isAdmin = useAppSelector(selectIsUserAdmin)
+
+  return (
+    <>
+      <Typography
+        variant={"h6"}
+        color={theme.scale.gray[4]}
+        textAlign={"center"}
+      >
+        There are no counts pending
+      </Typography>
+      {isAdmin && (
+        <Typography
+          variant={"h6"}
+          color={theme.scale.gray[4]}
+          sx={{ display: "flex", justifyContent: "center" }}
+        >
+          Click + to setup a new count
+        </Typography>
+      )}
+    </>
+  )
 }
 /*
 

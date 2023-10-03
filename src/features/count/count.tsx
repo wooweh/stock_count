@@ -18,6 +18,7 @@ import {
   selectCountersUuidList,
   selectIsStockCountCompleted,
   selectIsUserCounting,
+  selectIsUserOnlyOrganiser,
   selectIsUserOrganiser,
 } from "./countSlice"
 import {
@@ -200,7 +201,7 @@ function CountStepsContainer() {
   const counterUuids = useAppSelector(selectCountersUuidList)
   const isCountCompleted = useAppSelector(selectIsStockCountCompleted)
   const isOrganiser = useAppSelector(selectIsUserOrganiser)
-  // const isOnlyOrganiser = useAppSelector(selectIsUserOnlyOrganiser)
+  const isOnlyOrganiser = useAppSelector(selectIsUserOnlyOrganiser)
 
   const countType = useCountStore((state) => state.tempCountType) as CountTypes
   const isCounterRequirementMet = useCountStore(
@@ -286,12 +287,6 @@ function CountStepsContainer() {
     review: {
       label: "Review",
       body: <ReviewBody />,
-      prevButton: { label: "Count", onClick: handleReviewPrev },
-      nextButton: {
-        label: "Finalize",
-        onClick: handleReviewNext,
-        disabled: !isCountCompleted,
-      },
     },
     finalization: {
       label: "Finalization",
@@ -299,6 +294,20 @@ function CountStepsContainer() {
       submitButton: { label: "Submit", onClick: handleFinalizationSubmit },
     },
   }
+
+  if (!isOnlyOrganiser)
+    _.set(countSteps, "review.prevButton", {
+      label: "Count",
+      onClick: handleReviewPrev,
+    })
+
+  if (isOrganiser)
+    _.set(countSteps, "review.nextButton", {
+      label: "Finalize",
+      onClick: handleReviewNext,
+      disabled: !isCountCompleted,
+    })
+
   return (
     <Stack
       width={"100%"}

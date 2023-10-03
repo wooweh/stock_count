@@ -322,7 +322,7 @@ export function createCountChecksPayload(
 export function prepareSoloResultsTableRows(
   results: CountResultsProps,
   stock: StockProps,
-) {
+): RowData[] {
   const rows: RowData[] = []
 
   _.forIn(results, (value, key) => {
@@ -350,8 +350,63 @@ export function prepareSoloResultsTableRows(
 export function prepareDualResultsTableRows(
   results: CountResultsProps,
   stock: StockProps,
-) {
-  //TODO
+): RowData[] {
+  const rowsObject = {}
+  const memberCountList = _.values(results)
+
+  _.forIn(results, (value, key) => {
+    const counterUuid = key
+    _.forIn(value, (value: CountItemProps, key) => {
+      _.set(rowsObject, `${key}.id`, key)
+      _.set(rowsObject, `${key}.name`, stock[key].name)
+      _.set(rowsObject, `${key}.description`, stock[key].description)
+      _.set(
+        rowsObject,
+        `${key}.useable_${counterUuid}`,
+        formatCommaSeparatedNumber(value.useableCount),
+      )
+      _.set(
+        rowsObject,
+        `${key}.damaged_${counterUuid}`,
+        formatCommaSeparatedNumber(value.damagedCount),
+      )
+      _.set(
+        rowsObject,
+        `${key}.obsolete_${counterUuid}`,
+        formatCommaSeparatedNumber(value.obsoleteCount),
+      )
+
+      const useableDiff = Math.abs(
+        memberCountList[0][key].useableCount -
+          memberCountList[1][key].useableCount,
+      )
+      const damagedDiff = Math.abs(
+        memberCountList[0][key].damagedCount -
+          memberCountList[1][key].damagedCount,
+      )
+      const obsoleteDiff = Math.abs(
+        memberCountList[0][key].obsoleteCount -
+          memberCountList[1][key].obsoleteCount,
+      )
+
+      _.set(
+        rowsObject,
+        `${key}.useable_diff`,
+        formatCommaSeparatedNumber(useableDiff),
+      )
+      _.set(
+        rowsObject,
+        `${key}.damaged_diff`,
+        formatCommaSeparatedNumber(damagedDiff),
+      )
+      _.set(
+        rowsObject,
+        `${key}.obsolete_diff`,
+        formatCommaSeparatedNumber(obsoleteDiff),
+      )
+    })
+  })
+  return _.values(rowsObject)
 }
 /*
 
@@ -363,8 +418,26 @@ export function prepareDualResultsTableRows(
 export function prepareTeamResultsTableRows(
   results: CountResultsProps,
   stock: StockProps,
-) {
-  //TODO
+  members: MembersProps,
+): RowData[] {
+  const rows: RowData[] = []
+
+  _.forIn(results, (value, key) => {
+    const counterName = `${members[key].name[0]}. ${members[key].surname}`
+    _.forIn(value, (value: CountItemProps, key) => {
+      rows.push({
+        id: key,
+        name: stock[key].name,
+        description: stock[key].description,
+        useable: formatCommaSeparatedNumber(value.useableCount),
+        damaged: formatCommaSeparatedNumber(value.damagedCount),
+        obsolete: formatCommaSeparatedNumber(value.obsoleteCount),
+        counterName,
+      })
+    })
+  })
+
+  return rows
 }
 /*
 
@@ -373,7 +446,7 @@ export function prepareTeamResultsTableRows(
 
 
 */
-export function prepareSoloResultsTableColumns() {
+export function prepareSoloResultsTableColumns(): ColumnData[] {
   const columnIds = [
     "id",
     "name",
@@ -400,8 +473,28 @@ export function prepareSoloResultsTableColumns() {
 
 
 */
-export function prepareDualResultsTableColumns() {
-  // TODO
+export function prepareDualResultsTableColumns(
+  results: CountResultsProps,
+): ColumnData[] {
+  const columnIds = ["id", "name", "description"]
+  const counterIds = _.keys(results)
+  _.forEach(counterIds, (counterId) => {
+    columnIds.push(`useable_${counterId}`)
+    columnIds.push(`damaged_${counterId}`)
+    columnIds.push(`obsolete_${counterId}`)
+  })
+  columnIds.push("useable_diff", "damaged_diff", "obsolete_diff")
+
+  const columns: ColumnData[] = []
+  _.forEach(columnIds, (columnId, index) => {
+    columns.push({
+      label: _.capitalize(columnId.split("_")[0]),
+      dataKey: columnId,
+      width: "min-content",
+      align: index > 2 ? "right" : "left",
+    })
+  })
+  return columns
 }
 /*
 
@@ -410,8 +503,27 @@ export function prepareDualResultsTableColumns() {
 
 
 */
-export function prepareTeamResultsTableColumns() {
-  // TODO
+export function prepareTeamResultsTableColumns(): ColumnData[] {
+  const columnIds = [
+    "id",
+    "name",
+    "description",
+    "useable",
+    "damaged",
+    "obsolete",
+    "counterName",
+  ]
+  const columns: ColumnData[] = []
+  _.forEach(columnIds, (columnId, index) => {
+    const label = columnId === "counterName" ? "Name" : _.capitalize(columnId)
+    columns.push({
+      label,
+      dataKey: columnId,
+      width: "min-content",
+      align: index > 2 ? "right" : "left",
+    })
+  })
+  return columns
 }
 /*
 
@@ -420,7 +532,7 @@ export function prepareTeamResultsTableColumns() {
 
 
 */
-export function prepareSoloResultsTableColumnGroups() {
+export function prepareSoloResultsTableColumnGroups(): ColumnGroupData[] {
   const columnGroups: ColumnGroupData[] = [
     { label: "Stock Item", colSpan: 3 },
     { label: "Results", colSpan: 3 },
@@ -434,8 +546,24 @@ export function prepareSoloResultsTableColumnGroups() {
 
 
 */
-export function prepareDualResultsTableColumnGroups() {
-  //TODO
+export function prepareDualResultsTableColumnGroups(
+  results: CountResultsProps,
+  members: MembersProps,
+): ColumnGroupData[] {
+  const columnGroups: ColumnGroupData[] = [{ label: "Stock Item", colSpan: 3 }]
+  const counterUuids = _.keys(results)
+  _.forEach(counterUuids, (counterUuid) => {
+    const counterName = `${members[counterUuid].name[0]}. ${members[counterUuid].surname}`
+    columnGroups.push({
+      label: counterName,
+      colSpan: 3,
+    })
+  })
+  columnGroups.push({
+    label: "Differences",
+    colSpan: 3,
+  })
+  return columnGroups
 }
 /*
 
@@ -445,7 +573,12 @@ export function prepareDualResultsTableColumnGroups() {
 
 */
 export function prepareTeamResultsTableColumnGroups() {
-  //TODO
+  const columnGroups: ColumnGroupData[] = [
+    { label: "Stock Item", colSpan: 3 },
+    { label: "Results", colSpan: 3 },
+    { label: "Counters", colSpan: 1 },
+  ]
+  return columnGroups
 }
 /*
 

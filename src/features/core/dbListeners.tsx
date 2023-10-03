@@ -10,6 +10,7 @@ import {
   CountMembersProps,
   CountMetadataProps,
   CountResultsProps,
+  deleteCount,
   selectCountChecks,
   selectCountComments,
   selectCountMembers,
@@ -43,6 +44,7 @@ import {
   selectIsSystemBooting,
   setSystemStatus,
 } from "./coreSlice"
+import { updateCountStep } from "../count/countUtils"
 /*
 
 
@@ -61,6 +63,7 @@ export function DBListeners() {
   const localCountComments = useAppSelector(selectCountComments)
   const localCountMembers = useAppSelector(selectCountMembers)
   const localCountMetadata = useAppSelector(selectCountMetadata)
+  console.log(localCountMetadata)
   const localCountResults = useAppSelector(selectCountResults)
   const localUserCountStep = useAppSelector(selectUserCountMemberStep)
   const isJoined = useAppSelector(selectIsJoined)
@@ -151,7 +154,7 @@ export function DBListeners() {
       )
       onValue(dbCountChecksRef, (snapshot) => {
         const dbCountChecks: CountCheckProps[] = snapshot.val()
-        if (!!dbCountChecks && !_.isEqual(localCountChecks, dbCountChecks)) {
+        if (!!dbCountChecks) {
           dispatch(setCountChecks({ checks: dbCountChecks, updateDB: false }))
         }
       })
@@ -167,10 +170,7 @@ export function DBListeners() {
       )
       onValue(dbCountCommentsRef, (snapshot) => {
         const dbCountComments: CountCommentsProps = snapshot.val()
-        if (
-          !!dbCountComments &&
-          !_.isEqual(localCountComments, dbCountComments)
-        ) {
+        if (!!dbCountComments) {
           dispatch(
             setCountComments({ comments: dbCountComments, updateDB: false }),
           )
@@ -188,10 +188,14 @@ export function DBListeners() {
       )
       onValue(dbCountMembersRef, (snapshot) => {
         const dbCountMembers: CountMembersProps = snapshot.val()
-        if (!!dbCountMembers && !_.isEqual(localCountMembers, dbCountMembers)) {
+        console.log(dbCountMembers)
+        if (!!dbCountMembers) {
           dispatch(
             setCountMembers({ members: dbCountMembers, updateDB: false }),
           )
+        }
+        if (!dbCountMembers && !!localCountMembers) {
+          updateCountStep("dashboard", false)
         }
       })
     }
@@ -206,13 +210,12 @@ export function DBListeners() {
       )
       onValue(dbCountMetadataRef, (snapshot) => {
         const dbCountMetadata: CountMetadataProps = snapshot.val()
-        if (
-          !!dbCountMetadata &&
-          !_.isEqual(localCountMetadata, dbCountMetadata)
-        ) {
+        if (!!dbCountMetadata) {
           dispatch(
             setCountMetaData({ metadata: dbCountMetadata, updateDB: false }),
           )
+        } else if (!dbCountMetadata && !!localCountMetadata) {
+          dispatch(deleteCount())
         }
       })
     }
@@ -227,7 +230,7 @@ export function DBListeners() {
       )
       onValue(dbCountResultsRef, (snapshot) => {
         const dbCountResults: CountResultsProps = snapshot.val()
-        if (!!dbCountResults && !_.isEqual(localCountResults, dbCountResults)) {
+        if (!!dbCountResults) {
           dispatch(setCountResults(dbCountResults))
         } else if (dbCountResults === null) {
           dispatch(setCountResults({}))

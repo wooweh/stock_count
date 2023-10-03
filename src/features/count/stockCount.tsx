@@ -16,8 +16,11 @@ import { selectUserUuid } from "../user/userSlice"
 import { setUseCount, useCountStore } from "./count"
 import {
   CountItemProps,
+  CountTypes,
   SelectCountMemberResultsListProps,
   SelectCountMemberResultsProps,
+  selectCountType,
+  selectRemainingDualStockList,
   selectRemainingStockList,
   selectUserCountResults,
   selectUserCountResultsList,
@@ -116,6 +119,11 @@ function AddStockItemSearchBar() {
 
   const userUuid = useAppSelector(selectUserUuid) as string
   const remainingStockList = useAppSelector(selectRemainingStockList)
+  const remainingDualStockList = useAppSelector(selectRemainingDualStockList)
+  const countType = useAppSelector(selectCountType) as CountTypes
+
+  const list =
+    countType === "dual" ? remainingDualStockList : remainingStockList
 
   const resultPayload = {
     useableCount: 0,
@@ -153,7 +161,7 @@ function AddStockItemSearchBar() {
       >
         <SearchBar
           isOpen
-          list={remainingStockList}
+          list={list}
           searchKeys={["name", "description"]}
           handleSelect={handleSelect}
           formatResult={formatResult}

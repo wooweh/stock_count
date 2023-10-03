@@ -26,6 +26,7 @@ import {
   updateCountStep,
 } from "./countUtils"
 import _ from "lodash"
+import { CountSteps, selectIsUserOnlyOrganiser } from "./countSlice"
 /*
 
 
@@ -313,17 +314,21 @@ function CommentListItem(props: CommentListProps) {
 function StartCountConfirmation() {
   const theme = useTheme()
 
+  const isOnlyOrganiser = useAppSelector(selectIsUserOnlyOrganiser)
+
   const isStartingCount = useCountStore((state: any) => state.isStartingCount)
   const satisfiedCheckUuids = useCountStore(
     (state) => state.satisfiedCheckUuids,
   )
   const prepCommments = useCountStore((state) => state.prepCommments)
 
+  const step: CountSteps = isOnlyOrganiser ? "review" : "stockCount"
+
   function handleAccept() {
     createCountMembers()
     createCountChecks(satisfiedCheckUuids)
     updateCountComments({ preparation: prepCommments })
-    updateCountStep("stockCount", true)
+    updateCountStep(step, true)
     updateCountMetadata({ countStartTime: getTimeStamp() })
     setUseCount("isStartingCount", false)
   }

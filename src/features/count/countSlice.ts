@@ -1,9 +1,9 @@
 import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit"
 import _ from "lodash"
 import { RootState } from "../../app/store"
-import { UpdateDB, selectUserUuid } from "../user/userSlice"
 import { selectOrgMembers } from "../organisation/organisationSlice"
 import { StockItemProps, selectStock } from "../stock/stockSlice"
+import { UpdateDB, selectUserUuid } from "../user/userSlice"
 
 export interface CountState {
   step: CountSteps
@@ -238,7 +238,7 @@ export const selectIsUserOrganiser = createSelector(
 )
 export const selectIsUserOnlyOrganiser = createSelector(
   selectUserCountMember,
-  (user) => user?.isOrganiser && user.isCounter,
+  (user) => user?.isOrganiser && !user.isCounter,
 )
 export const selectCounters = createSelector(selectCountMembers, (members) => {
   const counters: CountMembersProps = {}
@@ -289,12 +289,6 @@ export const selectCountResultsStockIdsList = createSelector(
     return ids
   },
 )
-export const selectRemainingStockList = createSelector(
-  [selectStock, selectCountResultsStockIdsList],
-  (stock, ids) => {
-    return _.filter(stock, (value, key) => !ids.includes(key))
-  },
-)
 export const selectUserCountResults = createSelector(
   [selectCountResults, selectUserUuid, selectStock],
   (results, userUuid, stock) => {
@@ -318,20 +312,22 @@ export const selectUserCountResultsList = createSelector(
     return _.values(results)
   },
 )
+export const selectRemainingStockList = createSelector(
+  [selectStock, selectCountResultsStockIdsList],
+  (stock, ids) => {
+    return _.filter(stock, (value, key) => !ids.includes(key))
+  },
+)
+export const selectRemainingDualStockList = createSelector(
+  [selectStock, selectUserCountResults],
+  (stock, results) => {
+    const ids = _.keys(results)
+    return _.filter(stock, (value, key) => !ids.includes(key))
+  },
+)
 export const selectIsUserCounting = createSelector(selectCountStep, (step) => {
   const countingSteps: CountSteps[] = ["stockCount", "review", "finalization"]
   return countingSteps.includes(step)
 })
-// export const selectCountDuration = createSelector(
-//   selectCountMetadata,
-//   (metadata) => {
-//     if (!!metadata) {
-//       const startTime = new Date(metadata.countStartTime)
-//       const endTime = new Date(metadata.finalizationStartTime)
-//       const duration = endTime - startTime
-//       return duration
-//     }
-//   },
-// )
 
 export default countSlice.reducer

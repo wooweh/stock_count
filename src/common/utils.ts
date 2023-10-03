@@ -6,7 +6,11 @@
 
 */
 export function formatCommaSeparatedNumber(number: number) {
-  return number.toLocaleString("en-US")
+  if (number === 0) {
+    return "-"
+  } else {
+    return number.toLocaleString("en-US")
+  }
 }
 /*
 

@@ -10,6 +10,7 @@ import {
   CountMemberProps,
   CountMembersProps,
   CountMetadataProps,
+  CountResultsProps,
 } from "./countSlice"
 import {
   createCountChecksPayload,
@@ -18,7 +19,18 @@ import {
   updateCountMetadataPayload,
   updateCountMemberPayload,
   updateCountCommentsPayload,
+  prepareSoloResultsTableRows,
+  prepareDualResultsTableRows,
+  prepareTeamResultsTableRows,
+  prepareSoloResultsTableColumns,
+  prepareDualResultsTableColumns,
+  prepareTeamResultsTableColumns,
+  prepareSoloResultsTableColumnGroups,
+  prepareDualResultsTableColumnGroups,
+  prepareTeamResultsTableColumnGroups,
 } from "./countUtils"
+import { StockProps } from "../stock/stockSlice"
+import { ColumnData, ColumnGroupData, RowData } from "../../components/table"
 
 describe("Count Members Utils", () => {
   const memberUuids = ["test-uuid1", "test-uuid2"]
@@ -129,5 +141,128 @@ describe("Count Comment Utils", () => {
     const comments = updateCountCommentsPayload(countComments, mockPayload)
     expect(comments.finalization).toEqual(mockPayload.finalization)
     expectTypeOf(comments).toEqualTypeOf<CountCommentsProps>()
+  })
+})
+
+describe("Count Results Table Utils", () => {
+  const mockSoloResults: CountResultsProps = {
+    mockCounterUuid1: {
+      mockStockId1: {
+        id: "mockStockId1",
+        useableCount: 1,
+        damagedCount: 2,
+        obsoleteCount: 3,
+      },
+    },
+  }
+  const mockDualResults: CountResultsProps = {
+    ...mockSoloResults,
+    mockCounterUuid2: {
+      mockStockId1: {
+        id: "mockStockId1",
+        useableCount: 2,
+        damagedCount: 3,
+        obsoleteCount: 4,
+      },
+    },
+  }
+  const mockTeamResults: CountResultsProps = {
+    ...mockSoloResults,
+    mockCounterUuid2: {
+      mockStockId2: {
+        id: "mockStockId2",
+        useableCount: 1,
+        damagedCount: 2,
+        obsoleteCount: 3,
+      },
+    },
+  }
+  const mockStock: StockProps = {
+    mockStockId1: {
+      id: "mockStockId1",
+      name: "mockName1",
+      description: "mockDescription1",
+    },
+    mockStockId2: {
+      id: "mockStockId2",
+      name: "mockName2",
+      description: "mockDescription2",
+    },
+  }
+
+  const mockMembers: MembersProps = {
+    mockCounterUuid1: {
+      uuid: "mockCounterUuid1",
+      name: "John",
+      surname: "Doe",
+      role: "member",
+    },
+    mockCounterUuid2: {
+      uuid: "mockCounterUuid2",
+      name: "Dane",
+      surname: "Doe",
+      role: "member",
+    },
+  }
+
+  it("should handle prepareSoloResultsTableRows", () => {
+    const rows = prepareSoloResultsTableRows(mockSoloResults, mockStock)
+    expect(rows[0].useable).toEqual("1")
+    expectTypeOf(rows).toEqualTypeOf<RowData[]>()
+  })
+
+  it("should handle prepareDualResultsTableRows", () => {
+    const rows = prepareDualResultsTableRows(mockDualResults, mockStock)
+    expect(rows[0].useable_mockCounterUuid1).toEqual("1")
+    expectTypeOf(rows).toEqualTypeOf<RowData[]>()
+  })
+
+  it("should handle prepareTeamResultsTableRows", () => {
+    const rows = prepareTeamResultsTableRows(
+      mockTeamResults,
+      mockStock,
+      mockMembers,
+    )
+    expect(rows[0].useable).toEqual("1")
+    expectTypeOf(rows).toEqualTypeOf<RowData[]>()
+  })
+
+  it("should handle prepareSoloResultsTableColumns", () => {
+    const columns = prepareSoloResultsTableColumns()
+    expect(columns[0].dataKey).toEqual("id")
+    expectTypeOf(columns).toEqualTypeOf<ColumnData[]>()
+  })
+
+  it("should handle prepareDualResultsTableColumns", () => {
+    const columns = prepareDualResultsTableColumns(mockDualResults)
+    expect(columns[0].dataKey).toEqual("id")
+    expectTypeOf(columns).toEqualTypeOf<ColumnData[]>()
+  })
+
+  it("should handle prepareTeamResultsTableColumns", () => {
+    const columns = prepareTeamResultsTableColumns()
+    expect(columns[0].dataKey).toEqual("id")
+    expectTypeOf(columns).toEqualTypeOf<ColumnData[]>()
+  })
+
+  it("should handle prepareSoloResultsTableColumnGroups", () => {
+    const columnGroups = prepareSoloResultsTableColumnGroups()
+    expect(columnGroups[0].label).toEqual("Stock Item")
+    expectTypeOf(columnGroups).toEqualTypeOf<ColumnGroupData[]>()
+  })
+
+  it("should handle prepareDualResultsTableColumnGroups", () => {
+    const columnGroups = prepareDualResultsTableColumnGroups(
+      mockDualResults,
+      mockMembers,
+    )
+    expect(columnGroups[0].label).toEqual("Stock Item")
+    expectTypeOf(columnGroups).toEqualTypeOf<ColumnGroupData[]>()
+  })
+
+  it.skip("should handle prepareTeamResultsTableColumnGroups", () => {
+    const columnGroups = prepareTeamResultsTableColumnGroups()
+    expect(columnGroups[0].label).toEqual("Stock Item")
+    expectTypeOf(columnGroups).toEqualTypeOf<ColumnGroupData[]>()
   })
 })

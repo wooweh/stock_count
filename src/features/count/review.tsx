@@ -9,15 +9,29 @@ import {
   CountMemberResultsProps,
   CountMembersProps,
   CountResultsProps,
+  CountTypes,
   selectCountMembers,
   selectCountResults,
+  selectCountType,
   selectIsStockCountCompleted,
+  selectIsUserOnlyOrganiser,
+  selectIsUserOrganiser,
 } from "./countSlice"
 import {
+  prepareDualResultsTableColumnGroups,
+  prepareDualResultsTableColumns,
+  prepareDualResultsTableRows,
   prepareSoloResultsTableColumnGroups,
   prepareSoloResultsTableColumns,
   prepareSoloResultsTableRows,
+  prepareTeamResultsTableColumnGroups,
+  prepareTeamResultsTableColumns,
+  prepareTeamResultsTableRows,
 } from "./countUtils"
+import {
+  MembersProps,
+  selectOrgMembers,
+} from "../organisation/organisationSlice"
 /*
 
 
@@ -27,6 +41,9 @@ import {
 */
 export function ReviewBody() {
   const theme = useTheme()
+
+  const isOrganiser = useAppSelector(selectIsUserOrganiser)
+
   return (
     <Stack
       width={"100%"}
@@ -34,12 +51,47 @@ export function ReviewBody() {
       padding={theme.module[0]}
       alignItems={"space-between"}
       boxSizing={"border-box"}
+      overflow={"hidden"}
     >
-      <Stack height={"100%"} gap={theme.module[4]}>
+      {isOrganiser ? <OrganiserReviewBody /> : <CounterReviewBody />}
+    </Stack>
+  )
+}
+/*
+
+
+
+
+
+*/
+function OrganiserReviewBody() {
+  const theme = useTheme()
+  return (
+    <>
+      <Stack height={"95%"} gap={theme.module[4]} flexShrink={0}>
         <ReviewResultsTable />
         <CounterSummary />
       </Stack>
       <ProceedMessage />
+    </>
+  )
+}
+/*
+
+
+
+
+
+*/
+function CounterReviewBody() {
+  return (
+    <Stack
+      width={"100%"}
+      height={"100%"}
+      alignItems={"center"}
+      justifyContent={"center"}
+    >
+      <Typography variant="h6">Organiser is reviewing results</Typography>
     </Stack>
   )
 }
@@ -53,7 +105,7 @@ export function ReviewBody() {
 function CounterSummary() {
   const theme = useTheme()
   const results = useAppSelector(selectCountResults) as CountResultsProps
-  const counterIds = _.keys(results)
+  const counterUuids = _.keys(results)
 
   return (
     <Stack
@@ -70,9 +122,21 @@ function CounterSummary() {
         overflow={"scroll"}
         maxHeight={theme.module[8]}
       >
-        {counterIds.map((id) => {
-          return <CounterSummaryItem id={id} results={results[id]} key={id} />
-        })}
+        {counterUuids.length ? (
+          counterUuids.map((uuid) => {
+            return (
+              <CounterSummaryItem
+                uuid={uuid}
+                results={results[uuid]}
+                key={uuid}
+              />
+            )
+          })
+        ) : (
+          <Typography color={theme.scale.gray[5]} textAlign={"center"}>
+            No data
+          </Typography>
+        )}
       </Stack>
     </Stack>
   )
@@ -85,19 +149,19 @@ function CounterSummary() {
 
 */
 function CounterSummaryItem({
-  id,
+  uuid,
   results,
 }: {
-  id: string
+  uuid: string
   results: CountMemberResultsProps
 }) {
   const theme = useTheme()
   const members = useAppSelector(selectCountMembers) as CountMembersProps
   const countValue = `${_.keys(results).length} items`
-  const nameInitial = members[id].name[0]
-  const surname = members[id].surname
+  const nameInitial = members[uuid].name[0]
+  const surname = members[uuid].surname
   const fullName = `${nameInitial}. ${surname}`
-  const step = members[id].step
+  const step = members[uuid].step
   const action =
     step === "review"
       ? "Reviewing"
@@ -114,11 +178,16 @@ function CounterSummaryItem({
   return (
     <Stack
       direction={"row"}
-      justifyContent={"space-between"}
       padding={theme.module[1]}
       boxSizing={"border-box"}
+      justifyContent={"space-between"}
     >
-      <Stack direction={"row"} gap={theme.module[2]} alignItems={"center"}>
+      <Stack
+        direction={"row"}
+        gap={theme.module[2]}
+        alignItems={"center"}
+        width={"7.25rem"}
+      >
         <Icon
           variation={"profile"}
           fontSize={"small"}
@@ -126,12 +195,26 @@ function CounterSummaryItem({
         />
         <Typography variant={"body2"}>{fullName}</Typography>
       </Stack>
-      <Stack direction={"row"} gap={theme.module[4]}>
-        <Stack direction={"row"} gap={theme.module[2]} alignItems={"center"}>
+      <Stack
+        direction={"row"}
+        gap={theme.module[4]}
+        justifyContent={"space-between"}
+      >
+        <Stack
+          direction={"row"}
+          width={"5.5rem"}
+          gap={theme.module[2]}
+          alignItems={"center"}
+        >
           <Icon variation={"stock"} fontSize={"small"} />
           <Typography variant={"body2"}>{countValue}</Typography>
         </Stack>
-        <Stack direction={"row"} gap={theme.module[2]} alignItems={"center"}>
+        <Stack
+          direction={"row"}
+          width={"6rem"}
+          gap={theme.module[2]}
+          alignItems={"center"}
+        >
           <Icon variation={"step"} fontSize={"small"} color={actionColor} />
           <Typography variant={"body2"} fontWeight={"bold"} color={actionColor}>
             {action}
@@ -180,11 +263,31 @@ function ReviewResultsTable() {
   const theme = useTheme()
 
   const results = useAppSelector(selectCountResults) as CountResultsProps
+  const members = useAppSelector(selectOrgMembers) as MembersProps
+  const countType = useAppSelector(selectCountType) as CountTypes
   const stock = useAppSelector(selectStock)
 
-  const rows = prepareSoloResultsTableRows(results, stock)
-  const columns = prepareSoloResultsTableColumns()
-  const columnGroups = prepareSoloResultsTableColumnGroups()
+  const tableData = {
+    solo: {
+      rows: prepareSoloResultsTableRows(results, stock),
+      columns: prepareSoloResultsTableColumns(),
+      columnGroups: prepareSoloResultsTableColumnGroups(),
+    },
+    dual: {
+      rows: prepareDualResultsTableRows(results, stock),
+      columns: prepareDualResultsTableColumns(results),
+      columnGroups: prepareDualResultsTableColumnGroups(results, members),
+    },
+    team: {
+      rows: prepareTeamResultsTableRows(results, stock, members),
+      columns: prepareTeamResultsTableColumns(),
+      columnGroups: prepareTeamResultsTableColumnGroups(),
+    },
+  }
+
+  const rows = tableData[countType].rows
+  const columns = tableData[countType].columns
+  const columnGroups = tableData[countType].columnGroups
 
   return (
     <Stack
