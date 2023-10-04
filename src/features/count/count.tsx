@@ -16,6 +16,7 @@ import {
   deleteCount,
   selectCountStep,
   selectCountersUuidList,
+  selectIsOrganiserFinalizing,
   selectIsStockCountCompleted,
   selectIsUserCounting,
   selectIsUserOnlyOrganiser,
@@ -53,6 +54,7 @@ type UseCountState = {
   isCountOptionsOpen: boolean
   isDeletingCount: boolean
   isLeavingCount: boolean
+  isStartingFinalization: boolean
   isSubmittingFinalization: boolean
   currentlyViewedStockItemId: false | string
   currentlyViewedStockItemUseableCount: number
@@ -78,6 +80,7 @@ const initialState: UseCountState = {
   isCountOptionsOpen: false,
   isDeletingCount: false,
   isLeavingCount: false,
+  isStartingFinalization: false,
   isSubmittingFinalization: false,
   currentlyViewedStockItemId: false,
   currentlyViewedStockItemUseableCount: 0,
@@ -202,6 +205,7 @@ function CountStepsContainer() {
   const isCountCompleted = useAppSelector(selectIsStockCountCompleted)
   const isOrganiser = useAppSelector(selectIsUserOrganiser)
   const isOnlyOrganiser = useAppSelector(selectIsUserOnlyOrganiser)
+  const isFinalizing = useAppSelector(selectIsOrganiserFinalizing)
 
   const countType = useCountStore((state) => state.tempCountType) as CountTypes
   const isCounterRequirementMet = useCountStore(
@@ -245,14 +249,13 @@ function CountStepsContainer() {
   }
 
   function handleReviewNext() {
-    updateCountMetadata({ finalizationStartTime: getTimeStamp() })
-    updateCountStep("finalization", true)
+    setUseCount("isStartingFinalization", true)
   }
 
   function handleFinalizationSubmit() {
     // setUseCount("isSubmittingFinalization", true)
-    updateCountComments({ finalization: finalComments })
-    updateCountMetadata({ finalSubmissionTime: getTimeStamp() })
+    // updateCountComments({ finalization: finalComments })
+    // updateCountMetadata({ finalSubmissionTime: getTimeStamp() })
     updateCountStep("review", true)
   }
 
@@ -295,7 +298,7 @@ function CountStepsContainer() {
     },
   }
 
-  if (!isOnlyOrganiser)
+  if (!isOnlyOrganiser && !isFinalizing)
     _.set(countSteps, "review.prevButton", {
       label: "Count",
       onClick: handleReviewPrev,
@@ -372,7 +375,7 @@ function Header({ label }: { label: string }) {
   return (
     <Stack
       direction={"row"}
-      width={"100"}
+      width={"min-content"}
       gap={theme.module[2]}
       padding={theme.module[2]}
       boxSizing={"border-box"}
@@ -405,10 +408,10 @@ function StepLabel({ label }: { label: string }) {
       paddingLeft={theme.module[4]}
       paddingRight={isUserCounting ? 0 : theme.module[4]}
       boxSizing={"border-box"}
-      width={"100%"}
+      // minWidth={"8rem"}
       height={"100%"}
     >
-      <Typography fontWeight={"bold"} variant={"subtitle1"}>
+      <Typography fontWeight={"bold"} variant={"subtitle1"} noWrap>
         {label}
       </Typography>
       {isUserCounting && (
@@ -437,6 +440,7 @@ function OptionsTray() {
   const theme = useTheme()
 
   const isOptionsOpen = useCountStore((state) => state.isCountOptionsOpen)
+  const isOrganiser = useAppSelector(selectIsUserOrganiser)
 
   const [isOpen, setIsOpen] = useState(false)
 
@@ -463,14 +467,6 @@ function OptionsTray() {
       },
     },
     {
-      label: "Delete",
-      iconName: "delete",
-      onClick: () => {
-        setUseCount("isDeletingCount", true)
-        handleCancel()
-      },
-    },
-    {
       iconName: "cancel",
       onClick: () => {
         handleCancel()
@@ -478,19 +474,30 @@ function OptionsTray() {
     },
   ]
 
+  if (isOrganiser) {
+    options.unshift({
+      label: "Delete",
+      iconName: "delete",
+      onClick: () => {
+        setUseCount("isDeletingCount", true)
+        handleCancel()
+      },
+    })
+  }
+
   return (
     <ClickAwayListener onClickAway={handleCancel}>
       <Stack
         direction={"row"}
         gap={theme.module[2]}
         alignItems={"center"}
-        width={"100%"}
+        width={"min-content"}
         height={"100%"}
         padding={`0 ${theme.module[2]}`}
       >
         <Animation
-          from={{ opacity: 0, width: "10rem" }}
-          to={{ opacity: 1, width: "15rem" }}
+          from={{ opacity: 0, width: "8.5rem" }}
+          to={{ opacity: 1, width: isOrganiser ? "15rem" : "8.5rem" }}
           duration={150}
           start={isOpen}
         >

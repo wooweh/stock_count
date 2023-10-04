@@ -21,7 +21,6 @@ type UseStockState = {
   isEditing: IsEditingProps
   isUploading: boolean
   isSelecting: boolean
-  idViewingOptions: string | false
   scrollIndex: number
   selectedItems: string[]
 }
@@ -31,7 +30,6 @@ const initialState: UseStockState = {
   isEditing: false,
   isUploading: false,
   isSelecting: false,
-  idViewingOptions: false,
   scrollIndex: 0,
   selectedItems: [],
 }

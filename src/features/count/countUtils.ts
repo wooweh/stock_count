@@ -12,6 +12,7 @@ import {
   CountCommentsProps,
   CountItemProps,
   CountMemberProps,
+  CountMemberResultsProps,
   CountMembersProps,
   CountMetadataProps,
   CountResultsProps,
@@ -520,7 +521,7 @@ export function prepareTeamResultsTableColumns(): ColumnData[] {
       label,
       dataKey: columnId,
       width: "min-content",
-      align: index > 2 ? "right" : "left",
+      align: index < 2 || index === columnIds.length - 1 ? "left" : "right",
     })
   })
   return columns
@@ -579,6 +580,37 @@ export function prepareTeamResultsTableColumnGroups() {
     { label: "Counters", colSpan: 1 },
   ]
   return columnGroups
+}
+/*
+
+
+
+
+
+*/
+export function prepareSubmissionPayload(
+  results: CountMemberResultsProps,
+  metadata: CountMetadataProps,
+) {
+  const payload = {
+    metadata,
+    results,
+  }
+  return payload
+}
+/*
+
+
+
+
+
+*/
+export function prepareFinalResults(results: CountResultsProps) {
+  let finalResults: CountMemberResultsProps = {}
+  _.forIn(results, (value, key) => {
+    finalResults = { ...finalResults, ...value }
+  })
+  return finalResults
 }
 /*
 

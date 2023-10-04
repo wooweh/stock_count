@@ -23,7 +23,18 @@ export const ColorSchema = z.enum([
   "success",
   "warning",
 ])
-
+export type ThemeColors =
+  | "gray"
+  | "black"
+  | "white"
+  | "blue"
+  | "green"
+  | "yellow"
+  | "orange"
+  | "red"
+  | "purple"
+  | "pink"
+  | "coral"
 export const ThemeSchema = z.object({
   scale: z.record(
     z.enum([

@@ -1,13 +1,16 @@
 import _ from "lodash"
 import { describe, expect, expectTypeOf, it } from "vitest"
+import { ColumnData, ColumnGroupData, RowData } from "../../components/table"
 import {
   CountChecksProps,
   MembersProps,
 } from "../organisation/organisationSlice"
+import { StockProps } from "../stock/stockSlice"
 import {
   CountCheckProps,
   CountCommentsProps,
   CountMemberProps,
+  CountMemberResultsProps,
   CountMembersProps,
   CountMetadataProps,
   CountResultsProps,
@@ -16,21 +19,21 @@ import {
   createCountChecksPayload,
   createCountMetadataPayload,
   prepareCountMembersPayload,
-  updateCountMetadataPayload,
-  updateCountMemberPayload,
-  updateCountCommentsPayload,
-  prepareSoloResultsTableRows,
-  prepareDualResultsTableRows,
-  prepareTeamResultsTableRows,
-  prepareSoloResultsTableColumns,
-  prepareDualResultsTableColumns,
-  prepareTeamResultsTableColumns,
-  prepareSoloResultsTableColumnGroups,
   prepareDualResultsTableColumnGroups,
+  prepareDualResultsTableColumns,
+  prepareDualResultsTableRows,
+  prepareFinalResults,
+  prepareSoloResultsTableColumnGroups,
+  prepareSoloResultsTableColumns,
+  prepareSoloResultsTableRows,
+  prepareSubmissionPayload,
   prepareTeamResultsTableColumnGroups,
+  prepareTeamResultsTableColumns,
+  prepareTeamResultsTableRows,
+  updateCountCommentsPayload,
+  updateCountMemberPayload,
+  updateCountMetadataPayload,
 } from "./countUtils"
-import { StockProps } from "../stock/stockSlice"
-import { ColumnData, ColumnGroupData, RowData } from "../../components/table"
 
 describe("Count Members Utils", () => {
   const memberUuids = ["test-uuid1", "test-uuid2"]
@@ -260,9 +263,60 @@ describe("Count Results Table Utils", () => {
     expectTypeOf(columnGroups).toEqualTypeOf<ColumnGroupData[]>()
   })
 
-  it.skip("should handle prepareTeamResultsTableColumnGroups", () => {
+  it("should handle prepareTeamResultsTableColumnGroups", () => {
     const columnGroups = prepareTeamResultsTableColumnGroups()
     expect(columnGroups[0].label).toEqual("Stock Item")
     expectTypeOf(columnGroups).toEqualTypeOf<ColumnGroupData[]>()
+  })
+})
+
+describe("Count Submission Utils", () => {
+  const mockFinalResults: CountResultsProps = {
+    mockCounterUuid1: {
+      mockStockId1: {
+        id: "mockStockId1",
+        useableCount: 2,
+        damagedCount: 3,
+        obsoleteCount: 4,
+      },
+    },
+    mockCounterUuid2: {
+      mockStockId2: {
+        id: "mockStockId2",
+        useableCount: 2,
+        damagedCount: 3,
+        obsoleteCount: 4,
+      },
+    },
+  }
+
+  const mockMetadata: CountMetadataProps = {
+    type: "solo",
+    organiser: "mockCounterUuid1",
+    counters: ["mockCounterUuid1", "mockCounterUuid2"],
+    prepStartTime: "test",
+    reviewStartTime: "test",
+    finalizationStartTime: "test",
+    finalSubmissionTime: "test",
+  }
+
+  it("should handle prepareFinalResults", () => {
+    const finalResults = prepareFinalResults(mockFinalResults)
+    expect(finalResults.mockStockId1).toEqual(
+      mockFinalResults.mockCounterUuid1.mockStockId1,
+    )
+    expect(finalResults.mockStockId2).toEqual(
+      mockFinalResults.mockCounterUuid2.mockStockId2,
+    )
+    expectTypeOf(finalResults).toEqualTypeOf<CountMemberResultsProps>()
+  })
+
+  it("should handle prepareSubmissionPayload", () => {
+    const mockResults = prepareFinalResults(mockFinalResults)
+    const payload = prepareSubmissionPayload(mockResults, mockMetadata)
+    expect(payload.metadata).toEqual(mockMetadata)
+    expect(payload.results).toEqual(mockResults)
+    expectTypeOf(payload.metadata).toEqualTypeOf<CountMetadataProps>()
+    expectTypeOf(payload.results).toEqualTypeOf<CountMemberResultsProps>()
   })
 })

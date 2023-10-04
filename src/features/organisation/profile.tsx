@@ -34,6 +34,7 @@ import {
   setOrgMember,
   setOrgName,
 } from "./organisationSlice"
+import { ClickAwayListener } from "@mui/material"
 /*
 
 
@@ -46,10 +47,10 @@ export function OrgProfile() {
     <ProfileSurface>
       <OrgNameHeader />
       <ButtonTray />
-      <RemoveOrgConfirmation />
       <MembersList />
       <InvitesList />
       <NewInvite />
+      <RemoveOrgConfirmation />
     </ProfileSurface>
   )
 }
@@ -94,41 +95,43 @@ function OrgNameHeader() {
   
   */
   return (
-    <Stack width={"100%"} gap={theme.module[3]}>
-      <Stack direction={"row"} alignItems={"center"} gap={theme.module[5]}>
-        <Input
-          disabled={!isEditing}
-          value={newOrgName}
-          onChange={(event: any) => setNewOrgName(event.target.value)}
-          sx={{
-            fontSize: "1.25rem",
-            background: theme.scale.gray[isEditing ? 8 : 9],
-            color: theme.scale.gray[isEditing ? 4 : 8],
-            fontWeight: "bold",
-          }}
-        />
-        {isAdmin && (
-          <Button
-            variation={"pill"}
-            onClick={isEditing ? handleAccept : handleEdit}
-            iconName={isEditing ? "done" : "edit"}
+    <ClickAwayListener onClickAway={() => setUseOrg("isEditing", false)}>
+      <Stack width={"100%"} gap={theme.module[3]}>
+        <Stack direction={"row"} alignItems={"center"} gap={theme.module[5]}>
+          <Input
+            disabled={!isEditing}
+            value={newOrgName}
+            onChange={(event: any) => setNewOrgName(event.target.value)}
+            sx={{
+              fontSize: "1.25rem",
+              background: theme.scale.gray[isEditing ? 8 : 9],
+              color: theme.scale.gray[isEditing ? 4 : 8],
+              fontWeight: "bold",
+            }}
           />
-        )}
+          {isAdmin && (
+            <Button
+              variation={"pill"}
+              onClick={isEditing ? handleAccept : handleEdit}
+              iconName={isEditing ? "done" : "edit"}
+            />
+          )}
+        </Stack>
+        <Stack
+          direction={"row"}
+          gap={theme.module[3]}
+          paddingLeft={theme.module[2]}
+        >
+          <Icon
+            variation={isAdmin ? "admin" : "profile"}
+            color={theme.scale.gray[5]}
+          />
+          <Typography color={theme.scale.gray[5]}>
+            {isAdmin ? "Admin" : "Member"}
+          </Typography>
+        </Stack>
       </Stack>
-      <Stack
-        direction={"row"}
-        gap={theme.module[3]}
-        paddingLeft={theme.module[2]}
-      >
-        <Icon
-          variation={isAdmin ? "admin" : "profile"}
-          color={theme.scale.gray[5]}
-        />
-        <Typography color={theme.scale.gray[5]}>
-          {isAdmin ? "Admin" : "Member"}
-        </Typography>
-      </Stack>
-    </Stack>
+    </ClickAwayListener>
   )
 }
 /*

@@ -13,7 +13,7 @@ import {
   setCountCheck,
 } from "../organisation/organisationSlice"
 import { selectIsUserAdmin } from "../user/userSlice"
-import { setUseCount, useCountStore } from "./count"
+import { resetUseCount, setUseCount, useCountStore } from "./count"
 import {
   selectIsCountInvitePending,
   selectIsUserAwayFromCount,
@@ -34,7 +34,12 @@ export function DashboardBody() {
       <Stack height={"100%"}>
         <Body />
       </Stack>
-      <Stack gap={theme.module[4]}>
+      <Stack
+        gap={theme.module[4]}
+        overflow={"visible"}
+        padding={theme.module[0]}
+        boxSizing={"border-box"}
+      >
         <ButtonTray />
         <PrepCheckList />
       </Stack>
@@ -52,6 +57,11 @@ function ButtonTray() {
   const theme = useTheme()
 
   const isAdmin = useAppSelector(selectIsUserAdmin)
+
+  function handleNewCountClick() {
+    updateCountStep("setup")
+    resetUseCount()
+  }
 
   return (
     isAdmin && (
@@ -74,7 +84,7 @@ function ButtonTray() {
           bgColor={theme.scale.blue[9]}
           outlineColor={theme.scale.blue[8]}
           justifyCenter
-          onClick={() => updateCountStep("setup")}
+          onClick={handleNewCountClick}
         />
       </>
     )
@@ -92,7 +102,6 @@ function Body() {
 
   const isInvitePending = useAppSelector(selectIsCountInvitePending)
   const isAwayFromCount = useAppSelector(selectIsUserAwayFromCount)
-  console.log(isInvitePending)
 
   return (
     <Stack

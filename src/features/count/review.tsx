@@ -13,6 +13,7 @@ import {
   selectCountMembers,
   selectCountResults,
   selectCountType,
+  selectIsOrganiserFinalizing,
   selectIsStockCountCompleted,
   selectIsUserOnlyOrganiser,
   selectIsUserOrganiser,
@@ -27,11 +28,16 @@ import {
   prepareTeamResultsTableColumnGroups,
   prepareTeamResultsTableColumns,
   prepareTeamResultsTableRows,
+  updateCountMetadata,
+  updateCountStep,
 } from "./countUtils"
 import {
   MembersProps,
   selectOrgMembers,
 } from "../organisation/organisationSlice"
+import { setUseCount, useCountStore } from "./count"
+import Modal, { ModalActionProps } from "../../components/modal"
+import { getTimeStamp } from "../../common/utils"
 /*
 
 
@@ -73,6 +79,7 @@ function OrganiserReviewBody() {
         <CounterSummary />
       </Stack>
       <ProceedMessage />
+      <ReviewCompletionConirmation />
     </>
   )
 }
@@ -84,6 +91,8 @@ function OrganiserReviewBody() {
 
 */
 function CounterReviewBody() {
+  const isFinalizing = useAppSelector(selectIsOrganiserFinalizing)
+
   return (
     <Stack
       width={"100%"}
@@ -91,7 +100,9 @@ function CounterReviewBody() {
       alignItems={"center"}
       justifyContent={"center"}
     >
-      <Typography variant="h6">Organiser is reviewing results</Typography>
+      <Typography variant="h6">
+        Organiser is {isFinalizing ? "finalizing" : "reviewing"} results
+      </Typography>
     </Stack>
   )
 }
@@ -162,10 +173,12 @@ function CounterSummaryItem({
   const surname = members[uuid].surname
   const fullName = `${nameInitial}. ${surname}`
   const step = members[uuid].step
+  const isCounting = members[uuid].isCounting
+
   const action =
-    step === "review"
+    step === "review" && isCounting
       ? "Reviewing"
-      : step === "stockCount"
+      : step === "stockCount" && isCounting
       ? "Counting"
       : "Away"
   const actionColors = {
@@ -269,25 +282,26 @@ function ReviewResultsTable() {
 
   const tableData = {
     solo: {
-      rows: prepareSoloResultsTableRows(results, stock),
-      columns: prepareSoloResultsTableColumns(),
-      columnGroups: prepareSoloResultsTableColumnGroups(),
+      rows: () => prepareSoloResultsTableRows(results, stock),
+      columns: () => prepareSoloResultsTableColumns(),
+      columnGroups: () => prepareSoloResultsTableColumnGroups(),
     },
     dual: {
-      rows: prepareDualResultsTableRows(results, stock),
-      columns: prepareDualResultsTableColumns(results),
-      columnGroups: prepareDualResultsTableColumnGroups(results, members),
+      rows: () => prepareDualResultsTableRows(results, stock),
+      columns: () => prepareDualResultsTableColumns(results),
+      columnGroups: () => prepareDualResultsTableColumnGroups(results, members),
     },
     team: {
-      rows: prepareTeamResultsTableRows(results, stock, members),
-      columns: prepareTeamResultsTableColumns(),
-      columnGroups: prepareTeamResultsTableColumnGroups(),
+      rows: () => prepareTeamResultsTableRows(results, stock, members),
+      columns: () => prepareTeamResultsTableColumns(),
+      columnGroups: () => prepareTeamResultsTableColumnGroups(),
     },
   }
 
-  const rows = tableData[countType].rows
-  const columns = tableData[countType].columns
-  const columnGroups = tableData[countType].columnGroups
+  const rows = tableData[countType].rows()
+  const columns = tableData[countType].columns()
+  const columnGroups = tableData[countType].columnGroups()
+  console.log(countType)
 
   return (
     <Stack
@@ -302,6 +316,61 @@ function ReviewResultsTable() {
         columnGroups={columnGroups}
       />
     </Stack>
+  )
+}
+/*
+
+
+
+
+
+*/
+function ReviewCompletionConirmation() {
+  const theme = useTheme()
+
+  const isStartingFinalization = useCountStore(
+    (state: any) => state.isStartingFinalization,
+  )
+
+  function handleAccept() {
+    updateCountMetadata({ finalizationStartTime: getTimeStamp() })
+    updateCountStep("finalization", true)
+    handleClose()
+  }
+
+  function handleClose() {
+    setUseCount("isStartingFinalization", false)
+  }
+
+  const actions: ModalActionProps[] = [
+    {
+      iconName: "cancel",
+      handleClick: handleClose,
+    },
+    {
+      iconName: "done",
+      handleClick: handleAccept,
+    },
+  ]
+
+  return (
+    <Modal
+      open={isStartingFinalization}
+      heading={"Finalization"}
+      body={
+        <Stack gap={theme.module[4]}>
+          <Typography textAlign={"center"}>
+            You are about to enter count finalization. You will not be able to
+            go back to the review stage or change count results.
+          </Typography>
+          <Typography textAlign={"center"}>
+            Are you sure you want to proceed?
+          </Typography>
+        </Stack>
+      }
+      actions={actions}
+      onClose={handleClose}
+    />
   )
 }
 /*

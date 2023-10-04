@@ -1,7 +1,7 @@
 import { Stack, Typography } from "@mui/material"
 import _ from "lodash"
 import { useAppSelector } from "../../app/hooks"
-import useTheme from "../../common/useTheme"
+import useTheme, { ThemeColors } from "../../common/useTheme"
 import { calculateDuration, formatLongDate } from "../../common/utils"
 import Icon, { IconNames } from "../../components/icon"
 import {
@@ -84,13 +84,18 @@ function FinalizationItems() {
 
 */
 function CountSummary() {
+  const theme = useTheme()
+
   const organiser = useAppSelector(selectOrganiser)
   const counters = useAppSelector(selectCountersList)
   const countType = useAppSelector(selectCountType)
   const metadata = useAppSelector(selectCountMetadata) as CountMetadataProps
 
   const countDate = formatLongDate(metadata.finalizationStartTime as string)
-  const countDuration = calculateDuration("1694427482985", "1694527483256")
+  const countDuration = calculateDuration(
+    metadata.countStartTime as string,
+    metadata.finalizationStartTime as string,
+  )
 
   const organiserFullName = `${organiser.name[0]}. ${organiser.surname}`
 
@@ -98,29 +103,35 @@ function CountSummary() {
     {
       label: "Date",
       iconName: "date",
-      data: <DataPill label={countDate} />,
+      data: <DataPill label={countDate} color={"blue"} />,
     },
     {
       label: "Type",
       iconName: "clipboard",
-      data: <DataPill label={_.capitalize(countType)} />,
+      data: <DataPill label={_.capitalize(countType)} color={"orange"} />,
     },
     {
       label: "Duration",
       iconName: "time",
-      data: <DataPill label={countDuration} />,
+      data: <DataPill label={countDuration} color={"green"} />,
     },
     {
       label: "Organiser",
       iconName: "profile",
-      data: <DataPill label={organiserFullName} />,
+      data: <DataPill label={organiserFullName} color={"purple"} />,
     },
     {
       label: "Counters",
       iconName: "group",
       data: counters.map((counter) => {
-        const counterFullName = `${organiser.name[0]}. ${organiser.surname}`
-        return <DataPill label={counterFullName} key={counter.uuid} />
+        const counterFullName = `${counter.name[0]}. ${counter.surname}`
+        return (
+          <DataPill
+            label={counterFullName}
+            key={counter.uuid}
+            color={"coral"}
+          />
+        )
       }),
     },
   ]
@@ -190,6 +201,7 @@ function CountDataLineItem(props: CountDataLineItemProps) {
 */
 type DataPillProps = {
   label: string
+  color?: ThemeColors
 }
 function DataPill(props: DataPillProps) {
   const theme = useTheme()
@@ -200,11 +212,20 @@ function DataPill(props: DataPillProps) {
       justifyContent={"center"}
       padding={`${theme.module[2]} ${theme.module[3]}`}
       borderRadius={theme.module[2]}
-      bgcolor={theme.scale.gray[9]}
+      bgcolor={props.color ? theme.scale[props.color][8] : theme.scale.gray[9]}
       boxSizing={"border-box"}
-      sx={{ outline: `1px solid ${theme.scale.gray[7]}` }}
+      sx={{
+        outline: `1px solid ${
+          props.color ? theme.scale[props.color][7] : theme.scale.gray[7]
+        }`,
+      }}
     >
-      <Typography noWrap variant="body2" fontWeight={"bold"}>
+      <Typography
+        color={props.color ? theme.scale[props.color][3] : theme.scale.gray[4]}
+        noWrap
+        variant="body2"
+        fontWeight={"bold"}
+      >
         {props.label}
       </Typography>
     </Stack>
@@ -252,25 +273,6 @@ function FinalizeCountConfirmation() {
       body={
         <Stack gap={theme.module[4]} alignItems={"center"}>
           <Typography>You are about to finalize the count.</Typography>
-          {/* <Stack
-            padding={theme.module[3]}
-            borderRadius={theme.module[2]}
-            boxSizing={"border-box"}
-            bgcolor={theme.scale.red[7]}
-            boxShadow={theme.shadow.neo[2]}
-            sx={{
-              outline: `1px solid ${theme.scale.red[5]}`,
-            }}
-          >
-            <Typography
-              variant={"body2"}
-              fontWeight={"bold"}
-              color={theme.scale.red[3]}
-            >
-              Once the count has been finalized you will not be able to edit any
-              
-            </Typography>
-          </Stack> */}
           <Typography>Are you sure you want to proceed?</Typography>
         </Stack>
       }

@@ -1,6 +1,6 @@
 import { Stack, Typography } from "@mui/material"
 import _ from "lodash"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Virtuoso } from "react-virtuoso"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
@@ -24,6 +24,7 @@ import {
   selectStockIdList,
   selectStockList,
 } from "./stockSlice"
+import { ScrollToTop } from "../../components/scrollToTop"
 /*
 
 
@@ -57,12 +58,14 @@ export function StockList() {
 
 */
 function Header() {
+  const theme = useTheme()
+
   const stockList = useAppSelector(selectStockList)
   const isSelecting = useStockStore((state: any) => state.isSelecting)
 
   return (
     !!stockList.length && (
-      <Stack width={"100%"} boxSizing={"border-box"}>
+      <Stack width={"100%"} height={theme.module[6]} flexShrink={0}>
         {isSelecting ? <StockSelectionBar /> : <StockSearchBar />}
       </Stack>
     )
@@ -97,15 +100,13 @@ function StockSearchBar() {
   }
 
   return (
-    <Stack width={"100%"}>
-      <SearchBar
-        heading={"Stock List:"}
-        list={stockList}
-        searchKeys={["name", "description"]}
-        handleSelect={handleSelect}
-        formatResult={formatResult}
-      />
-    </Stack>
+    <SearchBar
+      heading={"Stock List:"}
+      list={stockList}
+      searchKeys={["name", "description"]}
+      handleSelect={handleSelect}
+      formatResult={formatResult}
+    />
   )
 }
 /*
@@ -123,17 +124,11 @@ function StockSelectionBar() {
 
   const isAllSelected =
     !!selectedItems.length && stockIdList.length === selectedItems.length
-  /*
-  
-  
-  */
+
   function handleSelectAll() {
     setUseStock("selectedItems", stockIdList)
   }
-  /*
-  
-  
-  */
+
   function handleDelete() {
     if (isAllSelected) {
       dispatch(deleteStock())
@@ -143,18 +138,12 @@ function StockSelectionBar() {
     setUseStock("selectedItems", [])
     setUseStock("isSelecting", false)
   }
-  /*
-  
-  
-  */
+
   function handleBack() {
     setUseStock("selectedItems", [])
     setUseStock("isSelecting", false)
   }
-  /*
-  
-  
-  */
+
   return (
     <Stack
       height={"100%"}
@@ -203,9 +192,10 @@ function Body() {
   const stockList = useAppSelector(selectStockList)
   const scrollIndex = useStockStore((state: any) => state.scrollIndex)
   const isSelecting = useStockStore((state: any) => state.isSelecting)
-  const idViewingOptions = useStockStore((state: any) => state.idViewingOptions)
   const selectedItems = useStockStore((state: any) => state.selectedItems)
   const virtuoso: any = useRef(null)
+
+  const [showScrollToTop, setShowScrollToTop] = useState(false)
 
   useEffect(() => {
     if (isSelecting && !selectedItems.length) setUseStock("isSelecting", false)
@@ -220,6 +210,13 @@ function Body() {
       })
   }, [virtuoso, scrollIndex])
 
+  function handleScrollToTopClick() {
+    setUseStock("scrollIndex", 1)
+    setTimeout(() => {
+      setUseStock("scrollIndex", 0)
+    }, 50)
+  }
+
   return (
     <Stack
       width={"100%"}
@@ -228,6 +225,7 @@ function Body() {
       boxSizing={"border-box"}
       borderRadius={theme.module[3]}
       boxShadow={theme.shadow.neo[2]}
+      position={"relative"}
       sx={{
         outline: `1px solid ${theme.scale.gray[7]}`,
       }}
@@ -255,12 +253,14 @@ function Body() {
         ) : (
           <Virtuoso
             ref={virtuoso}
+            totalCount={stockList.length}
+            atTopThreshold={100}
+            atTopStateChange={(isAtTop) => setShowScrollToTop(!isAtTop)}
             style={{
               height: "100%",
               width: "100%",
               borderRadius: theme.module[3],
             }}
-            totalCount={stockList.length}
             itemContent={(index) => {
               const item = stockList[index]
               const options: ListItemOptionProps[] = [
@@ -272,10 +272,6 @@ function Body() {
                   iconName: "delete",
                   onClick: () => dispatch(deleteStockItem(item.id)),
                 },
-                {
-                  iconName: "cancel",
-                  onClick: () => setUseStock("idViewingOptions", false),
-                },
               ]
               return (
                 <Stack padding={theme.module[0]} boxSizing={"border-box"}>
@@ -284,12 +280,7 @@ function Body() {
                     description={item.description}
                     iconName={"stock"}
                     options={options}
-                    showOptions={idViewingOptions === item.id}
-                    onOptionsClick={() =>
-                      setUseStock("idViewingOptions", item.id)
-                    }
                     onLongPress={() => {
-                      setUseStock("idViewingOptions", false)
                       setUseStock("isSelecting", true)
                       addUseStockSelectedItem(item.id)
                     }}
@@ -304,6 +295,7 @@ function Body() {
           />
         )}
       </Stack>
+      {showScrollToTop && <ScrollToTop onClick={handleScrollToTopClick} />}
     </Stack>
   )
 }
@@ -316,24 +308,15 @@ function Body() {
 */
 function ButtonTray() {
   const theme = useTheme()
-  /*
-  
-  
-  */
+
   function handleAddClick() {
     setUseStock("isAdding", true)
   }
-  /*
-  
-  
-  */
+
   function handleIsUploading() {
     setUseStock("isUploading", true)
   }
-  /*
-  
-  
-  */
+
   return (
     <Stack
       width={"100%"}

@@ -46,6 +46,7 @@ import CalendarIcon from "@mui/icons-material/CalendarTodayRounded"
 import TimeIcon from "@mui/icons-material/AccessTimeRounded"
 import ClipboardIcon from "@mui/icons-material/ContentPasteRounded"
 import ChecklistIcon from "@mui/icons-material/ChecklistRtlRounded"
+import ScrollToTopIcon from "@mui/icons-material/FirstPage"
 import { useAppSelector } from "../app/hooks"
 import { SxProps } from "../common/types"
 import useTheme from "../common/useTheme"
@@ -106,6 +107,7 @@ export type IconNames =
   | "date"
   | "time"
   | "clipboard"
+  | "scrollToTop"
 
 type IconProps = {
   variation: IconNames
@@ -170,6 +172,12 @@ export default function Icon(props: IconProps) {
     time: <TimeIcon fontSize={fontSize} sx={{ ...styles }} />,
     clipboard: <ClipboardIcon fontSize={fontSize} sx={{ ...styles }} />,
     checklist: <ChecklistIcon fontSize={fontSize} sx={{ ...styles }} />,
+    scrollToTop: (
+      <ScrollToTopIcon
+        fontSize={fontSize}
+        sx={{ ...styles, transform: "rotate(90deg)" }}
+      />
+    ),
     useable: (
       <UseableIcon
         fontSize={fontSize}

@@ -9,7 +9,7 @@ import Icon, { IconNames } from "../../components/icon"
 import { ListGroup, ListItem } from "../../components/list"
 import Modal from "../../components/modal"
 import { selectUser } from "../user/userSlice"
-import { setUseOrg } from "./organisation"
+import { setUseOrg, useOrgStore } from "./organisation"
 import { createOrg, joinOrg } from "./organisationSlice"
 /*
 

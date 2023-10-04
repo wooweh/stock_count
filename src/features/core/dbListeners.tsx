@@ -22,8 +22,8 @@ import {
   setCountMembers,
   setCountMetaData,
   setCountResults,
-  setCountStep,
 } from "../count/countSlice"
+import { updateCountStep } from "../count/countUtils"
 import {
   OrgProps,
   leaveOrg,
@@ -44,7 +44,6 @@ import {
   selectIsSystemBooting,
   setSystemStatus,
 } from "./coreSlice"
-import { updateCountStep } from "../count/countUtils"
 /*
 
 
@@ -63,7 +62,6 @@ export function DBListeners() {
   const localCountComments = useAppSelector(selectCountComments)
   const localCountMembers = useAppSelector(selectCountMembers)
   const localCountMetadata = useAppSelector(selectCountMetadata)
-  console.log(localCountMetadata)
   const localCountResults = useAppSelector(selectCountResults)
   const localUserCountStep = useAppSelector(selectUserCountMemberStep)
   const isJoined = useAppSelector(selectIsJoined)
@@ -188,7 +186,6 @@ export function DBListeners() {
       )
       onValue(dbCountMembersRef, (snapshot) => {
         const dbCountMembers: CountMembersProps = snapshot.val()
-        console.log(dbCountMembers)
         if (!!dbCountMembers) {
           dispatch(
             setCountMembers({ members: dbCountMembers, updateDB: false }),

@@ -12,6 +12,8 @@ import { useLongPress } from "use-long-press"
 import useTheme from "../common/useTheme"
 import { Button } from "./button"
 import Icon, { IconNames } from "./icon"
+import { ClickAwayListener } from "@mui/material"
+import { selectShowNotification } from "../features/core/coreSlice"
 /* 
 
 
@@ -409,8 +411,6 @@ export type SelectableListItemWithOptionsProps = {
   description: string
   iconName: IconNames
   options: ListItemOptionProps[]
-  showOptions: boolean
-  onOptionsClick: Function
   isSelecting: boolean
   isSelected: boolean
   onSelection: Function
@@ -477,8 +477,6 @@ export function SelectableListItemWithOptions(
         description={props.description}
         iconName={props.iconName}
         options={props.options}
-        showOptions={props.showOptions}
-        onOptionsClick={props.onOptionsClick}
         onLongPress={handleLongPress}
       />
     </Stack>
@@ -499,37 +497,36 @@ export type ListItemWithOptionsProps = {
   description: string
   iconName: IconNames
   options: ListItemOptionProps[]
-  showOptions: boolean
-  onOptionsClick: Function
   onLongPress?: Function
 }
 export function ListItemWithOptions(props: ListItemWithOptionsProps) {
   const [showOptions, setShowOptions] = useState(false)
 
-  useEffect(() => {
-    if (!props.showOptions && showOptions) setShowOptions(false)
-    if (props.showOptions && !showOptions) setShowOptions(true)
-  }, [props.showOptions, showOptions])
-
   return (
-    <Stack position={"relative"}>
-      <ListItem
-        label={props.label}
-        description={props.description}
-        primarySlot={<Icon variation={props.iconName} />}
-        secondarySlot={
-          <Button
-            variation={"pill"}
-            iconName={"options"}
-            onClick={props.onOptionsClick}
-          />
-        }
-        onChange={props.onOptionsClick}
-        onLongPress={props.onLongPress}
-        tappable={true}
-      />
-      <ItemOptions show={showOptions} options={props.options} />
-    </Stack>
+    <ClickAwayListener onClickAway={() => setShowOptions(false)}>
+      <Stack position={"relative"}>
+        <ListItem
+          label={props.label}
+          description={props.description}
+          primarySlot={<Icon variation={props.iconName} />}
+          secondarySlot={
+            <Button
+              variation={"pill"}
+              iconName={"options"}
+              onClick={() => setShowOptions(true)}
+            />
+          }
+          onChange={() => setShowOptions(true)}
+          onLongPress={props.onLongPress}
+          tappable={true}
+        />
+        <ItemOptions
+          show={showOptions}
+          setShow={setShowOptions}
+          options={props.options}
+        />
+      </Stack>
+    </ClickAwayListener>
   )
 }
 /*
@@ -544,6 +541,7 @@ export function ListItemWithOptions(props: ListItemWithOptionsProps) {
 */
 type ItemOptionsProps = {
   show: boolean
+  setShow: Function
   options: ListItemOptionProps[]
 }
 function ItemOptions(props: ItemOptionsProps) {
@@ -577,6 +575,12 @@ function ItemOptions(props: ItemOptionsProps) {
             />
           )
         })}
+        <Button
+          variation={"pill"}
+          onClick={() => props.setShow(false)}
+          iconName={"cancel"}
+          key={props.options.length}
+        />
       </Stack>
     )
   )

@@ -240,6 +240,16 @@ export const selectIsUserOnlyOrganiser = createSelector(
   selectUserCountMember,
   (user) => user?.isOrganiser && !user.isCounter,
 )
+export const selectIsOrganiserFinalizing = createSelector(
+  selectOrganiser,
+  (organiser) => {
+    if (!!organiser) {
+      return organiser.step === "finalization"
+    } else {
+      return false
+    }
+  },
+)
 export const selectCounters = createSelector(selectCountMembers, (members) => {
   const counters: CountMembersProps = {}
   _.forIn(members, (value: CountMemberProps, key) => {
