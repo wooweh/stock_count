@@ -5,13 +5,14 @@ import { Route, Routes, useLocation, useNavigate } from "react-router-dom"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import Container from "../../components/container"
 import { Count, resetUseCount } from "../count/count"
+import { selectIsUserCounting } from "../count/countSlice"
+import { History, resetUseHistory } from "../history/history"
 import { Organisation, resetUseOrg } from "../organisation/organisation"
 import { Stock, resetUseStock } from "../stock/stock"
 import { Authentication, WithAuth, resetUseAuth } from "../user/authentication"
 import { UserProfile, resetUseUser } from "../user/user"
 import { selectIsMobile, toggleIsMobile } from "./coreSlice"
 import { Home } from "./home"
-import { selectIsUserCounting } from "../count/countSlice"
 /*
 
 
@@ -54,7 +55,7 @@ export const routes = [
     name: "History",
     path: "/history",
     requiresAuth: true,
-    element: <div>History</div>,
+    element: <History />,
   },
   {
     name: "Analysis",
@@ -139,12 +140,14 @@ export function Pages() {
     const isOrgPath = path === routePaths.organisation.path
     const isStockPath = path === routePaths.stock.path
     const isCountPath = path === routePaths.count.path
+    const isHistoryPath = path === routePaths.history.path
 
     if (!isAuthPath) resetUseAuth()
     if (!isProfilePath) resetUseUser()
     if (!isOrgPath) resetUseOrg()
     if (!isStockPath) resetUseStock()
     if (!isCountPath) resetUseCount()
+    if (!isHistoryPath) resetUseHistory()
   }, [path])
 
   useEffect(() => {

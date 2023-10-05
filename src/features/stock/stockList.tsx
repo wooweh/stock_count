@@ -9,7 +9,7 @@ import Icon from "../../components/icon"
 import {
   ListItemOptionProps,
   SelectableListItemWithOptions,
-} from "../../components/list"
+} from "../../components/listItem"
 import { SearchBar } from "../../components/searchBar"
 import {
   addUseStockSelectedItem,

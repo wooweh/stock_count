@@ -9,11 +9,11 @@ import { Button } from "../../components/button"
 import { Input } from "../../components/control"
 import Icon, { IconNames } from "../../components/icon"
 import {
-  List,
   ListItem,
   ListItemOptionProps,
   ListItemWithOptions,
-} from "../../components/list"
+} from "../../components/listItem"
+import { List } from "../../components/list"
 import Modal from "../../components/modal"
 import { ProfileSurface } from "../../components/profileSurface"
 import { generateNotification } from "../core/notifications"
