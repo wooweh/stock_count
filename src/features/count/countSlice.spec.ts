@@ -24,9 +24,8 @@ import countReducer, {
   setCountStep,
 } from "./countSlice"
 
-describe("count reducer", () => {
+describe("count Reducer", () => {
   const initialState: CountState = {
-    checks: [],
     step: "dashboard",
     count: {},
   }
@@ -73,9 +72,7 @@ describe("count reducer", () => {
 
   it("should handle initial state", () => {
     expect(countReducer(undefined, { type: "unknown" })).toEqual({
-      step: "dashboard",
-      count: {},
-      checks: [],
+      ...initialState,
     })
   })
 

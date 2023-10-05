@@ -253,10 +253,10 @@ function CountStepsContainer() {
   }
 
   function handleFinalizationSubmit() {
-    // setUseCount("isSubmittingFinalization", true)
-    // updateCountComments({ finalization: finalComments })
-    // updateCountMetadata({ finalSubmissionTime: getTimeStamp() })
-    updateCountStep("review", true)
+    setUseCount("isSubmittingFinalization", true)
+    updateCountComments({ finalization: finalComments })
+    updateCountMetadata({ finalSubmissionTime: getTimeStamp() })
+    // updateCountStep("review", true)
   }
 
   const isSetupNextButtonDisabled = !isCounterRequirementMet

@@ -1,6 +1,7 @@
 import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit"
 import _ from "lodash"
 import { RootState } from "../../app/store"
+import { UpdateDB } from "../user/userSlice"
 
 export interface StockState {
   stock: StockProps
@@ -8,6 +9,7 @@ export interface StockState {
 export type StockProps = {
   [key: string]: StockItemProps
 }
+export type SetStockProps = UpdateDB & { stock: StockProps }
 export type StockItemProps = {
   id: string
   name: string
@@ -28,11 +30,8 @@ export const stockSlice = createSlice({
     deleteStockItem: (state, action: PayloadAction<string>) => {
       delete state.stock[action.payload]
     },
-    addStockList: (state, action: PayloadAction<StockProps>) => {
-      state.stock = action.payload
-    },
-    setStock: (state, action: PayloadAction<StockProps>) => {
-      state.stock = action.payload
+    setStock: (state, action: PayloadAction<SetStockProps>) => {
+      state.stock = action.payload.stock
     },
     deleteStock: (state) => {
       state.stock = {}
@@ -40,13 +39,8 @@ export const stockSlice = createSlice({
   },
 })
 
-export const {
-  setStockItem,
-  deleteStockItem,
-  addStockList,
-  setStock,
-  deleteStock,
-} = stockSlice.actions
+export const { setStockItem, deleteStockItem, setStock, deleteStock } =
+  stockSlice.actions
 
 export const selectStock = (state: RootState) => state.stock.stock
 export const selectStockList = createSelector(selectStock, (stock) =>

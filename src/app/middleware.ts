@@ -99,6 +99,17 @@ import {
 import { auth } from "../remote"
 import { syncUserDetails } from "./helpers"
 import { store } from "./store"
+import {
+  deleteHistory,
+  deleteHistoryItem,
+  setHistory,
+  setHistoryItem,
+} from "../features/history/historySlice"
+import {
+  deleteHistoryItemOnDB,
+  deleteHistoryOnDB,
+  setHistoryItemOnDB,
+} from "../features/history/historySliceRemote"
 /*
 
 
@@ -115,9 +126,10 @@ listenerMiddleware.startListening({
     console.log("Reset stock in stockSlice")
     store.dispatch(setSystemStatus("notBooted"))
     store.dispatch(setMemberStatus("notJoined"))
+    // TODO: Reset util for each slice using delete reducers
     store.dispatch(setUser({}))
     store.dispatch(setOrg({}))
-    store.dispatch(setStock({}))
+    store.dispatch(setStock({ stock: {}, updateDB: false }))
     store.dispatch(setCount({}))
     // TODO: History
   },
@@ -366,7 +378,7 @@ listenerMiddleware.startListening({
     if (!!userUuid) {
       store.dispatch(deleteUserOrgDetails({ updateDB: true }))
       deleteOrgMemberOnDB(orgUuid, userUuid)
-        .then(() => store.dispatch(setStock({})))
+        .then(() => store.dispatch(setStock({ stock: {}, updateDB: false })))
         .then(() => generateNotification("leaveOrg"))
         .catch((error) => console.log(error))
     }
@@ -389,7 +401,7 @@ listenerMiddleware.startListening({
       deleteAllOrgInvitesOnDB(invites)
         .then(() => deleteOrgOnDB(orgUuid))
         .then(() => deleteStockOnDB(orgUuid))
-        .then(() => store.dispatch(setStock({})))
+        .then(() => store.dispatch(setStock({ stock: {}, updateDB: true })))
         .then(() => generateNotification("deleteOrg"))
         .catch((error) => console.log(error))
     }
@@ -531,10 +543,11 @@ listenerMiddleware.startListening({
 
 */
 listenerMiddleware.startListening({
-  actionCreator: addStockList,
+  actionCreator: setStock,
   effect: async (action) => {
-    const stockList = action.payload
-    setStockOnDB(stockList)
+    const stock = action.payload.stock
+    const updateDB = action.payload.updateDB
+    if (updateDB) setStockOnDB(stock)
   },
 })
 /*
@@ -700,6 +713,48 @@ listenerMiddleware.startListening({
   effect: async (action) => {
     const orgUuid = store.getState().organisation.org.uuid
     if (!!orgUuid) deleteCountOnDB(orgUuid)
+  },
+})
+/*
+
+
+
+
+
+*/
+listenerMiddleware.startListening({
+  actionCreator: deleteHistory,
+  effect: async (action) => {
+    const updateDB = action.payload.updateDB
+    if (updateDB) deleteHistoryOnDB()
+  },
+})
+/*
+
+
+
+
+
+*/
+listenerMiddleware.startListening({
+  actionCreator: setHistoryItem,
+  effect: async (action) => {
+    const historyItem = action.payload
+    setHistoryItemOnDB(historyItem)
+  },
+})
+/*
+
+
+
+
+
+*/
+listenerMiddleware.startListening({
+  actionCreator: deleteHistoryItem,
+  effect: async (action) => {
+    const uuid = action.payload.uuid
+    deleteHistoryItemOnDB(uuid)
   },
 })
 /*

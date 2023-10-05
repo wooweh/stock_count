@@ -300,6 +300,11 @@ describe("Count Submission Utils", () => {
     finalSubmissionTime: "test",
   }
 
+  const mockComments: CountCommentsProps = {
+    preparation: ["mockComment1", "mockComment2"],
+    finalization: ["mockComment3", "mockComment4"],
+  }
+
   it("should handle prepareFinalResults", () => {
     const finalResults = prepareFinalResults(mockFinalResults)
     expect(finalResults.mockStockId1).toEqual(
@@ -313,10 +318,16 @@ describe("Count Submission Utils", () => {
 
   it("should handle prepareSubmissionPayload", () => {
     const mockResults = prepareFinalResults(mockFinalResults)
-    const payload = prepareSubmissionPayload(mockResults, mockMetadata)
+    const payload = prepareSubmissionPayload(
+      mockResults,
+      mockMetadata,
+      mockComments,
+    )
     expect(payload.metadata).toEqual(mockMetadata)
     expect(payload.results).toEqual(mockResults)
+    expect(payload.comments).toEqual(mockComments)
     expectTypeOf(payload.metadata).toEqualTypeOf<CountMetadataProps>()
     expectTypeOf(payload.results).toEqualTypeOf<CountMemberResultsProps>()
+    expectTypeOf(payload.comments).toEqualTypeOf<CountCommentsProps>()
   })
 })

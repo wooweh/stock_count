@@ -61,7 +61,10 @@ describe("stock reducer", () => {
   })
 
   it("should handle setStock", () => {
-    const actual = stockReducer(initialState, setStock(mockStockPayload))
+    const actual = stockReducer(
+      initialState,
+      setStock({ stock: mockStockPayload, updateDB: false }),
+    )
     expect(actual.stock).toEqual(mockStockPayload)
   })
 

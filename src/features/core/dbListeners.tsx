@@ -134,8 +134,8 @@ export function DBListeners() {
       )
       onValue(dbStockRef, (snapshot) => {
         const dbStock: StockProps = snapshot.val()
-        if (!!dbStock && !_.isEqual(localStock, dbStock)) {
-          dispatch(setStock(dbStock))
+        if (!!dbStock) {
+          dispatch(setStock({ stock: dbStock, updateDB: false }))
         }
       })
     }

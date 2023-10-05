@@ -7,6 +7,7 @@ import {
   MembersProps,
 } from "../organisation/organisationSlice"
 import { StockProps } from "../stock/stockSlice"
+import { v4 as uuidv4 } from "uuid"
 import {
   CountCheckProps,
   CountCommentsProps,
@@ -30,6 +31,13 @@ import {
   setCountResultsItem,
   setCountStep,
 } from "./countSlice"
+import {
+  HistoryItemCommentsProps,
+  HistoryItemMetadataProps,
+  HistoryItemProps,
+  HistoryItemResultsProps,
+  setHistoryItem,
+} from "../history/historySlice"
 /*
 
 
@@ -573,7 +581,7 @@ export function prepareDualResultsTableColumnGroups(
 
 
 */
-export function prepareTeamResultsTableColumnGroups() {
+export function prepareTeamResultsTableColumnGroups(): ColumnGroupData[] {
   const columnGroups: ColumnGroupData[] = [
     { label: "Stock Item", colSpan: 3 },
     { label: "Results", colSpan: 3 },
@@ -588,15 +596,15 @@ export function prepareTeamResultsTableColumnGroups() {
 
 
 */
-export function prepareSubmissionPayload(
-  results: CountMemberResultsProps,
-  metadata: CountMetadataProps,
-) {
-  const payload = {
-    metadata,
-    results,
+export function submitCount() {
+  const results = store.getState().count.count.results
+  const metadata = store.getState().count.count.metadata
+  const comments = store.getState().count.count.comments
+  if (!!results && !!metadata && !!comments) {
+    const finalResults = prepareFinalResults(results)
+    const payload = prepareSubmissionPayload(finalResults, metadata, comments)
+    store.dispatch(setHistoryItem({ ...payload }))
   }
-  return payload
 }
 /*
 
@@ -611,6 +619,28 @@ export function prepareFinalResults(results: CountResultsProps) {
     finalResults = { ...finalResults, ...value }
   })
   return finalResults
+}
+/*
+
+
+
+
+
+*/
+export function prepareSubmissionPayload(
+  results: HistoryItemResultsProps,
+  metadata: HistoryItemMetadataProps,
+  comments: HistoryItemCommentsProps,
+): HistoryItemProps {
+  const uuid = uuidv4()
+
+  const payload = {
+    uuid,
+    metadata,
+    results,
+    comments,
+  }
+  return payload
 }
 /*
 

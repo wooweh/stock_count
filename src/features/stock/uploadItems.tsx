@@ -25,7 +25,7 @@ export function UploadItems() {
   function handleAccept() {
     const stockList = {}
     _.forEach(data, (item) => _.set(stockList, item.id, item))
-    dispatch(setStock(stockList))
+    dispatch(setStock({ stock: stockList, updateDB: true }))
     handleClose()
   }
 

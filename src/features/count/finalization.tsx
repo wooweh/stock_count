@@ -1,29 +1,33 @@
 import { Stack, Typography } from "@mui/material"
 import _ from "lodash"
-import { useAppSelector } from "../../app/hooks"
+import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import useTheme, { ThemeColors } from "../../common/useTheme"
 import { calculateDuration, formatLongDate } from "../../common/utils"
 import Icon, { IconNames } from "../../components/icon"
+import Modal, { ModalActionProps } from "../../components/modal"
 import {
   addUseCountFinalComment,
   editUseCountFinalComment,
   removeUseCountFinalComment,
+  resetUseCount,
   setUseCount,
   useCountStore,
 } from "./count"
 import {
   CountMetadataProps,
+  deleteCount,
   selectCountMetadata,
   selectCountType,
   selectCountersList,
   selectOrganiser,
 } from "./countSlice"
+import { submitCount, updateCountStep } from "./countUtils"
 import {
   CommentsList,
   PreparationItem as FinalizationItem,
   PreparationItemProps,
 } from "./preparation"
-import Modal, { ModalActionProps } from "../../components/modal"
+import { generateCustomNotification } from "../core/notifications"
 /*
 
 
@@ -240,15 +244,19 @@ function DataPill(props: DataPillProps) {
 */
 function FinalizeCountConfirmation() {
   const theme = useTheme()
+  const dispatch = useAppDispatch()
 
   const isSubmittingFinalization = useCountStore(
     (state: any) => state.isSubmittingFinalization,
   )
 
   function handleAccept() {
-    // TODO: Function to prepare results for submission
-    // TODO: History reducer to add count info to history
+    submitCount()
+    updateCountStep("dashboard")
+    resetUseCount()
     handleClose()
+    dispatch(deleteCount())
+    generateCustomNotification("success", "Count submitted to History")
   }
 
   function handleClose() {
