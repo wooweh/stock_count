@@ -10,6 +10,7 @@ import coreReducer from "../features/core/coreSlice"
 import organisationReducer from "../features/organisation/organisationSlice"
 import stockReducer from "../features/stock/stockSlice"
 import countReducer from "../features/count/countSlice"
+import historyReducer from "../features/history/historySlice"
 import { persistReducer, persistStore } from "redux-persist"
 import storageSession from "redux-persist/lib/storage/session"
 import thunk from "redux-thunk"
@@ -26,6 +27,7 @@ const rootReducer = combineReducers({
   organisation: organisationReducer,
   stock: stockReducer,
   count: countReducer,
+  history: historyReducer,
 })
 
 const persistConfig = {

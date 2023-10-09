@@ -120,6 +120,11 @@ type SearchProps = SearchBarProps & {
   handleSelect: any
   handleIconClick: any
 }
+export type SearchListProps = {
+  id: string
+  name: string
+  description: string
+}
 function Search(props: SearchProps) {
   const theme = useTheme()
 

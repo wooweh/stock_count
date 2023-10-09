@@ -1,6 +1,6 @@
 import { Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
-import Grid from "@mui/material/Unstable_Grid2"
+import Grid from "@mui/material/Unstable_Grid2/Grid2"
 import { useNavigate } from "react-router-dom"
 import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"

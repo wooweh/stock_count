@@ -6,6 +6,10 @@ import {
   CountMetadataProps,
 } from "../count/countSlice"
 import { UpdateDB } from "../user/userSlice"
+import _ from "lodash"
+import { formatLongDate } from "../../common/utils"
+import { selectOrgMembers } from "../organisation/organisationSlice"
+import { SearchListProps } from "../../components/searchBar"
 /*
 
 
@@ -23,7 +27,7 @@ export type HistoryItemProps = {
 }
 export type HistoryItemResultsProps = CountMemberResultsProps
 export type HistoryItemCommentsProps = CountCommentsProps
-export type HistoryItemMetadataProps = CountMetadataProps
+export type HistoryItemMetadataProps = Required<CountMetadataProps>
 
 export type DeleteHistoryProps = UpdateDB
 export type DeleteHistoryItemProps = { uuid: string }
@@ -60,11 +64,34 @@ export const historySlice = createSlice({
   },
 })
 
-export const {
-  setHistory,
-  deleteHistory,
-  setHistoryItem,
-  deleteHistoryItem,
-} = historySlice.actions
+export const { setHistory, deleteHistory, setHistoryItem, deleteHistoryItem } =
+  historySlice.actions
+
+export const selectHistory = (state: RootState) => state.history.history
+export const selectHistoryList = createSelector(selectHistory, (history) =>
+  _.values(history),
+)
+export const selectHistorySearchList = createSelector(
+  [selectHistoryList, selectOrgMembers],
+  (historyList, members) => {
+    const searchList: SearchListProps[] = []
+    if (members) {
+      _.forEach(historyList, (historyItem) => {
+        const id = historyItem.uuid
+        const name = formatLongDate(
+          historyItem.metadata.countStartTime as string,
+        )
+        const organiser = members[historyItem.metadata.organiser]
+        const organiserName = `${organiser?.name} ${organiser?.surname}`
+        const description = `Organizer: ${organiserName}`
+        searchList.push({ id, name, description })
+      })
+    }
+    return searchList
+  },
+)
+export const selectHistoryIdList = createSelector(selectHistory, (history) =>
+  _.keys(history),
+)
 
 export default historySlice.reducer

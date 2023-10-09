@@ -3,6 +3,8 @@ import { useState } from "react"
 import useTheme from "../common/useTheme"
 import Icon, { IconNames } from "./icon"
 import { Stack, Typography } from "@mui/material"
+import MuiToggleButton from "@mui/material/ToggleButton"
+import MuiToggleButtonGroup from "@mui/material/ToggleButtonGroup"
 /*
 
 
@@ -373,6 +375,62 @@ export function NavigationButton(props: NavigationButtonProps) {
     >
       {buttonElements}
     </ButtonBase>
+  )
+}
+/*
+
+
+
+
+
+*/
+export type ToggleButtonGroupProps = {
+  options: ToggleButtonGroupOptionsProps[]
+}
+export type ToggleButtonGroupOptionsProps = {
+  label: string
+  iconName: IconNames
+  onClick: () => void
+}
+export function ToggleButtonGroup(props: ToggleButtonGroupProps) {
+  const theme = useTheme()
+  const [alignment, setAlignment] = useState(props.options[0].label)
+
+  const handleAlignment = (
+    event: React.MouseEvent<HTMLElement>,
+    newAlignment: string | null,
+  ) => {
+    if (newAlignment !== null) {
+      setAlignment(newAlignment)
+    }
+  }
+
+  return (
+    <Stack direction="row" width={"100%"}>
+      <MuiToggleButtonGroup
+        value={alignment}
+        onChange={handleAlignment}
+        exclusive
+        fullWidth
+      >
+        {props.options.map((option) => (
+          <MuiToggleButton
+            value={option.label}
+            onClick={option.onClick}
+            disableFocusRipple
+            disableTouchRipple
+            disableRipple
+            key={option.label}
+            sx={{
+              background: theme.scale.gray[7],
+              transition: "background 250ms",
+            }}
+          >
+            <Icon variation={option.iconName} fontSize="large" />
+          </MuiToggleButton>
+        ))}
+      </MuiToggleButtonGroup>
+    </Stack>
   )
 }
 /*

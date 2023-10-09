@@ -20,16 +20,6 @@ import { selectShowNotification } from "../features/core/coreSlice"
 
 
 */
-// TODO
-export function ItemManagementList() {
-  return <Stack>x</Stack>
-}
-/*
-
-
-
-
-*/
 export type ListProps = {
   children: any
   gapScale?: number

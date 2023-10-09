@@ -44,6 +44,7 @@ import {
   selectIsSystemBooting,
   setSystemStatus,
 } from "./coreSlice"
+import { HistoryProps, setHistory } from "../history/historySlice"
 /*
 
 
@@ -241,8 +242,20 @@ export function DBListeners() {
 
   useEffect(() => {
     if (!!localUser && isSystemActive) {
-      // TODO
+      const dbHistoryRef = ref(
+        dbReal,
+        getDBPath.history(localUser.orgUuid as string).history,
+      )
+      onValue(dbHistoryRef, (snapshot) => {
+        const dbHistory: HistoryProps = snapshot.val()
+        if (!!dbHistory) {
+          dispatch(setHistory(dbHistory))
+        } else if (dbHistory === null) {
+          dispatch(setHistory({}))
+        }
+      })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, localUser, isSystemActive, isJoined])
 
   return undefined

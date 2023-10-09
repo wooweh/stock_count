@@ -38,6 +38,23 @@ export default function GlobalStyles() {
         input[type="file"] {
           color: ${theme.scale.gray[4]};
         }
+        .MuiToggleButtonGroup-grouped {
+          box-shadow: ${theme.shadow.neo[4]};
+          outline: 1px solid ${theme.scale.gray[6]} !important;
+          outline-offset: -1px;
+          &:first-of-type {
+            border-radius: ${theme.module[3]} 0 0 ${theme.module[3]} !important;
+          }
+          &:last-of-type {
+            border-radius: 0 ${theme.module[3]} ${theme.module[3]} 0 !important;
+          }
+        }
+        .MuiToggleButton-root {
+          border: none !important;
+        }
+        .MuiToggleButton-root.Mui-selected {
+          background: ${theme.scale.blue[8]} !important;
+        }
         .MuiSwitch-root {
           overflow: visible !important;
           height: ${theme.module[5]} !important;

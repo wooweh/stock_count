@@ -5,6 +5,7 @@ import useTheme, { ThemeColors } from "../../common/useTheme"
 import { calculateDuration, formatLongDate } from "../../common/utils"
 import Icon, { IconNames } from "../../components/icon"
 import Modal, { ModalActionProps } from "../../components/modal"
+import { generateCustomNotification } from "../core/notifications"
 import {
   addUseCountFinalComment,
   editUseCountFinalComment,
@@ -27,7 +28,6 @@ import {
   PreparationItem as FinalizationItem,
   PreparationItemProps,
 } from "./preparation"
-import { generateCustomNotification } from "../core/notifications"
 /*
 
 
@@ -88,8 +88,6 @@ function FinalizationItems() {
 
 */
 function CountSummary() {
-  const theme = useTheme()
-
   const organiser = useAppSelector(selectOrganiser)
   const counters = useAppSelector(selectCountersList)
   const countType = useAppSelector(selectCountType)
@@ -103,7 +101,7 @@ function CountSummary() {
 
   const organiserFullName = `${organiser.name[0]}. ${organiser.surname}`
 
-  const countDataItems: CountDataLineItemProps[] = [
+  const dataItems: DataLineItemProps[] = [
     {
       label: "Date",
       iconName: "date",
@@ -142,8 +140,8 @@ function CountSummary() {
 
   return (
     <Stack width={"100%"} height={"100%"}>
-      {countDataItems.map((item: CountDataLineItemProps) => (
-        <CountDataLineItem
+      {dataItems.map((item: DataLineItemProps) => (
+        <DataLineItem
           label={item.label}
           iconName={item.iconName}
           data={item.data}
@@ -160,12 +158,12 @@ function CountSummary() {
 
 
 */
-type CountDataLineItemProps = {
+export type DataLineItemProps = {
   label: string
   iconName: IconNames
   data: any
 }
-function CountDataLineItem(props: CountDataLineItemProps) {
+export function DataLineItem(props: DataLineItemProps) {
   const theme = useTheme()
 
   return (
@@ -178,7 +176,7 @@ function CountDataLineItem(props: CountDataLineItemProps) {
       boxSizing={"border-box"}
     >
       <Icon variation={props.iconName} />
-      <Typography width={75} flexShrink={0}>
+      <Typography width={"50%"} flexShrink={1}>
         {props.label}
         {":"}
       </Typography>
@@ -207,7 +205,7 @@ type DataPillProps = {
   label: string
   color?: ThemeColors
 }
-function DataPill(props: DataPillProps) {
+export function DataPill(props: DataPillProps) {
   const theme = useTheme()
 
   return (
