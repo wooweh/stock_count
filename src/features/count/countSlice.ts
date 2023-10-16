@@ -26,11 +26,11 @@ export type CountProps = {
 }
 export type CountMetadataProps = {
   type?: CountTypes
-  prepStartTime?: string
-  countStartTime?: string
-  reviewStartTime?: string
-  finalizationStartTime?: string
-  finalSubmissionTime?: string
+  prepStartTime?: number
+  countStartTime?: number
+  reviewStartTime?: number
+  finalizationStartTime?: number
+  finalSubmissionTime?: number
   organiser: string
   counters: string[]
 }

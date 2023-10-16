@@ -366,25 +366,6 @@ export function prepareDualResultsTableRows(
   _.forIn(results, (value, key) => {
     const counterUuid = key
     _.forIn(value, (value: CountItemProps, key) => {
-      _.set(rowsObject, `${key}.id`, key)
-      _.set(rowsObject, `${key}.name`, stock[key].name)
-      _.set(rowsObject, `${key}.description`, stock[key].description)
-      _.set(
-        rowsObject,
-        `${key}.useable_${counterUuid}`,
-        formatCommaSeparatedNumber(value.useableCount),
-      )
-      _.set(
-        rowsObject,
-        `${key}.damaged_${counterUuid}`,
-        formatCommaSeparatedNumber(value.damagedCount),
-      )
-      _.set(
-        rowsObject,
-        `${key}.obsolete_${counterUuid}`,
-        formatCommaSeparatedNumber(value.obsoleteCount),
-      )
-
       const useableDiff = Math.abs(
         memberCountList[0][key].useableCount -
           memberCountList[1][key].useableCount,
@@ -397,22 +378,27 @@ export function prepareDualResultsTableRows(
         memberCountList[0][key].obsoleteCount -
           memberCountList[1][key].obsoleteCount,
       )
+      const setInstructions = {
+        [`${key}.id`]: key,
+        [`${key}.name`]: stock[key].name,
+        [`${key}.description`]: stock[key].description,
+        [`${key}.useable_${counterUuid}`]: formatCommaSeparatedNumber(
+          value.useableCount,
+        ),
+        [`${key}.damaged_${counterUuid}`]: formatCommaSeparatedNumber(
+          value.damagedCount,
+        ),
+        [`${key}.obsolete_${counterUuid}`]: formatCommaSeparatedNumber(
+          value.obsoleteCount,
+        ),
+        [`${key}.useable_diff`]: formatCommaSeparatedNumber(useableDiff),
+        [`${key}.damaged_diff`]: formatCommaSeparatedNumber(damagedDiff),
+        [`${key}.obsolete_diff`]: formatCommaSeparatedNumber(obsoleteDiff),
+      }
 
-      _.set(
-        rowsObject,
-        `${key}.useable_diff`,
-        formatCommaSeparatedNumber(useableDiff),
-      )
-      _.set(
-        rowsObject,
-        `${key}.damaged_diff`,
-        formatCommaSeparatedNumber(damagedDiff),
-      )
-      _.set(
-        rowsObject,
-        `${key}.obsolete_diff`,
-        formatCommaSeparatedNumber(obsoleteDiff),
-      )
+      _.forIn(setInstructions, (value, key) => {
+        _.set(rowsObject, key, value)
+      })
     })
   })
   return _.values(rowsObject)
@@ -598,7 +584,8 @@ export function prepareTeamResultsTableColumnGroups(): ColumnGroupData[] {
 */
 export function submitCount() {
   const results = store.getState().count.count.results
-  const metadata = store.getState().count.count.metadata
+  const metadata = store.getState().count.count
+    .metadata as HistoryItemMetadataProps
   const comments = store.getState().count.count.comments
   if (!!results && !!metadata && !!comments) {
     const finalResults = prepareFinalResults(results)

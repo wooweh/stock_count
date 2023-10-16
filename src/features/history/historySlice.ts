@@ -78,9 +78,7 @@ export const selectHistorySearchList = createSelector(
     if (members) {
       _.forEach(historyList, (historyItem) => {
         const id = historyItem.uuid
-        const name = formatLongDate(
-          historyItem.metadata.countStartTime as string,
-        )
+        const name = formatLongDate(historyItem.metadata.countStartTime)
         const organiser = members[historyItem.metadata.organiser]
         const organiserName = `${organiser?.name} ${organiser?.surname}`
         const description = `Organizer: ${organiserName}`

@@ -58,12 +58,6 @@ export const routes = [
     element: <History />,
   },
   {
-    name: "Analysis",
-    path: "/analysis",
-    requiresAuth: true,
-    element: <div>Analysis</div>,
-  },
-  {
     name: "Organisation",
     path: "/organisation",
     requiresAuth: true,

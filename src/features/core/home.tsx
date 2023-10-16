@@ -122,7 +122,6 @@ function HomeButtons() {
     { label: "Count", icon: "list", path: routePaths.count.path },
     { label: "Stock", icon: "stock", path: routePaths.stock.path },
     { label: "History", icon: "history", path: routePaths.history.path },
-    { label: "Analysis", icon: "timeline", path: routePaths.analysis.path },
   ]
   const memberButtons = [adminButtons[0]]
 

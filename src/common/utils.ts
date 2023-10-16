@@ -19,8 +19,8 @@ export function formatCommaSeparatedNumber(number: number) {
 
 
 */
-export function formatLongDate(dateString: string) {
-  const date = new Date(parseInt(dateString))
+export function formatLongDate(timeStamp: number) {
+  const date = new Date(Number(timeStamp))
   const formattedDate = date.toLocaleDateString("en-GB", {
     day: "2-digit",
     month: "short",
@@ -36,7 +36,7 @@ export function formatLongDate(dateString: string) {
 
 */
 export function getTimeStamp() {
-  return Date.now().toString()
+  return Date.now()
 }
 /*
 
@@ -46,18 +46,29 @@ export function getTimeStamp() {
 
 */
 export function calculateDuration(
-  startTimestampString: string,
-  endTimestampString: string,
+  startTimestamp: number,
+  endTimestamp: number,
 ) {
-  const startTimestamp = parseInt(startTimestampString)
-  const endTimestamp = parseInt(endTimestampString)
-
   const durationInMs = endTimestamp - startTimestamp
 
+  return durationInMs
+}
+/*
+
+
+
+
+
+*/
+export function formatDuration(durationInMs: number) {
   const hours = Math.floor(durationInMs / (1000 * 60 * 60))
   const minutes = Math.floor((durationInMs % (1000 * 60 * 60)) / (1000 * 60))
 
-  return `${hours}h ${minutes}m`
+  if (!hours) {
+    return `${minutes} min`
+  } else {
+    return `${hours}h ${minutes}m`
+  }
 }
 /*
 

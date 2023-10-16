@@ -2,7 +2,11 @@ import { Stack, Typography } from "@mui/material"
 import _ from "lodash"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import useTheme, { ThemeColors } from "../../common/useTheme"
-import { calculateDuration, formatLongDate } from "../../common/utils"
+import {
+  calculateDuration,
+  formatDuration,
+  formatLongDate,
+} from "../../common/utils"
 import Icon, { IconNames } from "../../components/icon"
 import Modal, { ModalActionProps } from "../../components/modal"
 import { generateCustomNotification } from "../core/notifications"
@@ -91,14 +95,16 @@ function CountSummary() {
   const organiser = useAppSelector(selectOrganiser)
   const counters = useAppSelector(selectCountersList)
   const countType = useAppSelector(selectCountType)
-  const metadata = useAppSelector(selectCountMetadata) as CountMetadataProps
+  const metadata = useAppSelector(
+    selectCountMetadata,
+  ) as Required<CountMetadataProps>
 
-  const countDate = formatLongDate(metadata.finalizationStartTime as string)
+  const countDate = formatLongDate(metadata.finalizationStartTime)
   const countDuration = calculateDuration(
-    metadata.countStartTime as string,
-    metadata.finalizationStartTime as string,
+    metadata.countStartTime,
+    metadata.finalizationStartTime,
   )
-
+  const durationLabel = formatDuration(countDuration)
   const organiserFullName = `${organiser.name[0]}. ${organiser.surname}`
 
   const dataItems: DataLineItemProps[] = [
@@ -115,7 +121,7 @@ function CountSummary() {
     {
       label: "Duration",
       iconName: "time",
-      data: <DataPill label={countDuration} color={"green"} />,
+      data: <DataPill label={durationLabel} color={"green"} />,
     },
     {
       label: "Organiser",

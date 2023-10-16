@@ -188,6 +188,10 @@ function ModalButton(props: ButtonVariationProps) {
     width: "100%",
     padding: theme.module[3],
     color: props.color ?? theme.scale.gray[4],
+    outline: `1px solid ${
+      props.outlineColor ?? theme.scale.gray[7]
+    } !important`,
+    outlineOffset: "-1px",
     background: props.bgColor ?? theme.scale.gray[8],
     borderRadius: theme.module[3],
     boxShadow: theme.shadow.neo[props.boxShadowScale ?? 3],
