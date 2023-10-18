@@ -32,33 +32,30 @@ export const coreSlice = createSlice({
     setSystemStatus: (state, action: PayloadAction<SystemStatusProps>) => {
       state.systemStatus = action.payload
     },
-    resetSystem: (state) => {
-      state.systemStatus = "notBooted"
-    },
     toggleIsDarkmode: (state) => {
       state.isDarkmode = !state.isDarkmode
     },
     toggleIsMobile: (state) => {
       state.isMobile = !state.isMobile
     },
-    showNotification: (state, action: PayloadAction<NotificationProps>) => {
-      state.showNotification = true
-      state.notificaiton = action.payload
+    setShowNotification: (state, action: PayloadAction<boolean>) => {
+      state.showNotification = action.payload
     },
-    hideNotification: (state) => {
-      state.showNotification = false
-      state.notificaiton = undefined
+    setNotification: (
+      state,
+      action: PayloadAction<NotificationProps | undefined>,
+    ) => {
+      state.notificaiton = action.payload
     },
   },
 })
 
 export const {
   setSystemStatus,
-  resetSystem,
   toggleIsDarkmode,
   toggleIsMobile,
-  showNotification,
-  hideNotification,
+  setShowNotification,
+  setNotification,
 } = coreSlice.actions
 
 export const selectIsMobile = (state: RootState) => state.core.isMobile

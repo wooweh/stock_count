@@ -9,7 +9,7 @@ import Icon from "../../components/icon"
 import { ListItem } from "../../components/listItem"
 import { List } from "../../components/list"
 import Modal, { ModalActionProps } from "../../components/modal"
-import { generateCustomNotification } from "../core/notifications"
+import { generateCustomNotification } from "../core/coreUtils"
 import { MemberProps } from "../organisation/organisationSlice"
 import {
   addUseCountSelectedMemberUuid,

@@ -16,7 +16,7 @@ import {
 import { List } from "../../components/list"
 import Modal from "../../components/modal"
 import { ProfileSurface } from "../../components/profileSurface"
-import { generateNotification } from "../core/notifications"
+import { generateNotification } from "../core/coreUtils"
 import { selectIsUserAdmin } from "../user/userSlice"
 import { setUseOrg, useOrgStore } from "./organisation"
 import {

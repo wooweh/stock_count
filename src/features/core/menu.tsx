@@ -9,7 +9,8 @@ import { Switch } from "../../components/control"
 import Icon, { IconNames } from "../../components/icon"
 import { ListItem } from "../../components/listItem"
 import { signOut } from "../user/userSlice"
-import { selectIsDarkmode, toggleIsDarkmode } from "./coreSlice"
+import { selectIsDarkmode } from "./coreSlice"
+import { toggleDarkmode } from "./coreSliceUtils"
 import { routePaths } from "./pages"
 /*
 
@@ -27,8 +28,10 @@ export function Menu() {
   const theme = useTheme()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
-  const [anchorEl, setAnchorEl] = useState(null)
+
   const isDarkmode = useAppSelector(selectIsDarkmode)
+
+  const [anchorEl, setAnchorEl] = useState(null)
 
   function handleOpenMenu(e: any) {
     setAnchorEl(e.currentTarget)
@@ -52,7 +55,7 @@ export function Menu() {
     {
       label: "Darkmode",
       iconName: "colorTheme",
-      onChange: () => dispatch(toggleIsDarkmode()),
+      onChange: () => toggleDarkmode(),
     },
     {
       label: "Organisation",
@@ -70,10 +73,8 @@ export function Menu() {
       onChange: handleSignOut,
     },
   ]
-
   const origin: PopoverOrigin = { vertical: "top", horizontal: "left" }
   const open = Boolean(anchorEl)
-
   const buttonStyles = {
     borderRadius: theme.module[5],
     padding: theme.module[2],

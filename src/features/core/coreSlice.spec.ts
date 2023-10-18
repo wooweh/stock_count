@@ -1,15 +1,19 @@
+import { describe, expect, it } from "vitest"
 import coreReducer, {
   CoreState,
   NotificationProps,
-  hideNotification,
-  resetSystem,
+  setNotification,
+  setShowNotification,
   setSystemStatus,
-  showNotification,
   toggleIsDarkmode,
   toggleIsMobile,
 } from "./coreSlice"
-import { v4 as uuidv4 } from "uuid"
+/*
 
+
+
+
+*/
 describe("core reducer", () => {
   const initialState: CoreState = {
     systemStatus: "notBooted",
@@ -18,6 +22,7 @@ describe("core reducer", () => {
     showNotification: false,
     notificaiton: undefined,
   }
+
   it("should handle initial state", () => {
     expect(coreReducer(undefined, { type: "unknown" })).toEqual({
       systemStatus: "notBooted",
@@ -33,11 +38,6 @@ describe("core reducer", () => {
     expect(actual.systemStatus).toEqual("isBooted")
   })
 
-  it("should handle resetSystem", () => {
-    const actual = coreReducer(initialState, resetSystem())
-    expect(actual.systemStatus).toEqual("notBooted")
-  })
-
   it("should handle toggleIsDarkmode", () => {
     const actual = coreReducer(initialState, toggleIsDarkmode())
     expect(actual.isDarkmode).toEqual(false)
@@ -48,20 +48,18 @@ describe("core reducer", () => {
     expect(actual.isMobile).toEqual(true)
   })
 
-  it("should handle showNotification", () => {
+  it("should handle setShowNotification", () => {
+    const actual = coreReducer(initialState, setShowNotification(true))
+    expect(actual.showNotification).toEqual(true)
+  })
+
+  it("should handle setNotification", () => {
     const mockNotification: NotificationProps = {
-      uuid: uuidv4(),
+      uuid: "mockUuid",
       type: "success",
       message: "hi",
     }
-    const actual = coreReducer(initialState, showNotification(mockNotification))
-    expect(actual.showNotification).toEqual(true)
+    const actual = coreReducer(initialState, setNotification(mockNotification))
     expect(actual.notificaiton?.message).toEqual(mockNotification.message)
-  })
-
-  it("should handle hideNotification", () => {
-    const actual = coreReducer(initialState, hideNotification())
-    expect(actual.showNotification).toEqual(false)
-    expect(actual.notificaiton).toEqual(undefined)
   })
 })

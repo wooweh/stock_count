@@ -9,7 +9,7 @@ import {
 } from "../../common/utils"
 import Icon, { IconNames } from "../../components/icon"
 import Modal, { ModalActionProps } from "../../components/modal"
-import { generateCustomNotification } from "../core/notifications"
+import { generateCustomNotification } from "../core/coreUtils"
 import {
   addUseCountFinalComment,
   editUseCountFinalComment,

@@ -45,6 +45,7 @@ import {
   setSystemStatus,
 } from "./coreSlice"
 import { HistoryProps, setHistory } from "../history/historySlice"
+import { setSystemIsBooted } from "./coreSliceUtils"
 /*
 
 
@@ -58,24 +59,19 @@ export function DBListeners() {
   const isSystemBooting = useAppSelector(selectIsSystemBooting)
   const localUser = useAppSelector(selectUser)
   const localOrg = useAppSelector(selectOrg)
-  const localStock = useAppSelector(selectStock)
-  const localCountChecks = useAppSelector(selectCountChecks)
-  const localCountComments = useAppSelector(selectCountComments)
   const localCountMembers = useAppSelector(selectCountMembers)
   const localCountMetadata = useAppSelector(selectCountMetadata)
-  const localCountResults = useAppSelector(selectCountResults)
-  const localUserCountStep = useAppSelector(selectUserCountMemberStep)
   const isJoined = useAppSelector(selectIsJoined)
   const isLocalUserOrgDetails = useAppSelector(selectIsLocalUserOrgDetails)
 
   useEffect(() => {
     if (isSystemBooting && localUser.orgUuid && localOrg.uuid) {
-      dispatch(setSystemStatus("isBooted"))
+      setSystemIsBooted()
     }
     if (isSystemBooting && !localUser.orgUuid) {
-      dispatch(setSystemStatus("isBooted"))
+      setSystemIsBooted()
     }
-  }, [isSystemBooting, dispatch, localUser, localOrg])
+  }, [isSystemBooting, localUser, localOrg])
 
   // USER LISTENER
 

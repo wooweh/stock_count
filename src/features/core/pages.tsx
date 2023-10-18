@@ -1,8 +1,7 @@
-import _ from "lodash"
-import { useEffect } from "react"
+import { ReactElement, useEffect } from "react"
 import { useResizeDetector } from "react-resize-detector"
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom"
-import { useAppDispatch, useAppSelector } from "../../app/hooks"
+import { useAppSelector } from "../../app/hooks"
 import Container from "../../components/container"
 import { Count, resetUseCount } from "../count/count"
 import { selectIsUserCounting } from "../count/countSlice"
@@ -11,7 +10,8 @@ import { Organisation, resetUseOrg } from "../organisation/organisation"
 import { Stock, resetUseStock } from "../stock/stock"
 import { Authentication, WithAuth, resetUseAuth } from "../user/authentication"
 import { UserProfile, resetUseUser } from "../user/user"
-import { selectIsMobile, toggleIsMobile } from "./coreSlice"
+import { toggleMobile } from "./coreSliceUtils"
+import { getRoutePaths } from "./coreUtils"
 import { Home } from "./home"
 /*
 
@@ -20,7 +20,13 @@ import { Home } from "./home"
 
 
 */
-export const routes = [
+export type Routes = {
+  name: string
+  path: string
+  requiresAuth: boolean
+  element: ReactElement
+}[]
+export const routes: Routes = [
   {
     name: "Sign in",
     path: "/sign_in",
@@ -77,37 +83,7 @@ export const routes = [
 
 
 */
-function getRoutePaths() {
-  const result: any = {}
-
-  routes.forEach((obj: any) => {
-    const { name, path } = obj
-    const keyName = _.replace(
-      name.toLowerCase(),
-      / ([a-z])/g,
-      (match: any, char: string) => char.toUpperCase(),
-    )
-    result[keyName] = { name: name, path: path }
-  })
-  return result
-}
-export const routePaths = getRoutePaths()
-/*
-
-
-
-
-
-*/
-function updateMobile(
-  dispatch: Function,
-  width: number | undefined,
-  isMobile: boolean,
-) {
-  const mobileWidth = 1000
-  if (width && width < mobileWidth && !isMobile) dispatch(toggleIsMobile())
-  if (width && width > mobileWidth && isMobile) dispatch(toggleIsMobile())
-}
+export const routePaths = getRoutePaths(routes)
 /*
 
 
@@ -116,17 +92,17 @@ function updateMobile(
 
 */
 export function Pages() {
-  const dispatch = useAppDispatch()
-  const isMobile = useAppSelector(selectIsMobile)
-  const isUserCounting = useAppSelector(selectIsUserCounting)
-  const { width, ref } = useResizeDetector()
   const location = useLocation()
   const navigate = useNavigate()
+  const { width, ref } = useResizeDetector()
+
+  const isUserCounting = useAppSelector(selectIsUserCounting)
+
   const path = location.pathname
 
   useEffect(() => {
-    updateMobile(dispatch, width, isMobile)
-  }, [width, isMobile, dispatch])
+    if (!!width) toggleMobile(width)
+  }, [width])
 
   useEffect(() => {
     const isAuthPath = path === routePaths.signIn.path

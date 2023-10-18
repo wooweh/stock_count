@@ -1,7 +1,7 @@
 import { Stack, Typography } from "@mui/material"
 import _ from "lodash"
 import { useLocation, useNavigate } from "react-router-dom"
-import { useAppDispatch, useAppSelector } from "../../app/hooks"
+import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { Button } from "../../components/button"
 import { selectIsUserCounting } from "../count/countSlice"
@@ -17,6 +17,7 @@ import { routePaths, routes } from "./pages"
 */
 export function Bar() {
   const theme = useTheme()
+
   const isSystemBooted = useAppSelector(selectIsSystemBooted)
   const isUserCounting = useAppSelector(selectIsUserCounting)
 
@@ -49,15 +50,14 @@ export function Bar() {
 */
 function NavigationBar() {
   const theme = useTheme()
-  const dispatch = useAppDispatch()
   const location = useLocation()
-  const locationName = _.find(routes, { path: location.pathname })?.name
   const navigate = useNavigate()
 
   function handleClick() {
     navigate(routePaths.home.path)
-    // dispatch(deleteCount())
   }
+
+  const locationName = _.find(routes, { path: location.pathname })?.name
 
   return (
     <>

@@ -18,7 +18,7 @@ import { Home } from "../core/home"
 import {
   generateErrorNotification,
   generateNotification,
-} from "../core/notifications"
+} from "../core/coreUtils"
 import { routePaths } from "../core/pages"
 import {
   registerUserOnAuth,

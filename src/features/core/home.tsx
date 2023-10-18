@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom"
 import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { Button } from "../../components/button"
-import Icon, { IconNames } from "../../components/icon"
+import { IconNames } from "../../components/icon"
 import { selectIsOrgSetup } from "../organisation/organisationSlice"
 import { selectIsProfileComplete, selectIsUserAdmin } from "../user/userSlice"
 import { routePaths } from "./pages"
@@ -76,6 +76,7 @@ export function CompleteProfilePrompt() {
 function OrgSetupPrompt() {
   const theme = useTheme()
   const navigate = useNavigate()
+
   return (
     <Stack
       gap={theme.module[5]}
@@ -116,6 +117,7 @@ type HomeButton = {
 function HomeButtons() {
   const theme = useTheme()
   const navigate = useNavigate()
+
   const isAdmin = useAppSelector(selectIsUserAdmin)
 
   const adminButtons: HomeButton[] = [
@@ -124,7 +126,6 @@ function HomeButtons() {
     { label: "History", icon: "history", path: routePaths.history.path },
   ]
   const memberButtons = [adminButtons[0]]
-
   const buttons = isAdmin ? adminButtons : memberButtons
 
   return (

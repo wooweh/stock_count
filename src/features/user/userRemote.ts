@@ -17,7 +17,7 @@ import { getDBPath } from "../../remote/dbPaths"
 import {
   generateErrorNotification,
   generateNotification,
-} from "../core/notifications"
+} from "../core/coreUtils"
 import { UserOrgRoles, UserProps, signIn } from "./userSlice"
 /*
 

@@ -3,6 +3,10 @@ import { setUser } from "../features/user/userSlice"
 import { auth } from "../remote"
 import { getUserFromDB, setNewUserOnDB } from "../features/user/userRemote"
 import { store } from "./store"
+import {
+  setSystemIsBooting,
+  setSystemNotBooted,
+} from "../features/core/coreSliceUtils"
 /*
 
 
@@ -14,7 +18,7 @@ import { store } from "./store"
 */
 export async function syncUserDetails() {
   const authUser = auth.currentUser
-  const isSystemBooted = store.getState().core.isSystemBooted
+  const isSystemBooted = store.getState().core.systemStatus === "isBooted"
 
   if (!!authUser && !isSystemBooted) {
     const newUser = {
@@ -34,11 +38,11 @@ export async function syncUserDetails() {
         }
       })
       .then(() => {
-        store.dispatch(setSystemStatus("isBooting"))
+        setSystemIsBooting()
         console.log("System booting")
       })
       .catch((error) => {
-        store.dispatch(setSystemStatus("notBooted"))
+        setSystemNotBooted()
         console.log("System booting stopped")
         console.error(error)
       })

@@ -10,7 +10,7 @@ import { Input } from "../../components/control"
 import { Loader } from "../../components/loader"
 import Modal from "../../components/modal"
 import { ProfileSurface } from "../../components/profileSurface"
-import { generateNotification } from "../core/notifications"
+import { generateNotification } from "../core/coreUtils"
 import {
   PasswordValidationCheck,
   getPasswordValidation,

@@ -1,10 +1,13 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit"
 import { User, signOut as signOutAuth } from "firebase/auth"
-import { resetSystem, setSystemStatus } from "../features/core/coreSlice"
+import {
+  resetSystem,
+  setSystemNotBooted,
+} from "../features/core/coreSliceUtils"
 import {
   generateErrorNotification,
   generateNotification,
-} from "../features/core/notifications"
+} from "../features/core/coreUtils"
 import {
   deleteCount,
   deleteCountMember,
@@ -30,6 +33,16 @@ import {
   setCountResultsItemOnDB,
 } from "../features/count/countSliceRemote"
 import { updateUserCountMember } from "../features/count/countUtils"
+import {
+  deleteHistory,
+  deleteHistoryItem,
+  setHistoryItem,
+} from "../features/history/historySlice"
+import {
+  deleteHistoryItemOnDB,
+  deleteHistoryOnDB,
+  setHistoryItemOnDB,
+} from "../features/history/historySliceRemote"
 import {
   createOrgInviteOnDB,
   deleteAllOrgInvitesOnDB,
@@ -67,7 +80,6 @@ import {
   setStockOnDB,
 } from "../features/stock/stockRemote"
 import {
-  addStockList,
   deleteStock,
   deleteStockItem,
   setStock,
@@ -99,17 +111,6 @@ import {
 import { auth } from "../remote"
 import { syncUserDetails } from "./helpers"
 import { store } from "./store"
-import {
-  deleteHistory,
-  deleteHistoryItem,
-  setHistory,
-  setHistoryItem,
-} from "../features/history/historySlice"
-import {
-  deleteHistoryItemOnDB,
-  deleteHistoryOnDB,
-  setHistoryItemOnDB,
-} from "../features/history/historySliceRemote"
 /*
 
 
@@ -118,29 +119,6 @@ import {
 
 */
 export const listenerMiddleware = createListenerMiddleware()
-listenerMiddleware.startListening({
-  actionCreator: resetSystem,
-  effect: async () => {
-    console.log("Reset user in userSlice")
-    console.log("Reset org in orgSlice")
-    console.log("Reset stock in stockSlice")
-    store.dispatch(setSystemStatus("notBooted"))
-    store.dispatch(setMemberStatus("notJoined"))
-    // TODO: Reset util for each slice using delete reducers
-    store.dispatch(setUser({}))
-    store.dispatch(setOrg({}))
-    store.dispatch(setStock({ stock: {}, updateDB: false }))
-    store.dispatch(setCount({}))
-    // TODO: History
-  },
-})
-/*
-
-
-
-
-
-*/
 listenerMiddleware.startListening({
   actionCreator: signIn,
   effect: async () => {
@@ -157,7 +135,7 @@ listenerMiddleware.startListening({
 listenerMiddleware.startListening({
   actionCreator: signOut,
   effect: async () => {
-    signOutAuth(auth).then(() => store.dispatch(resetSystem()))
+    signOutAuth(auth).then(() => resetSystem())
   },
 })
 /*
