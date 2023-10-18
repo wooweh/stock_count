@@ -3,6 +3,7 @@ import { setCount } from "../count/countSlice"
 import { setMemberStatus, setOrg } from "../organisation/organisationSlice"
 import { setStock } from "../stock/stockSlice"
 import { setUser } from "../user/userSlice"
+import { resetUser } from "../user/userSliceUtils"
 import {
   NotificationProps,
   setNotification,
@@ -85,7 +86,7 @@ export function showNotification(notificaiton: NotificationProps) {
 export function resetSystem() {
   setSystemNotBooted()
   store.dispatch(setMemberStatus("notJoined"))
-  store.dispatch(setUser({}))
+  resetUser()
   store.dispatch(setOrg({}))
   store.dispatch(setStock({ stock: {}, updateDB: false }))
   store.dispatch(setCount({}))

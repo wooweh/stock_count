@@ -11,12 +11,8 @@ import {
   CountMetadataProps,
   CountResultsProps,
   deleteCount,
-  selectCountChecks,
-  selectCountComments,
   selectCountMembers,
   selectCountMetadata,
-  selectCountResults,
-  selectUserCountMemberStep,
   setCountChecks,
   setCountComments,
   setCountMembers,
@@ -24,6 +20,7 @@ import {
   setCountResults,
 } from "../count/countSlice"
 import { updateCountStep } from "../count/countUtils"
+import { HistoryProps, setHistory } from "../history/historySlice"
 import {
   OrgProps,
   leaveOrg,
@@ -32,19 +29,14 @@ import {
   setMemberStatus,
   setOrg,
 } from "../organisation/organisationSlice"
-import { StockProps, selectStock, setStock } from "../stock/stockSlice"
+import { StockProps, setStock } from "../stock/stockSlice"
 import {
   UserProps,
   selectIsLocalUserOrgDetails,
   selectUser,
-  setUser,
 } from "../user/userSlice"
-import {
-  selectIsSystemActive,
-  selectIsSystemBooting,
-  setSystemStatus,
-} from "./coreSlice"
-import { HistoryProps, setHistory } from "../history/historySlice"
+import { updateUser } from "../user/userSliceUtils"
+import { selectIsSystemActive, selectIsSystemBooting } from "./coreSlice"
 import { setSystemIsBooted } from "./coreSliceUtils"
 /*
 
@@ -65,10 +57,10 @@ export function DBListeners() {
   const isLocalUserOrgDetails = useAppSelector(selectIsLocalUserOrgDetails)
 
   useEffect(() => {
-    if (isSystemBooting && localUser.orgUuid && localOrg.uuid) {
+    if (isSystemBooting && localUser.org?.uuid && localOrg.uuid) {
       setSystemIsBooted()
     }
-    if (isSystemBooting && !localUser.orgUuid) {
+    if (isSystemBooting && !localUser.org?.uuid) {
       setSystemIsBooted()
     }
   }, [isSystemBooting, localUser, localOrg])
@@ -84,7 +76,7 @@ export function DBListeners() {
       onValue(dbUserRef, (snapshot) => {
         const dbUser: UserProps = snapshot.val()
         if (!_.isEqual(localUser, dbUser)) {
-          dispatch(setUser(dbUser))
+          updateUser(dbUser)
         }
       })
     }
@@ -97,7 +89,7 @@ export function DBListeners() {
     if (!!localUser && isSystemActive) {
       const dbOrgRef = ref(
         dbReal,
-        getDBPath.org(localUser.orgUuid as string).org,
+        getDBPath.org(localUser.org?.uuid as string).org,
       )
       onValue(dbOrgRef, (snapshot) => {
         const dbOrg: OrgProps = snapshot.val()
@@ -127,7 +119,7 @@ export function DBListeners() {
     if (!!localUser && isSystemActive) {
       const dbStockRef = ref(
         dbReal,
-        getDBPath.stock(localUser.orgUuid as string).stock,
+        getDBPath.stock(localUser.org?.uuid as string).stock,
       )
       onValue(dbStockRef, (snapshot) => {
         const dbStock: StockProps = snapshot.val()
@@ -145,7 +137,7 @@ export function DBListeners() {
     if (!!localUser && isSystemActive) {
       const dbCountChecksRef = ref(
         dbReal,
-        getDBPath.count(localUser.orgUuid as string).checks,
+        getDBPath.count(localUser.org?.uuid as string).checks,
       )
       onValue(dbCountChecksRef, (snapshot) => {
         const dbCountChecks: CountCheckProps[] = snapshot.val()
@@ -161,7 +153,7 @@ export function DBListeners() {
     if (!!localUser && isSystemActive) {
       const dbCountCommentsRef = ref(
         dbReal,
-        getDBPath.count(localUser.orgUuid as string).comments,
+        getDBPath.count(localUser.org?.uuid as string).comments,
       )
       onValue(dbCountCommentsRef, (snapshot) => {
         const dbCountComments: CountCommentsProps = snapshot.val()
@@ -179,7 +171,7 @@ export function DBListeners() {
     if (!!localUser && isSystemActive) {
       const dbCountMembersRef = ref(
         dbReal,
-        getDBPath.count(localUser.orgUuid as string).members,
+        getDBPath.count(localUser.org?.uuid as string).members,
       )
       onValue(dbCountMembersRef, (snapshot) => {
         const dbCountMembers: CountMembersProps = snapshot.val()
@@ -200,7 +192,7 @@ export function DBListeners() {
     if (!!localUser && isSystemActive) {
       const dbCountMetadataRef = ref(
         dbReal,
-        getDBPath.count(localUser.orgUuid as string).metadata,
+        getDBPath.count(localUser.org?.uuid as string).metadata,
       )
       onValue(dbCountMetadataRef, (snapshot) => {
         const dbCountMetadata: CountMetadataProps = snapshot.val()
@@ -220,7 +212,7 @@ export function DBListeners() {
     if (!!localUser && isSystemActive) {
       const dbCountResultsRef = ref(
         dbReal,
-        getDBPath.count(localUser.orgUuid as string).results,
+        getDBPath.count(localUser.org?.uuid as string).results,
       )
       onValue(dbCountResultsRef, (snapshot) => {
         const dbCountResults: CountResultsProps = snapshot.val()
@@ -240,7 +232,7 @@ export function DBListeners() {
     if (!!localUser && isSystemActive) {
       const dbHistoryRef = ref(
         dbReal,
-        getDBPath.history(localUser.orgUuid as string).history,
+        getDBPath.history(localUser.org?.uuid as string).history,
       )
       onValue(dbHistoryRef, (snapshot) => {
         const dbHistory: HistoryProps = snapshot.val()

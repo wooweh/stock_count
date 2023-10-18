@@ -120,8 +120,8 @@ function CreateOrg() {
         uuid: uuidv4(),
         members: {
           [user.uuid as string]: {
-            name: user.name ?? "name",
-            surname: user.surname ?? "surname",
+            name: user.name?.first ?? "name",
+            surname: user.name?.last ?? "surname",
             role: "admin",
             uuid: user.uuid as string,
           },

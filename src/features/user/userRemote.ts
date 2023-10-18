@@ -2,11 +2,10 @@ import {
   EmailAuthProvider,
   User,
   createUserWithEmailAndPassword,
-  deleteUser,
+  deleteUser as deleteUserOnAuth,
   reauthenticateWithCredential,
   sendEmailVerification,
   sendPasswordResetEmail,
-  signInWithEmailAndPassword,
   updateEmail,
   updatePassword,
 } from "firebase/auth"
@@ -18,50 +17,7 @@ import {
   generateErrorNotification,
   generateNotification,
 } from "../core/coreUtils"
-import { UserOrgRoles, UserProps, signIn } from "./userSlice"
-/*
-
-
-
-
-
-
-
-*/
-export async function setUserEmailOnAuth(email: string) {
-  const authUser = auth.currentUser
-  if (!!authUser) {
-    updateEmail(authUser, email).catch((error) => {
-      console.log(error)
-    })
-  }
-}
-/*
-
-
-
-
-
-*/
-export async function deleteUserOnAuth() {
-  const authUser = auth.currentUser
-  console.log(authUser)
-  if (!!authUser) {
-    deleteUser(authUser).catch((error) => {
-      console.log(error)
-    })
-  }
-}
-/*
-
-
-
-
-
-*/
-export async function updateUserPassword(user: User, newPassword: string) {
-  return updatePassword(user, newPassword)
-}
+import { UserNameProps, UserOrgProps, UserProps } from "./userSlice"
 /*
 
 
@@ -121,22 +77,6 @@ export async function registerUserOnAuth(email: string, password: string) {
 
 
 */
-export async function signInUserOnAuth(email: string, password: string) {
-  return signInWithEmailAndPassword(auth, email, password).then(
-    (userCredential) => {
-      if (!!userCredential.user) {
-        store.dispatch(signIn())
-      }
-    },
-  )
-}
-/*
-
-
-
-
-
-*/
 export async function getUserFromDB() {
   const authUser = auth.currentUser
   const userUuid = authUser?.uid as string
@@ -174,17 +114,12 @@ export async function setNewUserOnDB() {
 
 
 */
-export async function setUserFullNameOnDB(name: string, surname: string) {
+export async function setUserNameOnDB(name: UserNameProps) {
   const userUuid = store.getState().user.user.uuid
   if (!!userUuid) {
     set(ref(dbReal, getDBPath.user(userUuid).name), name).catch((error) => {
       console.log(error)
     })
-    set(ref(dbReal, getDBPath.user(userUuid).surname), surname).catch(
-      (error) => {
-        console.log(error)
-      },
-    )
   }
 }
 /*
@@ -209,22 +144,12 @@ export async function setUserEmailOnDB(email: string) {
 
 
 */
-export async function setUserOrgDetailsOnDB(
-  orgUuid: string,
-  orgRole: UserOrgRoles,
-) {
+export async function setUserOrgDetailsOnDB(details: UserOrgProps) {
   const userUuid = store.getState().user.user.uuid
   if (!!userUuid) {
-    set(ref(dbReal, getDBPath.user(userUuid).orgUuid), orgUuid).catch(
-      (error) => {
-        console.log(error)
-      },
-    )
-    set(ref(dbReal, getDBPath.user(userUuid).orgRole), orgRole).catch(
-      (error) => {
-        console.log(error)
-      },
-    )
+    set(ref(dbReal, getDBPath.user(userUuid).org), details).catch((error) => {
+      console.log(error)
+    })
   }
 }
 /*
@@ -234,11 +159,8 @@ export async function setUserOrgDetailsOnDB(
 
 
 */
-export async function deleteUserOrgDetailsOnDB(userUuid: string) {
-  remove(ref(dbReal, getDBPath.user(userUuid).orgRole)).catch((error) =>
-    console.log(error),
-  )
-  remove(ref(dbReal, getDBPath.user(userUuid).orgUuid)).catch((error) =>
+export async function deleteUserOrgDetailsOnDB(uuid: string) {
+  remove(ref(dbReal, getDBPath.user(uuid).org)).catch((error) =>
     console.log(error),
   )
 }
@@ -249,13 +171,10 @@ export async function deleteUserOrgDetailsOnDB(userUuid: string) {
 
 
 */
-export async function deleteUserOnDB() {
-  const userUuid = auth.currentUser?.uid
-  if (!!userUuid) {
-    remove(ref(dbReal, getDBPath.user(userUuid).user)).catch((error) =>
-      console.log(error),
-    )
-  }
+export async function deleteUserOnDB(uuid: string) {
+  remove(ref(dbReal, getDBPath.user(uuid).user)).catch((error) =>
+    console.log(error),
+  )
 }
 /*
 

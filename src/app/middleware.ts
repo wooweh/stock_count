@@ -1,18 +1,10 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit"
-import { User, signOut as signOutAuth } from "firebase/auth"
-import {
-  resetSystem,
-  setSystemNotBooted,
-} from "../features/core/coreSliceUtils"
-import {
-  generateErrorNotification,
-  generateNotification,
-} from "../features/core/coreUtils"
+import { resetSystem } from "../features/core/coreSliceUtils"
+import { generateNotification } from "../features/core/coreUtils"
 import {
   deleteCount,
   deleteCountMember,
   deleteCountResultsItem,
-  setCount,
   setCountChecks,
   setCountComments,
   setCountMember,
@@ -58,6 +50,7 @@ import {
   setOrgNameOnDB,
 } from "../features/organisation/organisationRemote"
 import {
+  MemberProps,
   OrgProps,
   createInvite,
   createOrg,
@@ -86,28 +79,26 @@ import {
   setStockItem,
 } from "../features/stock/stockSlice"
 import {
-  deleteUserOnAuth,
   deleteUserOnDB,
   deleteUserOrgDetailsOnDB,
-  reauthenticateUser,
-  setUserEmailOnAuth,
+  setNewUserOnDB,
   setUserEmailOnDB,
-  setUserFullNameOnDB,
+  setUserNameOnDB,
   setUserOrgDetailsOnDB,
-  updateUserPassword,
 } from "../features/user/userRemote"
 import {
-  changeUserPassword,
   deleteUser,
   deleteUserOrgDetails,
-  setPasswordChangeStatus,
+  setIsSignedIn,
   setUser,
   setUserEmail,
-  setUserFullName,
+  setUserName,
   setUserOrgDetails,
-  signIn,
-  signOut,
 } from "../features/user/userSlice"
+import {
+  removeUserOrgDetails,
+  updateUserOrgDetails,
+} from "../features/user/userSliceUtils"
 import { auth } from "../remote"
 import { syncUserDetails } from "./helpers"
 import { store } from "./store"
@@ -120,22 +111,13 @@ import { store } from "./store"
 */
 export const listenerMiddleware = createListenerMiddleware()
 listenerMiddleware.startListening({
-  actionCreator: signIn,
-  effect: async () => {
-    syncUserDetails()
-  },
-})
-/*
-
-
-
-
-
-*/
-listenerMiddleware.startListening({
-  actionCreator: signOut,
-  effect: async () => {
-    signOutAuth(auth).then(() => resetSystem())
+  actionCreator: setIsSignedIn,
+  effect: async (action) => {
+    if (action.payload) {
+      syncUserDetails()
+    } else {
+      resetSystem()
+    }
   },
 })
 /*
@@ -148,9 +130,8 @@ listenerMiddleware.startListening({
 listenerMiddleware.startListening({
   actionCreator: setUserEmail,
   effect: async (action) => {
-    const email = action.payload
+    const email = action.payload.email
     setUserEmailOnDB(email)
-    setUserEmailOnAuth(email)
   },
 })
 /*
@@ -161,21 +142,20 @@ listenerMiddleware.startListening({
 
 */
 listenerMiddleware.startListening({
-  actionCreator: setUserFullName,
+  actionCreator: setUserName,
   effect: async (action) => {
-    const name = action.payload.name
-    const surname = action.payload.surname
-    setUserFullNameOnDB(name, surname)
+    const name = action.payload
+    setUserNameOnDB(name)
 
-    const orgUuid = store.getState().user.user.orgUuid
-    const orgRole = store.getState().user.user.orgRole
+    const orgUuid = store.getState().user.user.org?.uuid
+    const orgRole = store.getState().user.user.org?.role
     const userUuid = store.getState().user.user.uuid
     if (!!orgUuid && !!orgRole && !!userUuid)
       store.dispatch(
         setOrgMember({
           uuid: userUuid,
-          name: name,
-          surname: surname,
+          name: name.first,
+          surname: name.last,
           role: orgRole,
         }),
       )
@@ -191,10 +171,8 @@ listenerMiddleware.startListening({
 listenerMiddleware.startListening({
   actionCreator: setUserOrgDetails,
   effect: async (action) => {
-    const orgUuid = action.payload.orgUuid
-    const orgRole = action.payload.orgRole
-    const updateDB = action.payload.updateDB
-    if (updateDB) setUserOrgDetailsOnDB(orgUuid, orgRole)
+    const details = action.payload
+    setUserOrgDetailsOnDB(details)
   },
 })
 /*
@@ -206,10 +184,9 @@ listenerMiddleware.startListening({
 */
 listenerMiddleware.startListening({
   actionCreator: deleteUserOrgDetails,
-  effect: async (action) => {
+  effect: async () => {
     const userUuid = auth.currentUser?.uid
-    const updateDB = action.payload.updateDB
-    if (!!userUuid && updateDB) deleteUserOrgDetailsOnDB(userUuid)
+    if (!!userUuid) deleteUserOrgDetailsOnDB(userUuid)
   },
 })
 /*
@@ -220,22 +197,10 @@ listenerMiddleware.startListening({
 
 */
 listenerMiddleware.startListening({
-  actionCreator: changeUserPassword,
+  actionCreator: setUser,
   effect: async (action) => {
-    const password = action.payload.password
-    const newPassword = action.payload.newPassword
-    const user = auth.currentUser as User
-    reauthenticateUser(user, password)
-      .then(() => updateUserPassword(user, newPassword))
-      .then(() => {
-        store.dispatch(setPasswordChangeStatus("isSuccess"))
-        generateNotification("passwordChange")
-      })
-      .catch((error) => {
-        console.log(error)
-        store.dispatch(setPasswordChangeStatus("isFailed"))
-        generateErrorNotification(error.code)
-      })
+    const updateDB = action.payload.updateDB
+    if (updateDB) setNewUserOnDB()
   },
 })
 /*
@@ -248,21 +213,8 @@ listenerMiddleware.startListening({
 listenerMiddleware.startListening({
   actionCreator: deleteUser,
   effect: async (action) => {
-    const user = auth.currentUser as User
-    const password = action.payload
-    const userUuid = user.uid
-    const orgUuid = store.getState().organisation.org.uuid
-    if (!!userUuid) {
-      reauthenticateUser(user, password)
-        .then(() => store.dispatch(signOut()))
-        .then(() => {
-          deleteUserOnDB()
-          deleteUserOnAuth()
-          if (!!orgUuid) deleteOrgMemberOnDB(orgUuid, userUuid)
-        })
-        .catch((error) => generateErrorNotification(error.code))
-      // TODO: If only admin then delete org
-    }
+    const uuid = action.payload.uuid
+    deleteUserOnDB(uuid)
   },
 })
 /*
@@ -276,15 +228,10 @@ listenerMiddleware.startListening({
   actionCreator: createOrg,
   effect: async (action) => {
     const org = action.payload
-    const orgUuid = action.payload.uuid
-    if (!!orgUuid) {
-      store.dispatch(
-        setUserOrgDetails({
-          orgUuid: orgUuid,
-          orgRole: "admin",
-          updateDB: true,
-        }),
-      )
+    const uuid = action.payload.uuid
+    const role = "admin"
+    if (!!uuid) {
+      updateUserOrgDetails(uuid, role)
       store.dispatch(setMemberStatus("isJoined"))
       setNewOrgOnDB(org)
     }
@@ -302,24 +249,15 @@ listenerMiddleware.startListening({
   effect: async (action) => {
     const inviteKey = action.payload
     const uuid = store.getState().user.user.uuid as string
-    const name = store.getState().user.user.name as string
-    const surname = store.getState().user.user.surname as string
+    const name = store.getState().user.user.name?.first as string
+    const surname = store.getState().user.user.name?.last as string
+    const role = "member"
+    const member: MemberProps = { uuid, name, surname, role }
     getOrgUuidWithInviteKeyFromDB(inviteKey)
       .then((orgUuid: string) => {
         deleteOrgInviteOnDB(orgUuid, inviteKey)
-        setOrgMemberOnDB(orgUuid, {
-          uuid: uuid,
-          name: name,
-          surname: surname,
-          role: "member",
-        })
-        store.dispatch(
-          setUserOrgDetails({
-            orgUuid: orgUuid,
-            orgRole: "member",
-            updateDB: true,
-          }),
-        )
+        setOrgMemberOnDB(orgUuid, member)
+        updateUserOrgDetails(orgUuid, role)
         return getOrgFromDB(orgUuid)
       })
       .then((org: OrgProps) => {
@@ -354,7 +292,7 @@ listenerMiddleware.startListening({
     const userUuid = auth.currentUser?.uid
     const orgUuid = action.payload
     if (!!userUuid) {
-      store.dispatch(deleteUserOrgDetails({ updateDB: true }))
+      removeUserOrgDetails()
       deleteOrgMemberOnDB(orgUuid, userUuid)
         .then(() => store.dispatch(setStock({ stock: {}, updateDB: false })))
         .then(() => generateNotification("leaveOrg"))
@@ -375,7 +313,7 @@ listenerMiddleware.startListening({
     const invites: any = action.payload.invites
     const orgUuid = action.payload.uuid
     if (!!orgUuid) {
-      store.dispatch(deleteUserOrgDetails({ updateDB: true }))
+      removeUserOrgDetails()
       deleteAllOrgInvitesOnDB(invites)
         .then(() => deleteOrgOnDB(orgUuid))
         .then(() => deleteStockOnDB(orgUuid))

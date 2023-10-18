@@ -1,3 +1,4 @@
+import { ClickAwayListener } from "@mui/material"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 import _ from "lodash"
@@ -8,12 +9,12 @@ import useTheme from "../../common/useTheme"
 import { Button } from "../../components/button"
 import { Input } from "../../components/control"
 import Icon, { IconNames } from "../../components/icon"
+import { List } from "../../components/list"
 import {
   ListItem,
   ListItemOptionProps,
   ListItemWithOptions,
 } from "../../components/listItem"
-import { List } from "../../components/list"
 import Modal from "../../components/modal"
 import { ProfileSurface } from "../../components/profileSurface"
 import { generateNotification } from "../core/coreUtils"
@@ -34,7 +35,6 @@ import {
   setOrgMember,
   setOrgName,
 } from "./organisationSlice"
-import { ClickAwayListener } from "@mui/material"
 /*
 
 
@@ -302,8 +302,6 @@ function MemberListItem({ member }: { member: MemberProps }) {
       description={_.capitalize(member.role)}
       iconName={member.role === "admin" ? "admin" : "profile"}
       options={options}
-      showOptions={member.uuid === idViewingOptions}
-      onOptionsClick={() => setUseOrg("idViewingOptions", member.uuid)}
     />
   )
 }
@@ -400,8 +398,6 @@ function InviteListItem({ invite }: { invite: InviteProps }) {
       description={invite.inviteKey}
       iconName={"profile"}
       options={options}
-      showOptions={idViewingOptions === invite.inviteKey}
-      onOptionsClick={() => setUseOrg("idViewingOptions", invite.inviteKey)}
     />
   )
 }

@@ -8,10 +8,10 @@ import useTheme from "../../common/useTheme"
 import { Switch } from "../../components/control"
 import Icon, { IconNames } from "../../components/icon"
 import { ListItem } from "../../components/listItem"
-import { signOut } from "../user/userSlice"
 import { selectIsDarkmode } from "./coreSlice"
 import { toggleDarkmode } from "./coreSliceUtils"
 import { routePaths } from "./pages"
+import { signOut } from "../user/userSliceUtils"
 /*
 
 
@@ -43,7 +43,7 @@ export function Menu() {
 
   function handleSignOut() {
     setAnchorEl(null)
-    dispatch(signOut())
+    signOut()
   }
 
   function handleMenuItemClick(path: string) {

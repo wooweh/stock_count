@@ -5,11 +5,11 @@ import { Virtuoso } from "react-virtuoso"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { Button } from "../../components/button"
-import Icon from "../../components/icon"
 import {
   ListItemOptionProps,
   SelectableListItemWithOptions,
 } from "../../components/listItem"
+import { ScrollToTop } from "../../components/scrollToTop"
 import { SearchBar } from "../../components/searchBar"
 import {
   addUseStockSelectedItem,
@@ -24,7 +24,6 @@ import {
   selectStockIdList,
   selectStockList,
 } from "./stockSlice"
-import { ScrollToTop } from "../../components/scrollToTop"
 /*
 
 
@@ -217,7 +216,25 @@ function Body() {
     }, 50)
   }
 
-  return (
+  return !stockList.length ? (
+    <Stack
+      width={"100%"}
+      height={"100%"}
+      justifyContent={"center"}
+      alignItems={"center"}
+    >
+      <Typography variant="h6" color={theme.scale.gray[5]}>
+        Click + to add a stock item
+      </Typography>
+      <Typography
+        variant="h6"
+        color={theme.scale.gray[5]}
+        sx={{ display: "flex", alignItems: "center" }}
+      >
+        or upload a CSV stock list
+      </Typography>
+    </Stack>
+  ) : (
     <Stack
       width={"100%"}
       height={"100%"}
@@ -239,61 +256,48 @@ function Body() {
         borderRadius={theme.module[3]}
         overflow={"hidden"}
       >
-        {!stockList.length ? (
-          <>
-            <Typography variant="h5" color={theme.scale.gray[5]}>
-              Click <Icon variation="add" fontSize="small" /> to add a stock
-              item
-            </Typography>
-            <Typography variant="h5" color={theme.scale.gray[5]}>
-              or <Icon variation="upload" fontSize="small" /> to upload CSV
-              stock list
-            </Typography>
-          </>
-        ) : (
-          <Virtuoso
-            ref={virtuoso}
-            totalCount={stockList.length}
-            atTopThreshold={100}
-            atTopStateChange={(isAtTop) => setShowScrollToTop(!isAtTop)}
-            style={{
-              height: "100%",
-              width: "100%",
-              borderRadius: theme.module[3],
-            }}
-            itemContent={(index) => {
-              const item = stockList[index]
-              const options: ListItemOptionProps[] = [
-                {
-                  iconName: "edit",
-                  onClick: () => setUseStock("isEditing", item),
-                },
-                {
-                  iconName: "delete",
-                  onClick: () => dispatch(deleteStockItem(item.id)),
-                },
-              ]
-              return (
-                <Stack padding={theme.module[0]} boxSizing={"border-box"}>
-                  <SelectableListItemWithOptions
-                    label={item.name}
-                    description={item.description}
-                    iconName={"stock"}
-                    options={options}
-                    onLongPress={() => {
-                      setUseStock("isSelecting", true)
-                      addUseStockSelectedItem(item.id)
-                    }}
-                    onSelection={() => addUseStockSelectedItem(item.id)}
-                    onDeselection={() => removeUseStockSelectedItem(item.id)}
-                    isSelecting={isSelecting}
-                    isSelected={_.find(selectedItems, (id) => id === item.id)}
-                  />
-                </Stack>
-              )
-            }}
-          />
-        )}
+        <Virtuoso
+          ref={virtuoso}
+          totalCount={stockList.length}
+          atTopThreshold={100}
+          atTopStateChange={(isAtTop) => setShowScrollToTop(!isAtTop)}
+          style={{
+            height: "100%",
+            width: "100%",
+            borderRadius: theme.module[3],
+          }}
+          itemContent={(index) => {
+            const item = stockList[index]
+            const options: ListItemOptionProps[] = [
+              {
+                iconName: "edit",
+                onClick: () => setUseStock("isEditing", item),
+              },
+              {
+                iconName: "delete",
+                onClick: () => dispatch(deleteStockItem(item.id)),
+              },
+            ]
+            return (
+              <Stack padding={theme.module[0]} boxSizing={"border-box"}>
+                <SelectableListItemWithOptions
+                  label={item.name}
+                  description={item.description}
+                  iconName={"stock"}
+                  options={options}
+                  onLongPress={() => {
+                    setUseStock("isSelecting", true)
+                    addUseStockSelectedItem(item.id)
+                  }}
+                  onSelection={() => addUseStockSelectedItem(item.id)}
+                  onDeselection={() => removeUseStockSelectedItem(item.id)}
+                  isSelecting={isSelecting}
+                  isSelected={_.find(selectedItems, (id) => id === item.id)}
+                />
+              </Stack>
+            )
+          }}
+        />
       </Stack>
       {showScrollToTop && <ScrollToTop onClick={handleScrollToTopClick} />}
     </Stack>

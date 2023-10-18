@@ -82,30 +82,24 @@ function orgPaths(orgUuid: string): OrgPathsReturnProps {
 */
 type UserPathsReturnProps = {
   user: string
-  name: string
-  surname: string
-  email: string
   uuid: string
-  orgRole: string
-  orgUuid: string
+  email: string
+  name: string
+  org: string
 }
 function userPaths(userUuid: string): UserPathsReturnProps {
   const user = `users/${userUuid}`
-  const name = `${user}/name`
-  const surname = `${user}/surname`
-  const email = `${user}/email`
   const uuid = `${user}/uuid`
-  const orgRole = `${user}/orgRole`
-  const orgUuid = `${user}/orgUuid`
+  const email = `${user}/email`
+  const name = `${user}/name`
+  const org = `${user}/org`
 
   return {
     user,
     name,
-    surname,
     email,
     uuid,
-    orgRole,
-    orgUuid,
+    org,
   }
 }
 /*

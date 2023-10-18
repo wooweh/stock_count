@@ -26,6 +26,7 @@ import {
   signInUserOnAuth,
 } from "./userRemote"
 import { selectIsSignedIn } from "./userSlice"
+import { signIn } from "./userSliceUtils"
 /*
 
 
@@ -288,10 +289,8 @@ function ButtonTray({ isRegistering }: { isRegistering: boolean }) {
         registerUserOnAuth(email, password)
       } else {
         setUseAuth("isSigningIn", true)
-        signInUserOnAuth(email, password).catch((error) => {
-          generateErrorNotification(error.code)
+        signIn(email, password).catch(() => {
           setUseAuth("isSigningIn", false)
-          console.log(error.code)
         })
       }
       setUseAuth("email", "")

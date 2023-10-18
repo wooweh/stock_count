@@ -1,12 +1,11 @@
-import { bootSystem, setSystemStatus } from "../features/core/coreSlice"
-import { setUser } from "../features/user/userSlice"
-import { auth } from "../remote"
-import { getUserFromDB, setNewUserOnDB } from "../features/user/userRemote"
-import { store } from "./store"
 import {
   setSystemIsBooting,
   setSystemNotBooted,
 } from "../features/core/coreSliceUtils"
+import { getUserFromDB, setNewUserOnDB } from "../features/user/userRemote"
+import { createNewUser, updateUser } from "../features/user/userSliceUtils"
+import { auth } from "../remote"
+import { store } from "./store"
 /*
 
 
@@ -30,10 +29,10 @@ export async function syncUserDetails() {
       .then((dbUser) => {
         if (!!dbUser) {
           console.log("Setting existing user in userSlice")
-          store.dispatch(setUser({ ...dbUser }))
+          updateUser(dbUser)
         } else {
           console.log("Setting new user in userSlice and db")
-          store.dispatch(setUser({ ...newUser }))
+          createNewUser(newUser)
           setNewUserOnDB()
         }
       })
