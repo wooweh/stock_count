@@ -1,14 +1,8 @@
-import {
-  User,
-  deleteUser as deleteUserOnAuth,
-  signInWithEmailAndPassword,
-  signOut as signOutAuth,
-  updateEmail,
-} from "firebase/auth"
+import { User, deleteUser as deleteUserOnAuth } from "firebase/auth"
 import { store } from "../../app/store"
 import { auth } from "../../remote"
 import { generateErrorNotification } from "../core/coreUtils"
-import { reauthenticateUser } from "./userRemote"
+import { reauthenticate, signOut } from "./userAuth"
 import {
   PasswordChangeStatuses,
   UserOrgRoles,
@@ -28,16 +22,8 @@ import {
 
 
 */
-export async function signIn(email: string, password: string) {
-  return signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      if (!!userCredential.user) {
-        store.dispatch(setIsSignedIn(true))
-      }
-    })
-    .catch((error) => {
-      generateErrorNotification(error.code)
-    })
+export async function signUserIn() {
+  store.dispatch(setIsSignedIn(true))
 }
 /*
 
@@ -45,12 +31,8 @@ export async function signIn(email: string, password: string) {
 
 
 */
-export async function signOut() {
-  return signOutAuth(auth)
-    .then(() => {
-      store.dispatch(setIsSignedIn(false))
-    })
-    .catch((error) => console.log(error))
+export async function signUserOut() {
+  store.dispatch(setIsSignedIn(false))
 }
 /*
 
@@ -58,16 +40,8 @@ export async function signOut() {
 
 
 */
-export async function updateUserEmail(email: string, oldEmail: string) {
-  const authUser = auth.currentUser
-  if (!!authUser && email !== oldEmail) {
-    updateEmail(authUser, email)
-      .then(() => store.dispatch(setUserEmail({ email })))
-      .catch((error) => {
-        generateErrorNotification(error.code)
-        console.log(error)
-      })
-  }
+export async function updateUserEmail(email: string) {
+  store.dispatch(setUserEmail({ email }))
 }
 /*
 
@@ -102,8 +76,17 @@ export function removeUserOrgDetails() {
 
 
 */
-export function updatePasswordChangeStatus(status: PasswordChangeStatuses) {
+export function updateUserPasswordChangeStatus(status: PasswordChangeStatuses) {
   store.dispatch(setPasswordChangeStatus(status))
+}
+/*
+
+
+
+
+*/
+export function resetPasswordChangeStatus() {
+  setTimeout(() => updateUserPasswordChangeStatus("notChanged"), 250)
 }
 /*
 
@@ -142,7 +125,7 @@ export function removeUser(password: string) {
   const user = auth.currentUser as User
   const uuid = user.uid
   if (!!uuid) {
-    reauthenticateUser(user, password)
+    reauthenticate(user, password)
       .then(() => signOut())
       .then(() => deleteUserOnAuth(user))
       .then(() => store.dispatch(deleteUser({ uuid, password })))

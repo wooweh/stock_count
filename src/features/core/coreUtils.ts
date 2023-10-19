@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid"
 import { store } from "../../app/store"
 import { NotificationProps, NotificationTypes } from "./coreSlice"
 import { showNotification } from "./coreSliceUtils"
-import { Routes } from "./pages"
+import { Route } from "./pages"
 /*
 
 
@@ -18,7 +18,7 @@ export type GetRoutePathsReturnProps = {
     name: boolean
   }
 }
-export function getRoutePaths(routes: Routes): GetRoutePathsReturnProps {
+export function getRoutePaths(routes: Route[]): GetRoutePathsReturnProps {
   const paths: GetRoutePathsReturnProps = {}
 
   routes.forEach((obj: any) => {

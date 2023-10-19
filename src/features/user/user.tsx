@@ -11,18 +11,16 @@ import { Loader } from "../../components/loader"
 import Modal from "../../components/modal"
 import { ProfileSurface } from "../../components/profileSurface"
 import { generateNotification } from "../core/coreUtils"
-import {
-  PasswordValidationCheck,
-  getPasswordValidation,
-} from "./authentication"
+import { PasswordValidationCheck } from "./authentication"
+import { changeEmail, changePassword } from "./userAuth"
 import {
   selectIsPasswordChangePending,
   selectIsPasswordChangeSuccess,
   selectUserEmail,
   selectUserName,
 } from "./userSlice"
-import { removeUser, updateUserEmail, updateUserName } from "./userSliceUtils"
-import { changeUserPassword, checkUserNewPassword } from "./userUtils"
+import { removeUser, updateUserName } from "./userSliceUtils"
+import { checkNewPassword, getPasswordValidation } from "./userUtils"
 /*
 
 
@@ -205,53 +203,36 @@ function ButtonTray() {
   const name = useUserStore((state: any) => state.name)
   const surname = useUserStore((state: any) => state.surname)
   const newEmail = useUserStore((state: any) => state.email)
-  /*
-  
-  
-  */
+
+  const isChangingEmail = !!newEmail
+  const isProfileComplete = !!name && !!surname && !!oldEmail
+
   function handleEdit() {
     setUseUser("isEditing", true)
   }
-  /*
-  
-  
-  */
+
   function handleAccept() {
-    if (!!name && !!surname) {
+    if (isProfileComplete) {
       setUseUser("isEditing", false)
       updateUserName(name, surname)
-      if (!!newEmail && !!oldEmail) {
-        updateUserEmail(newEmail, oldEmail)
-      }
+      if (isChangingEmail) changeEmail(oldEmail, newEmail)
     } else {
       generateNotification("incompleteProfileDetails")
     }
   }
-  /*
-  
-  
-  */
+
   function handleCancel() {
     setUseUser("isEditing", false)
   }
-  /*
-  
-  
-  */
+
   function handleDelete() {
     setUseUser("isDeleting", true)
   }
-  /*
-  
-  
-  */
+
   function handleResetPassword() {
     setUseUser("isChangingPassword", true)
   }
-  /*
-  
-  
-  */
+
   return (
     <Stack width={"100%"} gap={theme.module[5]}>
       {!isEditing && (
@@ -287,29 +268,17 @@ function ButtonTray() {
 */
 function DeleteProfileConfirmation() {
   const theme = useTheme()
-  const dispatch = useAppDispatch()
-
   const isDeleting = useUserStore((state: any) => state.isDeleting)
-
   const [password, setPassword] = useState("")
-  /*
-  
-  
-  */
+
   function handleAccept() {
     removeUser(password)
   }
-  /*
-  
-  
-  */
+
   function handleClose() {
     setUseUser("isDeleting", false)
   }
-  /*
-  
-  
-  */
+
   return (
     <Modal
       open={isDeleting}
@@ -352,22 +321,20 @@ function ChangePassword() {
   const [newPassword, setNewPassword] = useState("")
   const [confirmedNewPassword, setConfiredNewPassword] = useState("")
 
-  const isNewPasswordConfirmed = checkUserNewPassword(
-    password,
-    newPassword,
-    confirmedNewPassword,
-  ).isConfirmed
-
   useEffect(() => {
     if (isPasswordChangeSuccess) handleClose()
   }, [isPasswordChangeSuccess])
 
   function handleAccept() {
-    changeUserPassword(password, newPassword, confirmedNewPassword)
+    changePassword(password, newPassword, confirmedNewPassword)
   }
 
   function handleClose() {
     setUseUser("isChangingPassword", false)
+    resetInputs()
+  }
+
+  function resetInputs() {
     setTimeout(() => {
       setPassword("")
       setNewPassword("")
@@ -392,6 +359,12 @@ function ChangePassword() {
       onChange: (event: any) => setConfiredNewPassword(event.target.value),
     },
   ]
+
+  const isNewPasswordConfirmed = checkNewPassword(
+    password,
+    newPassword,
+    confirmedNewPassword,
+  ).isConfirmed
 
   return (
     <Modal

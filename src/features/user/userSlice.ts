@@ -34,10 +34,6 @@ export type UserOrgRoles = "admin" | "member"
 export type SetEmailProps = {
   email: string
 }
-export type SetUserOrgDetailsProps = UpdateDB & {
-  orgUuid: string
-  orgRole: UserOrgRoles
-}
 
 export interface UserState {
   isSignedIn: boolean

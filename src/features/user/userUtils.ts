@@ -1,36 +1,64 @@
-import { User, updatePassword } from "firebase/auth"
-import { auth } from "../../remote"
-import {
-  generateErrorNotification,
-  generateNotification,
-} from "../core/coreUtils"
-import { getPasswordValidation } from "./authentication"
-import { reauthenticateUser } from "./userRemote"
-import { updatePasswordChangeStatus } from "./userSliceUtils"
 /*
 
 
 
 
 */
-export async function changeUserPassword(
+export type CheckNewPasswordReturnProps = {
+  isConfirmed: boolean
+  isUnique: boolean
+  isValid: boolean
+}
+export function checkNewPassword(
   password: string,
   newPassword: string,
   confirmedNewPassword: string,
-) {
-  const check = checkUserNewPassword(
-    password,
-    newPassword,
-    confirmedNewPassword,
-  )
-  if (check.isValid && check.isConfirmed && check.isUnique) {
-    updateUserPassword(password, newPassword)
-  } else if (!check.isConfirmed) {
-    generateNotification("newPasswordNotConfirmed")
-  } else if (!check.isUnique) {
-    generateNotification("newPasswordNotUnique")
-  } else if (!check.isValid) {
-    generateNotification("newPasswordNotValid")
+): CheckNewPasswordReturnProps {
+  const isConfirmed = !!newPassword && newPassword === confirmedNewPassword
+  const isUnique = newPassword !== password
+  const isValid = getPasswordValidation(newPassword).isValid
+  return { isConfirmed, isUnique, isValid }
+}
+/*
+
+
+
+
+
+*/
+export type PasswordValidationReturnProps = {
+  minCharCount: boolean
+  minCapCharCount: boolean
+  minNumCharCount: boolean
+  minSpecialCharCount: boolean
+  isValid: boolean
+}
+export function getPasswordValidation(
+  password: string,
+): PasswordValidationReturnProps {
+  const MIN_CHAR_COUNT = 6
+  const MIN_CAP_CHAR_COUNT = 1
+  const MIN_NUM_CHAR_COUNT = 1
+  const MIN_SPECIAL_CHAR_COUNT = 1
+
+  const charCount = password.length
+  const capCharCount = (password.match(/[A-Z]/g) || []).length
+  const numCharCount = (password.match(/\d/g) || []).length
+  const specialCharCount = (password.match(/[^\w\s]/g) || []).length
+
+  const minCharCount = charCount >= MIN_CHAR_COUNT
+  const minCapCharCount = capCharCount >= MIN_CAP_CHAR_COUNT
+  const minNumCharCount = numCharCount >= MIN_NUM_CHAR_COUNT
+  const minSpecialCharCount = specialCharCount >= MIN_SPECIAL_CHAR_COUNT
+  const isValid =
+    minCharCount && minCapCharCount && minNumCharCount && minSpecialCharCount
+
+  return {
+    minCharCount,
+    minCapCharCount,
+    minNumCharCount,
+    minSpecialCharCount,
+    isValid,
   }
 }
 /*
@@ -39,38 +67,3 @@ export async function changeUserPassword(
 
 
 */
-export async function updateUserPassword(
-  password: string,
-  newPassword: string,
-) {
-  const user = auth.currentUser as User
-  updatePasswordChangeStatus("isPending")
-  return reauthenticateUser(user, password)
-    .then(() => updatePassword(user, newPassword))
-    .then(() => {
-      updatePasswordChangeStatus("isSuccess")
-      generateNotification("passwordChange")
-      setTimeout(() => updatePasswordChangeStatus("notChanged"), 250)
-    })
-    .catch((error) => {
-      updatePasswordChangeStatus("isFailed")
-      generateErrorNotification(error.code)
-      setTimeout(() => updatePasswordChangeStatus("notChanged"), 250)
-    })
-}
-/*
-
-
-
-
-*/
-export function checkUserNewPassword(
-  password: string,
-  newPassword: string,
-  confirmedNewPassword: string,
-) {
-  const isConfirmed = !!newPassword && newPassword === confirmedNewPassword
-  const isUnique = newPassword !== password
-  const isValid = getPasswordValidation(newPassword).isValid
-  return { isConfirmed, isUnique, isValid }
-}

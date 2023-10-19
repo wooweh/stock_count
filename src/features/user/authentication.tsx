@@ -14,19 +14,15 @@ import { Input } from "../../components/control"
 import Icon from "../../components/icon"
 import { Loader } from "../../components/loader"
 import { selectIsSystemBooted } from "../core/coreSlice"
+import { generateNotification } from "../core/coreUtils"
 import { Home } from "../core/home"
-import {
-  generateErrorNotification,
-  generateNotification,
-} from "../core/coreUtils"
-import { routePaths } from "../core/pages"
-import {
-  registerUserOnAuth,
-  resetUserPassword,
-  signInUserOnAuth,
-} from "./userRemote"
+import { Route, routePaths } from "../core/pages"
+import { register, resetPassword, signIn } from "./userAuth"
 import { selectIsSignedIn } from "./userSlice"
-import { signIn } from "./userSliceUtils"
+import {
+  PasswordValidationReturnProps,
+  getPasswordValidation,
+} from "./userUtils"
 /*
 
 
@@ -72,7 +68,7 @@ export function resetUseAuth() {
 
 
 */
-export function WithAuth({ route }: { route: any }) {
+export function WithAuth({ route }: { route: Route }) {
   const isSignedIn = useAppSelector(selectIsSignedIn)
   const isSystemBooted = useAppSelector(selectIsSystemBooted)
   const navigate = useNavigate()
@@ -112,8 +108,8 @@ export function Authentication({
   return (
     <>
       <AuthenticationInput isRegistering={isRegistering} />
-      <SigningIn />
-      <VerifyEmail />
+      <SigningInLoader />
+      <VerifyEmailPrompt />
     </>
   )
 }
@@ -229,48 +225,6 @@ function CredentialInputs() {
 
 
 */
-type PasswordValidationReturnProps = {
-  minCharCount: boolean
-  minCapCharCount: boolean
-  minNumCharCount: boolean
-  minSpecialCharCount: boolean
-  isValid: boolean
-}
-export function getPasswordValidation(
-  password: string,
-): PasswordValidationReturnProps {
-  const MIN_CHAR_COUNT = 6
-  const MIN_CAP_CHAR_COUNT = 1
-  const MIN_NUM_CHAR_COUNT = 1
-  const MIN_SPECIAL_CHAR_COUNT = 1
-
-  const charCount = password.length
-  const capCharCount = (password.match(/[A-Z]/g) || []).length
-  const numCharCount = (password.match(/\d/g) || []).length
-  const specialCharCount = (password.match(/[^\w\s]/g) || []).length
-
-  const minCharCount = charCount >= MIN_CHAR_COUNT
-  const minCapCharCount = capCharCount >= MIN_CAP_CHAR_COUNT
-  const minNumCharCount = numCharCount >= MIN_NUM_CHAR_COUNT
-  const minSpecialCharCount = specialCharCount >= MIN_SPECIAL_CHAR_COUNT
-  const isValid =
-    minCharCount && minCapCharCount && minNumCharCount && minSpecialCharCount
-
-  return {
-    minCharCount,
-    minCapCharCount,
-    minNumCharCount,
-    minSpecialCharCount,
-    isValid,
-  }
-}
-/*
-
-
-
-
-
-*/
 function ButtonTray({ isRegistering }: { isRegistering: boolean }) {
   const theme = useTheme()
   const navigate = useNavigate()
@@ -286,7 +240,7 @@ function ButtonTray({ isRegistering }: { isRegistering: boolean }) {
     if (!!email && !!password) {
       if (isRegistering && isPasswordValid) {
         setUseAuth("isVerifying", true)
-        registerUserOnAuth(email, password)
+        register(email, password)
       } else {
         setUseAuth("isSigningIn", true)
         signIn(email, password).catch(() => {
@@ -339,7 +293,7 @@ function ForgotPassword({ isRegistering }: { isRegistering: boolean }) {
 
   function handleClick() {
     if (!!email) {
-      resetUserPassword(email)
+      resetPassword(email)
     } else {
       generateNotification("invalidEmail")
     }
@@ -468,7 +422,7 @@ function CheckLineItem({
 
 
 */
-export function SigningIn() {
+export function SigningInLoader() {
   const isSigningIn = useAuthStore((state) => state.isSigningIn)
 
   return isSigningIn ? <Loader narration="signing in..." /> : undefined
@@ -480,7 +434,7 @@ export function SigningIn() {
 
 
 */
-export function VerifyEmail() {
+export function VerifyEmailPrompt() {
   const theme = useTheme()
 
   const isVerifying = useAuthStore((state) => state.isVerifying)

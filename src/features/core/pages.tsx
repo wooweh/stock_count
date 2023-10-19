@@ -20,13 +20,13 @@ import { Home } from "./home"
 
 
 */
-export type Routes = {
+export type Route = {
   name: string
   path: string
   requiresAuth: boolean
   element: ReactElement
-}[]
-export const routes: Routes = [
+}
+export const routes: Route[] = [
   {
     name: "Sign in",
     path: "/sign_in",

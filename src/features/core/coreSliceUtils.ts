@@ -2,7 +2,6 @@ import { store } from "../../app/store"
 import { setCount } from "../count/countSlice"
 import { setMemberStatus, setOrg } from "../organisation/organisationSlice"
 import { setStock } from "../stock/stockSlice"
-import { setUser } from "../user/userSlice"
 import { resetUser } from "../user/userSliceUtils"
 import {
   NotificationProps,
@@ -72,6 +71,15 @@ export function toggleMobile(width: number) {
 export function showNotification(notificaiton: NotificationProps) {
   store.dispatch(setShowNotification(true))
   store.dispatch(setNotification(notificaiton))
+  resetShowNotification()
+}
+/*
+
+
+
+
+*/
+function resetShowNotification() {
   setTimeout(() => {
     store.dispatch(setShowNotification(false))
     store.dispatch(setNotification(undefined))
@@ -85,8 +93,8 @@ export function showNotification(notificaiton: NotificationProps) {
 */
 export function resetSystem() {
   setSystemNotBooted()
-  store.dispatch(setMemberStatus("notJoined"))
   resetUser()
+  store.dispatch(setMemberStatus("notJoined"))
   store.dispatch(setOrg({}))
   store.dispatch(setStock({ stock: {}, updateDB: false }))
   store.dispatch(setCount({}))

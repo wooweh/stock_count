@@ -11,7 +11,7 @@ import { ListItem } from "../../components/listItem"
 import { selectIsDarkmode } from "./coreSlice"
 import { toggleDarkmode } from "./coreSliceUtils"
 import { routePaths } from "./pages"
-import { signOut } from "../user/userSliceUtils"
+import { signOut } from "../user/userAuth"
 /*
 
 

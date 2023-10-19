@@ -1,75 +1,8 @@
-import {
-  EmailAuthProvider,
-  User,
-  createUserWithEmailAndPassword,
-  deleteUser as deleteUserOnAuth,
-  reauthenticateWithCredential,
-  sendEmailVerification,
-  sendPasswordResetEmail,
-  updateEmail,
-  updatePassword,
-} from "firebase/auth"
 import { child, get, ref, remove, set } from "firebase/database"
 import { store } from "../../app/store"
 import { auth, dbReal } from "../../remote"
 import { getDBPath } from "../../remote/dbPaths"
-import {
-  generateErrorNotification,
-  generateNotification,
-} from "../core/coreUtils"
 import { UserNameProps, UserOrgProps, UserProps } from "./userSlice"
-/*
-
-
-
-
-
-*/
-const actionCodeSettings = {
-  url: "http://localhost:5173/sign_in",
-  handleCodeInApp: false,
-}
-export function resetUserPassword(email: string) {
-  sendPasswordResetEmail(auth, email, actionCodeSettings)
-    .then(() => {
-      generateNotification("passwordReset")
-    })
-    .catch((error) => {
-      generateErrorNotification(error.code)
-    })
-}
-/*
-
-
-
-
-
-*/
-export async function reauthenticateUser(user: User, password: string) {
-  const email = user.email as string
-  const credentials = EmailAuthProvider.credential(email, password)
-  return reauthenticateWithCredential(user, credentials)
-}
-/*
-
-
-
-
-
-*/
-export async function registerUserOnAuth(email: string, password: string) {
-  return createUserWithEmailAndPassword(auth, email, password)
-    .then((credential) => {
-      if (!!credential.user) {
-        console.log("email sent")
-        sendEmailVerification(credential.user, actionCodeSettings)
-      }
-    })
-    .catch((error) => {
-      generateErrorNotification(error.code)
-      console.log(error)
-    })
-}
 /*
 
 
