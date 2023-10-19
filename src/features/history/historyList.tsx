@@ -5,7 +5,6 @@ import { Virtuoso } from "react-virtuoso"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { Button } from "../../components/button"
-import Icon from "../../components/icon"
 import {
   ListItemOptionProps,
   SelectableListItemWithOptions,
@@ -130,7 +129,7 @@ function HistorySelectionBar() {
 
   function handleDelete() {
     if (isAllSelected) {
-      dispatch(deleteHistory({ updateDB: true }))
+      dispatch(deleteHistory())
     } else {
       _.forEach(selectedItems, (id) =>
         dispatch(deleteHistoryItem({ uuid: id })),

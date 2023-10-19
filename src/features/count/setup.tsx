@@ -6,8 +6,8 @@ import useTheme from "../../common/useTheme"
 import { Button } from "../../components/button"
 import { Select } from "../../components/control"
 import Icon from "../../components/icon"
-import { ListItem } from "../../components/listItem"
 import { List } from "../../components/list"
+import { ListItem } from "../../components/listItem"
 import Modal, { ModalActionProps } from "../../components/modal"
 import { generateCustomNotification } from "../core/coreUtils"
 import { MemberProps } from "../organisation/organisationSlice"
@@ -259,11 +259,11 @@ function MembersList({
   return (
     <List>
       {availableMembers.map((member: MemberProps) => {
-        const fullname = `${member.name} ${member.surname}`
+        const name = `${member.firstName} ${member.lastName}`
         const selected = selectedMemberUuids.includes(member.uuid)
         return (
           <ListItem
-            label={fullname}
+            label={name}
             primarySlot={
               <Icon variation={selected ? "checked" : "unchecked"} />
             }
@@ -275,7 +275,7 @@ function MembersList({
                 : addUseCountSelectedMemberUuid(member.uuid)
             }
             tappable
-            key={fullname}
+            key={name}
           />
         )
       })}

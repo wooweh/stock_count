@@ -47,7 +47,7 @@ export const historySlice = createSlice({
     setHistory: (state, action: PayloadAction<HistoryProps>) => {
       state.history = action.payload
     },
-    deleteHistory: (state, action: PayloadAction<DeleteHistoryProps>) => {
+    deleteHistory: (state) => {
       state.history = {}
     },
     setHistoryItem: (state, action: PayloadAction<HistoryItemProps>) => {
@@ -80,7 +80,7 @@ export const selectHistorySearchList = createSelector(
         const id = historyItem.uuid
         const name = formatLongDate(historyItem.metadata.countStartTime)
         const organiser = members[historyItem.metadata.organiser]
-        const organiserName = `${organiser?.name} ${organiser?.surname}`
+        const organiserName = `${organiser?.firstName} ${organiser?.lastName}`
         const description = `Organizer: ${organiserName}`
         searchList.push({ id, name, description })
       })

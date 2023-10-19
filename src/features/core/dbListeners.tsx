@@ -23,7 +23,6 @@ import { updateCountStep } from "../count/countUtils"
 import { HistoryProps, setHistory } from "../history/historySlice"
 import {
   OrgProps,
-  leaveOrg,
   selectIsJoined,
   selectOrg,
   setMemberStatus,
@@ -38,6 +37,7 @@ import {
 import { updateUser } from "../user/userSliceUtils"
 import { selectIsSystemActive, selectIsSystemBooting } from "./coreSlice"
 import { setSystemIsBooted } from "./coreSliceUtils"
+import { leaveOrg } from "../organisation/organisationSliceUtils"
 /*
 
 
@@ -95,18 +95,17 @@ export function DBListeners() {
         const dbOrg: OrgProps = snapshot.val()
         if (
           !!dbOrg &&
-          !_.isEqual(localOrg, dbOrg) &&
           isLocalUserOrgDetails &&
           localUser.uuid! in dbOrg.members!
         ) {
-          dispatch(setOrg(dbOrg))
+          dispatch(setOrg({ org: dbOrg, updateDB: false }))
           dispatch(setMemberStatus("isJoined"))
         }
         if (
           (!dbOrg || !(localUser.uuid! in dbOrg.members!)) &&
           isLocalUserOrgDetails
         ) {
-          dispatch(leaveOrg(localOrg.uuid as string))
+          leaveOrg()
         }
       })
     }

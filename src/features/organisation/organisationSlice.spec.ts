@@ -1,23 +1,23 @@
+import { v4 as uuidv4 } from "uuid"
 import organisationReducer, {
+  InviteProps,
+  InvitesProps,
+  MemberProps,
+  MemberStatuses,
   MembersProps,
   OrgProps,
   OrganisationState,
+  setInvite,
   createOrg,
-  deleteOrg,
-  setOrgName,
-  setOrg,
-  setMemberStatus,
-  MemberStatusOptions,
-  leaveOrg,
-  InviteProps,
-  createInvite,
-  InvitesProps,
   deleteInvite,
+  deleteOrg,
   deleteOrgMember,
-  MemberProps,
+  leaveOrg,
+  setMemberStatus,
+  setOrg,
   setOrgMember,
+  setOrgName,
 } from "./organisationSlice"
-import { v4 as uuidv4 } from "uuid"
 
 describe("organisation reducer", () => {
   const initialState: OrganisationState = {
@@ -58,8 +58,8 @@ describe("organisation reducer", () => {
       uuid: uuid,
       members: {
         mockUuid: {
-          name: "memberName",
-          surname: "memberSurname",
+          firstName: "memberName",
+          lastName: "memberSurname",
           role: "admin",
           uuid: "mockUuid",
         },
@@ -78,13 +78,13 @@ describe("organisation reducer", () => {
   it("should handle setOrgMember", () => {
     const mockData: MemberProps = {
       uuid: "mockUuid",
-      name: "mockName",
-      surname: "mockSurname",
+      firstName: "mockName",
+      lastName: "mockSurname",
       role: "admin",
     }
     const actual = organisationReducer(mockState, setOrgMember(mockData))
     const members = actual.org.members as MembersProps
-    expect(members[mockData.uuid].name).toEqual(mockData.name)
+    expect(members[mockData.uuid].firstName).toEqual(mockData.firstName)
   })
 
   it("should handle deleteOrgMember", () => {
@@ -94,12 +94,12 @@ describe("organisation reducer", () => {
     expect(members[mockData]).toBe(undefined)
   })
 
-  it("should handle createInvite", () => {
+  it("should handle setInvite", () => {
     const mockData: InviteProps = {
       inviteKey: "mockInviteKey2",
       tempName: "mockTempName2",
     }
-    const actual = organisationReducer(mockState, createInvite(mockData))
+    const actual = organisationReducer(mockState, setInvite(mockData))
     const invites = actual.org.invites as InvitesProps
     expect(invites[mockData.inviteKey]).toEqual(mockData.tempName)
   })
@@ -134,7 +134,7 @@ describe("organisation reducer", () => {
   })
 
   it("should handle setMemberStatus", () => {
-    const mockPayload: MemberStatusOptions = "joining"
+    const mockPayload: MemberStatuses = "joining"
     const actual = organisationReducer(mockState, setMemberStatus(mockPayload))
     expect(actual.memberStatus).toEqual(mockPayload)
   })

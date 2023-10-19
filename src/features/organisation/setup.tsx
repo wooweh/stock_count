@@ -1,17 +1,15 @@
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 import { useState } from "react"
-import { v4 as uuidv4 } from "uuid"
-import { useAppDispatch, useAppSelector } from "../../app/hooks"
+import { useAppDispatch } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { Input } from "../../components/control"
 import Icon, { IconNames } from "../../components/icon"
 import { ListGroup } from "../../components/list"
 import { ListItem } from "../../components/listItem"
 import Modal from "../../components/modal"
-import { selectUser } from "../user/userSlice"
 import { setUseOrg, useOrgStore } from "./organisation"
-import { createOrg, joinOrg } from "./organisationSlice"
+import { createOrg, joinOrg } from "./organisationSliceUtils"
 /*
 
 
@@ -90,50 +88,23 @@ function OrgSetupActions() {
 
 */
 function CreateOrg() {
-  const isCreating = useOrgStore((state: any) => state.isCreating)
-  const dispatch = useAppDispatch()
   const theme = useTheme()
-  const user = useAppSelector(selectUser)
+  const isCreating = useOrgStore((state: any) => state.isCreating)
   const [orgName, setOrgName] = useState("")
-  /*
-  
-  
-  */
+
   function handleClose() {
     setUseOrg("isCreating", false)
   }
-  /*
-  
-  
-  */
+
   function handleChange(event: any) {
     setOrgName(event.target.value)
   }
-  /*
-  
-  
-  */
+
   function handleCreate() {
-    dispatch(
-      createOrg({
-        name: orgName,
-        uuid: uuidv4(),
-        members: {
-          [user.uuid as string]: {
-            name: user.name?.first ?? "name",
-            surname: user.name?.last ?? "surname",
-            role: "admin",
-            uuid: user.uuid as string,
-          },
-        },
-      }),
-    )
+    createOrg(orgName)
     setUseOrg("isCreating", false)
   }
-  /*
-  
-  
-  */
+
   return (
     <Modal
       open={isCreating}
@@ -176,32 +147,20 @@ function JoinOrg() {
   const dispatch = useAppDispatch()
   const isJoining = useOrgStore((state: any) => state.isJoining)
   const [inviteKey, setInviteKey] = useState("")
-  /*
-  
-  
-  */
+
   function handleClose() {
     setUseOrg("isJoining", false)
   }
-  /*
-  
-  
-  */
+
   function handleChange(event: any) {
     setInviteKey(event.target.value)
   }
-  /*
-  
-  
-  */
+
   function handleJoin() {
-    dispatch(joinOrg(inviteKey))
+    joinOrg(inviteKey)
     setUseOrg("isJoining", false)
   }
-  /*
-  
-  
-  */
+
   return (
     <Modal
       open={isJoining}

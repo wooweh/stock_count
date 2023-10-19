@@ -1,7 +1,7 @@
 import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit"
 import _ from "lodash"
 import { RootState, store } from "../../app/store"
-import { UserOrgRoles } from "../user/userSlice"
+import { UpdateDB, UserOrgRoles } from "../user/userSlice"
 
 export type OrgProps = {
   name?: string
@@ -11,23 +11,27 @@ export type OrgProps = {
   countChecks?: CountChecksProps
 }
 export type MemberProps = {
-  name: string
-  surname: string
+  firstName: string
+  lastName: string
   role: UserOrgRoles
   uuid: string
 }
 export type MembersProps = {
   [key: string]: MemberProps
 }
-export type MemberStatusOptions = "notJoined" | "joining" | "isJoined"
+export type MemberStatuses = "notJoined" | "joining" | "isJoined"
 export type InvitesProps = { [key: string]: string }
 export type InviteProps = { inviteKey: string; tempName: string }
 export type CountChecksProps = {
   [key: string]: string
 }
+export type SetOrgProps = { org: OrgProps } & UpdateDB
+export type SetOrgMemberProps = { orgUuid: string; member: MemberProps }
+export type DeleteOrgMemberProps = { orgUuid: string; memberUuid: string }
+export type DeleteOrgProps = { uuid: string }
 
 export interface OrganisationState {
-  memberStatus: MemberStatusOptions
+  memberStatus: MemberStatuses
   org: OrgProps
 }
 
@@ -40,48 +44,37 @@ export const organisationSlice = createSlice({
   name: "organisation",
   initialState,
   reducers: {
-    createOrg: (state, action: PayloadAction<OrgProps>) => {
-      state.org = action.payload
-      state.memberStatus = "isJoined"
+    setMemberStatus: (state, action: PayloadAction<MemberStatuses>) => {
+      state.memberStatus = action.payload
     },
-    joinOrg: (state, action: PayloadAction<string>) => {
-      state.memberStatus = "joining"
+    setOrg: (state, action: PayloadAction<SetOrgProps>) => {
+      state.org = action.payload.org
     },
-    setOrg: (state, action: PayloadAction<OrgProps>) => {
-      state.org = action.payload
-    },
-    deleteOrg: (state, action: PayloadAction<OrgProps>) => {
-      state.org = {}
-      state.memberStatus = "notJoined"
-    },
-    leaveOrg: (state, action: PayloadAction<string>) => {
+    deleteOrg: (state, action: PayloadAction<DeleteOrgProps>) => {
       state.org = {}
       state.memberStatus = "notJoined"
     },
     setOrgName: (state, action: PayloadAction<string>) => {
       state.org.name = action.payload
     },
-    setOrgMember: (state, action: PayloadAction<MemberProps>) => {
-      const memberUuid = action.payload.uuid
+    setOrgMember: (state, action: PayloadAction<SetOrgMemberProps>) => {
+      const memberUuid = action.payload.member.uuid
+      const member = action.payload.member
       const members = state.org.members
-      const member = action.payload
 
       if (members) {
         members[memberUuid] = member
       }
     },
-    deleteOrgMember: (state, action: PayloadAction<string>) => {
-      const memberUuid = action.payload
+    deleteOrgMember: (state, action: PayloadAction<DeleteOrgMemberProps>) => {
+      const memberUuid = action.payload.memberUuid
       const members = state.org.members
 
       if (members) {
         delete members[memberUuid]
       }
     },
-    setMemberStatus: (state, action: PayloadAction<MemberStatusOptions>) => {
-      state.memberStatus = action.payload
-    },
-    createInvite: (state, action: PayloadAction<InviteProps>) => {
+    setInvite: (state, action: PayloadAction<InviteProps>) => {
       const inviteKey = action.payload.inviteKey
       const tempName = action.payload.tempName
       _.set(state.org, `invites.${inviteKey}`, tempName)
@@ -91,6 +84,12 @@ export const organisationSlice = createSlice({
       const invites = state.org.invites
       if (invites && inviteKey in invites) {
         delete invites[inviteKey]
+      }
+    },
+    deleteInvites: (state) => {
+      const invites = state.org.invites
+      if (invites) {
+        delete state.org.invites
       }
     },
     setCountCheck: (
@@ -112,17 +111,15 @@ export const organisationSlice = createSlice({
 })
 
 export const {
-  createOrg,
-  joinOrg,
   setOrg,
   setOrgName,
   setOrgMember,
   deleteOrgMember,
   setMemberStatus,
   deleteOrg,
-  leaveOrg,
-  createInvite,
+  setInvite,
   deleteInvite,
+  deleteInvites,
   setCountCheck,
   deleteCountCheck,
 } = organisationSlice.actions

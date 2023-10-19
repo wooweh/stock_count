@@ -79,7 +79,7 @@ export async function deleteOrgInviteOnDB(orgUuid: string, inviteKey: string) {
 
 
 */
-export async function deleteAllOrgInvitesOnDB(invites: InvitesProps) {
+export async function deleteOrgInvitesOnDB(invites: InvitesProps) {
   _.forEach(invites, (value, key) =>
     remove(ref(dbReal, getDBPath.invite(key).invite)).catch((error) =>
       console.log(error),
@@ -93,13 +93,11 @@ export async function deleteAllOrgInvitesOnDB(invites: InvitesProps) {
 
 
 */
-export async function setNewOrgOnDB(payload: OrgProps) {
-  const orgUuid = payload.uuid as string
-  set(ref(dbReal, getDBPath.org(orgUuid).org), { ...payload }).catch(
-    (error) => {
-      console.log(error)
-    },
-  )
+export async function setOrgOnDB(org: OrgProps) {
+  const orgUuid = org.uuid as string
+  set(ref(dbReal, getDBPath.org(orgUuid).org), org).catch((error) => {
+    console.log(error)
+  })
 }
 /*
 

@@ -23,18 +23,17 @@ import { setUseOrg, useOrgStore } from "./organisation"
 import {
   InviteProps,
   MemberProps,
-  createInvite,
   deleteInvite,
-  deleteOrg,
   deleteOrgMember,
-  leaveOrg,
-  selectOrg,
   selectOrgInvitesList,
   selectOrgName,
+  selectOrgUuid,
   selectOtherOrgMembersList,
+  setInvite,
   setOrgMember,
   setOrgName,
 } from "./organisationSlice"
+import { leaveOrg, removeOrg } from "./organisationSliceUtils"
 /*
 
 
@@ -68,32 +67,20 @@ function OrgNameHeader() {
   const isAdmin = useAppSelector(selectIsUserAdmin)
   const isEditing = useOrgStore((state: any) => state.isEditing)
   const [newOrgName, setNewOrgName] = useState(orgName)
-  /*
-  
-  
-  */
+
   useEffect(() => {
     setNewOrgName(orgName)
   }, [orgName])
-  /*
-  
-  
-  */
+
   function handleEdit() {
     setUseOrg("isEditing", true)
   }
-  /*
-  
-  
-  */
+
   function handleAccept() {
     setUseOrg("isEditing", false)
     if (!!newOrgName) dispatch(setOrgName(newOrgName))
   }
-  /*
-  
-  
-  */
+
   return (
     <ClickAwayListener onClickAway={() => setUseOrg("isEditing", false)}>
       <Stack width={"100%"} gap={theme.module[3]}>
@@ -145,17 +132,11 @@ type OrgItems = { iconName: IconNames; label: string; onClick: Function }[]
 function ButtonTray() {
   const theme = useTheme()
   const isAdmin = useAppSelector(selectIsUserAdmin)
-  /*
-  
-  
-  */
+
   function handleRemove() {
     setUseOrg("isRemoving", true)
   }
-  /*
-  
-  
-  */
+
   const orgItems: OrgItems = [
     {
       iconName: "group",
@@ -215,18 +196,12 @@ function ButtonTray() {
 function MembersList() {
   const members = useAppSelector(selectOtherOrgMembersList)
   const isViewingMembers = useOrgStore((state: any) => state.isViewingMembers)
-  /*
-  
-  
-  */
+
   function handleClose() {
     setUseOrg("isViewingMembers", false)
     setUseOrg("idViewingOptions", false)
   }
-  /*
-  
-  
-  */
+
   return (
     <Modal
       open={isViewingMembers}
@@ -256,31 +231,26 @@ function MembersList() {
 */
 function MemberListItem({ member }: { member: MemberProps }) {
   const dispatch = useAppDispatch()
-  const idViewingOptions = useOrgStore((state) => state.idViewingOptions)
+  const orgUuid = useAppSelector(selectOrgUuid) as string
   const isMemberAdmin = member.role === "admin"
-  /*
-  
 
-*/
   function handleAssignRole() {
     dispatch(
       setOrgMember({
-        ...member,
-        role: isMemberAdmin ? "member" : "admin",
+        orgUuid,
+        member: {
+          ...member,
+          role: isMemberAdmin ? "member" : "admin",
+        },
       }),
     )
   }
-  /*
-  
-  
-  */
-  function handleDelete() {
-    dispatch(deleteOrgMember(member.uuid))
-  }
-  /*
 
-  
-  */
+  function handleDelete() {
+    const memberUuid = member.uuid
+    dispatch(deleteOrgMember({ orgUuid, memberUuid }))
+  }
+
   const options: ListItemOptionProps[] = [
     {
       iconName: isMemberAdmin ? "profile" : "admin",
@@ -295,10 +265,11 @@ function MemberListItem({ member }: { member: MemberProps }) {
       onClick: () => setUseOrg("idViewingOptions", false),
     },
   ]
+  const name = `${member.firstName} ${member.lastName}`
 
   return (
     <ListItemWithOptions
-      label={`${member.name} ${member.surname}`}
+      label={name}
       description={_.capitalize(member.role)}
       iconName={member.role === "admin" ? "admin" : "profile"}
       options={options}
@@ -315,18 +286,12 @@ function MemberListItem({ member }: { member: MemberProps }) {
 function InvitesList() {
   const invites = useAppSelector(selectOrgInvitesList) as InviteProps[]
   const isViewingInvites = useOrgStore((state: any) => state.isViewingInvites)
-  /*
-  
-  
-  */
+
   function handleClose() {
     setUseOrg("isViewingInvites", false)
     setUseOrg("idViewingOptions", false)
   }
-  /*
-  
-  
-  */
+
   return (
     <Modal
       open={isViewingInvites}
@@ -357,10 +322,7 @@ function InvitesList() {
 function InviteListItem({ invite }: { invite: InviteProps }) {
   const dispatch = useAppDispatch()
   const idViewingOptions = useOrgStore((state) => state.idViewingOptions)
-  /*
-  
 
-*/
   function handleCopy() {
     navigator.clipboard
       .writeText(invite.inviteKey)
@@ -415,47 +377,32 @@ function NewInvite() {
   const [tempName, setTempName] = useState("")
   const [inviteKey, setInviteKey] = useState("")
   const [isCopied, setIsCopied] = useState(false)
-  /*
-  
-  
-  */
+
   function handleChange(event: any) {
     setTempName(_.capitalize(event.target.value))
   }
-  /*
-  
-  
-  */
+
   function handleClose() {
     setUseOrg("isInviting", false)
   }
-  /*
-  
-  
-  */
+
   function handleAccept() {
     dispatch(
-      createInvite({
+      setInvite({
         inviteKey: inviteKey,
         tempName: !!tempName ? tempName : "Unnamed",
       }),
     )
     setUseOrg("isInviting", false)
   }
-  /*
-  
-  
-  */
+
   function handleCopy() {
     setIsCopied(true)
     navigator.clipboard
       .writeText(inviteKey)
       .then(() => generateNotification("inviteKeyCopied"))
   }
-  /*
-  
-  
-  */
+
   useEffect(() => {
     if (isInviting) {
       setTempName("")
@@ -533,29 +480,18 @@ function NewInvite() {
 
 */
 function RemoveOrgConfirmation() {
-  const dispatch = useAppDispatch()
-  const org = useAppSelector(selectOrg)
   const isAdmin = useAppSelector(selectIsUserAdmin)
   const isRemoving = useOrgStore((state: any) => state.isRemoving)
-  /*
-  
-  
-  */
+
   function handleAccept() {
-    dispatch(isAdmin ? deleteOrg(org) : leaveOrg(org.uuid as string))
+    isAdmin ? removeOrg() : leaveOrg()
     setUseOrg("isRemoving", false)
   }
-  /*
-  
-  
-  */
+
   function handleClose() {
     setUseOrg("isRemoving", false)
   }
-  /*
-  
-  
-  */
+
   return (
     <Modal
       open={isRemoving}

@@ -37,31 +37,24 @@ import {
 } from "../features/history/historySliceRemote"
 import {
   createOrgInviteOnDB,
-  deleteAllOrgInvitesOnDB,
   deleteCountCheckOnDB,
   deleteOrgInviteOnDB,
+  deleteOrgInvitesOnDB,
   deleteOrgMemberOnDB,
   deleteOrgOnDB,
-  getOrgFromDB,
-  getOrgUuidWithInviteKeyFromDB,
   setCountCheckOnDB,
-  setNewOrgOnDB,
   setOrgMemberOnDB,
   setOrgNameOnDB,
+  setOrgOnDB,
 } from "../features/organisation/organisationRemote"
 import {
-  MemberProps,
-  OrgProps,
-  createInvite,
-  createOrg,
   deleteCountCheck,
   deleteInvite,
+  deleteInvites,
   deleteOrg,
   deleteOrgMember,
-  joinOrg,
-  leaveOrg,
   setCountCheck,
-  setMemberStatus,
+  setInvite,
   setOrg,
   setOrgMember,
   setOrgName,
@@ -95,10 +88,6 @@ import {
   setUserName,
   setUserOrgDetails,
 } from "../features/user/userSlice"
-import {
-  removeUserOrgDetails,
-  updateUserOrgDetails,
-} from "../features/user/userSliceUtils"
 import { auth } from "../remote"
 import { syncUserDetails } from "./helpers"
 import { store } from "./store"
@@ -146,19 +135,6 @@ listenerMiddleware.startListening({
   effect: async (action) => {
     const name = action.payload
     setUserNameOnDB(name)
-
-    const orgUuid = store.getState().user.user.org?.uuid
-    const orgRole = store.getState().user.user.org?.role
-    const userUuid = store.getState().user.user.uuid
-    if (!!orgUuid && !!orgRole && !!userUuid)
-      store.dispatch(
-        setOrgMember({
-          uuid: userUuid,
-          name: name.first,
-          surname: name.last,
-          role: orgRole,
-        }),
-      )
   },
 })
 /*
@@ -225,44 +201,11 @@ listenerMiddleware.startListening({
 
 */
 listenerMiddleware.startListening({
-  actionCreator: createOrg,
+  actionCreator: setOrg,
   effect: async (action) => {
-    const org = action.payload
-    const uuid = action.payload.uuid
-    const role = "admin"
-    if (!!uuid) {
-      updateUserOrgDetails(uuid, role)
-      store.dispatch(setMemberStatus("isJoined"))
-      setNewOrgOnDB(org)
-    }
-  },
-})
-/*
-
-
-
-
-
-*/
-listenerMiddleware.startListening({
-  actionCreator: joinOrg,
-  effect: async (action) => {
-    const inviteKey = action.payload
-    const uuid = store.getState().user.user.uuid as string
-    const name = store.getState().user.user.name?.first as string
-    const surname = store.getState().user.user.name?.last as string
-    const role = "member"
-    const member: MemberProps = { uuid, name, surname, role }
-    getOrgUuidWithInviteKeyFromDB(inviteKey)
-      .then((orgUuid: string) => {
-        deleteOrgInviteOnDB(orgUuid, inviteKey)
-        setOrgMemberOnDB(orgUuid, member)
-        updateUserOrgDetails(orgUuid, role)
-        return getOrgFromDB(orgUuid)
-      })
-      .then((org: OrgProps) => {
-        store.dispatch(setOrg(org))
-      })
+    const org = action.payload.org
+    const updateDB = action.payload.updateDB
+    if (updateDB) setOrgOnDB(org)
   },
 })
 /*
@@ -287,40 +230,12 @@ listenerMiddleware.startListening({
 
 */
 listenerMiddleware.startListening({
-  actionCreator: leaveOrg,
-  effect: async (action) => {
-    const userUuid = auth.currentUser?.uid
-    const orgUuid = action.payload
-    if (!!userUuid) {
-      removeUserOrgDetails()
-      deleteOrgMemberOnDB(orgUuid, userUuid)
-        .then(() => store.dispatch(setStock({ stock: {}, updateDB: false })))
-        .then(() => generateNotification("leaveOrg"))
-        .catch((error) => console.log(error))
-    }
-  },
-})
-/*
-
-
-
-
-
-*/
-listenerMiddleware.startListening({
   actionCreator: deleteOrg,
   effect: async (action) => {
-    const invites: any = action.payload.invites
     const orgUuid = action.payload.uuid
-    if (!!orgUuid) {
-      removeUserOrgDetails()
-      deleteAllOrgInvitesOnDB(invites)
-        .then(() => deleteOrgOnDB(orgUuid))
-        .then(() => deleteStockOnDB(orgUuid))
-        .then(() => store.dispatch(setStock({ stock: {}, updateDB: true })))
-        .then(() => generateNotification("deleteOrg"))
-        .catch((error) => console.log(error))
-    }
+    deleteOrgOnDB(orgUuid)
+      .then(() => generateNotification("deleteOrg"))
+      .catch((error) => console.log(error))
   },
 })
 /*
@@ -331,7 +246,7 @@ listenerMiddleware.startListening({
 
 */
 listenerMiddleware.startListening({
-  actionCreator: createInvite,
+  actionCreator: setInvite,
   effect: async (action) => {
     const inviteKey = action.payload.inviteKey
     const tempName = action.payload.tempName
@@ -366,11 +281,28 @@ listenerMiddleware.startListening({
 
 */
 listenerMiddleware.startListening({
+  actionCreator: deleteInvites,
+  effect: async () => {
+    const orgUuid = store.getState().organisation.org.uuid
+    const invites = store.getState().organisation.org.invites
+    if (!!orgUuid && !!invites) {
+      deleteOrgInvitesOnDB(invites)
+    }
+  },
+})
+/*
+
+
+
+
+
+*/
+listenerMiddleware.startListening({
   actionCreator: setOrgMember,
   effect: async (action) => {
-    const orgUuid = store.getState().organisation.org.uuid
-    const orgMember = action.payload
-    if (!!orgUuid) setOrgMemberOnDB(orgUuid, orgMember)
+    const orgUuid = action.payload.orgUuid
+    const orgMember = action.payload.member
+    setOrgMemberOnDB(orgUuid, orgMember)
   },
 })
 /*
@@ -383,13 +315,19 @@ listenerMiddleware.startListening({
 listenerMiddleware.startListening({
   actionCreator: deleteOrgMember,
   effect: async (action) => {
-    const memberUuid = action.payload
-    const orgUuid = store.getState().organisation.org.uuid
-    if (!!memberUuid && !!orgUuid) {
-      deleteOrgMemberOnDB(orgUuid, memberUuid)
-        .then(() => generateNotification("deleteOrgMember"))
-        .catch((error) => console.log(error))
-    }
+    const userUuid = store.getState().user.user.uuid
+    const memberUuid = action.payload.memberUuid
+    const orgUuid = action.payload.orgUuid
+    const isLeaving = userUuid === memberUuid
+    deleteOrgMemberOnDB(orgUuid, memberUuid)
+      .then(() => {
+        if (isLeaving) {
+          generateNotification("leaveOrg")
+        } else {
+          generateNotification("deleteOrgMember")
+        }
+      })
+      .catch((error) => console.log(error))
   },
 })
 /*
@@ -640,9 +578,8 @@ listenerMiddleware.startListening({
 */
 listenerMiddleware.startListening({
   actionCreator: deleteHistory,
-  effect: async (action) => {
-    const updateDB = action.payload.updateDB
-    if (updateDB) deleteHistoryOnDB()
+  effect: async () => {
+    deleteHistoryOnDB()
   },
 })
 /*

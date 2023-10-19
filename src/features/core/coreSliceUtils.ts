@@ -2,7 +2,7 @@ import { store } from "../../app/store"
 import { setCount } from "../count/countSlice"
 import { setMemberStatus, setOrg } from "../organisation/organisationSlice"
 import { setStock } from "../stock/stockSlice"
-import { resetUser } from "../user/userSliceUtils"
+import { setUser } from "../user/userSlice"
 import {
   NotificationProps,
   setNotification,
@@ -92,10 +92,10 @@ function resetShowNotification() {
 
 */
 export function resetSystem() {
-  setSystemNotBooted()
-  resetUser()
+  store.dispatch(setSystemStatus("notBooted"))
+  store.dispatch(setUser({ user: {}, updateDB: false }))
   store.dispatch(setMemberStatus("notJoined"))
-  store.dispatch(setOrg({}))
+  store.dispatch(setOrg({ org: {}, updateDB: false }))
   store.dispatch(setStock({ stock: {}, updateDB: false }))
   store.dispatch(setCount({}))
 }
