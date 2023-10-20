@@ -1,24 +1,26 @@
-import { v4 as uuidv4 } from "uuid"
+import { describe, expect, expectTypeOf, it } from "vitest"
 import organisationReducer, {
   InviteProps,
   InvitesProps,
   MemberProps,
   MemberStatuses,
   MembersProps,
-  OrgProps,
   OrganisationState,
-  setInvite,
-  createOrg,
   deleteInvite,
   deleteOrg,
   deleteOrgMember,
-  leaveOrg,
+  setInvite,
   setMemberStatus,
   setOrg,
   setOrgMember,
   setOrgName,
 } from "./organisationSlice"
+/*
 
+
+
+
+*/
 describe("organisation reducer", () => {
   const initialState: OrganisationState = {
     memberStatus: "notJoined",
@@ -31,8 +33,8 @@ describe("organisation reducer", () => {
       uuid: "uuid",
       members: {
         mockUuid: {
-          name: "name",
-          surname: "surname",
+          firstName: "name",
+          lastName: "surname",
           role: "admin",
           uuid: "mockUuid",
         },
@@ -51,22 +53,32 @@ describe("organisation reducer", () => {
     })
   })
 
-  it("should handle createOrg", () => {
-    const uuid = uuidv4()
-    const testPayload: OrgProps = {
-      name: "Org Name",
-      uuid: uuid,
-      members: {
-        mockUuid: {
-          firstName: "memberName",
-          lastName: "memberSurname",
-          role: "admin",
-          uuid: "mockUuid",
-        },
-      },
+  it("should handle setMemberStatus", () => {
+    const mockData = "isJoined"
+    const actual = organisationReducer(initialState, setMemberStatus(mockData))
+    expect(actual.org.name).toEqual(mockData)
+    expectTypeOf(actual.memberStatus).toEqualTypeOf<MemberStatuses>()
+  })
+
+  it("should handle setOrg", () => {
+    const mockPayload = {
+      uuid: "uuid",
+      name: "name",
+      members: mockState.org.members,
     }
-    const actual = organisationReducer(initialState, createOrg(testPayload))
-    expect(actual.org).toEqual(testPayload)
+    const actual = organisationReducer(
+      initialState,
+      setOrg({ org: mockPayload, updateDB: false }),
+    )
+    expect(actual.org.name).toEqual(mockPayload.name)
+    expect(actual.org.uuid).toEqual(mockPayload.uuid)
+    expect(actual.org.members).toEqual(mockPayload.members)
+  })
+
+  it("should handle deleteOrg", () => {
+    const mockUuid = mockState.org.uuid as string
+    const actual = organisationReducer(mockState, deleteOrg({ uuid: mockUuid }))
+    expect(actual.org).toEqual({})
   })
 
   it("should handle setOrgName", () => {
@@ -76,22 +88,31 @@ describe("organisation reducer", () => {
   })
 
   it("should handle setOrgMember", () => {
-    const mockData: MemberProps = {
+    const member: MemberProps = {
       uuid: "mockUuid",
       firstName: "mockName",
       lastName: "mockSurname",
       role: "admin",
     }
-    const actual = organisationReducer(mockState, setOrgMember(mockData))
+    const orgUuid = mockState.org.uuid as string
+    const actual = organisationReducer(
+      mockState,
+      setOrgMember({ member, orgUuid }),
+    )
     const members = actual.org.members as MembersProps
-    expect(members[mockData.uuid].firstName).toEqual(mockData.firstName)
+    expect(members[member.uuid].firstName).toEqual(member.firstName)
+    expectTypeOf(members[member.uuid]).toEqualTypeOf<MemberProps>()
   })
 
   it("should handle deleteOrgMember", () => {
-    const mockData: string = "mockUuid"
-    const actual = organisationReducer(mockState, deleteOrgMember(mockData))
+    const memberUuid: string = "mockUuid"
+    const orgUuid = mockState.org.uuid as string
+    const actual = organisationReducer(
+      mockState,
+      deleteOrgMember({ memberUuid, orgUuid }),
+    )
     const members = actual.org.members as MembersProps
-    expect(members[mockData]).toBe(undefined)
+    expect(members[memberUuid]).toBe(undefined)
   })
 
   it("should handle setInvite", () => {
@@ -101,41 +122,15 @@ describe("organisation reducer", () => {
     }
     const actual = organisationReducer(mockState, setInvite(mockData))
     const invites = actual.org.invites as InvitesProps
-    expect(invites[mockData.inviteKey]).toEqual(mockData.tempName)
+    const inviteKey = mockData.inviteKey
+    expect(invites[inviteKey]).toEqual(mockData.tempName)
+    expectTypeOf(invites[inviteKey]).toEqualTypeOf<string>()
   })
 
   it("should handle deleteInvite", () => {
     const inviteKey = "mockInviteKey1"
-    const actual = organisationReducer(mockState, deleteInvite(inviteKey))
+    const actual = organisationReducer(mockState, deleteInvite({ inviteKey }))
     const invites = actual.org.invites as InvitesProps
     expect(invites[inviteKey]).toBe(undefined)
-  })
-
-  it("should handle setOrg", () => {
-    const mockPayload = {
-      uuid: "uuid",
-      name: "name",
-      members: mockState.org.members,
-    }
-    const actual = organisationReducer(initialState, setOrg(mockPayload))
-    expect(actual.org.name).toEqual(mockPayload.name)
-    expect(actual.org.uuid).toEqual(mockPayload.uuid)
-    expect(actual.org.members).toEqual(mockPayload.members)
-  })
-
-  it("should handle deleteOrg", () => {
-    const actual = organisationReducer(mockState, deleteOrg(mockState.org))
-    expect(actual.org).toEqual({})
-  })
-
-  it("should handle leaveOrg", () => {
-    const actual = organisationReducer(mockState, leaveOrg("uuid"))
-    expect(actual.org).toEqual({})
-  })
-
-  it("should handle setMemberStatus", () => {
-    const mockPayload: MemberStatuses = "joining"
-    const actual = organisationReducer(mockState, setMemberStatus(mockPayload))
-    expect(actual.memberStatus).toEqual(mockPayload)
   })
 })

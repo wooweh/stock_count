@@ -148,8 +148,14 @@ export const selectOrgCountChecksList = createSelector(
     return checkList
   },
 )
-export const selectOrgMembers = (state: RootState) =>
-  state.organisation.org.members
+export const selectOrgMembers = (state: RootState) => {
+  const members = state.organisation.org.members
+  if (!!members) {
+    return members
+  } else {
+    return {}
+  }
+}
 export const selectUserOrgMember = createSelector(
   [selectOrgMembers],
   (members) => {
