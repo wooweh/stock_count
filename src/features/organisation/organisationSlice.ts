@@ -29,6 +29,7 @@ export type SetOrgProps = { org: OrgProps } & UpdateDB
 export type SetOrgMemberProps = { orgUuid: string; member: MemberProps }
 export type DeleteOrgMemberProps = { orgUuid: string; memberUuid: string }
 export type DeleteOrgProps = { uuid: string }
+export type DeleteInviteProps = { inviteKey: string }
 
 export interface OrganisationState {
   memberStatus: MemberStatuses
@@ -79,8 +80,8 @@ export const organisationSlice = createSlice({
       const tempName = action.payload.tempName
       _.set(state.org, `invites.${inviteKey}`, tempName)
     },
-    deleteInvite: (state, action: PayloadAction<string>) => {
-      const inviteKey = action.payload
+    deleteInvite: (state, action: PayloadAction<DeleteInviteProps>) => {
+      const inviteKey = action.payload.inviteKey
       const invites = state.org.invites
       if (invites && inviteKey in invites) {
         delete invites[inviteKey]

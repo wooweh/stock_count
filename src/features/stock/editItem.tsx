@@ -46,10 +46,7 @@ export function EditItem() {
       onChange: (event: any) => setDescription(event.target.value),
     },
   ]
-  /*
-  
-  
-  */
+
   function handleAccept(event: any) {
     if (id && name) {
       dispatch(
@@ -62,18 +59,11 @@ export function EditItem() {
       handleClose()
     }
   }
-  /*
-  
-  
-  */
+
   function handleClose() {
     setUseStock("isEditing", false)
-    setUseStock("idViewingOptions", false)
   }
-  /*
-  
-  
-  */
+
   return (
     <Modal
       open={!!isEditing}

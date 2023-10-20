@@ -4,8 +4,9 @@ import Typography from "@mui/material/Typography"
 import _ from "lodash"
 import { useEffect, useState } from "react"
 import { v4 as uuidv4 } from "uuid"
-import { useAppDispatch, useAppSelector } from "../../app/hooks"
+import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
+import { copyToClipboard } from "../../common/utils"
 import { Button } from "../../components/button"
 import { Input } from "../../components/control"
 import Icon, { IconNames } from "../../components/icon"
@@ -23,17 +24,19 @@ import { setUseOrg, useOrgStore } from "./organisation"
 import {
   InviteProps,
   MemberProps,
-  deleteInvite,
-  deleteOrgMember,
   selectOrgInvitesList,
   selectOrgName,
-  selectOrgUuid,
   selectOtherOrgMembersList,
-  setInvite,
-  setOrgMember,
-  setOrgName,
 } from "./organisationSlice"
-import { leaveOrg, removeOrg } from "./organisationSliceUtils"
+import {
+  createInvite,
+  leaveOrg,
+  removeInvite,
+  removeOrg,
+  removeOrgMember,
+  updateOrgMemberRole,
+  updateOrgName,
+} from "./organisationSliceUtils"
 /*
 
 
@@ -62,11 +65,13 @@ export function OrgProfile() {
 */
 function OrgNameHeader() {
   const theme = useTheme()
-  const dispatch = useAppDispatch()
+
   const orgName = useAppSelector(selectOrgName) as string
   const isAdmin = useAppSelector(selectIsUserAdmin)
+
   const isEditing = useOrgStore((state: any) => state.isEditing)
-  const [newOrgName, setNewOrgName] = useState(orgName)
+
+  const [newOrgName, setNewOrgName] = useState("")
 
   useEffect(() => {
     setNewOrgName(orgName)
@@ -78,12 +83,12 @@ function OrgNameHeader() {
 
   function handleAccept() {
     setUseOrg("isEditing", false)
-    if (!!newOrgName) dispatch(setOrgName(newOrgName))
+    if (!!newOrgName) updateOrgName(newOrgName)
   }
 
   return (
-    <ClickAwayListener onClickAway={() => setUseOrg("isEditing", false)}>
-      <Stack width={"100%"} gap={theme.module[3]}>
+    <Stack width={"100%"} gap={theme.module[3]}>
+      <ClickAwayListener onClickAway={() => setUseOrg("isEditing", false)}>
         <Stack direction={"row"} alignItems={"center"} gap={theme.module[5]}>
           <Input
             disabled={!isEditing}
@@ -104,21 +109,21 @@ function OrgNameHeader() {
             />
           )}
         </Stack>
-        <Stack
-          direction={"row"}
-          gap={theme.module[3]}
-          paddingLeft={theme.module[2]}
-        >
-          <Icon
-            variation={isAdmin ? "admin" : "profile"}
-            color={theme.scale.gray[5]}
-          />
-          <Typography color={theme.scale.gray[5]}>
-            {isAdmin ? "Admin" : "Member"}
-          </Typography>
-        </Stack>
+      </ClickAwayListener>
+      <Stack
+        direction={"row"}
+        gap={theme.module[3]}
+        paddingLeft={theme.module[2]}
+      >
+        <Icon
+          variation={isAdmin ? "admin" : "profile"}
+          color={theme.scale.gray[5]}
+        />
+        <Typography color={theme.scale.gray[5]}>
+          {isAdmin ? "Admin" : "Member"}
+        </Typography>
       </Stack>
-    </ClickAwayListener>
+    </Stack>
   )
 }
 /*
@@ -199,7 +204,6 @@ function MembersList() {
 
   function handleClose() {
     setUseOrg("isViewingMembers", false)
-    setUseOrg("idViewingOptions", false)
   }
 
   return (
@@ -230,39 +234,18 @@ function MembersList() {
 
 */
 function MemberListItem({ member }: { member: MemberProps }) {
-  const dispatch = useAppDispatch()
-  const orgUuid = useAppSelector(selectOrgUuid) as string
   const isMemberAdmin = member.role === "admin"
-
-  function handleAssignRole() {
-    dispatch(
-      setOrgMember({
-        orgUuid,
-        member: {
-          ...member,
-          role: isMemberAdmin ? "member" : "admin",
-        },
-      }),
-    )
-  }
-
-  function handleDelete() {
-    const memberUuid = member.uuid
-    dispatch(deleteOrgMember({ orgUuid, memberUuid }))
-  }
+  const role = isMemberAdmin ? "member" : "admin"
+  const uuid = member.uuid
 
   const options: ListItemOptionProps[] = [
     {
       iconName: isMemberAdmin ? "profile" : "admin",
-      onClick: handleAssignRole,
+      onClick: () => updateOrgMemberRole(uuid, role),
     },
     {
       iconName: "delete",
-      onClick: handleDelete,
-    },
-    {
-      iconName: "cancel",
-      onClick: () => setUseOrg("idViewingOptions", false),
+      onClick: () => removeOrgMember(uuid),
     },
   ]
   const name = `${member.firstName} ${member.lastName}`
@@ -289,7 +272,6 @@ function InvitesList() {
 
   function handleClose() {
     setUseOrg("isViewingInvites", false)
-    setUseOrg("idViewingOptions", false)
   }
 
   return (
@@ -320,44 +302,24 @@ function InvitesList() {
 
 */
 function InviteListItem({ invite }: { invite: InviteProps }) {
-  const dispatch = useAppDispatch()
-  const idViewingOptions = useOrgStore((state) => state.idViewingOptions)
+  const tempName = invite.tempName
+  const key = invite.inviteKey
 
-  function handleCopy() {
-    navigator.clipboard
-      .writeText(invite.inviteKey)
-      .then(() => generateNotification("inviteKeyCopied"))
-  }
-  /*
-
-
-*/
-  function handleDelete() {
-    dispatch(deleteInvite(invite.inviteKey))
-  }
-  /*
-
-  
-  */
   const options: ListItemOptionProps[] = [
     {
       iconName: "copy",
-      onClick: handleCopy,
+      onClick: () => copyToClipboard(key, "inviteKeyCopied"),
     },
     {
       iconName: "delete",
-      onClick: handleDelete,
-    },
-    {
-      iconName: "cancel",
-      onClick: () => setUseOrg("idViewingOptions", false),
+      onClick: () => removeInvite(key),
     },
   ]
 
   return (
     <ListItemWithOptions
-      label={invite.tempName}
-      description={invite.inviteKey}
+      label={tempName}
+      description={key}
       iconName={"profile"}
       options={options}
     />
@@ -372,36 +334,14 @@ function InviteListItem({ invite }: { invite: InviteProps }) {
 */
 function NewInvite() {
   const theme = useTheme()
-  const dispatch = useAppDispatch()
+
   const isInviting = useOrgStore((state: any) => state.isInviting)
+
   const [tempName, setTempName] = useState("")
   const [inviteKey, setInviteKey] = useState("")
   const [isCopied, setIsCopied] = useState(false)
 
-  function handleChange(event: any) {
-    setTempName(_.capitalize(event.target.value))
-  }
-
-  function handleClose() {
-    setUseOrg("isInviting", false)
-  }
-
-  function handleAccept() {
-    dispatch(
-      setInvite({
-        inviteKey: inviteKey,
-        tempName: !!tempName ? tempName : "Unnamed",
-      }),
-    )
-    setUseOrg("isInviting", false)
-  }
-
-  function handleCopy() {
-    setIsCopied(true)
-    navigator.clipboard
-      .writeText(inviteKey)
-      .then(() => generateNotification("inviteKeyCopied"))
-  }
+  const name = !!tempName ? tempName : "Unnamed"
 
   useEffect(() => {
     if (isInviting) {
@@ -417,6 +357,26 @@ function NewInvite() {
       }, 2000)
     }
   }, [isCopied])
+
+  function handleChange(event: any) {
+    setTempName(_.capitalize(event.target.value))
+  }
+
+  function handleClose() {
+    setUseOrg("isInviting", false)
+  }
+
+  function handleAccept() {
+    createInvite(inviteKey, name)
+    setUseOrg("isInviting", false)
+  }
+
+  function handleCopy() {
+    setIsCopied(true)
+    navigator.clipboard
+      .writeText(inviteKey)
+      .then(() => generateNotification("inviteKeyCopied"))
+  }
 
   return (
     <Modal

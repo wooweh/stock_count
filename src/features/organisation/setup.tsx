@@ -1,7 +1,6 @@
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 import { useState } from "react"
-import { useAppDispatch } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { Input } from "../../components/control"
 import Icon, { IconNames } from "../../components/icon"
@@ -144,7 +143,6 @@ function CreateOrg() {
 */
 function JoinOrg() {
   const theme = useTheme()
-  const dispatch = useAppDispatch()
   const isJoining = useOrgStore((state: any) => state.isJoining)
   const [inviteKey, setInviteKey] = useState("")
 

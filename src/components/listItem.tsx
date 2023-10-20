@@ -310,29 +310,20 @@ export function SelectableListItemWithOptions(
 ) {
   const theme = useTheme()
   const [isLongPressing, setIsLongPressing] = useState(true)
-  /*
   
-
-*/
   function handleSelectionClick() {
     if (props.isSelecting) {
       if (!props.isSelected) props.onSelection()
       if (props.isSelected) props.onDeselection()
     }
   }
-  /*
   
-  
-  */
   function handleLongPress() {
     if (!props.isSelecting) {
       props.onLongPress()
     }
   }
-  /*
   
-  
-  */
   useEffect(() => {
     if (!props.isSelecting) setIsLongPressing(true)
     if (props.isSelecting)

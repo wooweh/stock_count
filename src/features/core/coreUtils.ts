@@ -59,7 +59,7 @@ type NotificationsProps = {
   incompleteProfileDetails: Notification
   noFileChosen: Notification
 }
-type NotificationNames = keyof NotificationsProps
+export type NotificationNames = keyof NotificationsProps
 export function generateNotification(notification: NotificationNames) {
   const orgName = store.getState().organisation.org.name
   const NOTIFICATIONS: NotificationsProps = {

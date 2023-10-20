@@ -266,7 +266,7 @@ listenerMiddleware.startListening({
   actionCreator: deleteInvite,
   effect: async (action) => {
     const orgUuid = store.getState().organisation.org.uuid
-    const inviteKey = action.payload
+    const inviteKey = action.payload.inviteKey
     if (!!orgUuid)
       deleteOrgInviteOnDB(orgUuid, inviteKey)
         .then(() => generateNotification("deleteInvite"))
@@ -340,8 +340,8 @@ listenerMiddleware.startListening({
 listenerMiddleware.startListening({
   actionCreator: setCountCheck,
   effect: async (action) => {
-    const id = action.payload.id
     const check = action.payload.check
+    const id = action.payload.id
     setCountCheckOnDB(check, id)
   },
 })

@@ -1,3 +1,8 @@
+import {
+  NotificationNames,
+  generateNotification,
+} from "../features/core/coreUtils"
+
 /*
 
 
@@ -69,6 +74,18 @@ export function formatDuration(durationInMs: number) {
   } else {
     return `${hours}h ${minutes}m`
   }
+}
+/*
+
+
+
+
+
+*/
+export function copyToClipboard(text: string, notification: NotificationNames) {
+  navigator.clipboard
+    .writeText(text)
+    .then(() => generateNotification(notification))
 }
 /*
 

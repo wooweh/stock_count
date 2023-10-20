@@ -21,9 +21,11 @@ import {
   deleteInvites,
   deleteOrg,
   deleteOrgMember,
+  setInvite,
   setMemberStatus,
   setOrg,
   setOrgMember,
+  setOrgName
 } from "./organisationSlice"
 /*
 
@@ -127,70 +129,53 @@ export function removeOrg() {
 
 
 */
-export function updateOrgName() {}
+export function updateOrgName(name: string) {
+  store.dispatch(setOrgName(name))
+}
 /*
 
 
 
 
 */
-export function createOrgMember() {}
+export function updateOrgMemberRole(uuid: string, role: UserOrgRoles) {
+  const orgUuid = store.getState().organisation.org.uuid
+  const members = store.getState().organisation.org.members
+  if (!!orgUuid && !!members) {
+    const member = members[uuid]
+    store.dispatch(setOrgMember({ orgUuid, member }))
+  }
+}
 /*
 
 
 
 
 */
-export function updateOrgMemberName(firstName: string, lastName: string) {}
+export function removeOrgMember(memberUuid: string) {
+  const orgUuid = store.getState().organisation.org.uuid
+  if (!!orgUuid) {
+    store.dispatch(deleteOrgMember({ orgUuid, memberUuid }))
+  }
+}
 /*
 
 
 
 
 */
-export function updateOrgMemberRole(role: UserOrgRoles) {}
+export function createInvite(inviteKey: string, tempName: string) {
+  store.dispatch(setInvite({ inviteKey, tempName }))
+}
 /*
 
 
 
 
 */
-export function removeOrgMember() {}
-/*
-
-
-
-
-*/
-export function sendInvite() {}
-/*
-
-
-
-
-*/
-export function removeInvite() {}
-/*
-
-
-
-
-*/
-export function removeInvites() {}
-/*
-
-
-
-
-*/
-export function updateCountCheck() {}
-/*
-
-
-
-
-*/
-export function removeCountCheck() {}
+export function removeInvite(inviteKey: string) {
+  store.dispatch(deleteInvite({ inviteKey }))
+}
 /*
 
 

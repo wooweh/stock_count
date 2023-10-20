@@ -1,6 +1,5 @@
 import { ClickAwayListener, Stack, Typography } from "@mui/material"
 import { useState } from "react"
-import { v4 as uuidv4 } from "uuid"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { Button } from "../../components/button"
@@ -19,6 +18,7 @@ import {
   selectIsUserAwayFromCount,
   selectUserCountMemberStep,
 } from "./countSlice"
+import { createCountCheck } from "./countSliceUtils"
 import { updateCountStep, updateUserCountMember } from "./countUtils"
 /*
 
@@ -279,19 +279,12 @@ function Notification(props: NotificationProps) {
 
 */
 function PrepCheckList() {
-  const dispatch = useAppDispatch()
-
   const isManagingCheckList = useCountStore(
     (state: any) => state.isManagingCheckList,
   )
 
   function handleClose() {
     setUseCount("isManagingCheckList", false)
-  }
-
-  function handleAdd() {
-    // TODO
-    dispatch(setCountCheck({ id: uuidv4(), check: "" }))
   }
 
   const actions: ModalActionProps[] = [
@@ -301,7 +294,7 @@ function PrepCheckList() {
     },
     {
       iconName: "add",
-      handleClick: handleAdd,
+      handleClick: createCountCheck,
     },
   ]
 

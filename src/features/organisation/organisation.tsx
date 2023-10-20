@@ -20,7 +20,6 @@ type UseOrgState = {
   isJoining: boolean
   isCreating: boolean
   isInviting: boolean
-  idViewingOptions: string | false
   isViewingMembers: boolean
   isViewingInvites: boolean
 }
@@ -31,7 +30,6 @@ const initialState: UseOrgState = {
   isJoining: false,
   isCreating: false,
   isInviting: false,
-  idViewingOptions: false,
   isViewingMembers: false,
   isViewingInvites: false,
 }
