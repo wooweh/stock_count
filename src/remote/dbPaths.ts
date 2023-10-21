@@ -30,7 +30,7 @@ type CountCheckReturnProps = {
   check: string
 }
 function orgPaths(orgUuid: string): OrgPathsReturnProps {
-  const org = `organisations/${orgUuid}`
+  const org = `orgs/${orgUuid}`
   const invites = `${org}/invites`
   const members = `${org}/members`
   const countChecks = `${org}/countChecks`

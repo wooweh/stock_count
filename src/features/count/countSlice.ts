@@ -1,7 +1,7 @@
 import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit"
 import _ from "lodash"
 import { RootState } from "../../app/store"
-import { selectOrgMembers } from "../organisation/organisationSlice"
+import { selectOrgMembers } from "../org/orgSlice"
 import { StockItemProps, selectStock } from "../stock/stockSlice"
 import { UpdateDB, selectUserUuid } from "../user/userSlice"
 

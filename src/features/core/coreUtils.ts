@@ -61,7 +61,7 @@ type NotificationsProps = {
 }
 export type NotificationNames = keyof NotificationsProps
 export function generateNotification(notification: NotificationNames) {
-  const orgName = store.getState().organisation.org.name
+  const orgName = store.getState().org.org.name
   const NOTIFICATIONS: NotificationsProps = {
     deleteOrg: {
       type: "success",

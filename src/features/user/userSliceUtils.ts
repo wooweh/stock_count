@@ -2,7 +2,7 @@ import { User, deleteUser as deleteUserOnAuth } from "firebase/auth"
 import { store } from "../../app/store"
 import { auth } from "../../remote"
 import { generateErrorNotification } from "../core/coreUtils"
-import { setOrgMember } from "../organisation/organisationSlice"
+import { setOrgMember } from "../org/orgSlice"
 import { reauthenticate, signOut } from "./userAuth"
 import {
   PasswordChangeStatuses,

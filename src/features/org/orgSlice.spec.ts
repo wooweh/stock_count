@@ -5,7 +5,7 @@ import organisationReducer, {
   MemberProps,
   MemberStatuses,
   MembersProps,
-  OrganisationState,
+  OrgState,
   deleteInvite,
   deleteOrg,
   deleteOrgMember,
@@ -14,7 +14,7 @@ import organisationReducer, {
   setOrg,
   setOrgMember,
   setOrgName,
-} from "./organisationSlice"
+} from "./orgSlice"
 /*
 
 
@@ -22,11 +22,11 @@ import organisationReducer, {
 
 */
 describe("organisation reducer", () => {
-  const initialState: OrganisationState = {
+  const initialState: OrgState = {
     memberStatus: "notJoined",
     org: {},
   }
-  const mockState: OrganisationState = {
+  const mockState: OrgState = {
     memberStatus: "notJoined",
     org: {
       name: "name",

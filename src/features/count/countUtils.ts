@@ -5,7 +5,7 @@ import { ColumnData, ColumnGroupData, RowData } from "../../components/table"
 import {
   CountChecksProps,
   MembersProps,
-} from "../organisation/organisationSlice"
+} from "../org/orgSlice"
 import { StockProps } from "../stock/stockSlice"
 import { v4 as uuidv4 } from "uuid"
 import {
@@ -119,7 +119,7 @@ export function createCountMembers() {
 */
 export function prepareCountMembers(memberUuids: string[]) {
   const userUuid = store.getState().user.user.uuid as string
-  const orgMembers = store.getState().organisation.org.members as MembersProps
+  const orgMembers = store.getState().org.org.members as MembersProps
   const members = prepareCountMembersPayload(memberUuids, userUuid, orgMembers)
   store.dispatch(setCountMembers({ members, updateDB: false }))
 }
@@ -295,7 +295,7 @@ export function updateCountMetadataPayload(
 
 */
 export function createCountChecks(satisfiedCheckUuids: string[]) {
-  const checks = store.getState().organisation.org.countChecks
+  const checks = store.getState().org.org.countChecks
   if (checks) {
     const countChecks = createCountChecksPayload(checks, satisfiedCheckUuids)
     store.dispatch(setCountChecks({ checks: countChecks, updateDB: true }))

@@ -6,7 +6,7 @@ import Container from "../../components/container"
 import { Count, resetUseCount } from "../count/count"
 import { selectIsUserCounting } from "../count/countSlice"
 import { History, resetUseHistory } from "../history/history"
-import { Organisation, resetUseOrg } from "../organisation/organisation"
+import { Org, resetUseOrg } from "../org/org"
 import { Stock, resetUseStock } from "../stock/stock"
 import { Authentication, WithAuth, resetUseAuth } from "../user/authentication"
 import { UserProfile, resetUseUser } from "../user/user"
@@ -64,10 +64,10 @@ export const routes: Route[] = [
     element: <History />,
   },
   {
-    name: "Organisation",
-    path: "/organisation",
+    name: "Org",
+    path: "/org",
     requiresAuth: true,
-    element: <Organisation />,
+    element: <Org />,
   },
   {
     name: "Profile",
@@ -107,7 +107,7 @@ export function Pages() {
   useEffect(() => {
     const isAuthPath = path === routePaths.signIn.path
     const isProfilePath = path === routePaths.profile.path
-    const isOrgPath = path === routePaths.organisation.path
+    const isOrgPath = path === routePaths.org.path
     const isStockPath = path === routePaths.stock.path
     const isCountPath = path === routePaths.count.path
     const isHistoryPath = path === routePaths.history.path

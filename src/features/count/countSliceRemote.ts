@@ -21,7 +21,7 @@ import {
 */
 export async function setCountMemberOnDB(payload: CountMemberProps) {
   const memberUuid = payload.uuid
-  const orgUuid = store.getState().organisation.org.uuid
+  const orgUuid = store.getState().org.org.uuid
   if (orgUuid) {
     set(
       ref(dbReal, getDBPath.count(orgUuid).member(memberUuid).member),
@@ -39,7 +39,7 @@ export async function setCountMemberOnDB(payload: CountMemberProps) {
 
 */
 export async function deleteCountMemberOnDB(memberUuid: string) {
-  const orgUuid = store.getState().organisation.org.uuid
+  const orgUuid = store.getState().org.org.uuid
   if (orgUuid) {
     remove(
       ref(dbReal, getDBPath.count(orgUuid).member(memberUuid).member),
@@ -58,7 +58,7 @@ export async function deleteCountMemberOnDB(memberUuid: string) {
 export async function setCountResultsItemOnDB(
   payload: SetCountResultsItemProps,
 ) {
-  const orgUuid = store.getState().organisation.org.uuid
+  const orgUuid = store.getState().org.org.uuid
   const memberUuid = payload.memberUuid
   const stockId = payload.id
   const item = _.omit(payload, "memberUuid")
@@ -85,7 +85,7 @@ export async function setCountResultsItemOnDB(
 export async function deleteCountResultsItemOnDB(
   payload: DeleteCountItemProps,
 ) {
-  const orgUuid = store.getState().organisation.org.uuid
+  const orgUuid = store.getState().org.org.uuid
   const memberUuid = payload.memberUuid
   const stockId = payload.id
   if (orgUuid) {
@@ -108,7 +108,7 @@ export async function deleteCountResultsItemOnDB(
 
 */
 export async function setCountMembersOnDB(payload: CountMembersProps) {
-  const orgUuid = store.getState().organisation.org.uuid
+  const orgUuid = store.getState().org.org.uuid
   if (orgUuid) {
     set(ref(dbReal, getDBPath.count(orgUuid).members), payload).catch(
       (error) => {
@@ -125,7 +125,7 @@ export async function setCountMembersOnDB(payload: CountMembersProps) {
 
 */
 export async function setCountMetaDataOnDB(payload: CountMetadataProps) {
-  const orgUuid = store.getState().organisation.org.uuid
+  const orgUuid = store.getState().org.org.uuid
   if (orgUuid) {
     set(ref(dbReal, getDBPath.count(orgUuid).metadata), payload).catch(
       (error) => {
@@ -142,7 +142,7 @@ export async function setCountMetaDataOnDB(payload: CountMetadataProps) {
 
 */
 export async function setCountChecksOnDB(payload: CountCheckProps[]) {
-  const orgUuid = store.getState().organisation.org.uuid
+  const orgUuid = store.getState().org.org.uuid
   if (orgUuid) {
     set(ref(dbReal, getDBPath.count(orgUuid).checks), payload).catch(
       (error) => {
@@ -159,7 +159,7 @@ export async function setCountChecksOnDB(payload: CountCheckProps[]) {
 
 */
 export async function setCountCommentsOnDB(comments: CountCommentsProps) {
-  const orgUuid = store.getState().organisation.org.uuid
+  const orgUuid = store.getState().org.org.uuid
   if (orgUuid) {
     set(ref(dbReal, getDBPath.count(orgUuid).comments), comments).catch(
       (error) => {

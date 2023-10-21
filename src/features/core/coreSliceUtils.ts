@@ -1,6 +1,6 @@
 import { store } from "../../app/store"
 import { setCount } from "../count/countSlice"
-import { setMemberStatus, setOrg } from "../organisation/organisationSlice"
+import { setMemberStatus, setOrg } from "../org/orgSlice"
 import { setStock } from "../stock/stockSlice"
 import { setUser } from "../user/userSlice"
 import {

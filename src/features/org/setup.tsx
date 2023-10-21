@@ -7,8 +7,8 @@ import Icon, { IconNames } from "../../components/icon"
 import { ListGroup } from "../../components/list"
 import { ListItem } from "../../components/listItem"
 import Modal from "../../components/modal"
-import { setUseOrg, useOrgStore } from "./organisation"
-import { createOrg, joinOrg } from "./organisationSliceUtils"
+import { setUseOrg, useOrgStore } from "./org"
+import { createOrg, joinOrg } from "./orgSliceUtils"
 /*
 
 

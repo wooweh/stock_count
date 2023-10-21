@@ -20,7 +20,7 @@ import {
 import {
   MembersProps,
   selectOrgMembers,
-} from "../organisation/organisationSlice"
+} from "../org/orgSlice"
 import { UseHistoryState, setUseHistory, useHistoryStore } from "./history"
 import {
   HistoryItemCommentsProps,

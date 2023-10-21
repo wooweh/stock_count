@@ -1,5 +1,4 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit"
-import { resetSystem } from "../features/core/coreSliceUtils"
 import { generateNotification } from "../features/core/coreUtils"
 import {
   deleteCount,
@@ -46,7 +45,7 @@ import {
   setOrgMemberOnDB,
   setOrgNameOnDB,
   setOrgOnDB,
-} from "../features/organisation/organisationRemote"
+} from "../features/org/orgRemote"
 import {
   deleteCountCheck,
   deleteInvite,
@@ -58,7 +57,7 @@ import {
   setOrg,
   setOrgMember,
   setOrgName,
-} from "../features/organisation/organisationSlice"
+} from "../features/org/orgSlice"
 import {
   deleteStockItemOnDB,
   deleteStockOnDB,
@@ -74,22 +73,20 @@ import {
 import {
   deleteUserOnDB,
   deleteUserOrgDetailsOnDB,
-  setNewUserOnDB,
   setUserEmailOnDB,
   setUserNameOnDB,
+  setUserOnDB,
   setUserOrgDetailsOnDB,
 } from "../features/user/userRemote"
 import {
   deleteUser,
   deleteUserOrgDetails,
-  setIsSignedIn,
   setUser,
   setUserEmail,
   setUserName,
   setUserOrgDetails,
 } from "../features/user/userSlice"
 import { auth } from "../remote"
-import { syncUserDetails } from "./helpers"
 import { store } from "./store"
 /*
 
@@ -99,16 +96,6 @@ import { store } from "./store"
 
 */
 export const listenerMiddleware = createListenerMiddleware()
-listenerMiddleware.startListening({
-  actionCreator: setIsSignedIn,
-  effect: async (action) => {
-    if (action.payload) {
-      syncUserDetails()
-    } else {
-      resetSystem()
-    }
-  },
-})
 /*
 
 
@@ -176,7 +163,8 @@ listenerMiddleware.startListening({
   actionCreator: setUser,
   effect: async (action) => {
     const updateDB = action.payload.updateDB
-    if (updateDB) setNewUserOnDB()
+    const user = action.payload.user
+    if (updateDB) setUserOnDB(user)
   },
 })
 /*
@@ -265,7 +253,7 @@ listenerMiddleware.startListening({
 listenerMiddleware.startListening({
   actionCreator: deleteInvite,
   effect: async (action) => {
-    const orgUuid = store.getState().organisation.org.uuid
+    const orgUuid = store.getState().org.org.uuid
     const inviteKey = action.payload.inviteKey
     if (!!orgUuid)
       deleteOrgInviteOnDB(orgUuid, inviteKey)
@@ -283,8 +271,8 @@ listenerMiddleware.startListening({
 listenerMiddleware.startListening({
   actionCreator: deleteInvites,
   effect: async () => {
-    const orgUuid = store.getState().organisation.org.uuid
-    const invites = store.getState().organisation.org.invites
+    const orgUuid = store.getState().org.org.uuid
+    const invites = store.getState().org.org.invites
     if (!!orgUuid && !!invites) {
       deleteOrgInvitesOnDB(invites)
     }
@@ -428,7 +416,7 @@ listenerMiddleware.startListening({
 listenerMiddleware.startListening({
   actionCreator: deleteStock,
   effect: async () => {
-    const orgUuid = store.getState().organisation.org.uuid
+    const orgUuid = store.getState().org.org.uuid
     if (!!orgUuid) deleteStockOnDB(orgUuid)
   },
 })
@@ -459,7 +447,7 @@ listenerMiddleware.startListening({
 listenerMiddleware.startListening({
   actionCreator: setCountMember,
   effect: async (action) => {
-    const orgUuid = store.getState().organisation.org.uuid
+    const orgUuid = store.getState().org.org.uuid
     const members = store.getState().count.count.members
     const updateDB = action.payload.updateDB
     const member = action.payload.member
@@ -565,7 +553,7 @@ listenerMiddleware.startListening({
 listenerMiddleware.startListening({
   actionCreator: deleteCount,
   effect: async (action) => {
-    const orgUuid = store.getState().organisation.org.uuid
+    const orgUuid = store.getState().org.org.uuid
     if (!!orgUuid) deleteCountOnDB(orgUuid)
   },
 })

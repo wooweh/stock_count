@@ -29,13 +29,10 @@ export async function getUserFromDB() {
 
 
 */
-export async function setNewUserOnDB() {
-  const userUuid = auth.currentUser?.uid
-  const userEmail = auth.currentUser?.email as string
-  const user: UserProps = { uuid: userUuid, email: userEmail }
-
-  if (!!userUuid) {
-    set(ref(dbReal, getDBPath.user(userUuid).user), user).catch((error) => {
+export async function setUserOnDB(user: UserProps) {
+  const uuid = user.uuid
+  if (!!uuid) {
+    set(ref(dbReal, getDBPath.user(uuid).user), user).catch((error) => {
       console.log(error)
     })
   }

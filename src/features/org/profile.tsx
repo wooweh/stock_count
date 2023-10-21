@@ -20,14 +20,14 @@ import Modal from "../../components/modal"
 import { ProfileSurface } from "../../components/profileSurface"
 import { generateNotification } from "../core/coreUtils"
 import { selectIsUserAdmin } from "../user/userSlice"
-import { setUseOrg, useOrgStore } from "./organisation"
+import { setUseOrg, useOrgStore } from "./org"
 import {
   InviteProps,
   MemberProps,
   selectOrgInvitesList,
   selectOrgName,
   selectOtherOrgMembersList,
-} from "./organisationSlice"
+} from "./orgSlice"
 import {
   createInvite,
   leaveOrg,
@@ -36,7 +36,7 @@ import {
   removeOrgMember,
   updateOrgMemberRole,
   updateOrgName,
-} from "./organisationSliceUtils"
+} from "./orgSliceUtils"
 /*
 
 

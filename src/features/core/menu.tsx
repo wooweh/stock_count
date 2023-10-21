@@ -58,9 +58,9 @@ export function Menu() {
       onChange: () => toggleDarkmode(),
     },
     {
-      label: "Organisation",
+      label: "Org",
       iconName: "org",
-      onChange: () => handleMenuItemClick(routePaths.organisation.path),
+      onChange: () => handleMenuItemClick(routePaths.org.path),
     },
     {
       label: "Profile",

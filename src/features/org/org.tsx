@@ -4,7 +4,7 @@ import { useAppSelector } from "../../app/hooks"
 import { Loader } from "../../components/loader"
 import { CompleteProfilePrompt } from "../core/home"
 import { selectIsProfileComplete } from "../user/userSlice"
-import { selectIsJoining, selectIsOrgSetup } from "./organisationSlice"
+import { selectIsJoining, selectIsOrgSetup } from "./orgSlice"
 import { OrgProfile } from "./profile"
 import { OrgSetup } from "./setup"
 /*
@@ -59,7 +59,7 @@ export function resetUseOrg() {
 
 
 */
-export function Organisation() {
+export function Org() {
   const isProfileComplete = useAppSelector(selectIsProfileComplete)
   const isOrgSetup = useAppSelector(selectIsOrgSetup)
   const isJoiningOrg = useAppSelector(selectIsJoining)

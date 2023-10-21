@@ -9,7 +9,7 @@ import Icon from "../../components/icon"
 import { ListItem } from "../../components/listItem"
 import { List } from "../../components/list"
 import Modal, { ModalActionProps } from "../../components/modal"
-import { selectOrgCountChecksList } from "../organisation/organisationSlice"
+import { selectOrgCountChecksList } from "../org/orgSlice"
 import {
   addUseCountPrepComment,
   addUseCountSatisfiedCheckUuid,

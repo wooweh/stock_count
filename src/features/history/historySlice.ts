@@ -8,7 +8,7 @@ import {
   CountMemberResultsProps,
   CountMetadataProps,
 } from "../count/countSlice"
-import { selectOrgMembers } from "../organisation/organisationSlice"
+import { selectOrgMembers } from "../org/orgSlice"
 import { UpdateDB } from "../user/userSlice"
 /*
 

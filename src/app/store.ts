@@ -7,7 +7,7 @@ import {
 import { listenerMiddleware } from "./middleware"
 import userReducer from "../features/user/userSlice"
 import coreReducer from "../features/core/coreSlice"
-import organisationReducer from "../features/organisation/organisationSlice"
+import orgReducer from "../features/org/orgSlice"
 import stockReducer from "../features/stock/stockSlice"
 import countReducer from "../features/count/countSlice"
 import historyReducer from "../features/history/historySlice"
@@ -24,7 +24,7 @@ import thunk from "redux-thunk"
 const rootReducer = combineReducers({
   core: coreReducer,
   user: userReducer,
-  organisation: organisationReducer,
+  org: orgReducer,
   stock: stockReducer,
   count: countReducer,
   history: historyReducer,

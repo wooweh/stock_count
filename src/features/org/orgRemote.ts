@@ -3,7 +3,7 @@ import _ from "lodash"
 import { store } from "../../app/store"
 import { dbReal } from "../../remote"
 import { getDBPath } from "../../remote/dbPaths"
-import { InvitesProps, MemberProps, OrgProps } from "./organisationSlice"
+import { InvitesProps, MemberProps, OrgProps } from "./orgSlice"
 /*
 
 

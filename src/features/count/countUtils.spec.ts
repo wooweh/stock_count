@@ -4,7 +4,7 @@ import { ColumnData, ColumnGroupData, RowData } from "../../components/table"
 import {
   CountChecksProps,
   MembersProps,
-} from "../organisation/organisationSlice"
+} from "../org/orgSlice"
 import { StockProps } from "../stock/stockSlice"
 import {
   CountCheckProps,

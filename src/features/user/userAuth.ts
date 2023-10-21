@@ -10,15 +10,24 @@ import {
   updateEmail as updateEmailOnAuth,
   updatePassword as updatePasswordOnAuth,
 } from "firebase/auth"
+import { store } from "../../app/store"
 import { auth } from "../../remote"
+import {
+  resetSystem,
+  setSystemIsBooting,
+  setSystemNotBooted,
+} from "../core/coreSliceUtils"
 import {
   generateErrorNotification,
   generateNotification,
 } from "../core/coreUtils"
+import { getUserFromDB } from "./userRemote"
 import {
+  createNewUser,
   resetPasswordChangeStatus,
   signUserIn,
   signUserOut,
+  updateUser,
   updateUserEmail,
   updateUserPasswordChangeStatus,
 } from "./userSliceUtils"
@@ -32,9 +41,46 @@ import { checkNewPassword } from "./userUtils"
 export async function signIn(email: string, password: string) {
   return signInOnAuth(auth, email, password)
     .then((credential) => {
-      if (!!credential.user) signUserIn()
+      const user = credential.user
+      if (!!user) {
+        signUserIn()
+        syncUserDetails(user)
+      }
     })
     .catch((error) => generateErrorNotification(error.code))
+}
+/*
+
+
+
+
+*/
+export async function syncUserDetails(user: User) {
+  const isSystemBooted = store.getState().core.systemStatus === "isBooted"
+  const uuid = user.uid
+  const email = user.email as string
+
+  if (!isSystemBooted) {
+    getUserFromDB()
+      .then((dbUser) => {
+        if (!!dbUser) {
+          console.log("Setting existing user in userSlice")
+          updateUser(dbUser)
+        } else {
+          console.log("Setting new user in userSlice and db")
+          createNewUser({ uuid, email })
+        }
+      })
+      .then(() => {
+        setSystemIsBooting()
+        console.log("System booting")
+      })
+      .catch((error) => {
+        setSystemNotBooted()
+        console.log("System booting stopped")
+        console.error(error)
+      })
+  }
 }
 /*
 
@@ -45,6 +91,7 @@ export async function signIn(email: string, password: string) {
 export async function signOut() {
   return signOutOnAuth(auth)
     .then(() => signUserOut())
+    .then(() => resetSystem())
     .catch((error) => generateErrorNotification(error.code))
 }
 /*

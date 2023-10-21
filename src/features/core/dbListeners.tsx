@@ -27,7 +27,7 @@ import {
   selectOrg,
   setMemberStatus,
   setOrg,
-} from "../organisation/organisationSlice"
+} from "../org/orgSlice"
 import { StockProps, setStock } from "../stock/stockSlice"
 import {
   UserProps,
@@ -37,7 +37,7 @@ import {
 import { updateUser } from "../user/userSliceUtils"
 import { selectIsSystemActive, selectIsSystemBooting } from "./coreSlice"
 import { setSystemIsBooted } from "./coreSliceUtils"
-import { leaveOrg } from "../organisation/organisationSliceUtils"
+import { leaveOrg } from "../org/orgSliceUtils"
 /*
 
 

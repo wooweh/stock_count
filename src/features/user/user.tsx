@@ -177,8 +177,8 @@ function ProfileField(props: ProfileFieldProps) {
           onChange={props.handleChange}
           disabled={isEditing ? false : true}
           sx={{
-            fontSize: "1.25rem",
-            fontWeight: "bold",
+            fontSize: "1.125rem",
+            fontWeight: "medium",
             background: isEditing ? theme.scale.gray[8] : theme.scale.gray[9],
           }}
         />
@@ -223,6 +223,8 @@ function ButtonTray() {
 
   function handleCancel() {
     setUseUser("isEditing", false)
+    setUseUser("name", "")
+    setUseUser("surname", "")
   }
 
   function handleDelete() {

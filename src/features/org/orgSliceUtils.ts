@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from "uuid"
 import { store } from "../../app/store"
+import { generateCustomNotification } from "../core/coreUtils"
 import { deleteCount } from "../count/countSlice"
 import { deleteHistory } from "../history/historySlice"
 import { deleteStock } from "../stock/stockSlice"
@@ -8,10 +9,7 @@ import {
   deleteUserOrgDetails,
   setUserOrgDetails,
 } from "../user/userSlice"
-import {
-  getOrgFromDB,
-  getOrgUuidWithInviteKeyFromDB,
-} from "./organisationRemote"
+import { getOrgFromDB, getOrgUuidWithInviteKeyFromDB } from "./orgRemote"
 import {
   MemberProps,
   MemberStatuses,
@@ -25,8 +23,9 @@ import {
   setMemberStatus,
   setOrg,
   setOrgMember,
-  setOrgName
-} from "./organisationSlice"
+  setOrgName,
+} from "./orgSlice"
+import { getInviteKeyValidation } from "./orgUtils"
 /*
 
 
@@ -69,26 +68,36 @@ export function joinOrg(inviteKey: string) {
   const lastName = store.getState().user.user.name?.last as string
   const role = "member"
   const member: MemberProps = { uuid, firstName, lastName, role }
-  store.dispatch(setMemberStatus("joining"))
-  getOrgUuidWithInviteKeyFromDB(inviteKey)
-    .then((uuid: string) => {
-      store.dispatch(setUserOrgDetails({ uuid, role }))
-      store.dispatch(setOrgMember({ orgUuid: uuid, member }))
-      return uuid
-    })
-    .then((uuid: string) => {
-      return getOrgFromDB(uuid)
-    })
-    .then((org: OrgProps) => {
-      store.dispatch(setOrg({ org, updateDB: false }))
-      store.dispatch(setMemberStatus("isJoined"))
-    })
-    .then(() => {
-      store.dispatch(deleteInvite(inviteKey))
-    })
-    .catch((error) => {
-      console.log(error)
-    })
+
+  const isInviteKeyValid = getInviteKeyValidation(inviteKey)
+  if (isInviteKeyValid) {
+    store.dispatch(setMemberStatus("joining"))
+    return getOrgUuidWithInviteKeyFromDB(inviteKey)
+      .then((uuid: string) => {
+        store.dispatch(setUserOrgDetails({ uuid, role }))
+        store.dispatch(setOrgMember({ orgUuid: uuid, member }))
+        return uuid
+      })
+      .then((uuid: string) => {
+        return getOrgFromDB(uuid)
+      })
+      .then((org: OrgProps) => {
+        store.dispatch(setOrg({ org, updateDB: false }))
+        store.dispatch(setMemberStatus("isJoined"))
+        store.dispatch(deleteInvite({ inviteKey }))
+        generateCustomNotification("success", `You have joined ${org.name}`)
+        return { isJoined: true }
+      })
+      .catch((error) => {
+        console.log(error)
+        generateCustomNotification("error", "Invite key does not exist.")
+        return { isJoined: false }
+      })
+  } else {
+    console.log(isInviteKeyValid)
+    generateCustomNotification("error", "Invite key is invalid.")
+    return { isJoined: false }
+  }
 }
 /*
 
@@ -98,7 +107,7 @@ export function joinOrg(inviteKey: string) {
 */
 export function leaveOrg() {
   const memberUuid = store.getState().user.user.uuid
-  const orgUuid = store.getState().organisation.org.uuid
+  const orgUuid = store.getState().org.org.uuid
   if (!!memberUuid && !!orgUuid) {
     store.dispatch(setMemberStatus("notJoined"))
     store.dispatch(setOrg({ org: {}, updateDB: false }))
@@ -113,7 +122,7 @@ export function leaveOrg() {
 
 */
 export function removeOrg() {
-  const uuid = store.getState().organisation.org.uuid
+  const uuid = store.getState().org.org.uuid
   if (!!uuid) {
     store.dispatch(deleteInvites())
     store.dispatch(deleteStock())
@@ -139,8 +148,8 @@ export function updateOrgName(name: string) {
 
 */
 export function updateOrgMemberRole(uuid: string, role: UserOrgRoles) {
-  const orgUuid = store.getState().organisation.org.uuid
-  const members = store.getState().organisation.org.members
+  const orgUuid = store.getState().org.org.uuid
+  const members = store.getState().org.org.members
   if (!!orgUuid && !!members) {
     const member = members[uuid]
     store.dispatch(setOrgMember({ orgUuid, member }))
@@ -153,7 +162,7 @@ export function updateOrgMemberRole(uuid: string, role: UserOrgRoles) {
 
 */
 export function removeOrgMember(memberUuid: string) {
-  const orgUuid = store.getState().organisation.org.uuid
+  const orgUuid = store.getState().org.org.uuid
   if (!!orgUuid) {
     store.dispatch(deleteOrgMember({ orgUuid, memberUuid }))
   }

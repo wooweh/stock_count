@@ -63,6 +63,7 @@ type InputProps = {
   isNumber?: boolean
   multiline?: boolean
   autoFocus?: boolean
+  spellCheck?: boolean
   onFocus?: any
   onBlur?: any
   readOnly?: any
@@ -100,6 +101,7 @@ export function Input(props: InputProps) {
       onBlur={props.onBlur}
       readOnly={props.readOnly}
       inputProps={props.inputProps}
+      spellCheck={!!props.spellCheck}
       sx={props.sx}
       endAdornment={
         props.isPassword && (

@@ -31,18 +31,18 @@ export type DeleteOrgMemberProps = { orgUuid: string; memberUuid: string }
 export type DeleteOrgProps = { uuid: string }
 export type DeleteInviteProps = { inviteKey: string }
 
-export interface OrganisationState {
+export interface OrgState {
   memberStatus: MemberStatuses
   org: OrgProps
 }
 
-const initialState: OrganisationState = {
+const initialState: OrgState = {
   memberStatus: "notJoined",
   org: {},
 }
 
 export const organisationSlice = createSlice({
-  name: "organisation",
+  name: "org",
   initialState,
   reducers: {
     setMemberStatus: (state, action: PayloadAction<MemberStatuses>) => {
@@ -126,18 +126,17 @@ export const {
 } = organisationSlice.actions
 
 export const selectIsJoining = (state: RootState) => {
-  return state.organisation.memberStatus === "joining"
+  return state.org.memberStatus === "joining"
 }
 export const selectIsJoined = (state: RootState) => {
-  return state.organisation.memberStatus === "isJoined"
+  return state.org.memberStatus === "isJoined"
 }
-export const selectOrg = (state: RootState) => state.organisation.org
-export const selectOrgName = (state: RootState) => state.organisation.org.name
-export const selectOrgUuid = (state: RootState) => state.organisation.org.uuid
-export const selectIsOrgSetup = (state: RootState) =>
-  !!state.organisation.org.uuid
+export const selectOrg = (state: RootState) => state.org.org
+export const selectOrgName = (state: RootState) => state.org.org.name
+export const selectOrgUuid = (state: RootState) => state.org.org.uuid
+export const selectIsOrgSetup = (state: RootState) => !!state.org.org.uuid
 export const selectOrgCountChecks = (state: RootState) =>
-  state.organisation.org.countChecks
+  state.org.org.countChecks
 export const selectOrgCountChecksList = createSelector(
   [selectOrgCountChecks],
   (checks) => {
@@ -149,7 +148,7 @@ export const selectOrgCountChecksList = createSelector(
   },
 )
 export const selectOrgMembers = (state: RootState) => {
-  const members = state.organisation.org.members
+  const members = state.org.org.members
   if (!!members) {
     return members
   } else {
@@ -185,7 +184,7 @@ export const selectOtherOrgMembersList = createSelector(
   },
 )
 export const selectOrgInvites = (state: RootState) => {
-  const invites = state.organisation.org.invites
+  const invites = state.org.org.invites
   const modifiedInvites = {}
   if (!!invites) {
     _.forIn(invites, (value, key) => {

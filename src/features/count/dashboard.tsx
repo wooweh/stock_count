@@ -10,7 +10,7 @@ import {
   deleteCountCheck,
   selectOrgCountChecksList,
   setCountCheck,
-} from "../organisation/organisationSlice"
+} from "../org/orgSlice"
 import { selectIsUserAdmin } from "../user/userSlice"
 import { resetUseCount, setUseCount, useCountStore } from "./count"
 import {

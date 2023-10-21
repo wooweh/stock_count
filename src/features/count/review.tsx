@@ -34,7 +34,7 @@ import {
 import {
   MembersProps,
   selectOrgMembers,
-} from "../organisation/organisationSlice"
+} from "../org/orgSlice"
 import { setUseCount, useCountStore } from "./count"
 import Modal, { ModalActionProps } from "../../components/modal"
 import { getTimeStamp } from "../../common/utils"

@@ -160,7 +160,7 @@ function ProfileButton(props: ButtonVariationProps) {
         {!!props.iconName && (
           <Icon
             variation={props.iconName}
-            fontSize={"large"}
+            fontSize={props.iconSize ?? "large"}
             color={props.iconColor}
           />
         )}

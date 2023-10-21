@@ -10,7 +10,7 @@ import { List } from "../../components/list"
 import { ListItem } from "../../components/listItem"
 import Modal, { ModalActionProps } from "../../components/modal"
 import { generateCustomNotification } from "../core/coreUtils"
-import { MemberProps } from "../organisation/organisationSlice"
+import { MemberProps } from "../org/orgSlice"
 import {
   addUseCountSelectedMemberUuid,
   removeUseCountSelectedMemberUuid,
