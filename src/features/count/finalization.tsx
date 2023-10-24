@@ -26,7 +26,7 @@ import {
   selectCountersList,
   selectOrganiser,
 } from "./countSlice"
-import { submitCount, updateCountStep } from "./countUtils"
+import { removeCount, submitCount, updateCountStep } from "./countSliceUtils"
 import {
   CommentsList,
   PreparationItem as FinalizationItem,
@@ -59,6 +59,7 @@ export function FinalizationBody() {
 type FinalizationItemsProps = PreparationItemProps
 function FinalizationItems() {
   const comments = useCountStore((state) => state.finalComments)
+
   const finalItems: FinalizationItemsProps[] = [
     {
       label: "Summary:",
@@ -105,7 +106,7 @@ function CountSummary() {
     metadata.finalizationStartTime,
   )
   const durationLabel = formatDuration(countDuration)
-  const organiserFullName = `${organiser.name[0]}. ${organiser.surname}`
+  const organiserFullName = `${organiser.firstName[0]}. ${organiser.lastName}`
 
   const dataItems: DataLineItemProps[] = [
     {
@@ -132,7 +133,7 @@ function CountSummary() {
       label: "Counters",
       iconName: "group",
       data: counters.map((counter) => {
-        const counterFullName = `${counter.name[0]}. ${counter.surname}`
+        const counterFullName = `${counter.firstName[0]}. ${counter.lastName}`
         return (
           <DataPill
             label={counterFullName}
@@ -167,7 +168,7 @@ function CountSummary() {
 export type DataLineItemProps = {
   label: string
   iconName: IconNames
-  data: any
+  data: React.ReactNode
 }
 export function DataLineItem(props: DataLineItemProps) {
   const theme = useTheme()
@@ -248,19 +249,13 @@ export function DataPill(props: DataPillProps) {
 */
 function FinalizeCountConfirmation() {
   const theme = useTheme()
-  const dispatch = useAppDispatch()
-
   const isSubmittingFinalization = useCountStore(
     (state: any) => state.isSubmittingFinalization,
   )
 
   function handleAccept() {
     submitCount()
-    updateCountStep("dashboard")
     resetUseCount()
-    handleClose()
-    dispatch(deleteCount())
-    generateCustomNotification("success", "Count submitted to History")
   }
 
   function handleClose() {

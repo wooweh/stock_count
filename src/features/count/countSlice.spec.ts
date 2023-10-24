@@ -1,44 +1,67 @@
+import _ from "lodash"
+import { describe, expect, expectTypeOf, it } from "vitest"
+import { CountChecksProps, MembersProps } from "../org/orgSlice"
 import countReducer, {
+  CountCheckProps,
   CountCommentsProps,
+  CountItemProps,
   CountMemberProps,
+  CountMemberResultsProps,
   CountMembersProps,
   CountMetadataProps,
   CountResultsProps,
   CountState,
   DeleteCountItemProps,
-  SetCountResultsItemProps,
-  addCountCheck,
   deleteCount,
-  deleteCountCheck,
   deleteCountMember,
   deleteCountResultsItem,
   setCount,
+  setCountChecks,
   setCountComments,
-  setCountFinalComments,
   setCountMember,
   setCountMembers,
   setCountMetaData,
-  setCountPrepComments,
   setCountResults,
   setCountResultsItem,
   setCountStep,
 } from "./countSlice"
+import {
+  createCountChecksPayload,
+  prepareCountMembersPayload,
+  prepareFinalResults,
+} from "./countSliceUtils"
+/*
 
-describe("count Reducer", () => {
+
+
+
+*/
+const PREP_START_TIME = 1698135256
+const COUNT_START_TIME = PREP_START_TIME + 10 * 60
+const REVIEW_START_TIME = COUNT_START_TIME + 10 * 60
+const FINALIZE_START_TIME = REVIEW_START_TIME + 10 * 60
+const FINAL_SUBMIT_TIME = FINALIZE_START_TIME + 10 * 60
+/*
+
+
+
+
+*/
+describe("Count Reducer", () => {
   const initialState: CountState = {
     step: "dashboard",
     count: {},
   }
+
   const mockState: CountState = {
-    checks: ["mockCheck"],
     step: "dashboard",
     count: {
       metadata: {
         type: "solo",
-        prepStartTime: "mockPrepTime",
-        countStartTime: "mockCountTime",
-        reviewStartTime: "mockReviewTime",
-        finalSubmissionTime: "mockFinalTime",
+        prepStartTime: PREP_START_TIME,
+        countStartTime: COUNT_START_TIME,
+        reviewStartTime: REVIEW_START_TIME,
+        finalSubmissionTime: FINAL_SUBMIT_TIME,
         organiser: "mockUuid",
         counters: ["mockUuid"],
       },
@@ -49,7 +72,7 @@ describe("count Reducer", () => {
       results: {
         mockUuid: {
           mockStockId: {
-            stockId: "mockStockId",
+            id: "mockStockId",
             useableCount: 1,
             damagedCount: 2,
             obsoleteCount: 3,
@@ -59,10 +82,11 @@ describe("count Reducer", () => {
       members: {
         mockUuid: {
           uuid: "mockUuid",
-          name: "mockName",
-          surname: "mockSurname",
+          firstName: "mockName",
+          lastName: "mockSurname",
           isOrganiser: true,
           isCounter: true,
+          isCounting: true,
           isJoined: true,
           step: "dashboard",
         },
@@ -76,76 +100,79 @@ describe("count Reducer", () => {
     })
   })
 
-  it("should handle addCountCheck", () => {
-    const mockCheck = "Clean all boxes"
-    const actual = countReducer(initialState, addCountCheck(mockCheck))
-    expect(actual.checks[0]).toEqual(mockCheck)
-  })
-
-  it("should handle deleteCountCheck", () => {
-    const actual = countReducer(initialState, deleteCountCheck(0))
-    expect(actual.checks[0]).toEqual(undefined)
-  })
-
   it("should handle setCountStep", () => {
-    const actual = countReducer(initialState, setCountStep("setup"))
-    expect(actual.step).toEqual("setup")
+    const step = "setup"
+    const actual = countReducer(
+      initialState,
+      setCountStep({ step, updateMember: false }),
+    )
+    expect(actual.step).toEqual(step)
   })
 
   it("should handle setCountMember", () => {
-    const mockData: CountMemberProps = {
+    const member: CountMemberProps = {
       uuid: "mockUuid",
-      name: "mockName",
-      surname: "mockSurname",
+      firstName: "mockName",
+      lastName: "mockSurname",
       isCounter: false,
+      isCounting: false,
       isJoined: false,
       isOrganiser: false,
       step: "dashboard",
     }
     const actual = countReducer(
       mockState,
-      setCountMember({ member: mockData, updateDB: false }),
+      setCountMember({ member, updateDB: false }),
     )
     const members = actual.count.members as CountMembersProps
-    expect(members[mockData.uuid]).toEqual(mockData)
+    expect(members[member.uuid]).toEqual(member)
   })
 
   it("should handle deleteCountMember", () => {
-    const actual = countReducer(mockState, deleteCountMember("mockUuid"))
+    const uuid = "mockUuid"
+    const actual = countReducer(mockState, deleteCountMember({ uuid }))
     const members = actual.count.members as CountMembersProps
     expect(members["mockUuid"]).toEqual(undefined)
   })
 
   it("should handle setCountResultsItem", () => {
-    const mockItem: SetCountResultsItemProps = {
-      memberUuid: "mockUuid",
-      stockId: "mockStockId1",
+    const memberUuid = "mockUuid"
+    const item: CountItemProps = {
+      id: "mockStockId1",
       useableCount: 1,
       damagedCount: 2,
       obsoleteCount: 3,
     }
-    const actual = countReducer(mockState, setCountResultsItem(mockItem))
+    const stockId = item.id
+    const actual = countReducer(
+      mockState,
+      setCountResultsItem({ memberUuid, item }),
+    )
     const results = actual.count.results as CountResultsProps
-    expect(results["mockUuid"]["mockStockId1"].useableCount).toEqual(1)
+    expect(results[memberUuid][stockId].useableCount).toEqual(1)
   })
 
   it("should handle deleteCountResultsItem", () => {
+    const memberUuid = "mockUuid"
+    const id = "mockStockId"
     const mockPayload: DeleteCountItemProps = {
-      memberUuid: "mockUuid",
-      stockId: "mockStockId",
+      memberUuid,
+      id,
     }
     const actual = countReducer(mockState, deleteCountResultsItem(mockPayload))
     const results = actual.count.results as CountResultsProps
-    expect(results["mockUuid"]["mockStockId"]).toEqual(undefined)
+    expect(results[memberUuid][id]).toEqual(undefined)
   })
 
   it("should handle setCountMembers", () => {
+    const uuid = "mockUuid1"
     const mockPayload: CountMembersProps = {
       mockUuid1: {
-        uuid: "mockUuid1",
-        name: "mockName",
-        surname: "mockSurname",
+        uuid,
+        firstName: "mockName",
+        lastName: "mockSurname",
         isCounter: false,
+        isCounting: false,
         isJoined: false,
         isOrganiser: false,
         step: "dashboard",
@@ -156,16 +183,16 @@ describe("count Reducer", () => {
       setCountMembers({ members: mockPayload, updateDB: false }),
     )
     const members = actual.count.members as CountMembersProps
-    expect(members["mockUuid1"]).toEqual(mockPayload.mockUuid1)
+    expect(members[uuid]).toEqual(mockPayload.mockUuid1)
   })
 
   it("should handle setCountMetaData", () => {
     const mockPayload: CountMetadataProps = {
       type: "dual",
-      prepStartTime: "mockPrepTime",
-      countStartTime: "mockCountTime",
-      reviewStartTime: "mockReviewTime",
-      finalSubmissionTime: "mockFinalTime",
+      prepStartTime: PREP_START_TIME,
+      countStartTime: COUNT_START_TIME,
+      reviewStartTime: REVIEW_START_TIME,
+      finalSubmissionTime: FINAL_SUBMIT_TIME,
       organiser: "mockUuid",
       counters: ["mockUuid"],
     }
@@ -177,31 +204,30 @@ describe("count Reducer", () => {
     expect(metadata).toEqual(mockPayload)
   })
 
-  const mockCommentPayload: CountCommentsProps = {
-    preparation: ["mockComment1", "mockComment2"],
-    finalization: ["mockComment3", "mockComment4"],
-  }
-  it("should handle setCountComments", () => {
+  it("should handle setCountChecks", () => {
+    const checks: CountCheckProps[] = [
+      { check: "mockCheck1", isChecked: true },
+      { check: "mockCheck2", isChecked: false },
+    ]
     const actual = countReducer(
       initialState,
-      setCountComments(mockCommentPayload),
+      setCountChecks({ checks, updateDB: false }),
     )
-    const comments = actual.count.comments as CountCommentsProps
-    expect(comments).toEqual(mockCommentPayload)
+    const countChecks = actual.count.checks as CountCheckProps[]
+    expect(countChecks).toEqual(checks)
   })
 
-  it("should handle setCountPrepComments", () => {
-    const mockComments = mockCommentPayload.preparation as string[]
-    const actual = countReducer(mockState, setCountPrepComments(mockComments))
-    const comments = actual.count.comments as CountCommentsProps
-    expect(comments.preparation).toEqual(mockComments)
-  })
-
-  it("should handle setCountFinalComments", () => {
-    const mockComments = mockCommentPayload.finalization as string[]
-    const actual = countReducer(mockState, setCountFinalComments(mockComments))
-    const comments = actual.count.comments as CountCommentsProps
-    expect(comments.finalization).toEqual(mockComments)
+  it("should handle setCountComments", () => {
+    const comments: CountCommentsProps = {
+      preparation: ["mockComment1", "mockComment2"],
+      finalization: ["mockComment3", "mockComment4"],
+    }
+    const actual = countReducer(
+      initialState,
+      setCountComments({ comments, updateDB: false }),
+    )
+    const countComments = actual.count.comments as CountCommentsProps
+    expect(countComments).toEqual(comments)
   })
 
   it("should handle setCountResults", () => {
@@ -222,3 +248,89 @@ describe("count Reducer", () => {
     expect(actual.count).toEqual({})
   })
 })
+/*
+
+
+
+
+*/
+describe("Count SliceUtils", () => {
+  const memberUuids = ["test-uuid1", "test-uuid2"]
+  const userUuid = "test-uuid1"
+  const members: MembersProps = {
+    "test-uuid1": {
+      uuid: "test-uuid1",
+      firstName: "John",
+      lastName: "Doe",
+      role: "admin",
+    },
+    "test-uuid2": {
+      uuid: "test-uuid2",
+      firstName: "Jane",
+      lastName: "Doe",
+      role: "admin",
+    },
+  }
+
+  it("should handle prepareCountMembersPayload", () => {
+    const countMembers = prepareCountMembersPayload(
+      memberUuids,
+      userUuid,
+      members,
+    )
+
+    expect(_.keys(countMembers)).toEqual(memberUuids)
+    expect(countMembers[userUuid].firstName).toEqual(
+      members[userUuid].firstName,
+    )
+    expectTypeOf(countMembers).toEqualTypeOf<CountMembersProps>()
+  })
+
+  it("should handle createCountChecksPayload", () => {
+    const countChecks: CountChecksProps = {
+      check1: "Check 1",
+      check2: "Check 2",
+      check3: "Check 3",
+    }
+    const satisfiedCheckUuids = ["check1", "check2"]
+    const checks = createCountChecksPayload(countChecks, satisfiedCheckUuids)
+    expect(checks.length).toEqual(3)
+    expectTypeOf(checks).toEqualTypeOf<CountCheckProps[]>()
+  })
+
+  it("should handle prepareFinalResults", () => {
+    const mockFinalResults: CountResultsProps = {
+      mockCounterUuid1: {
+        mockStockId1: {
+          id: "mockStockId1",
+          useableCount: 2,
+          damagedCount: 3,
+          obsoleteCount: 4,
+        },
+      },
+      mockCounterUuid2: {
+        mockStockId2: {
+          id: "mockStockId2",
+          useableCount: 2,
+          damagedCount: 3,
+          obsoleteCount: 4,
+        },
+      },
+    }
+
+    const finalResults = prepareFinalResults(mockFinalResults)
+    expect(finalResults.mockStockId1).toEqual(
+      mockFinalResults.mockCounterUuid1.mockStockId1,
+    )
+    expect(finalResults.mockStockId2).toEqual(
+      mockFinalResults.mockCounterUuid2.mockStockId2,
+    )
+    expectTypeOf(finalResults).toEqualTypeOf<CountMemberResultsProps>()
+  })
+})
+/*
+
+
+
+
+*/

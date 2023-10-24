@@ -23,7 +23,7 @@ import {
   setCountMetaDataOnDB,
   setCountResultsItemOnDB,
 } from "../features/count/countSliceRemote"
-import { updateUserCountMember } from "../features/count/countUtils"
+import { updateUserCountMember } from "../features/count/countSliceUtils"
 import {
   deleteHistory,
   deleteHistoryItem,
@@ -45,7 +45,7 @@ import {
   setOrgMemberOnDB,
   setOrgNameOnDB,
   setOrgOnDB,
-} from "../features/org/orgRemote"
+} from "../features/org/orgSliceRemote"
 import {
   deleteCountCheck,
   deleteInvite,
@@ -59,17 +59,17 @@ import {
   setOrgName,
 } from "../features/org/orgSlice"
 import {
-  deleteStockItemOnDB,
-  deleteStockOnDB,
-  setStockItemOnDB,
-  setStockOnDB,
-} from "../features/stock/stockRemote"
-import {
   deleteStock,
   deleteStockItem,
   setStock,
   setStockItem,
 } from "../features/stock/stockSlice"
+import {
+  deleteStockItemOnDB,
+  deleteStockOnDB,
+  setStockItemOnDB,
+  setStockOnDB,
+} from "../features/stock/stockSliceRemote"
 import {
   deleteUserOnDB,
   deleteUserOrgDetailsOnDB,
@@ -77,7 +77,7 @@ import {
   setUserNameOnDB,
   setUserOnDB,
   setUserOrgDetailsOnDB,
-} from "../features/user/userRemote"
+} from "../features/user/userSliceRemote"
 import {
   deleteUser,
   deleteUserOrgDetails,
@@ -358,7 +358,7 @@ listenerMiddleware.startListening({
 listenerMiddleware.startListening({
   actionCreator: deleteCountCheck,
   effect: async (action) => {
-    const id = action.payload
+    const id = action.payload.id
     deleteCountCheckOnDB(id)
   },
 })
@@ -402,8 +402,8 @@ listenerMiddleware.startListening({
 listenerMiddleware.startListening({
   actionCreator: deleteStockItem,
   effect: async (action) => {
-    const stockId = action.payload
-    deleteStockItemOnDB(stockId)
+    const id = action.payload.id
+    deleteStockItemOnDB(id)
   },
 })
 /*
@@ -466,7 +466,7 @@ listenerMiddleware.startListening({
 listenerMiddleware.startListening({
   actionCreator: deleteCountMember,
   effect: async (action) => {
-    const memberUuid = action.payload
+    const memberUuid = action.payload.uuid
     deleteCountMemberOnDB(memberUuid)
   },
 })

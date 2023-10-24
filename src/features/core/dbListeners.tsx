@@ -19,7 +19,7 @@ import {
   setCountMetaData,
   setCountResults,
 } from "../count/countSlice"
-import { updateCountStep } from "../count/countUtils"
+import { updateCountStep } from "../count/countSliceUtils"
 import { HistoryProps, setHistory } from "../history/historySlice"
 import {
   OrgProps,

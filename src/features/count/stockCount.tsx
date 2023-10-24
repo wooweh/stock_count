@@ -25,7 +25,11 @@ import {
   selectUserCountResults,
   selectUserCountResultsList,
 } from "./countSlice"
-import { removeCountResultsItem, updateCountResultItem } from "./countUtils"
+import {
+  addCountResultItem,
+  removeCountResultsItem,
+  updateCountResultItem,
+} from "./countSliceUtils"
 /*
 
 
@@ -125,17 +129,11 @@ function AddStockItemSearchBar() {
   const list =
     countType === "dual" ? remainingDualStockList : remainingStockList
 
-  const resultPayload = {
-    useableCount: 0,
-    damagedCount: 0,
-    obsoleteCount: 0,
-    memberUuid: userUuid,
-  }
-
-  function handleSelect(item: any) {
-    updateCountResultItem({ id: item.id, ...resultPayload })
+  function handleSelect(selectedItem: any) {
+    const id = selectedItem.id
+    addCountResultItem(id, userUuid)
+    setUseCount("currentlyViewedStockItemId", id)
     setUseCount("isAddingStockItem", false)
-    setUseCount("currentlyViewedStockItemId", item.id)
   }
 
   function handleClickAway() {
@@ -417,20 +415,19 @@ function RecordStockItemCount() {
 
   const [isOpen, setIsOpen] = useState(false)
 
-  const resultItemPayload = {
-    id,
-    useableCount,
-    damagedCount,
-    obsoleteCount,
-    memberUuid,
-  }
-
   useEffect(() => {
     if (!!id) setIsOpen(true)
   }, [id])
 
+  const item = {
+    id,
+    useableCount,
+    damagedCount,
+    obsoleteCount,
+  }
+
   function handleAccept() {
-    updateCountResultItem(resultItemPayload)
+    updateCountResultItem(item, memberUuid)
     handleClose()
   }
 
@@ -507,10 +504,10 @@ function RecordStockItemCountBody({ handleClose }: { handleClose: Function }) {
     }
   }, [stockItem])
 
-  function handleDeleteClick() {
+  function handleDelete() {
     handleClose()
     setTimeout(() => {
-      removeCountResultsItem({ memberUuid, id })
+      removeCountResultsItem(id, memberUuid)
     }, 250)
   }
 
@@ -624,7 +621,7 @@ function RecordStockItemCountBody({ handleClose }: { handleClose: Function }) {
             iconName={"delete"}
             label={"Remove Item"}
             bgColor={theme.scale.red[9]}
-            onClick={handleDeleteClick}
+            onClick={handleDelete}
             boxShadowScale={4}
             justifyCenter
           />

@@ -1,16 +1,14 @@
 import { Stack, Typography } from "@mui/material"
-import _ from "lodash"
 import { useEffect, useState } from "react"
-import { useAppDispatch } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { Button } from "../../components/button"
 import { CSVParser, downloadCSVTemplate } from "../../components/csvParser"
 import Modal, { ModalActionProps } from "../../components/modal"
 import VirtualizedTable, { ColumnData } from "../../components/table"
 import { setUseStock, useStockStore } from "./stock"
-import { StockItemProps, setStock } from "./stockSlice"
+import { StockItemProps } from "./stockSlice"
+import { uploadStockList } from "./stockSliceUtils"
 /*
-
 
 
 
@@ -18,15 +16,12 @@ import { StockItemProps, setStock } from "./stockSlice"
 */
 export function UploadItems() {
   const theme = useTheme()
-  const dispatch = useAppDispatch()
   const isUploading = useStockStore((state: any) => state.isUploading)
   const [data, setData]: any = useState([])
 
   function handleAccept() {
-    const stockList = {}
-    _.forEach(data, (item) => _.set(stockList, item.id, item))
-    dispatch(setStock({ stock: stockList, updateDB: true }))
-    handleClose()
+    uploadStockList(data)
+    setUseStock("isUploading", false)
   }
 
   function handleClose() {
@@ -70,6 +65,7 @@ export function UploadItems() {
   const modalActions: ModalActionProps[] = [
     { iconName: "cancel", handleClick: handleClose },
   ]
+
   if (data.length)
     modalActions.push({ iconName: "done", handleClick: handleAccept })
 
@@ -112,7 +108,6 @@ export function UploadItems() {
   )
 }
 /*
-
 
 
 

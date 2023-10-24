@@ -16,7 +16,7 @@ import {
   ListItemOptionProps,
   ListItemWithOptions,
 } from "../../components/listItem"
-import Modal from "../../components/modal"
+import Modal, { ModalActionProps } from "../../components/modal"
 import { ProfileSurface } from "../../components/profileSurface"
 import { generateNotification } from "../core/coreUtils"
 import { selectIsUserAdmin } from "../user/userSlice"
@@ -42,7 +42,6 @@ import {
 
 
 
-
 */
 export function OrgProfile() {
   return (
@@ -57,7 +56,6 @@ export function OrgProfile() {
   )
 }
 /*
-
 
 
 
@@ -131,7 +129,6 @@ function OrgNameHeader() {
 
 
 
-
 */
 type OrgItems = { iconName: IconNames; label: string; onClick: Function }[]
 function ButtonTray() {
@@ -196,7 +193,6 @@ function ButtonTray() {
 
 
 
-
 */
 function MembersList() {
   const members = useAppSelector(selectOtherOrgMembersList)
@@ -205,6 +201,10 @@ function MembersList() {
   function handleClose() {
     setUseOrg("isViewingMembers", false)
   }
+
+  const actions: ModalActionProps[] = [
+    { iconName: "cancel", handleClick: handleClose },
+  ]
 
   return (
     <Modal
@@ -221,13 +221,12 @@ function MembersList() {
           <Typography>No members have been added</Typography>
         )
       }
-      actions={[{ iconName: "cancel", handleClick: handleClose }]}
+      actions={actions}
       onClose={handleClose}
     />
   )
 }
 /*
-
 
 
 
@@ -264,7 +263,6 @@ function MemberListItem({ member }: { member: MemberProps }) {
 
 
 
-
 */
 function InvitesList() {
   const invites = useAppSelector(selectOrgInvitesList) as InviteProps[]
@@ -273,6 +271,10 @@ function InvitesList() {
   function handleClose() {
     setUseOrg("isViewingInvites", false)
   }
+
+  const actions: ModalActionProps[] = [
+    { iconName: "cancel", handleClick: handleClose },
+  ]
 
   return (
     <Modal
@@ -289,13 +291,12 @@ function InvitesList() {
           <Typography>No pending invites</Typography>
         )
       }
-      actions={[{ iconName: "cancel", handleClick: handleClose }]}
+      actions={actions}
       onClose={handleClose}
     />
   )
 }
 /*
-
 
 
 
@@ -330,11 +331,8 @@ function InviteListItem({ invite }: { invite: InviteProps }) {
 
 
 
-
 */
 function NewInvite() {
-  const theme = useTheme()
-
   const isInviting = useOrgStore((state: any) => state.isInviting)
 
   const [tempName, setTempName] = useState("")
@@ -346,7 +344,7 @@ function NewInvite() {
   useEffect(() => {
     if (isInviting) {
       setTempName("")
-      setInviteKey(String(uuidv4()))
+      setInviteKey(uuidv4())
     }
   }, [isInviting])
 
@@ -358,10 +356,6 @@ function NewInvite() {
     }
   }, [isCopied])
 
-  function handleChange(event: any) {
-    setTempName(_.capitalize(event.target.value))
-  }
-
   function handleClose() {
     setUseOrg("isInviting", false)
   }
@@ -371,69 +365,100 @@ function NewInvite() {
     setUseOrg("isInviting", false)
   }
 
-  function handleCopy() {
-    setIsCopied(true)
-    navigator.clipboard
-      .writeText(inviteKey)
-      .then(() => generateNotification("inviteKeyCopied"))
+  const inviteBodyProps: NewInviteBodyProps = {
+    inviteKey,
+    tempName,
+    isCopied,
+    setInviteKey,
+    setTempName,
+    setIsCopied,
   }
+
+  const actions: ModalActionProps[] = [
+    { iconName: "cancel", handleClick: handleClose },
+    { iconName: "done", handleClick: handleAccept },
+  ]
 
   return (
     <Modal
       open={isInviting}
       heading={"New Invite"}
-      body={
-        <Stack width={"100%"} gap={theme.module[4]}>
-          <Stack
-            width={"100%"}
-            direction={"row"}
-            alignItems={"center"}
-            paddingLeft={theme.module[2]}
-            gap={theme.module[3]}
-            boxSizing={"border-box"}
-          >
-            <Typography>Name:</Typography>
-            <Input
-              placeholder={"(optional)"}
-              onChange={handleChange}
-              value={tempName}
-              sx={{
-                background: theme.scale.gray[8],
-              }}
-            />
-          </Stack>
-          <ListItem
-            label={inviteKey}
-            primarySlot={
-              <Icon
-                variation={"key"}
-                fontSize={"small"}
-                color={theme.scale.gray[5]}
-              />
-            }
-            secondarySlot={
-              <Button
-                variation={"pill"}
-                onClick={handleCopy}
-                iconName={isCopied ? "done" : "copy"}
-              />
-            }
-            onChange={handleCopy}
-            noWrap
-            tappable
-          />
-        </Stack>
-      }
-      actions={[
-        { iconName: "cancel", handleClick: handleClose },
-        { iconName: "done", handleClick: handleAccept },
-      ]}
+      body={<NewInviteBody {...inviteBodyProps} />}
+      actions={actions}
       onClose={handleClose}
     />
   )
 }
 /*
 
+
+
+
+*/
+type NewInviteBodyProps = {
+  inviteKey: string
+  tempName: string
+  isCopied: boolean
+  setInviteKey: Function
+  setTempName: Function
+  setIsCopied: Function
+}
+function NewInviteBody(props: NewInviteBodyProps) {
+  const theme = useTheme()
+
+  function handleChange(event: any) {
+    props.setTempName(_.capitalize(event.target.value))
+  }
+
+  function handleCopy() {
+    props.setIsCopied(true)
+    copyToClipboard(props.inviteKey, "inviteKeyCopied")
+  }
+
+  return (
+    <Stack width={"100%"} gap={theme.module[4]}>
+      <Stack
+        width={"100%"}
+        direction={"row"}
+        alignItems={"center"}
+        paddingLeft={theme.module[2]}
+        gap={theme.module[3]}
+        boxSizing={"border-box"}
+      >
+        <Typography>Name:</Typography>
+        <Input
+          placeholder={"(optional)"}
+          onChange={handleChange}
+          value={props.tempName}
+          sx={{
+            background: theme.scale.gray[8],
+          }}
+        />
+      </Stack>
+      <ListItem
+        label={props.inviteKey}
+        primarySlot={
+          <Icon
+            variation={"key"}
+            fontSize={"small"}
+            color={theme.scale.gray[5]}
+          />
+        }
+        secondarySlot={
+          <Button
+            variation={"pill"}
+            onClick={handleCopy}
+            iconName={props.isCopied ? "done" : "copy"}
+          />
+        }
+        onChange={handleCopy}
+        noWrap
+        tappable
+      />
+    </Stack>
+  )
+}
+/*
 
 
 
@@ -452,6 +477,11 @@ function RemoveOrgConfirmation() {
     setUseOrg("isRemoving", false)
   }
 
+  const actions: ModalActionProps[] = [
+    { iconName: "cancel", handleClick: handleClose },
+    { iconName: "done", handleClick: handleAccept },
+  ]
+
   return (
     <Modal
       open={isRemoving}
@@ -463,16 +493,12 @@ function RemoveOrgConfirmation() {
             " your organisation?"}
         </Typography>
       }
-      actions={[
-        { iconName: "cancel", handleClick: handleClose },
-        { iconName: "done", handleClick: handleAccept },
-      ]}
+      actions={actions}
       onClose={handleClose}
     />
   )
 }
 /*
-
 
 
 

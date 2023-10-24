@@ -4,11 +4,12 @@ import { RootState } from "../../app/store"
 import { selectOrgMembers } from "../org/orgSlice"
 import { StockItemProps, selectStock } from "../stock/stockSlice"
 import { UpdateDB, selectUserUuid } from "../user/userSlice"
+/*
 
-export interface CountState {
-  step: CountSteps
-  count: CountProps
-}
+
+
+
+*/
 export type CountSteps =
   | "dashboard"
   | "setup"
@@ -65,8 +66,8 @@ export type CountCheckProps = {
 }
 export type CountMemberProps = {
   uuid: string
-  name: string
-  surname: string
+  firstName: string
+  lastName: string
   isOrganiser: boolean
   isCounter: boolean
   isJoined: boolean
@@ -79,14 +80,22 @@ export type SetCountChecksProps = UpdateDB & { checks: CountCheckProps[] }
 export type SetCountMetadataProps = UpdateDB & { metadata: CountMetadataProps }
 export type SetCountCommentsProps = UpdateDB & { comments: CountCommentsProps }
 export type SetCountStep = { step: CountSteps; updateMember: boolean }
+export type SetCountResultsItemProps = {
+  item: CountItemProps
+  memberUuid: string
+}
+export type DeleteCountMemberProps = {
+  uuid: string
+}
 export type DeleteCountItemProps = {
   memberUuid: string
   id: string
 }
-export type SetCountResultsItemProps = CountItemProps & {
-  memberUuid: string
-}
 
+export interface CountState {
+  step: CountSteps
+  count: CountProps
+}
 const initialState: CountState = {
   step: "dashboard",
   count: {},
@@ -105,19 +114,22 @@ export const countSlice = createSlice({
       const count = state.count
       if (count) _.set(count, `members.${memberUuid}`, member)
     },
-    deleteCountMember: (state, action: PayloadAction<string>) => {
-      const memberUuid = action.payload
+    deleteCountMember: (
+      state,
+      action: PayloadAction<DeleteCountMemberProps>,
+    ) => {
       const members = state.count.members
-      if (members) delete members[memberUuid]
+      const uuid = action.payload.uuid
+      if (members) delete members[uuid]
     },
     setCountResultsItem: (
       state,
       action: PayloadAction<SetCountResultsItemProps>,
     ) => {
-      const memberUuid = action.payload.memberUuid
-      const stockId = action.payload.id
-      const countItem = _.omit(action.payload, ["memberUuid"])
       const count = state.count
+      const memberUuid = action.payload.memberUuid
+      const countItem = action.payload.item
+      const stockId = countItem.id
       if (count) _.set(count, `results.${memberUuid}.${stockId}`, countItem)
     },
     deleteCountResultsItem: (

@@ -18,8 +18,13 @@ import {
   selectIsUserAwayFromCount,
   selectUserCountMemberStep,
 } from "./countSlice"
-import { createCountCheck } from "./countSliceUtils"
-import { updateCountStep, updateUserCountMember } from "./countUtils"
+import {
+  createCountCheck,
+  removeCountCheck,
+  updateCountCheck,
+  updateCountStep,
+  updateUserCountMember,
+} from "./countSliceUtils"
 /*
 
 
@@ -29,6 +34,7 @@ import { updateCountStep, updateUserCountMember } from "./countUtils"
 */
 export function DashboardBody() {
   const theme = useTheme()
+
   return (
     <Stack width={"100%"} height={"100%"} justifyContent={"space-between"}>
       <Stack height={"100%"}>
@@ -55,10 +61,9 @@ export function DashboardBody() {
 */
 function ButtonTray() {
   const theme = useTheme()
-
   const isAdmin = useAppSelector(selectIsUserAdmin)
 
-  function handleNewCountClick() {
+  function handleNewCount() {
     updateCountStep("setup")
     resetUseCount()
   }
@@ -84,7 +89,7 @@ function ButtonTray() {
           bgColor={theme.scale.blue[9]}
           outlineColor={theme.scale.blue[8]}
           justifyCenter
-          onClick={handleNewCountClick}
+          onClick={handleNewCount}
         />
       </>
     )
@@ -137,6 +142,7 @@ function Invite() {
     // TODO
   }
 
+  const MESSAGE = "You are invited to count"
   const actions: NotificationActionProps[] = [
     {
       label: "Accept",
@@ -150,7 +156,7 @@ function Invite() {
     },
   ]
 
-  return <Notification message={"You are invited to count"} actions={actions} />
+  return <Notification message={MESSAGE} actions={actions} />
 }
 /*
 
@@ -161,11 +167,13 @@ function Invite() {
 */
 function Rejoin() {
   const step = useAppSelector(selectUserCountMemberStep)
+
   function handleJoin() {
     updateUserCountMember({ isCounting: true })
     updateCountStep(step, true)
   }
 
+  const MESSAGE = "You have left a count"
   const actions: NotificationActionProps[] = [
     {
       label: "Join Count",
@@ -174,7 +182,7 @@ function Rejoin() {
     },
   ]
 
-  return <Notification message={"You have left a count"} actions={actions} />
+  return <Notification message={MESSAGE} actions={actions} />
 }
 /*
 
@@ -185,7 +193,6 @@ function Rejoin() {
 */
 function CountPrompt() {
   const theme = useTheme()
-
   const isAdmin = useAppSelector(selectIsUserAdmin)
 
   return (
@@ -338,33 +345,36 @@ function CheckList() {
 
 
 */
-function CheckListItem({ check }: { check: { id: string; check: string } }) {
+function CheckListItem({
+  countCheck,
+}: {
+  countCheck: { id: string; check: string }
+}) {
   const theme = useTheme()
   const dispatch = useAppDispatch()
 
-  const [value, setValue] = useState(check.check)
+  const [check, setCheck] = useState(countCheck.check)
   const [isEditing, setIsEditing] = useState(false)
 
-  const isDisabled = !isEditing && !!check.check
+  const isDisabled = !isEditing && !!countCheck.check
+  const id = countCheck.id
 
   function handleEdit() {
     setIsEditing(true)
   }
 
   function handleAccept() {
+    updateCountCheck(id, check)
     setIsEditing(false)
-    //TODO
-    dispatch(setCountCheck({ id: check.id, check: value }))
   }
 
   function handleDelete() {
+    removeCountCheck(id)
     setIsEditing(false)
-    //TODO
-    dispatch(deleteCountCheck(check.id))
   }
 
   return (
-    <ClickAwayListener onClickAway={!!value ? handleAccept : handleDelete}>
+    <ClickAwayListener onClickAway={!!check ? handleAccept : handleDelete}>
       <Stack
         direction={"row"}
         width={"100%"}
@@ -373,8 +383,8 @@ function CheckListItem({ check }: { check: { id: string; check: string } }) {
       >
         <Input
           disabled={isDisabled}
-          value={value}
-          onChange={(e: any) => setValue(e.target.value)}
+          value={check}
+          onChange={(e: any) => setCheck(e.target.value)}
           multiline
           sx={{
             background: theme.scale.gray[isDisabled ? 7 : 8],

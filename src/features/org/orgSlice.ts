@@ -27,6 +27,8 @@ export type CountChecksProps = {
 }
 export type SetOrgProps = { org: OrgProps } & UpdateDB
 export type SetOrgMemberProps = { orgUuid: string; member: MemberProps }
+export type SetCountCheckProps = { id: string; check: string }
+export type DeleteCountCheckProps = { id: string }
 export type DeleteOrgMemberProps = { orgUuid: string; memberUuid: string }
 export type DeleteOrgProps = { uuid: string }
 export type DeleteInviteProps = { inviteKey: string }
@@ -41,7 +43,7 @@ const initialState: OrgState = {
   org: {},
 }
 
-export const organisationSlice = createSlice({
+export const orgSlice = createSlice({
   name: "org",
   initialState,
   reducers: {
@@ -93,16 +95,13 @@ export const organisationSlice = createSlice({
         delete state.org.invites
       }
     },
-    setCountCheck: (
-      state,
-      action: PayloadAction<{ id: string; check: string }>,
-    ) => {
+    setCountCheck: (state, action: PayloadAction<SetCountCheckProps>) => {
       const id = action.payload.id
       const check = action.payload.check
       _.set(state.org, `countChecks.${id}`, check)
     },
-    deleteCountCheck: (state, action: PayloadAction<string>) => {
-      const id = action.payload
+    deleteCountCheck: (state, action: PayloadAction<DeleteCountCheckProps>) => {
+      const id = action.payload.id
       const countChecks = state.org.countChecks
       if (countChecks) {
         delete countChecks[id]
@@ -123,7 +122,7 @@ export const {
   deleteInvites,
   setCountCheck,
   deleteCountCheck,
-} = organisationSlice.actions
+} = orgSlice.actions
 
 export const selectIsJoining = (state: RootState) => {
   return state.org.memberStatus === "joining"
@@ -201,4 +200,4 @@ export const selectOrgInvitesList = createSelector(
   },
 )
 
-export default organisationSlice.reducer
+export default orgSlice.reducer

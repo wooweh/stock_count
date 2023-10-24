@@ -12,15 +12,20 @@ import {
   ToggleButtonGroup,
   ToggleButtonGroupOptionsProps,
 } from "../../components/button"
+import { PieChart, PieChartDataProps } from "../../components/chart"
+import { downloadCSVTemplate } from "../../components/csvParser"
+import VirtualizedTable from "../../components/table"
+import {
+  prepareSoloResultsTableColumns,
+  prepareSoloResultsTableRows,
+} from "../count/countUtils"
 import {
   DataLineItem,
   DataLineItemProps,
   DataPill,
 } from "../count/finalization"
-import {
-  MembersProps,
-  selectOrgMembers,
-} from "../org/orgSlice"
+import { MembersProps, selectOrgMembers } from "../org/orgSlice"
+import { selectStock } from "../stock/stockSlice"
 import { UseHistoryState, setUseHistory, useHistoryStore } from "./history"
 import {
   HistoryItemCommentsProps,
@@ -29,17 +34,6 @@ import {
   HistoryItemResultsProps,
   selectHistory,
 } from "./historySlice"
-import { PieChart, PieChartDataProps } from "../../components/chart"
-import {
-  prepareSoloResultsTableColumnGroups,
-  prepareSoloResultsTableColumns,
-  prepareSoloResultsTableRows,
-} from "../count/countUtils"
-import { CountResultsProps } from "../count/countSlice"
-import { selectStock } from "../stock/stockSlice"
-import VirtualizedTable from "../../components/table"
-import { downloadCSVTemplate } from "../../components/csvParser"
-import Icon from "../../components/icon"
 /*
 
 

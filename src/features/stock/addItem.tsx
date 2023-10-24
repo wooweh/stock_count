@@ -4,10 +4,10 @@ import { useAppDispatch } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { Input } from "../../components/control"
 import Modal from "../../components/modal"
+import { generateCustomNotification } from "../core/coreUtils"
 import { setUseStock, useStockStore } from "./stock"
-import { setStockItem } from "./stockSlice"
+import { updateStockItem } from "./stockSliceUtils"
 /*
-
 
 
 
@@ -15,11 +15,34 @@ import { setStockItem } from "./stockSlice"
 */
 export function AddItem() {
   const theme = useTheme()
-  const dispatch = useAppDispatch()
+
   const isAdding = useStockStore((state: any) => state.isAdding)
+
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
   const [id, setId] = useState("")
+
+  function handleAccept() {
+    if (id && name && description) {
+      updateStockItem(id, name, description)
+      setUseStock("isAdding", false)
+      resetFields()
+    } else {
+      generateCustomNotification("error", "Please complete all fields.")
+    }
+  }
+
+  function resetFields() {
+    setTimeout(() => {
+      setId("")
+      setName("")
+      setDescription("")
+    }, 250)
+  }
+
+  function handleClose(event: any) {
+    setUseStock("isAdding", false)
+  }
 
   const inputs = [
     {
@@ -38,39 +61,7 @@ export function AddItem() {
       onChange: (event: any) => setDescription(event.target.value),
     },
   ]
-  /*
-  
-  
-  */
-  function handleAccept(event: any) {
-    if (id && name) {
-      dispatch(
-        setStockItem({
-          id: id,
-          name: name,
-          description: description,
-        }),
-      )
-      setUseStock("isAdding", false)
-      setTimeout(() => {
-        setId("")
-        setName("")
-        setDescription("")
-      }, 250)
-    } else {
-    }
-  }
-  /*
-  
-  
-  */
-  function handleClose(event: any) {
-    setUseStock("isAdding", false)
-  }
-  /*
-  
-  
-  */
+
   return (
     <Modal
       open={isAdding}
@@ -116,7 +107,6 @@ export function AddItem() {
   )
 }
 /*
-
 
 
 

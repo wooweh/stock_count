@@ -2,7 +2,7 @@ import { Stack, Typography } from "@mui/material"
 import _ from "lodash"
 import { useEffect, useRef, useState } from "react"
 import { Virtuoso } from "react-virtuoso"
-import { useAppDispatch, useAppSelector } from "../../app/hooks"
+import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { Button } from "../../components/button"
 import {
@@ -19,13 +19,15 @@ import {
 } from "./stock"
 import {
   StockItemProps,
-  deleteStock,
-  deleteStockItem,
   selectStockIdList,
   selectStockList,
 } from "./stockSlice"
+import {
+  removeStock,
+  removeStockItem,
+  removeStockItems,
+} from "./stockSliceUtils"
 /*
-
 
 
 
@@ -33,6 +35,7 @@ import {
 */
 export function StockList() {
   const theme = useTheme()
+
   return (
     <Stack width={"100%"} height={"100%"} gap={theme.module[4]}>
       <Stack
@@ -54,11 +57,9 @@ export function StockList() {
 
 
 
-
 */
 function Header() {
   const theme = useTheme()
-
   const stockList = useAppSelector(selectStockList)
   const isSelecting = useStockStore((state: any) => state.isSelecting)
 
@@ -71,7 +72,6 @@ function Header() {
   )
 }
 /*
-
 
 
 
@@ -113,11 +113,9 @@ function StockSearchBar() {
 
 
 
-
 */
 function StockSelectionBar() {
   const theme = useTheme()
-  const dispatch = useAppDispatch()
   const selectedItems = useStockStore((state: any) => state.selectedItems)
   const stockIdList = useAppSelector(selectStockIdList)
 
@@ -130,9 +128,9 @@ function StockSelectionBar() {
 
   function handleDelete() {
     if (isAllSelected) {
-      dispatch(deleteStock())
+      removeStock()
     } else {
-      _.forEach(selectedItems, (id) => dispatch(deleteStockItem(id)))
+      removeStockItems(selectedItems)
     }
     setUseStock("selectedItems", [])
     setUseStock("isSelecting", false)
@@ -183,18 +181,19 @@ function StockSelectionBar() {
 
 
 
-
 */
 function Body() {
   const theme = useTheme()
-  const dispatch = useAppDispatch()
+
   const stockList = useAppSelector(selectStockList)
+
   const scrollIndex = useStockStore((state: any) => state.scrollIndex)
   const isSelecting = useStockStore((state: any) => state.isSelecting)
   const selectedItems = useStockStore((state: any) => state.selectedItems)
-  const virtuoso: any = useRef(null)
 
   const [showScrollToTop, setShowScrollToTop] = useState(false)
+
+  const virtuoso: any = useRef(null)
 
   useEffect(() => {
     if (isSelecting && !selectedItems.length) setUseStock("isSelecting", false)
@@ -268,6 +267,7 @@ function Body() {
           }}
           itemContent={(index) => {
             const item = stockList[index]
+            const id = item.id
             const options: ListItemOptionProps[] = [
               {
                 iconName: "edit",
@@ -275,7 +275,7 @@ function Body() {
               },
               {
                 iconName: "delete",
-                onClick: () => dispatch(deleteStockItem(item.id)),
+                onClick: () => removeStockItem(id),
               },
             ]
             return (
@@ -304,7 +304,6 @@ function Body() {
   )
 }
 /*
-
 
 
 
@@ -347,7 +346,6 @@ function ButtonTray() {
   )
 }
 /*
-
 
 
 

@@ -14,7 +14,6 @@ import { createOrg, joinOrg } from "./orgSliceUtils"
 
 
 
-
 */
 export function OrgSetup() {
   return (
@@ -26,7 +25,6 @@ export function OrgSetup() {
   )
 }
 /*
-
 
 
 
@@ -80,7 +78,6 @@ function OrgSetupActions() {
   )
 }
 /*
-
 
 
 
@@ -139,7 +136,6 @@ function CreateOrg() {
 
 
 
-
 */
 function JoinOrg() {
   const theme = useTheme()
@@ -190,7 +186,6 @@ function JoinOrg() {
   )
 }
 /*
-
 
 
 

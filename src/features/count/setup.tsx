@@ -29,9 +29,8 @@ import {
   removeCountMember,
   removeCountMembers,
   updateCountMember,
-} from "./countUtils"
+} from "./countSliceUtils"
 /*
-
 
 
 
@@ -39,13 +38,11 @@ import {
 */
 export function SetupBody() {
   const theme = useTheme()
-
   const counterUuids = useAppSelector(selectCountersUuidList)
-
   const countType = useCountStore((state: any) => state.tempCountType)
   const isSolo = countType === "solo"
 
-  const countTypes: any = {
+  const COUNT_TYPE_DESCRIPTIONS: any = {
     solo: "A single counter will count the entire stock holding.",
     dual: "Two counters will each count the entire stock holding and compare results.",
     team: "Two or more counters will together count the entire stock holding.",
@@ -64,12 +61,12 @@ export function SetupBody() {
   const options: SetupOptionProps[] = [
     {
       label: "Count Type",
-      description: countTypes[countType] ?? "",
+      description: COUNT_TYPE_DESCRIPTIONS[countType] ?? "",
       control: (
         <Select
           value={countType}
           onChange={handleCountTypeSelect}
-          options={_.keys(countTypes)}
+          options={_.keys(COUNT_TYPE_DESCRIPTIONS)}
           placeholder="Choose Count Type"
         />
       ),
@@ -118,11 +115,9 @@ export function SetupBody() {
 
 
 
-
 */
 function WarningBox() {
   const theme = useTheme()
-
   const countType = useCountStore((state: any) => state.tempCountType)
   const isCounterRequirementMet = useCountStore(
     (state: any) => state.isCounterRequirementMet,
@@ -153,7 +148,6 @@ function WarningBox() {
 
 
 
-
 */
 function AddMembers() {
   const availableMembers = useAppSelector(selectAvailableCountersList)
@@ -164,6 +158,7 @@ function AddMembers() {
   const selectedMemberUuids = useCountStore(
     (state: any) => state.selectedMemberUuids,
   )
+
   const counterRequirement = {
     solo: {
       isMet: selectedMemberUuids.length === 1,
@@ -237,7 +232,6 @@ function AddMembers() {
 
 
 
-
 */
 function MembersList({
   isRequirementMet,
@@ -246,10 +240,11 @@ function MembersList({
   isRequirementMet: boolean
   warningMessage: string
 }) {
+  const availableMembers = useAppSelector(selectAvailableCountersList)
+
   const countType: CountTypes = useCountStore(
     (state: any) => state.tempCountType,
   )
-  const availableMembers = useAppSelector(selectAvailableCountersList)
   const selectedMemberUuids = useCountStore(
     (state: any) => state.selectedMemberUuids,
   )
@@ -287,7 +282,6 @@ function MembersList({
 
 
 
-
 */
 function CountersList() {
   const theme = useTheme()
@@ -303,16 +297,18 @@ function CountersList() {
         {counters.length ? (
           counters.map((counter: CountMemberProps) => {
             const isOrganiser = counter.isOrganiser
-            const fullname = `${counter.name} ${counter.surname}`
+            const uuid = counter.uuid
 
             function handleDelete() {
               if (isOrganiser) {
-                updateCountMember(counter.uuid, { isCounter: false })
+                updateCountMember(uuid, { isCounter: false })
               } else {
-                removeCountMember(counter.uuid)
+                removeCountMember(uuid)
               }
-              removeUseCountSelectedMemberUuid(counter.uuid)
+              removeUseCountSelectedMemberUuid(uuid)
             }
+
+            const fullname = `${counter.firstName} ${counter.lastName}`
 
             return (
               <ListItem
@@ -344,7 +340,6 @@ function CountersList() {
   )
 }
 /*
-
 
 
 
@@ -381,7 +376,6 @@ function SetupOption(props: SetupOptionProps) {
   )
 }
 /*
-
 
 
 

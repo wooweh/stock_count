@@ -60,8 +60,8 @@ export async function setCountResultsItemOnDB(
 ) {
   const orgUuid = store.getState().org.org.uuid
   const memberUuid = payload.memberUuid
-  const stockId = payload.id
-  const item = _.omit(payload, "memberUuid")
+  const item = payload.item
+  const stockId = item.id
   if (orgUuid) {
     set(
       ref(

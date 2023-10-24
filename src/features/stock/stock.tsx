@@ -13,7 +13,6 @@ import { UploadItems } from "./uploadItems"
 
 
 
-
 */
 type IsEditingProps = false | StockItemProps
 type UseStockState = {
@@ -68,7 +67,6 @@ export function resetUseStock() {
 
 
 
-
 */
 export function Stock() {
   return (
@@ -81,7 +79,6 @@ export function Stock() {
   )
 }
 /*
-
 
 
 
@@ -101,7 +98,6 @@ function Outer({ children }: { children: any }) {
   )
 }
 /*
-
 
 
 

@@ -93,8 +93,8 @@ function resetShowNotification() {
 */
 export function resetSystem() {
   store.dispatch(setSystemStatus("notBooted"))
-  store.dispatch(setUser({ user: {}, updateDB: false }))
   store.dispatch(setMemberStatus("notJoined"))
+  store.dispatch(setUser({ user: {}, updateDB: false }))
   store.dispatch(setOrg({ org: {}, updateDB: false }))
   store.dispatch(setStock({ stock: {}, updateDB: false }))
   store.dispatch(setCount({}))

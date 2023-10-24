@@ -21,7 +21,7 @@ import {
   generateErrorNotification,
   generateNotification,
 } from "../core/coreUtils"
-import { getUserFromDB } from "./userRemote"
+import { getUserFromDB } from "./userSliceRemote"
 import {
   createNewUser,
   resetPasswordChangeStatus,

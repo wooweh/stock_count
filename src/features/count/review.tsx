@@ -3,8 +3,11 @@ import _ from "lodash"
 import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import Icon from "../../components/icon"
+import Modal, { ModalActionProps } from "../../components/modal"
 import VirtualizedTable from "../../components/table"
+import { MembersProps, selectOrgMembers } from "../org/orgSlice"
 import { selectStock } from "../stock/stockSlice"
+import { setUseCount, useCountStore } from "./count"
 import {
   CountMemberResultsProps,
   CountMembersProps,
@@ -15,9 +18,9 @@ import {
   selectCountType,
   selectIsOrganiserFinalizing,
   selectIsStockCountCompleted,
-  selectIsUserOnlyOrganiser,
   selectIsUserOrganiser,
 } from "./countSlice"
+import { completeReview } from "./countSliceUtils"
 import {
   prepareDualResultsTableColumnGroups,
   prepareDualResultsTableColumns,
@@ -28,18 +31,8 @@ import {
   prepareTeamResultsTableColumnGroups,
   prepareTeamResultsTableColumns,
   prepareTeamResultsTableRows,
-  updateCountMetadata,
-  updateCountStep,
 } from "./countUtils"
-import {
-  MembersProps,
-  selectOrgMembers,
-} from "../org/orgSlice"
-import { setUseCount, useCountStore } from "./count"
-import Modal, { ModalActionProps } from "../../components/modal"
-import { getTimeStamp } from "../../common/utils"
 /*
-
 
 
 
@@ -47,7 +40,6 @@ import { getTimeStamp } from "../../common/utils"
 */
 export function ReviewBody() {
   const theme = useTheme()
-
   const isOrganiser = useAppSelector(selectIsUserOrganiser)
 
   return (
@@ -68,10 +60,10 @@ export function ReviewBody() {
 
 
 
-
 */
 function OrganiserReviewBody() {
   const theme = useTheme()
+
   return (
     <>
       <Stack height={"95%"} gap={theme.module[4]} flexShrink={0}>
@@ -84,7 +76,6 @@ function OrganiserReviewBody() {
   )
 }
 /*
-
 
 
 
@@ -107,7 +98,6 @@ function CounterReviewBody() {
   )
 }
 /*
-
 
 
 
@@ -157,7 +147,6 @@ function CounterSummary() {
 
 
 
-
 */
 function CounterSummaryItem({
   uuid,
@@ -167,25 +156,27 @@ function CounterSummaryItem({
   results: CountMemberResultsProps
 }) {
   const theme = useTheme()
+
   const members = useAppSelector(selectCountMembers) as CountMembersProps
+
   const countValue = `${_.keys(results).length} items`
-  const nameInitial = members[uuid].name[0]
-  const surname = members[uuid].surname
+  const nameInitial = members[uuid].firstName[0]
+  const surname = members[uuid].lastName
   const fullName = `${nameInitial}. ${surname}`
   const step = members[uuid].step
   const isCounting = members[uuid].isCounting
 
+  const actionColors = {
+    Reviewing: theme.scale.green[6],
+    Counting: theme.scale.orange[6],
+    Away: theme.scale.red[6],
+  }
   const action =
     step === "review" && isCounting
       ? "Reviewing"
       : step === "stockCount" && isCounting
       ? "Counting"
       : "Away"
-  const actionColors = {
-    Reviewing: theme.scale.green[6],
-    Counting: theme.scale.orange[6],
-    Away: theme.scale.red[6],
-  }
   const actionColor = actionColors[action]
 
   return (
@@ -242,11 +233,11 @@ function CounterSummaryItem({
 
 
 
-
 */
 function ProceedMessage() {
   const theme = useTheme()
   const isStockCountCompleted = useAppSelector(selectIsStockCountCompleted)
+
   return (
     <Stack
       direction={"row"}
@@ -266,7 +257,6 @@ function ProceedMessage() {
   )
 }
 /*
-
 
 
 
@@ -301,7 +291,6 @@ function ReviewResultsTable() {
   const rows = tableData[countType].rows()
   const columns = tableData[countType].columns()
   const columnGroups = tableData[countType].columnGroups()
-  console.log(countType)
 
   return (
     <Stack
@@ -323,7 +312,6 @@ function ReviewResultsTable() {
 
 
 
-
 */
 function ReviewCompletionConirmation() {
   const theme = useTheme()
@@ -333,9 +321,8 @@ function ReviewCompletionConirmation() {
   )
 
   function handleAccept() {
-    updateCountMetadata({ finalizationStartTime: getTimeStamp() })
-    updateCountStep("finalization", true)
-    handleClose()
+    completeReview()
+    setUseCount("isStartingFinalization", false)
   }
 
   function handleClose() {
@@ -374,7 +361,6 @@ function ReviewCompletionConirmation() {
   )
 }
 /*
-
 
 
 

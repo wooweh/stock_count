@@ -3,7 +3,7 @@ import _ from "lodash"
 import { useEffect, useState } from "react"
 import { create } from "zustand"
 import { createJSONStorage, persist } from "zustand/middleware"
-import { useAppDispatch, useAppSelector } from "../../app/hooks"
+import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { getTimeStamp } from "../../common/utils"
 import Animation from "../../components/animation"
@@ -13,7 +13,6 @@ import Modal, { ModalActionProps } from "../../components/modal"
 import {
   CountSteps,
   CountTypes,
-  deleteCount,
   selectCountStep,
   selectCountersUuidList,
   selectIsOrganiserFinalizing,
@@ -24,11 +23,13 @@ import {
 } from "./countSlice"
 import {
   createCountMetadata,
+  leaveCount,
+  removeCount,
   updateCountComments,
   updateCountMetadata,
   updateCountStep,
   updateUserCountMember,
-} from "./countUtils"
+} from "./countSliceUtils"
 import { DashboardBody } from "./dashboard"
 import { FinalizationBody } from "./finalization"
 import { PreparationBody } from "./preparation"
@@ -36,7 +37,6 @@ import { ReviewBody } from "./review"
 import { SetupBody } from "./setup"
 import { StockCountBody } from "./stockCount"
 /*
-
 
 
 
@@ -181,13 +181,11 @@ export function resetUseCount() {
 
 
 
-
 */
 export function Count() {
-  return <CountStepsContainer />
+  return <CountSteps />
 }
 /*
-
 
 
 
@@ -197,7 +195,7 @@ type CountStepsPropsCreator<CountStepsProperties extends string> = {
   [key in CountStepsProperties as key]: CountStepProps
 }
 type CountStepsProps = CountStepsPropsCreator<CountSteps>
-function CountStepsContainer() {
+function CountSteps() {
   const theme = useTheme()
 
   const countStep = useAppSelector(selectCountStep)
@@ -218,8 +216,8 @@ function CountStepsContainer() {
 
   useEffect(() => {
     if (isCountCompleted && isOrganiser && !isReviewMetadataSubmitted) {
-      setUseCount("isReviewMetadataSubmitted", true)
       updateCountMetadata({ reviewStartTime: getTimeStamp() })
+      setUseCount("isReviewMetadataSubmitted", true)
     }
   }, [isCountCompleted, isReviewMetadataSubmitted, isOrganiser])
 
@@ -253,10 +251,9 @@ function CountStepsContainer() {
   }
 
   function handleFinalizationSubmit() {
-    setUseCount("isSubmittingFinalization", true)
     updateCountComments({ finalization: finalComments })
     updateCountMetadata({ finalSubmissionTime: getTimeStamp() })
-    // updateCountStep("review", true)
+    setUseCount("isSubmittingFinalization", true)
   }
 
   const isSetupNextButtonDisabled = !isCounterRequirementMet
@@ -329,7 +326,6 @@ function CountStepsContainer() {
 
 
 
-
 */
 type CountStepProps = {
   label: string
@@ -365,11 +361,9 @@ function CountStep(props: CountStepProps) {
 
 
 
-
 */
 function Header({ label }: { label: string }) {
   const theme = useTheme()
-
   const isOptionsOpen = useCountStore((state) => state.isCountOptionsOpen)
 
   return (
@@ -395,11 +389,11 @@ function Header({ label }: { label: string }) {
 
 
 
-
 */
 function StepLabel({ label }: { label: string }) {
   const theme = useTheme()
   const isUserCounting = useAppSelector(selectIsUserCounting)
+
   return (
     <Stack
       direction={"row"}
@@ -408,7 +402,6 @@ function StepLabel({ label }: { label: string }) {
       paddingLeft={theme.module[4]}
       paddingRight={isUserCounting ? 0 : theme.module[4]}
       boxSizing={"border-box"}
-      // minWidth={"8rem"}
       height={"100%"}
     >
       <Typography fontWeight={"bold"} variant={"subtitle1"} noWrap>
@@ -425,7 +418,6 @@ function StepLabel({ label }: { label: string }) {
   )
 }
 /*
-
 
 
 
@@ -451,6 +443,16 @@ function OptionsTray() {
     }, 150)
   }
 
+  function handleLeave() {
+    setUseCount("isLeavingCount", true)
+    handleCancel()
+  }
+
+  function handleDelete() {
+    setUseCount("isLeavingCount", true)
+    handleCancel()
+  }
+
   useEffect(() => {
     if (!isOpen) {
       setIsOpen(isOptionsOpen)
@@ -461,16 +463,11 @@ function OptionsTray() {
     {
       label: "Leave",
       iconName: "leave",
-      onClick: () => {
-        setUseCount("isLeavingCount", true)
-        handleCancel()
-      },
+      onClick: handleLeave,
     },
     {
       iconName: "cancel",
-      onClick: () => {
-        handleCancel()
-      },
+      onClick: handleCancel,
     },
   ]
 
@@ -478,10 +475,7 @@ function OptionsTray() {
     options.unshift({
       label: "Delete",
       iconName: "delete",
-      onClick: () => {
-        setUseCount("isDeletingCount", true)
-        handleCancel()
-      },
+      onClick: handleDelete,
     })
   }
 
@@ -535,7 +529,6 @@ function OptionsTray() {
 
 
 
-
 */
 function Body({ body }: { body: any }) {
   return (
@@ -551,7 +544,6 @@ function Body({ body }: { body: any }) {
   )
 }
 /*
-
 
 
 
@@ -600,7 +592,6 @@ function ButtonTray(props: CountStepProps) {
 
 
 
-
 */
 function LeaveCountConfirmation() {
   const isOpen = useCountStore((state) => state.isLeavingCount)
@@ -610,8 +601,7 @@ function LeaveCountConfirmation() {
   }
 
   function handleAccept() {
-    updateUserCountMember({ isCounting: false })
-    updateCountStep("dashboard")
+    leaveCount()
     setUseCount("isLeavingCount", false)
   }
 
@@ -641,7 +631,6 @@ function LeaveCountConfirmation() {
 
 
 
-
 */
 function LeaveCountConfirmationBody() {
   const theme = useTheme()
@@ -660,11 +649,8 @@ function LeaveCountConfirmationBody() {
 
 
 
-
 */
 function DeleteCountConfirmation() {
-  const dispatch = useAppDispatch()
-
   const isOpen = useCountStore((state) => state.isDeletingCount)
 
   function handleClose() {
@@ -672,10 +658,8 @@ function DeleteCountConfirmation() {
   }
 
   function handleAccept() {
-    updateCountStep("dashboard")
+    removeCount()
     resetUseCount()
-    dispatch(deleteCount())
-    setUseCount("isDeletingCount", false)
   }
 
   const actions: ModalActionProps[] = [
@@ -705,7 +689,7 @@ function DeleteCountConfirmation() {
   
   
   
-  */
+*/
 function DeleteCountConfirmationBody() {
   const theme = useTheme()
 
@@ -724,4 +708,4 @@ function DeleteCountConfirmationBody() {
  
  
  
- */
+*/

@@ -9,7 +9,7 @@ import {
   deleteUserOrgDetails,
   setUserOrgDetails,
 } from "../user/userSlice"
-import { getOrgFromDB, getOrgUuidWithInviteKeyFromDB } from "./orgRemote"
+import { getOrgFromDB, getOrgUuidWithInviteKeyFromDB } from "./orgSliceRemote"
 import {
   MemberProps,
   MemberStatuses,

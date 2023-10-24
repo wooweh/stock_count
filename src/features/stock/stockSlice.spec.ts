@@ -1,6 +1,5 @@
 import stockReducer, {
   StockState,
-  addStockList,
   deleteStock,
   deleteStockItem,
   setStock,
@@ -28,14 +27,6 @@ describe("stock reducer", () => {
     description: "Stock description",
   }
 
-  const mockStockPayload = {
-    stock_id: {
-      id: "stock_id",
-      name: "Stock Name",
-      description: "Stock description",
-    },
-  }
-
   it("should handle initial state", () => {
     expect(stockReducer(undefined, { type: "unknown" })).toEqual({
       stock: {},
@@ -51,21 +42,24 @@ describe("stock reducer", () => {
   })
 
   it("should handle deleteStockItem", () => {
-    const actual = stockReducer(mockState, deleteStockItem("stock_id"))
+    const id = "stock_id"
+    const actual = stockReducer(mockState, deleteStockItem({ id }))
     expect(actual.stock["stock_id"]).toEqual(undefined)
   })
 
-  it("should handle addStockList", () => {
-    const actual = stockReducer(initialState, addStockList(mockStockPayload))
-    expect(actual.stock).toEqual(mockStockPayload)
-  })
-
   it("should handle setStock", () => {
+    const stock = {
+      stock_id: {
+        id: "stock_id",
+        name: "Stock Name",
+        description: "Stock description",
+      },
+    }
     const actual = stockReducer(
       initialState,
-      setStock({ stock: mockStockPayload, updateDB: false }),
+      setStock({ stock, updateDB: false }),
     )
-    expect(actual.stock).toEqual(mockStockPayload)
+    expect(actual.stock).toEqual(stock)
   })
 
   it("should handle deleteStock", () => {

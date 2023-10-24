@@ -1,4 +1,5 @@
 import { ClickAwayListener, Stack, Typography } from "@mui/material"
+import _ from "lodash"
 import { useState } from "react"
 import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
@@ -6,8 +7,8 @@ import { getTimeStamp } from "../../common/utils"
 import { Button } from "../../components/button"
 import { Input } from "../../components/control"
 import Icon from "../../components/icon"
-import { ListItem } from "../../components/listItem"
 import { List } from "../../components/list"
+import { ListItem } from "../../components/listItem"
 import Modal, { ModalActionProps } from "../../components/modal"
 import { selectOrgCountChecksList } from "../org/orgSlice"
 import {
@@ -19,17 +20,16 @@ import {
   setUseCount,
   useCountStore,
 } from "./count"
+import { CountSteps, selectIsUserOnlyOrganiser } from "./countSlice"
 import {
   createCountChecks,
   createCountMembers,
+  startCount,
   updateCountComments,
   updateCountMetadata,
   updateCountStep,
-} from "./countUtils"
-import _ from "lodash"
-import { CountSteps, selectIsUserOnlyOrganiser } from "./countSlice"
+} from "./countSliceUtils"
 /*
-
 
 
 
@@ -46,7 +46,6 @@ export function PreparationBody() {
   )
 }
 /*
-
 
 
 
@@ -71,6 +70,7 @@ function PreparationItems() {
       ),
     },
   ]
+
   return (
     <>
       {prepItems.map((item: PreparationItemProps) => (
@@ -80,7 +80,6 @@ function PreparationItems() {
   )
 }
 /*
-
 
 
 
@@ -148,7 +147,6 @@ export function PreparationItem(props: PreparationItemProps) {
 
 
 
-
 */
 function Checklist() {
   const checks = useAppSelector(selectOrgCountChecksList)
@@ -163,7 +161,6 @@ function Checklist() {
   )
 }
 /*
-
 
 
 
@@ -198,7 +195,6 @@ function CheckListItem({ check }: { check: { id: string; check: string } }) {
   )
 }
 /*
-
 
 
 
@@ -242,7 +238,6 @@ export function CommentsList({
 
 
 
-
 */
 type CommentListProps = {
   comment: string
@@ -255,8 +250,6 @@ function CommentListItem(props: CommentListProps) {
 
   const [value, setValue] = useState(props.comment)
   const [isEditing, setIsEditing] = useState(false)
-
-  const isDisabled = !isEditing && !!props.comment
 
   function handleEdit() {
     setIsEditing(true)
@@ -271,6 +264,8 @@ function CommentListItem(props: CommentListProps) {
     props.handleDelete(props.index)
     setIsEditing(false)
   }
+
+  const isDisabled = !isEditing && !!props.comment
 
   return (
     <ClickAwayListener onClickAway={!!value ? handleAccept : handleDelete}>
@@ -310,7 +305,6 @@ function CommentListItem(props: CommentListProps) {
 
 
 
-
 */
 function StartCountConfirmation() {
   const theme = useTheme()
@@ -318,19 +312,13 @@ function StartCountConfirmation() {
   const isOnlyOrganiser = useAppSelector(selectIsUserOnlyOrganiser)
 
   const isStartingCount = useCountStore((state: any) => state.isStartingCount)
-  const satisfiedCheckUuids = useCountStore(
-    (state) => state.satisfiedCheckUuids,
-  )
-  const prepCommments = useCountStore((state) => state.prepCommments)
+  const checkUuids = useCountStore((state) => state.satisfiedCheckUuids)
+  const comments = useCountStore((state) => state.prepCommments)
 
   const step: CountSteps = isOnlyOrganiser ? "review" : "stockCount"
 
   function handleAccept() {
-    createCountMembers()
-    createCountChecks(satisfiedCheckUuids)
-    updateCountComments({ preparation: prepCommments })
-    updateCountStep(step, true)
-    updateCountMetadata({ countStartTime: getTimeStamp() })
+    startCount(checkUuids, comments, step)
     setUseCount("isStartingCount", false)
   }
 
@@ -384,7 +372,6 @@ function StartCountConfirmation() {
   )
 }
 /*
-
 
 
 

@@ -12,7 +12,6 @@ import { OrgSetup } from "./setup"
 
 
 
-
 */
 type UseOrgState = {
   isRemoving: boolean
@@ -57,7 +56,6 @@ export function resetUseOrg() {
 
 
 
-
 */
 export function Org() {
   const isProfileComplete = useAppSelector(selectIsProfileComplete)
@@ -77,7 +75,6 @@ export function Org() {
   )
 }
 /*
-
 
 
 
