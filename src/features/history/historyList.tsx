@@ -2,7 +2,7 @@ import { Stack, Typography } from "@mui/material"
 import _ from "lodash"
 import { useEffect, useRef, useState } from "react"
 import { Virtuoso } from "react-virtuoso"
-import { useAppDispatch, useAppSelector } from "../../app/hooks"
+import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { Button } from "../../components/button"
 import {
@@ -18,12 +18,15 @@ import {
   useHistoryStore,
 } from "./history"
 import {
-  deleteHistory,
-  deleteHistoryItem,
   selectHistoryIdList,
   selectHistoryList,
   selectHistorySearchList,
 } from "./historySlice"
+import {
+  removeHistory,
+  removeHistoryItem,
+  removeHistoryItems,
+} from "./historySliceUtils"
 /*
 
 
@@ -33,6 +36,7 @@ import {
 */
 export function HistoryList() {
   const theme = useTheme()
+
   return (
     <Stack width={"100%"} height={"100%"} gap={theme.module[4]}>
       <Stack
@@ -57,7 +61,6 @@ export function HistoryList() {
 */
 function Header() {
   const theme = useTheme()
-
   const historyList = useAppSelector(selectHistoryList)
   const isSelecting = useHistoryStore((state: any) => state.isSelecting)
 
@@ -116,7 +119,6 @@ function HistorySearchBar() {
 */
 function HistorySelectionBar() {
   const theme = useTheme()
-  const dispatch = useAppDispatch()
   const selectedItems = useHistoryStore((state: any) => state.selectedItems)
   const historyIdList = useAppSelector(selectHistoryIdList)
 
@@ -128,15 +130,8 @@ function HistorySelectionBar() {
   }
 
   function handleDelete() {
-    if (isAllSelected) {
-      dispatch(deleteHistory())
-    } else {
-      _.forEach(selectedItems, (id) =>
-        dispatch(deleteHistoryItem({ uuid: id })),
-      )
-    }
-    setUseHistory("selectedItems", [])
-    setUseHistory("isSelecting", false)
+    isAllSelected ? removeHistory() : removeHistoryItems(selectedItems)
+    handleBack()
   }
 
   function handleBack() {
@@ -188,11 +183,13 @@ function HistorySelectionBar() {
 */
 function Body() {
   const theme = useTheme()
-  const dispatch = useAppDispatch()
+
   const historySearchList = useAppSelector(selectHistorySearchList)
+
   const scrollIndex = useHistoryStore((state: any) => state.scrollIndex)
   const isSelecting = useHistoryStore((state: any) => state.isSelecting)
   const selectedItems = useHistoryStore((state: any) => state.selectedItems)
+
   const virtuoso: any = useRef(null)
 
   const [showScrollToTop, setShowScrollToTop] = useState(false)
@@ -263,6 +260,12 @@ function Body() {
           }}
           itemContent={(index) => {
             const item = historySearchList[index]
+
+            function handleLongPress() {
+              setUseHistory("isSelecting", true)
+              addUseHistorySelectedItem(item.id)
+            }
+
             const options: ListItemOptionProps[] = [
               {
                 iconName: "visible",
@@ -270,9 +273,10 @@ function Body() {
               },
               {
                 iconName: "delete",
-                onClick: () => dispatch(deleteHistoryItem({ uuid: item.id })),
+                onClick: () => removeHistoryItem(item.id),
               },
             ]
+
             return (
               <Stack padding={theme.module[0]} boxSizing={"border-box"}>
                 <SelectableListItemWithOptions
@@ -280,10 +284,7 @@ function Body() {
                   description={item.description}
                   iconName={"history"}
                   options={options}
-                  onLongPress={() => {
-                    setUseHistory("isSelecting", true)
-                    addUseHistorySelectedItem(item.id)
-                  }}
+                  onLongPress={handleLongPress}
                   onSelection={() => addUseHistorySelectedItem(item.id)}
                   onDeselection={() => removeUseHistorySelectedItem(item.id)}
                   isSelecting={isSelecting}

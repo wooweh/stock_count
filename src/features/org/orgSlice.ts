@@ -1,6 +1,6 @@
+import { RootState, store } from "../../app/store"
 import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit"
 import _ from "lodash"
-import { RootState, store } from "../../app/store"
 import { UpdateDB, UserOrgRoles } from "../user/userSlice"
 
 export type OrgProps = {

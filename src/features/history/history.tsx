@@ -80,6 +80,7 @@ export function History() {
 */
 function Outer({ children }: { children: any }) {
   const theme = useTheme()
+
   return (
     <Stack
       width={"100%"}

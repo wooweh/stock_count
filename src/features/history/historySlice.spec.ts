@@ -1,5 +1,3 @@
-import _ from "lodash"
-import { describe, expect, expectTypeOf, it } from "vitest"
 import historyReducer, {
   HistoryItemCommentsProps,
   HistoryItemMetadataProps,
@@ -12,6 +10,18 @@ import historyReducer, {
   setHistory,
   setHistoryItem,
 } from "./historySlice"
+import { describe, expect, expectTypeOf, it } from "vitest"
+/*
+
+
+
+
+*/
+const PREP_START_TIME = 1698135256
+const COUNT_START_TIME = PREP_START_TIME + 10 * 60
+const REVIEW_START_TIME = COUNT_START_TIME + 10 * 60
+const FINALIZE_START_TIME = REVIEW_START_TIME + 10 * 60
+const FINAL_SUBMIT_TIME = FINALIZE_START_TIME + 10 * 60
 /*
 
 
@@ -45,11 +55,11 @@ describe("History Reducer", () => {
     type: "dual",
     organiser: "mockUuid",
     counters: ["mockUuid"],
-    prepStartTime: "mockPrepTime",
-    countStartTime: "mockCountTime",
-    reviewStartTime: "mockReviewTime",
-    finalizationStartTime: "mockFinalTime",
-    finalSubmissionTime: "mockFinalTime",
+    prepStartTime: PREP_START_TIME,
+    countStartTime: COUNT_START_TIME,
+    reviewStartTime: REVIEW_START_TIME,
+    finalizationStartTime: FINALIZE_START_TIME,
+    finalSubmissionTime: FINAL_SUBMIT_TIME,
   }
   const mockHistoryItem: HistoryItemProps = {
     uuid: "mockHistoryUuid1",
@@ -68,10 +78,7 @@ describe("History Reducer", () => {
   })
 
   it("should handle deleteHistory", () => {
-    const actual = historyReducer(
-      initialState,
-      deleteHistory({ updateDB: false }),
-    )
+    const actual = historyReducer(initialState, deleteHistory())
     expect(actual.history).toEqual({})
   })
 

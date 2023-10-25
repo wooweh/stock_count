@@ -1,7 +1,7 @@
 import { Stack, Typography } from "@mui/material"
 import _ from "lodash"
 import { useAppSelector } from "../../app/hooks"
-import useTheme from "../../common/useTheme"
+import useTheme, { ThemeColors } from "../../common/useTheme"
 import {
   calculateDuration,
   formatDuration,
@@ -25,6 +25,7 @@ import {
   DataPill,
 } from "../count/finalization"
 import { MembersProps, selectOrgMembers } from "../org/orgSlice"
+import { getMemberShortName, getMembersShortNames } from "../org/orgUtils"
 import { selectStock } from "../stock/stockSlice"
 import { UseHistoryState, setUseHistory, useHistoryStore } from "./history"
 import {
@@ -179,23 +180,17 @@ function Details(props: Required<HistoryItemMetadataProps>) {
 
 */
 function DetailsList(props: Required<HistoryItemMetadataProps>) {
-  const theme = useTheme()
-
   const members = useAppSelector(selectOrgMembers) as MembersProps
+
   const organizer = members[props.organiser]
-
-  const countDate = formatLongDate(props.countStartTime)
-  console.log(countDate)
+  const counters = props.counters
   const countType = props.type
-  const organizerName = `${organizer.name[0]}. ${organizer.surname}`
-  const countersNames = props.counters.map(
-    (uuid) => `${members[uuid].name[0]}. ${members[uuid].surname}`,
-  )
-
-  const totalDuration = calculateDuration(
-    props.prepStartTime,
-    props.finalSubmissionTime,
-  )
+  const countDate = formatLongDate(props.countStartTime)
+  const organizerName = getMemberShortName(organizer)
+  const countersNames = getMembersShortNames(members, counters)
+  const start = props.prepStartTime
+  const end = props.finalSubmissionTime
+  const totalDuration = calculateDuration(start, end)
   const durationLabel = formatDuration(totalDuration)
 
   const dataItems: DataLineItemProps[] = [
@@ -251,32 +246,24 @@ function DetailsList(props: Required<HistoryItemMetadataProps>) {
 function DurationChart(props: Required<HistoryItemMetadataProps>) {
   const theme = useTheme()
 
-  const prepDuration = calculateDuration(
-    props.prepStartTime,
-    props.countStartTime,
-  )
-  const countDuration = calculateDuration(
-    props.countStartTime,
-    props.reviewStartTime,
-  )
-  const reviewDuration = calculateDuration(
-    props.reviewStartTime,
-    props.finalizationStartTime,
-  )
-  const finalizationDuration = calculateDuration(
-    props.finalizationStartTime,
-    props.finalSubmissionTime,
-  )
+  const prepStart = props.prepStartTime
+  const countStart = props.countStartTime
+  const reviewStart = props.reviewStartTime
+  const finalStart = props.finalizationStartTime
+  const finalEnd = props.finalSubmissionTime
+
+  const prepDuration = calculateDuration(prepStart, countStart)
+  const countDuration = calculateDuration(countStart, reviewStart)
+  const reviewDuration = calculateDuration(reviewStart, finalStart)
+  const finalizeDuration = calculateDuration(finalStart, finalEnd)
+
+  const color = (color: ThemeColors) => theme.scale[color][6]
 
   const data: PieChartDataProps[] = [
-    { name: "Prep", value: prepDuration, color: theme.scale.blue[6] },
-    { name: "Count", value: countDuration, color: theme.scale.green[6] },
-    { name: "Review", value: reviewDuration, color: theme.scale.gray[5] },
-    {
-      name: "Finalize",
-      value: finalizationDuration,
-      color: theme.scale.orange[6],
-    },
+    { name: "Prep", value: prepDuration, color: color("blue") },
+    { name: "Count", value: countDuration, color: color("green") },
+    { name: "Review", value: reviewDuration, color: color("gray") },
+    { name: "Finalize", value: finalizeDuration, color: color("orange") },
   ]
 
   return <PieChart data={data} />
@@ -289,6 +276,7 @@ function DurationChart(props: Required<HistoryItemMetadataProps>) {
 */
 function Comments(props: HistoryItemCommentsProps) {
   const theme = useTheme()
+
   return (
     <Stack
       width={"100%"}
@@ -359,10 +347,6 @@ function Results(props: Required<HistoryItemResultsProps>) {
   const rows = prepareSoloResultsTableRows(results, stock)
   const columns = prepareSoloResultsTableColumns()
 
-  function handleDownload() {
-    downloadCSVTemplate(rows)
-  }
-
   return (
     <Stack width={"100%"} height={"100%"} justifyContent={"space-between"}>
       <VirtualizedTable rows={rows} columns={columns} />
@@ -372,7 +356,7 @@ function Results(props: Required<HistoryItemResultsProps>) {
         iconName={"download"}
         outlineColor={theme.scale.gray[7]}
         bgColor={theme.scale.gray[8]}
-        onClick={handleDownload}
+        onClick={() => downloadCSVTemplate(rows)}
         sx={{ borderRadius: theme.module[2], boxShadow: "none" }}
       />
     </Stack>
@@ -387,21 +371,25 @@ function Results(props: Required<HistoryItemResultsProps>) {
 function ButtonTray() {
   const theme = useTheme()
 
+  const handleClick = (section: string) => {
+    setUseHistory("reviewSectionName", section)
+  }
+
   const options: ToggleButtonGroupOptionsProps[] = [
     {
       label: "Details",
       iconName: "list",
-      onClick: () => setUseHistory("reviewSectionName", "details"),
+      onClick: () => handleClick("details"),
     },
     {
       label: "Comments",
       iconName: "comments",
-      onClick: () => setUseHistory("reviewSectionName", "comments"),
+      onClick: () => handleClick("comments"),
     },
     {
       label: "Resuls",
       iconName: "checklist",
-      onClick: () => setUseHistory("reviewSectionName", "results"),
+      onClick: () => handleClick("results"),
     },
   ]
 

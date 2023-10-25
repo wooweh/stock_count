@@ -35,18 +35,6 @@ import {
   setHistoryItemOnDB,
 } from "../features/history/historySliceRemote"
 import {
-  createOrgInviteOnDB,
-  deleteCountCheckOnDB,
-  deleteOrgInviteOnDB,
-  deleteOrgInvitesOnDB,
-  deleteOrgMemberOnDB,
-  deleteOrgOnDB,
-  setCountCheckOnDB,
-  setOrgMemberOnDB,
-  setOrgNameOnDB,
-  setOrgOnDB,
-} from "../features/org/orgSliceRemote"
-import {
   deleteCountCheck,
   deleteInvite,
   deleteInvites,
@@ -58,6 +46,18 @@ import {
   setOrgMember,
   setOrgName,
 } from "../features/org/orgSlice"
+import {
+  createOrgInviteOnDB,
+  deleteCountCheckOnDB,
+  deleteOrgInviteOnDB,
+  deleteOrgInvitesOnDB,
+  deleteOrgMemberOnDB,
+  deleteOrgOnDB,
+  setCountCheckOnDB,
+  setOrgMemberOnDB,
+  setOrgNameOnDB,
+  setOrgOnDB,
+} from "../features/org/orgSliceRemote"
 import {
   deleteStock,
   deleteStockItem,
@@ -71,14 +71,6 @@ import {
   setStockOnDB,
 } from "../features/stock/stockSliceRemote"
 import {
-  deleteUserOnDB,
-  deleteUserOrgDetailsOnDB,
-  setUserEmailOnDB,
-  setUserNameOnDB,
-  setUserOnDB,
-  setUserOrgDetailsOnDB,
-} from "../features/user/userSliceRemote"
-import {
   deleteUser,
   deleteUserOrgDetails,
   setUser,
@@ -86,6 +78,14 @@ import {
   setUserName,
   setUserOrgDetails,
 } from "../features/user/userSlice"
+import {
+  deleteUserOnDB,
+  deleteUserOrgDetailsOnDB,
+  setUserEmailOnDB,
+  setUserNameOnDB,
+  setUserOnDB,
+  setUserOrgDetailsOnDB,
+} from "../features/user/userSliceRemote"
 import { auth } from "../remote"
 import { store } from "./store"
 /*

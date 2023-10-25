@@ -1,6 +1,6 @@
+import { RootState } from "../../app/store"
 import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit"
 import _ from "lodash"
-import { RootState } from "../../app/store"
 import { formatLongDate } from "../../common/utils"
 import { SearchListProps } from "../../components/searchBar"
 import {
