@@ -13,7 +13,6 @@ import { routePaths, routes } from "./pages"
 
 
 
-
 */
 export function Bar() {
   const theme = useTheme()
@@ -42,7 +41,6 @@ export function Bar() {
   )
 }
 /*
-
 
 
 
@@ -78,7 +76,6 @@ function NavigationBar() {
 
 
 
-
 */
 function CountBanner() {
   const theme = useTheme()
@@ -90,7 +87,6 @@ function CountBanner() {
   )
 }
 /*
-
 
 
 

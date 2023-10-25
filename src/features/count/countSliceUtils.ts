@@ -2,6 +2,7 @@ import _ from "lodash"
 import { v4 as uuidv4 } from "uuid"
 import { store } from "../../app/store"
 import { getTimeStamp } from "../../common/utils"
+import { generateCustomNotification } from "../core/coreUtils"
 import {
   HistoryItemMetadataProps,
   setHistoryItem,
@@ -23,7 +24,6 @@ import {
   CountResultsProps,
   CountSteps,
   CountTypes,
-  DeleteCountItemProps,
   deleteCount,
   deleteCountMember,
   deleteCountResultsItem,
@@ -35,7 +35,6 @@ import {
   setCountResultsItem,
   setCountStep,
 } from "./countSlice"
-import { generateCustomNotification } from "../core/coreUtils"
 /*
 
 
@@ -115,6 +114,7 @@ export function createCountMembers() {
 
 */
 export function prepareCountMembers(memberUuids: string[]) {
+  console.log(memberUuids)
   const userUuid = store.getState().user.user.uuid as string
   const orgMembers = store.getState().org.org.members as MembersProps
   const members = prepareCountMembersPayload(memberUuids, userUuid, orgMembers)
@@ -173,7 +173,7 @@ export function updateUserCountMember(payload: Partial<CountMemberProps>) {
   const userUuid = store.getState().user.user.uuid
   const members = store.getState().count.count.members
   if (members && userUuid) {
-    const member = { ...members[userUuid], payload }
+    const member = { ...members[userUuid], ...payload }
     store.dispatch(setCountMember({ member, updateDB: true }))
   }
 }

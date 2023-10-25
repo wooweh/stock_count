@@ -3,7 +3,6 @@ import _ from "lodash"
 import { useState } from "react"
 import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
-import { getTimeStamp } from "../../common/utils"
 import { Button } from "../../components/button"
 import { Input } from "../../components/control"
 import Icon from "../../components/icon"
@@ -12,23 +11,16 @@ import { ListItem } from "../../components/listItem"
 import Modal, { ModalActionProps } from "../../components/modal"
 import { selectOrgCountChecksList } from "../org/orgSlice"
 import {
-  addUseCountPrepComment,
-  addUseCountSatisfiedCheckUuid,
-  editUseCountPrepComment,
-  removeUseCountPrepComment,
-  removeUseCountSatisfiedCheckUuid,
-  setUseCount,
-  useCountStore,
+  addCountUIPrepComment,
+  addCountUISatisfiedCheckUuid,
+  editCountUIPrepComment,
+  removeCountUIPrepComment,
+  removeCountUISatisfiedCheckUuid,
+  setCountUI,
+  useCountUI,
 } from "./count"
 import { CountSteps, selectIsUserOnlyOrganiser } from "./countSlice"
-import {
-  createCountChecks,
-  createCountMembers,
-  startCount,
-  updateCountComments,
-  updateCountMetadata,
-  updateCountStep,
-} from "./countSliceUtils"
+import { startCount } from "./countSliceUtils"
 /*
 
 
@@ -52,7 +44,7 @@ export function PreparationBody() {
 
 */
 function PreparationItems() {
-  const comments = useCountStore((state) => state.prepCommments)
+  const comments = useCountUI((state) => state.prepCommments)
   const prepItems: PreparationItemProps[] = [
     {
       label: "Checklist:",
@@ -60,12 +52,12 @@ function PreparationItems() {
     },
     {
       label: "Comments:",
-      onClick: () => addUseCountPrepComment(""),
+      onClick: () => addCountUIPrepComment(""),
       item: (
         <CommentsList
           comments={comments}
-          handleAccept={editUseCountPrepComment}
-          handleDelete={removeUseCountPrepComment}
+          handleAccept={editCountUIPrepComment}
+          handleDelete={removeCountUIPrepComment}
         />
       ),
     },
@@ -149,15 +141,19 @@ export function PreparationItem(props: PreparationItemProps) {
 
 */
 function Checklist() {
+  const theme = useTheme()
   const checks = useAppSelector(selectOrgCountChecksList)
 
-  return (
+  return !!checks.length ? (
     <List maxHeight={"100%"} gapScale={0}>
-      {!!checks &&
-        checks.map((check: { id: string; check: string }) => {
-          return <CheckListItem check={check} key={check.id} />
-        })}
+      {checks.map((check: { id: string; check: string }) => {
+        return <CheckListItem check={check} key={check.id} />
+      })}
     </List>
+  ) : (
+    <Typography textAlign={"center"} color={theme.scale.gray[5]}>
+      No checks added
+    </Typography>
   )
 }
 /*
@@ -168,15 +164,13 @@ function Checklist() {
 */
 function CheckListItem({ check }: { check: { id: string; check: string } }) {
   const theme = useTheme()
-  const satisfiedCheckUuids = useCountStore(
-    (state) => state.satisfiedCheckUuids,
-  )
+  const satisfiedCheckUuids = useCountUI((state) => state.satisfiedCheckUuids)
   const isSatisfied = satisfiedCheckUuids.includes(check.id)
 
   function handleClick() {
     isSatisfied
-      ? removeUseCountSatisfiedCheckUuid(check.id)
-      : addUseCountSatisfiedCheckUuid(check.id)
+      ? removeCountUISatisfiedCheckUuid(check.id)
+      : addCountUISatisfiedCheckUuid(check.id)
   }
 
   return (
@@ -311,19 +305,19 @@ function StartCountConfirmation() {
 
   const isOnlyOrganiser = useAppSelector(selectIsUserOnlyOrganiser)
 
-  const isStartingCount = useCountStore((state: any) => state.isStartingCount)
-  const checkUuids = useCountStore((state) => state.satisfiedCheckUuids)
-  const comments = useCountStore((state) => state.prepCommments)
+  const isStartingCount = useCountUI((state: any) => state.isStartingCount)
+  const checkUuids = useCountUI((state) => state.satisfiedCheckUuids)
+  const comments = useCountUI((state) => state.prepCommments)
 
   const step: CountSteps = isOnlyOrganiser ? "review" : "stockCount"
 
   function handleAccept() {
     startCount(checkUuids, comments, step)
-    setUseCount("isStartingCount", false)
+    setCountUI("isStartingCount", false)
   }
 
   function handleClose() {
-    setUseCount("isStartingCount", false)
+    setCountUI("isStartingCount", false)
   }
 
   const actions: ModalActionProps[] = [

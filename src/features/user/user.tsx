@@ -21,14 +21,14 @@ import {
 } from "./userSlice"
 import { removeUser, updateUserName } from "./userSliceUtils"
 import { checkNewPassword, getPasswordValidation } from "./userUtils"
+import { ClickAwayListener } from "@mui/material"
 /*
 
 
 
 
-
 */
-type UseUserState = {
+type UserUIState = {
   isEditing: boolean
   isDeleting: boolean
   isChangingPassword: boolean
@@ -36,8 +36,8 @@ type UseUserState = {
   surname: string
   email: string
 }
-type UseUserKeys = keyof UseUserState
-const initialState: UseUserState = {
+type UserUIKeys = keyof UserUIState
+const initialState: UserUIState = {
   isEditing: false,
   isDeleting: false,
   isChangingPassword: false,
@@ -45,7 +45,7 @@ const initialState: UseUserState = {
   surname: "",
   email: "",
 }
-const useUserStore = create<UseUserState>()(
+const useUserUI = create<UserUIState>()(
   persist(
     (set) => ({
       ...initialState,
@@ -54,15 +54,14 @@ const useUserStore = create<UseUserState>()(
   ),
 )
 
-function setUseUser(path: UseUserKeys, value: boolean | string) {
-  useUserStore.setState({ [path]: value })
+function setUserUI(path: UserUIKeys, value: boolean | string) {
+  useUserUI.setState({ [path]: value })
 }
 
-export function resetUseUser() {
-  useUserStore.setState(initialState)
+export function resetUserUI() {
+  useUserUI.setState(initialState)
 }
 /*
-
 
 
 
@@ -83,7 +82,6 @@ export function UserProfile() {
 
 
 
-
 */
 function ProfileFields() {
   const theme = useTheme()
@@ -91,32 +89,32 @@ function ProfileFields() {
   const name = useAppSelector(selectUserName)
   const email = useAppSelector(selectUserEmail)
 
-  const isEditing = useUserStore((state: any) => state.isEditing)
-  const editableName = useUserStore((state: any) => state.name)
-  const editableSurname = useUserStore((state: any) => state.surname)
-  const editableEmail = useUserStore((state: any) => state.email)
+  const isEditing = useUserUI((state: any) => state.isEditing)
+  const editableName = useUserUI((state: any) => state.name)
+  const editableSurname = useUserUI((state: any) => state.surname)
+  const editableEmail = useUserUI((state: any) => state.email)
 
   useEffect(() => {
-    if (name?.first) setUseUser("name", name.first)
-    if (name?.last) setUseUser("surname", name.last)
-    if (email) setUseUser("email", email)
+    if (name?.first) setUserUI("name", name.first)
+    if (name?.last) setUserUI("surname", name.last)
+    if (email) setUserUI("email", email)
   }, [isEditing, name, email])
 
   const fields = [
     {
       label: "Name",
       value: editableName ? editableName : name?.first,
-      handleChange: (event: any) => setUseUser("name", event.target.value),
+      handleChange: (event: any) => setUserUI("name", event.target.value),
     },
     {
       label: "Surname",
       value: editableSurname ? editableSurname : name?.last,
-      handleChange: (event: any) => setUseUser("surname", event.target.value),
+      handleChange: (event: any) => setUserUI("surname", event.target.value),
     },
     {
       label: "Email",
       value: editableEmail ? editableEmail : email,
-      handleChange: (event: any) => setUseUser("email", event.target.value),
+      handleChange: (event: any) => setUserUI("email", event.target.value),
     },
   ]
 
@@ -140,7 +138,6 @@ function ProfileFields() {
 
 
 
-
 */
 type ProfileFieldProps = {
   label: string
@@ -150,7 +147,7 @@ type ProfileFieldProps = {
 function ProfileField(props: ProfileFieldProps) {
   const theme = useTheme()
 
-  const isEditing = useUserStore((state: any) => state.isEditing)
+  const isEditing = useUserUI((state: any) => state.isEditing)
   const placeholder =
     props.value === "" && !isEditing
       ? `Fill in your ${props.label.toLowerCase()}`
@@ -191,7 +188,6 @@ function ProfileField(props: ProfileFieldProps) {
 
 
 
-
 */
 function ButtonTray() {
   const theme = useTheme()
@@ -199,21 +195,21 @@ function ButtonTray() {
 
   const oldEmail = useAppSelector(selectUserEmail)
 
-  const isEditing = useUserStore((state: any) => state.isEditing)
-  const name = useUserStore((state: any) => state.name)
-  const surname = useUserStore((state: any) => state.surname)
-  const newEmail = useUserStore((state: any) => state.email)
+  const isEditing = useUserUI((state: any) => state.isEditing)
+  const name = useUserUI((state: any) => state.name)
+  const surname = useUserUI((state: any) => state.surname)
+  const newEmail = useUserUI((state: any) => state.email)
 
   const isChangingEmail = !!newEmail
   const isProfileComplete = !!name && !!surname && !!oldEmail
 
   function handleEdit() {
-    setUseUser("isEditing", true)
+    setUserUI("isEditing", true)
   }
 
   function handleAccept() {
     if (isProfileComplete) {
-      setUseUser("isEditing", false)
+      setUserUI("isEditing", false)
       updateUserName(name, surname)
       if (isChangingEmail) changeEmail(oldEmail, newEmail)
     } else {
@@ -222,17 +218,17 @@ function ButtonTray() {
   }
 
   function handleCancel() {
-    setUseUser("isEditing", false)
-    setUseUser("name", "")
-    setUseUser("surname", "")
+    setUserUI("isEditing", false)
+    setUserUI("name", "")
+    setUserUI("surname", "")
   }
 
   function handleDelete() {
-    setUseUser("isDeleting", true)
+    setUserUI("isDeleting", true)
   }
 
   function handleResetPassword() {
-    setUseUser("isChangingPassword", true)
+    setUserUI("isChangingPassword", true)
   }
 
   return (
@@ -266,11 +262,10 @@ function ButtonTray() {
 
 
 
-
 */
 function DeleteProfileConfirmation() {
   const theme = useTheme()
-  const isDeleting = useUserStore((state: any) => state.isDeleting)
+  const isDeleting = useUserUI((state: any) => state.isDeleting)
   const [password, setPassword] = useState("")
 
   function handleAccept() {
@@ -278,7 +273,7 @@ function DeleteProfileConfirmation() {
   }
 
   function handleClose() {
-    setUseUser("isDeleting", false)
+    setUserUI("isDeleting", false)
   }
 
   return (
@@ -309,15 +304,12 @@ function DeleteProfileConfirmation() {
 
 
 
-
 */
 function ChangePassword() {
   const isPasswordChangeSuccess = useAppSelector(selectIsPasswordChangeSuccess)
   const isPasswordChangePending = useAppSelector(selectIsPasswordChangePending)
 
-  const isChangingPassword = useUserStore(
-    (state: any) => state.isChangingPassword,
-  )
+  const isChangingPassword = useUserUI((state: any) => state.isChangingPassword)
 
   const [password, setPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
@@ -332,7 +324,7 @@ function ChangePassword() {
   }
 
   function handleClose() {
-    setUseUser("isChangingPassword", false)
+    setUserUI("isChangingPassword", false)
     resetInputs()
   }
 
@@ -397,7 +389,6 @@ function ChangePassword() {
 
 
 
-
 */
 type InputsProps = {
   placeholder: string
@@ -448,7 +439,6 @@ function PasswordInputs({
   )
 }
 /*
-
 
 
 

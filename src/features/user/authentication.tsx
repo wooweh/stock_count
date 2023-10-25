@@ -28,24 +28,23 @@ import {
 
 
 
-
 */
-type UseAuthState = {
+type AuthUIState = {
   isSigningIn: boolean
   isVerifying: boolean
   email: string
   password: string
   passwordValidation: PasswordValidationReturnProps
 }
-type UseAuthKeys = keyof UseAuthState
-const initialState: UseAuthState = {
+type AuthUIKeys = keyof AuthUIState
+const initialState: AuthUIState = {
   isSigningIn: false,
   isVerifying: false,
   email: "",
   password: "",
   passwordValidation: {} as PasswordValidationReturnProps,
 }
-const useAuthStore = create<UseAuthState>()(
+const useAuthUI = create<AuthUIState>()(
   persist(
     (set) => ({
       ...initialState,
@@ -54,15 +53,14 @@ const useAuthStore = create<UseAuthState>()(
   ),
 )
 
-function setUseAuth(path: UseAuthKeys, value: any) {
-  useAuthStore.setState({ [path]: value })
+function setAuthUI(path: AuthUIKeys, value: any) {
+  useAuthUI.setState({ [path]: value })
 }
 
-export function resetUseAuth() {
-  useAuthStore.setState(initialState)
+export function resetAuthUI() {
+  useAuthUI.setState(initialState)
 }
 /*
-
 
 
 
@@ -98,7 +96,6 @@ export function WithAuth({ route }: { route: Route }) {
 
 
 
-
 */
 export function Authentication({
   isRegistering = false,
@@ -118,12 +115,11 @@ export function Authentication({
 
 
 
-
 */
 function AuthenticationInput({ isRegistering }: { isRegistering: boolean }) {
-  const isSigningIn = useAuthStore((state) => state.isSigningIn)
-  const isVerifying = useAuthStore((state) => state.isVerifying)
-  const validationReport = useAuthStore((state) => state.passwordValidation)
+  const isSigningIn = useAuthUI((state) => state.isSigningIn)
+  const isVerifying = useAuthUI((state) => state.isVerifying)
+  const validationReport = useAuthUI((state) => state.passwordValidation)
 
   return !isSigningIn && !isVerifying ? (
     <Outer>
@@ -139,7 +135,6 @@ function AuthenticationInput({ isRegistering }: { isRegistering: boolean }) {
   ) : undefined
 }
 /*
-
 
 
 
@@ -166,7 +161,6 @@ function Outer({ children }: { children: any }) {
 
 
 
-
 */
 function Logo() {
   const theme = useTheme()
@@ -189,21 +183,20 @@ function Logo() {
 
 
 
-
 */
 function CredentialInputs() {
   const theme = useTheme()
-  const email = useAuthStore((state) => state.email)
-  const password = useAuthStore((state) => state.password)
+  const email = useAuthUI((state) => state.email)
+  const password = useAuthUI((state) => state.password)
 
   function handleEmailChange(event: any) {
-    setUseAuth("email", event.target.value)
+    setAuthUI("email", event.target.value)
   }
 
   function handlePasswordChange(event: any) {
     const passwordValidation = getPasswordValidation(event.target.value)
-    setUseAuth("passwordValidation", passwordValidation)
-    setUseAuth("password", event.target.value)
+    setAuthUI("passwordValidation", passwordValidation)
+    setAuthUI("password", event.target.value)
   }
 
   return (
@@ -223,15 +216,14 @@ function CredentialInputs() {
 
 
 
-
 */
 function ButtonTray({ isRegistering }: { isRegistering: boolean }) {
   const theme = useTheme()
   const navigate = useNavigate()
 
-  const email = useAuthStore((state) => state.email)
-  const password = useAuthStore((state) => state.password)
-  const passwordValidation = useAuthStore((state) => state.passwordValidation)
+  const email = useAuthUI((state) => state.email)
+  const password = useAuthUI((state) => state.password)
+  const passwordValidation = useAuthUI((state) => state.passwordValidation)
   const isPasswordValid = passwordValidation.isValid
   const isDetailsIncomplete =
     (isRegistering && !isPasswordValid) || !email || !password
@@ -239,16 +231,16 @@ function ButtonTray({ isRegistering }: { isRegistering: boolean }) {
   function handleClick() {
     if (!!email && !!password) {
       if (isRegistering && isPasswordValid) {
-        setUseAuth("isVerifying", true)
+        setAuthUI("isVerifying", true)
         register(email, password)
       } else {
-        setUseAuth("isSigningIn", true)
+        setAuthUI("isSigningIn", true)
         signIn(email, password).catch(() => {
-          setUseAuth("isSigningIn", false)
+          setAuthUI("isSigningIn", false)
         })
       }
-      setUseAuth("email", "")
-      setUseAuth("password", "")
+      setAuthUI("email", "")
+      setAuthUI("password", "")
     }
   }
   /*
@@ -285,11 +277,10 @@ function ButtonTray({ isRegistering }: { isRegistering: boolean }) {
 
 
 
-
 */
 function ForgotPassword({ isRegistering }: { isRegistering: boolean }) {
   const theme = useTheme()
-  const email = useAuthStore((state) => state.email)
+  const email = useAuthUI((state) => state.email)
 
   function handleClick() {
     if (!!email) {
@@ -319,7 +310,6 @@ function ForgotPassword({ isRegistering }: { isRegistering: boolean }) {
   )
 }
 /*
-
 
 
 
@@ -387,7 +377,6 @@ export function PasswordValidationCheck({
 
 
 
-
 */
 function CheckLineItem({
   check,
@@ -420,10 +409,9 @@ function CheckLineItem({
 
 
 
-
 */
 export function SigningInLoader() {
-  const isSigningIn = useAuthStore((state) => state.isSigningIn)
+  const isSigningIn = useAuthUI((state) => state.isSigningIn)
 
   return isSigningIn ? <Loader narration="signing in..." /> : undefined
 }
@@ -432,12 +420,11 @@ export function SigningInLoader() {
 
 
 
-
 */
 export function VerifyEmailPrompt() {
   const theme = useTheme()
 
-  const isVerifying = useAuthStore((state) => state.isVerifying)
+  const isVerifying = useAuthUI((state) => state.isVerifying)
 
   return (
     isVerifying && (
@@ -458,14 +445,13 @@ export function VerifyEmailPrompt() {
         <Button
           variation={"pill"}
           label={"Back to sign in"}
-          onClick={() => setUseAuth("isVerifying", false)}
+          onClick={() => setAuthUI("isVerifying", false)}
         />
       </Stack>
     )
   )
 }
 /*
-
 
 
 

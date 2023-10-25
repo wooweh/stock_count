@@ -5,7 +5,7 @@ import useTheme from "../../common/useTheme"
 import { Input } from "../../components/control"
 import Modal from "../../components/modal"
 import { generateCustomNotification } from "../core/coreUtils"
-import { setUseStock, useStockStore } from "./stock"
+import { setStockUI, useStockUI } from "./stock"
 import { updateStockItem } from "./stockSliceUtils"
 /*
 
@@ -16,7 +16,7 @@ import { updateStockItem } from "./stockSliceUtils"
 export function AddItem() {
   const theme = useTheme()
 
-  const isAdding = useStockStore((state: any) => state.isAdding)
+  const isAdding = useStockUI((state: any) => state.isAdding)
 
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
@@ -25,7 +25,7 @@ export function AddItem() {
   function handleAccept() {
     if (id && name && description) {
       updateStockItem(id, name, description)
-      setUseStock("isAdding", false)
+      setStockUI("isAdding", false)
       resetFields()
     } else {
       generateCustomNotification("error", "Please complete all fields.")
@@ -41,7 +41,7 @@ export function AddItem() {
   }
 
   function handleClose(event: any) {
-    setUseStock("isAdding", false)
+    setStockUI("isAdding", false)
   }
 
   const inputs = [

@@ -1,18 +1,14 @@
 import { ClickAwayListener, Stack, Typography } from "@mui/material"
 import { useState } from "react"
-import { useAppDispatch, useAppSelector } from "../../app/hooks"
+import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { Button } from "../../components/button"
 import { Input } from "../../components/control"
 import Icon from "../../components/icon"
 import Modal, { ModalActionProps } from "../../components/modal"
-import {
-  deleteCountCheck,
-  selectOrgCountChecksList,
-  setCountCheck,
-} from "../org/orgSlice"
+import { selectOrgCountChecksList } from "../org/orgSlice"
 import { selectIsUserAdmin } from "../user/userSlice"
-import { resetUseCount, setUseCount, useCountStore } from "./count"
+import { resetCountUI, setCountUI, useCountUI } from "./count"
 import {
   selectIsCountInvitePending,
   selectIsUserAwayFromCount,
@@ -65,7 +61,7 @@ function ButtonTray() {
 
   function handleNewCount() {
     updateCountStep("setup")
-    resetUseCount()
+    resetCountUI()
   }
 
   return (
@@ -78,7 +74,7 @@ function ButtonTray() {
           bgColor={theme.scale.gray[7]}
           outlineColor={theme.scale.gray[6]}
           justifyCenter
-          onClick={() => setUseCount("isManagingCheckList", true)}
+          onClick={() => setCountUI("isManagingCheckList", true)}
         />
         <Button
           variation={"profile"}
@@ -286,12 +282,12 @@ function Notification(props: NotificationProps) {
 
 */
 function PrepCheckList() {
-  const isManagingCheckList = useCountStore(
+  const isManagingCheckList = useCountUI(
     (state: any) => state.isManagingCheckList,
   )
 
   function handleClose() {
-    setUseCount("isManagingCheckList", false)
+    setCountUI("isManagingCheckList", false)
   }
 
   const actions: ModalActionProps[] = [
@@ -328,12 +324,14 @@ function CheckList() {
 
   return (
     <Stack width={"100%"} gap={theme.module[3]}>
-      {!!checkList ? (
+      {!!checkList.length ? (
         checkList.map((check: any) => {
-          return <CheckListItem check={check} key={check.id} />
+          return <CheckListItem countCheck={check} key={check.id} />
         })
       ) : (
-        <Typography>No checks added.</Typography>
+        <Typography textAlign={"center"} color={theme.scale.gray[5]}>
+          No checks added
+        </Typography>
       )}
     </Stack>
   )
@@ -351,7 +349,6 @@ function CheckListItem({
   countCheck: { id: string; check: string }
 }) {
   const theme = useTheme()
-  const dispatch = useAppDispatch()
 
   const [check, setCheck] = useState(countCheck.check)
   const [isEditing, setIsEditing] = useState(false)
@@ -383,6 +380,7 @@ function CheckListItem({
       >
         <Input
           disabled={isDisabled}
+          autoFocus
           value={check}
           onChange={(e: any) => setCheck(e.target.value)}
           multiline

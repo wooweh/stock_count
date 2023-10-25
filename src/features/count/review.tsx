@@ -7,7 +7,7 @@ import Modal, { ModalActionProps } from "../../components/modal"
 import VirtualizedTable from "../../components/table"
 import { MembersProps, selectOrgMembers } from "../org/orgSlice"
 import { selectStock } from "../stock/stockSlice"
-import { setUseCount, useCountStore } from "./count"
+import { setCountUI, useCountUI } from "./count"
 import {
   CountMemberResultsProps,
   CountMembersProps,
@@ -316,17 +316,17 @@ function ReviewResultsTable() {
 function ReviewCompletionConirmation() {
   const theme = useTheme()
 
-  const isStartingFinalization = useCountStore(
+  const isStartingFinalization = useCountUI(
     (state: any) => state.isStartingFinalization,
   )
 
   function handleAccept() {
     completeReview()
-    setUseCount("isStartingFinalization", false)
+    setCountUI("isStartingFinalization", false)
   }
 
   function handleClose() {
-    setUseCount("isStartingFinalization", false)
+    setCountUI("isStartingFinalization", false)
   }
 
   const actions: ModalActionProps[] = [

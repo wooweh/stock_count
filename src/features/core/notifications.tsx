@@ -13,22 +13,21 @@ import {
 
 
 
-
 */
 export function Notifications() {
-  const dispatch = useDispatch()
   const notification = useAppSelector(selectNotification)
   const showNotification = useAppSelector(selectShowNotification)
   const isDarkmode = useAppSelector(selectIsDarkmode)
 
-  const AUTO_CLOSE = 2000
   useEffect(() => {
     if (showNotification && notification) {
       const notificationType = notification.type
       const notify = () => toast[notificationType](notification.message)
       notify()
     }
-  }, [showNotification, dispatch, notification])
+  }, [showNotification, notification])
+
+  const AUTO_CLOSE = 2000
 
   return (
     <ToastContainer

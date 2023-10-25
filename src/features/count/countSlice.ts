@@ -271,8 +271,8 @@ export const selectCounters = createSelector(selectCountMembers, (members) => {
   })
   return counters
 })
-export const selectCountersList = createSelector(selectCounters, (members) => {
-  return _.values(members)
+export const selectCountersList = createSelector(selectCounters, (counters) => {
+  return _.values(counters)
 })
 export const selectCountersUuidList = createSelector(
   selectCounters,

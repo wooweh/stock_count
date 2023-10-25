@@ -20,7 +20,7 @@ import Modal, { ModalActionProps } from "../../components/modal"
 import { ProfileSurface } from "../../components/profileSurface"
 import { generateNotification } from "../core/coreUtils"
 import { selectIsUserAdmin } from "../user/userSlice"
-import { setUseOrg, useOrgStore } from "./org"
+import { setOrgUI, useOrgUI } from "./org"
 import {
   InviteProps,
   MemberProps,
@@ -67,7 +67,7 @@ function OrgNameHeader() {
   const orgName = useAppSelector(selectOrgName) as string
   const isAdmin = useAppSelector(selectIsUserAdmin)
 
-  const isEditing = useOrgStore((state: any) => state.isEditing)
+  const isEditing = useOrgUI((state: any) => state.isEditing)
 
   const [newOrgName, setNewOrgName] = useState("")
 
@@ -76,17 +76,17 @@ function OrgNameHeader() {
   }, [orgName])
 
   function handleEdit() {
-    setUseOrg("isEditing", true)
+    setOrgUI("isEditing", true)
   }
 
   function handleAccept() {
-    setUseOrg("isEditing", false)
+    setOrgUI("isEditing", false)
     if (!!newOrgName) updateOrgName(newOrgName)
   }
 
   return (
     <Stack width={"100%"} gap={theme.module[3]}>
-      <ClickAwayListener onClickAway={() => setUseOrg("isEditing", false)}>
+      <ClickAwayListener onClickAway={() => setOrgUI("isEditing", false)}>
         <Stack direction={"row"} alignItems={"center"} gap={theme.module[5]}>
           <Input
             disabled={!isEditing}
@@ -136,24 +136,24 @@ function ButtonTray() {
   const isAdmin = useAppSelector(selectIsUserAdmin)
 
   function handleRemove() {
-    setUseOrg("isRemoving", true)
+    setOrgUI("isRemoving", true)
   }
 
   const orgItems: OrgItems = [
     {
       iconName: "group",
       label: "Members",
-      onClick: () => setUseOrg("isViewingMembers", true),
+      onClick: () => setOrgUI("isViewingMembers", true),
     },
     {
       iconName: "invite",
       label: "Invites",
-      onClick: () => setUseOrg("isViewingInvites", true),
+      onClick: () => setOrgUI("isViewingInvites", true),
     },
     {
       iconName: "add",
       label: "New Invite",
-      onClick: () => setUseOrg("isInviting", true),
+      onClick: () => setOrgUI("isInviting", true),
     },
   ]
 
@@ -196,10 +196,10 @@ function ButtonTray() {
 */
 function MembersList() {
   const members = useAppSelector(selectOtherOrgMembersList)
-  const isViewingMembers = useOrgStore((state: any) => state.isViewingMembers)
+  const isViewingMembers = useOrgUI((state: any) => state.isViewingMembers)
 
   function handleClose() {
-    setUseOrg("isViewingMembers", false)
+    setOrgUI("isViewingMembers", false)
   }
 
   const actions: ModalActionProps[] = [
@@ -266,10 +266,10 @@ function MemberListItem({ member }: { member: MemberProps }) {
 */
 function InvitesList() {
   const invites = useAppSelector(selectOrgInvitesList) as InviteProps[]
-  const isViewingInvites = useOrgStore((state: any) => state.isViewingInvites)
+  const isViewingInvites = useOrgUI((state: any) => state.isViewingInvites)
 
   function handleClose() {
-    setUseOrg("isViewingInvites", false)
+    setOrgUI("isViewingInvites", false)
   }
 
   const actions: ModalActionProps[] = [
@@ -333,7 +333,7 @@ function InviteListItem({ invite }: { invite: InviteProps }) {
 
 */
 function NewInvite() {
-  const isInviting = useOrgStore((state: any) => state.isInviting)
+  const isInviting = useOrgUI((state: any) => state.isInviting)
 
   const [tempName, setTempName] = useState("")
   const [inviteKey, setInviteKey] = useState("")
@@ -357,12 +357,12 @@ function NewInvite() {
   }, [isCopied])
 
   function handleClose() {
-    setUseOrg("isInviting", false)
+    setOrgUI("isInviting", false)
   }
 
   function handleAccept() {
     createInvite(inviteKey, name)
-    setUseOrg("isInviting", false)
+    setOrgUI("isInviting", false)
   }
 
   const inviteBodyProps: NewInviteBodyProps = {
@@ -466,15 +466,15 @@ function NewInviteBody(props: NewInviteBodyProps) {
 */
 function RemoveOrgConfirmation() {
   const isAdmin = useAppSelector(selectIsUserAdmin)
-  const isRemoving = useOrgStore((state: any) => state.isRemoving)
+  const isRemoving = useOrgUI((state: any) => state.isRemoving)
 
   function handleAccept() {
     isAdmin ? removeOrg() : leaveOrg()
-    setUseOrg("isRemoving", false)
+    setOrgUI("isRemoving", false)
   }
 
   function handleClose() {
-    setUseOrg("isRemoving", false)
+    setOrgUI("isRemoving", false)
   }
 
   const actions: ModalActionProps[] = [
@@ -490,7 +490,7 @@ function RemoveOrgConfirmation() {
         <Typography display={"flex"} justifyContent={"center"}>
           {"Are you sure you want to " +
             (isAdmin ? "delete" : "leave") +
-            " your organisation?"}
+            " your org?"}
         </Typography>
       }
       actions={actions}

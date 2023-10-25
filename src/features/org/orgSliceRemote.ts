@@ -46,7 +46,7 @@ export async function getOrgUuidWithInviteKeyFromDB(inviteKey: string) {
 
 */
 export async function createOrgInviteOnDB(inviteKey: string, tempName: string) {
-  const orgUuid = store.getState().organisation.org.uuid
+  const orgUuid = store.getState().org.org.uuid
   if (!!orgUuid) {
     set(ref(dbReal, getDBPath.invite(inviteKey).invite), orgUuid).catch(
       (error) => console.log(error),
@@ -155,7 +155,7 @@ export async function deleteOrgMemberOnDB(orgUuid: string, memberUuid: string) {
 
 */
 export async function setOrgNameOnDB(name: string) {
-  const orgUuid = store.getState().organisation.org.uuid
+  const orgUuid = store.getState().org.org.uuid
   if (!!orgUuid) {
     set(ref(dbReal, getDBPath.org(orgUuid).name), name).catch((error) => {
       console.log(error)
@@ -170,7 +170,7 @@ export async function setOrgNameOnDB(name: string) {
 
 */
 export async function setCountCheckOnDB(check: string, id: string) {
-  const orgUuid = store.getState().organisation.org.uuid
+  const orgUuid = store.getState().org.org.uuid
   if (!!orgUuid) {
     set(ref(dbReal, getDBPath.org(orgUuid).countCheck(id).check), check).catch(
       (error) => {
@@ -187,7 +187,7 @@ export async function setCountCheckOnDB(check: string, id: string) {
 
 */
 export async function deleteCountCheckOnDB(id: string) {
-  const orgUuid = store.getState().organisation.org.uuid
+  const orgUuid = store.getState().org.org.uuid
   if (!!orgUuid) {
     remove(ref(dbReal, getDBPath.org(orgUuid).countCheck(id).check)).catch(
       (error) => {

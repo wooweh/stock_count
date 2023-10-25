@@ -17,7 +17,6 @@ import { signOut } from "../user/userAuth"
 
 
 
-
 */
 type MenuItemProps = {
   label: string
@@ -26,7 +25,6 @@ type MenuItemProps = {
 }
 export function Menu() {
   const theme = useTheme()
-  const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
   const isDarkmode = useAppSelector(selectIsDarkmode)

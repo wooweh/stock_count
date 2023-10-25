@@ -13,7 +13,7 @@ import Modal, { ModalActionProps } from "../../components/modal"
 import { SearchBar } from "../../components/searchBar"
 import { StockItemProps } from "../stock/stockSlice"
 import { selectUserUuid } from "../user/userSlice"
-import { setUseCount, useCountStore } from "./count"
+import { setCountUI, useCountUI } from "./count"
 import {
   CountItemProps,
   CountTypes,
@@ -64,7 +64,7 @@ export function StockCountBody() {
 
 */
 function SearchControls() {
-  const isAddingStockItem = useCountStore(
+  const isAddingStockItem = useCountUI(
     (state: any) => state.isAddingStockItem,
   )
 
@@ -86,7 +86,7 @@ function CountSearchBar() {
       countList,
       (countItem) => countItem.id === item.id,
     )
-    setUseCount("scrollIndex", index)
+    setCountUI("scrollIndex", index)
   }
 
   function formatResult(item: StockItemProps) {
@@ -132,12 +132,12 @@ function AddStockItemSearchBar() {
   function handleSelect(selectedItem: any) {
     const id = selectedItem.id
     addCountResultItem(id, userUuid)
-    setUseCount("currentlyViewedStockItemId", id)
-    setUseCount("isAddingStockItem", false)
+    setCountUI("currentlyViewedStockItemId", id)
+    setCountUI("isAddingStockItem", false)
   }
 
   function handleClickAway() {
-    setUseCount("isAddingStockItem", false)
+    setCountUI("isAddingStockItem", false)
   }
 
   function formatResult(item: StockItemProps) {
@@ -178,7 +178,7 @@ function AddStockItemSearchBar() {
             bgColor={theme.scale.gray[9]}
             iconSize={"small"}
             iconName={"cancel"}
-            onClick={() => setUseCount("isAddingStockItem", false)}
+            onClick={() => setCountUI("isAddingStockItem", false)}
             sx={{ padding: theme.module[3] }}
           />
         </Stack>
@@ -199,7 +199,7 @@ function CountSheet() {
     selectUserCountResultsList,
   ) as SelectCountMemberResultsListProps
 
-  const scrollIndex = useCountStore((state: any) => state.scrollIndex)
+  const scrollIndex = useCountUI((state: any) => state.scrollIndex)
 
   const virtuoso: any = useRef(null)
 
@@ -262,7 +262,7 @@ function CountSheetListItem({
   const theme = useTheme()
 
   function handleOptionsClick() {
-    setUseCount("currentlyViewedStockItemId", item.id)
+    setCountUI("currentlyViewedStockItemId", item.id)
   }
 
   const countData =
@@ -374,7 +374,7 @@ function AddStockItemButton() {
   const theme = useTheme()
 
   function handleClick() {
-    setUseCount("isAddingStockItem", true)
+    setCountUI("isAddingStockItem", true)
   }
 
   return (
@@ -402,16 +402,16 @@ function AddStockItemButton() {
 function RecordStockItemCount() {
   const memberUuid = useAppSelector(selectUserUuid) as string
 
-  const useableCount = useCountStore(
+  const useableCount = useCountUI(
     (state: any) => state.currentlyViewedStockItemUseableCount,
   )
-  const damagedCount = useCountStore(
+  const damagedCount = useCountUI(
     (state: any) => state.currentlyViewedStockItemDamagedCount,
   )
-  const obsoleteCount = useCountStore(
+  const obsoleteCount = useCountUI(
     (state: any) => state.currentlyViewedStockItemObsoleteCount,
   )
-  const id = useCountStore((state: any) => state.currentlyViewedStockItemId)
+  const id = useCountUI((state: any) => state.currentlyViewedStockItemId)
 
   const [isOpen, setIsOpen] = useState(false)
 
@@ -434,7 +434,7 @@ function RecordStockItemCount() {
   function handleClose() {
     setIsOpen(false)
     setTimeout(() => {
-      setUseCount("currentlyViewedStockItemId", false)
+      setCountUI("currentlyViewedStockItemId", false)
     }, 250)
   }
 
@@ -474,14 +474,14 @@ function RecordStockItemCountBody({ handleClose }: { handleClose: Function }) {
     selectUserCountResults,
   )
 
-  const id = useCountStore((state: any) => state.currentlyViewedStockItemId)
-  const useableCount = useCountStore(
+  const id = useCountUI((state: any) => state.currentlyViewedStockItemId)
+  const useableCount = useCountUI(
     (state: any) => state.currentlyViewedStockItemUseableCount,
   )
-  const damagedCount = useCountStore(
+  const damagedCount = useCountUI(
     (state: any) => state.currentlyViewedStockItemDamagedCount,
   )
-  const obsoleteCount = useCountStore(
+  const obsoleteCount = useCountUI(
     (state: any) => state.currentlyViewedStockItemObsoleteCount,
   )
 
@@ -489,15 +489,15 @@ function RecordStockItemCountBody({ handleClose }: { handleClose: Function }) {
 
   useEffect(() => {
     if (!!stockItem) {
-      setUseCount(
+      setCountUI(
         "currentlyViewedStockItemUseableCount",
         stockItem.useableCount,
       )
-      setUseCount(
+      setCountUI(
         "currentlyViewedStockItemDamagedCount",
         stockItem.damagedCount,
       )
-      setUseCount(
+      setCountUI(
         "currentlyViewedStockItemObsoleteCount",
         stockItem.obsoleteCount,
       )
@@ -512,15 +512,15 @@ function RecordStockItemCountBody({ handleClose }: { handleClose: Function }) {
   }
 
   function setUseableCount(count: number) {
-    setUseCount("currentlyViewedStockItemUseableCount", count)
+    setCountUI("currentlyViewedStockItemUseableCount", count)
   }
 
   function setDamagedCount(count: number) {
-    setUseCount("currentlyViewedStockItemDamagedCount", count)
+    setCountUI("currentlyViewedStockItemDamagedCount", count)
   }
 
   function setObsoleteCount(count: number) {
-    setUseCount("currentlyViewedStockItemObsoleteCount", count)
+    setCountUI("currentlyViewedStockItemObsoleteCount", count)
   }
 
   const inputs: StockItemCountInputProps[] = [

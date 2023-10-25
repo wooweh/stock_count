@@ -11,16 +11,18 @@ import { ListItem } from "../../components/listItem"
 import Modal, { ModalActionProps } from "../../components/modal"
 import { generateCustomNotification } from "../core/coreUtils"
 import { MemberProps } from "../org/orgSlice"
+import { getMemberName } from "../org/orgUtils"
 import {
-  addUseCountSelectedMemberUuid,
-  removeUseCountSelectedMemberUuid,
-  setUseCount,
-  useCountStore,
+  addCountUISelectedMemberUuid,
+  removeCountUISelectedMemberUuid,
+  setCountUI,
+  useCountUI,
 } from "./count"
 import {
   CountMemberProps,
   CountTypes,
   selectAvailableCountersList,
+  selectCounters,
   selectCountersList,
   selectCountersUuidList,
 } from "./countSlice"
@@ -39,7 +41,7 @@ import {
 export function SetupBody() {
   const theme = useTheme()
   const counterUuids = useAppSelector(selectCountersUuidList)
-  const countType = useCountStore((state: any) => state.tempCountType)
+  const countType = useCountUI((state: any) => state.tempCountType)
   const isSolo = countType === "solo"
 
   const COUNT_TYPE_DESCRIPTIONS: any = {
@@ -49,12 +51,12 @@ export function SetupBody() {
   }
 
   useEffect(() => {
-    setUseCount("selectedMemberUuids", counterUuids)
+    setCountUI("selectedMemberUuids", counterUuids)
   }, [counterUuids])
 
   function handleCountTypeSelect(value: any) {
-    setUseCount("tempCountType", value)
-    setUseCount("selectedMemberUuids", [])
+    setCountUI("tempCountType", value)
+    setCountUI("selectedMemberUuids", [])
     removeCountMembers()
   }
 
@@ -81,7 +83,7 @@ export function SetupBody() {
           variation={"profile"}
           label={`Add ${isSolo ? "Counter" : "Counters"}`}
           iconName={"addMembers"}
-          onClick={() => setUseCount("isAddingMembers", true)}
+          onClick={() => setCountUI("isAddingMembers", true)}
           bgColor={theme.scale.gray[7]}
           outlineColor={theme.scale.gray[6]}
           justifyCenter
@@ -118,8 +120,8 @@ export function SetupBody() {
 */
 function WarningBox() {
   const theme = useTheme()
-  const countType = useCountStore((state: any) => state.tempCountType)
-  const isCounterRequirementMet = useCountStore(
+  const countType = useCountUI((state: any) => state.tempCountType)
+  const isCounterRequirementMet = useCountUI(
     (state: any) => state.isCounterRequirementMet,
   )
 
@@ -151,11 +153,11 @@ function WarningBox() {
 */
 function AddMembers() {
   const availableMembers = useAppSelector(selectAvailableCountersList)
-  const countType: CountTypes = useCountStore(
+  const countType: CountTypes = useCountUI(
     (state: any) => state.tempCountType,
   )
-  const isAddingMembers = useCountStore((state: any) => state.isAddingMembers)
-  const selectedMemberUuids = useCountStore(
+  const isAddingMembers = useCountUI((state: any) => state.isAddingMembers)
+  const selectedMemberUuids = useCountUI(
     (state: any) => state.selectedMemberUuids,
   )
 
@@ -179,16 +181,16 @@ function AddMembers() {
   const warningMessage = `${verbose} required for ${countType} count.`
 
   useEffect(() => {
-    setUseCount("isCounterRequirementMet", isRequirementMet)
+    setCountUI("isCounterRequirementMet", isRequirementMet)
   }, [isRequirementMet])
 
   function handleClose() {
-    setUseCount("selectedMemberUuids", [])
-    setUseCount("isAddingMembers", false)
+    setCountUI("selectedMemberUuids", [])
+    setCountUI("isAddingMembers", false)
   }
   function handleAccept() {
     if (isRequirementMet) {
-      setUseCount("isAddingMembers", false)
+      setCountUI("isAddingMembers", false)
       setTimeout(() => prepareCountMembers(selectedMemberUuids), 150)
     } else {
       generateCustomNotification("warning", warningMessage)
@@ -242,10 +244,10 @@ function MembersList({
 }) {
   const availableMembers = useAppSelector(selectAvailableCountersList)
 
-  const countType: CountTypes = useCountStore(
+  const countType: CountTypes = useCountUI(
     (state: any) => state.tempCountType,
   )
-  const selectedMemberUuids = useCountStore(
+  const selectedMemberUuids = useCountUI(
     (state: any) => state.selectedMemberUuids,
   )
 
@@ -264,10 +266,10 @@ function MembersList({
             }
             onChange={() =>
               selected
-                ? removeUseCountSelectedMemberUuid(member.uuid)
+                ? removeCountUISelectedMemberUuid(member.uuid)
                 : isRequirementMet && !isTeamCount
                 ? generateCustomNotification("warning", warningMessage)
-                : addUseCountSelectedMemberUuid(member.uuid)
+                : addCountUISelectedMemberUuid(member.uuid)
             }
             tappable
             key={name}
@@ -286,6 +288,8 @@ function MembersList({
 function CountersList() {
   const theme = useTheme()
   const counters = useAppSelector(selectCountersList)
+  const counter = useAppSelector(selectCounters)
+  console.log(counter)
 
   return (
     <Stack
@@ -305,14 +309,14 @@ function CountersList() {
               } else {
                 removeCountMember(uuid)
               }
-              removeUseCountSelectedMemberUuid(uuid)
+              removeCountUISelectedMemberUuid(uuid)
             }
 
-            const fullname = `${counter.firstName} ${counter.lastName}`
+            const name = getMemberName(counter)
 
             return (
               <ListItem
-                label={fullname}
+                label={name}
                 noWrap
                 primarySlot={<Icon variation={"profile"} />}
                 bgColor={theme.scale.gray[9]}
@@ -324,7 +328,7 @@ function CountersList() {
                   />
                 }
                 sx={{ padding: theme.module[2], paddingLeft: theme.module[4] }}
-                key={fullname}
+                key={name}
               />
             )
           })

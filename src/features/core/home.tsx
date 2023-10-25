@@ -21,7 +21,6 @@ import { routePaths } from "./pages"
 
 
 
-
 */
 export function Home() {
   const isProfileComplete = useAppSelector(selectIsProfileComplete)
@@ -38,7 +37,6 @@ export function Home() {
   )
 }
 /*
-
 
 
 
@@ -114,7 +112,6 @@ export function CompleteProfilePrompt() {
 
 
 
-
 */
 type PromptInputProps = {
   placeholder: string
@@ -122,7 +119,6 @@ type PromptInputProps = {
   onChange: Function
 }
 function PromptInput(props: PromptInputProps) {
-  const theme = useTheme()
   const [placeholder, setPlacehoder] = useState(props.placeholder ?? "")
 
   return (
@@ -146,7 +142,6 @@ function PromptInput(props: PromptInputProps) {
   )
 }
 /*
-
 
 
 
@@ -228,7 +223,6 @@ function SetupOrgPrompt() {
 
 
 
-
 */
 type OrgSetupPromptActionProps = {
   value: string
@@ -267,7 +261,6 @@ function OrgSetupPromptAction(props: OrgSetupPromptActionProps) {
 
 
 
-
 */
 type HomeButton = {
   label: string
@@ -292,17 +285,13 @@ function HomeButtons() {
     <Stack width={theme.module[10]} paddingBottom={theme.module[6]}>
       <Grid container spacing={4}>
         {buttons.map((button: HomeButton, index: number) => {
-          function handleClick() {
-            navigate(button.path)
-          }
-
           return (
             <Grid width={"100%"} key={index}>
               <Button
                 variation={"home"}
                 label={button.label}
                 iconName={button.icon}
-                onClick={handleClick}
+                onClick={() => navigate(button.path)}
                 animationDuration={150}
               />
             </Grid>
@@ -313,7 +302,6 @@ function HomeButtons() {
   )
 }
 /*
-
 
 
 

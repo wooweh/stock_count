@@ -15,7 +15,7 @@ import { UploadItems } from "./uploadItems"
 
 */
 type IsEditingProps = false | StockItemProps
-type UseStockState = {
+type StockUIState = {
   isAdding: boolean
   isEditing: IsEditingProps
   isUploading: boolean
@@ -23,8 +23,8 @@ type UseStockState = {
   scrollIndex: number
   selectedItems: string[]
 }
-type UseStockKeys = keyof UseStockState
-const initialState: UseStockState = {
+type StockUIKeys = keyof StockUIState
+const initialState: StockUIState = {
   isAdding: false,
   isEditing: false,
   isUploading: false,
@@ -32,7 +32,7 @@ const initialState: UseStockState = {
   scrollIndex: 0,
   selectedItems: [],
 }
-export const useStockStore = create<UseStockState>()(
+export const useStockUI = create<StockUIState>()(
   persist(
     (set) => ({
       ...initialState,
@@ -41,26 +41,26 @@ export const useStockStore = create<UseStockState>()(
   ),
 )
 
-export function setUseStock(path: UseStockKeys, value: any) {
-  useStockStore.setState({ [path]: value })
+export function setStockUI(path: StockUIKeys, value: any) {
+  useStockUI.setState({ [path]: value })
 }
-export function addUseStockSelectedItem(id: string) {
-  const selectedItems = useStockStore.getState().selectedItems
+export function addStockUISelectedItem(id: string) {
+  const selectedItems = useStockUI.getState().selectedItems
   const index = _.indexOf(selectedItems, id)
   if (index === -1) {
     const newSelectedItems = [id, ...selectedItems]
-    useStockStore.setState({ selectedItems: newSelectedItems })
+    useStockUI.setState({ selectedItems: newSelectedItems })
   }
 }
-export function removeUseStockSelectedItem(id: string) {
-  const selectedItems = useStockStore.getState().selectedItems
+export function removeStockUISelectedItem(id: string) {
+  const selectedItems = useStockUI.getState().selectedItems
   const indexToRemove = _.indexOf(selectedItems, id)
   const newSelectedItems = [...selectedItems]
   newSelectedItems.splice(indexToRemove, 1)
-  useStockStore.setState({ selectedItems: newSelectedItems })
+  useStockUI.setState({ selectedItems: newSelectedItems })
 }
-export function resetUseStock() {
-  useStockStore.setState(initialState)
+export function resetStockUI() {
+  useStockUI.setState(initialState)
 }
 /*
 

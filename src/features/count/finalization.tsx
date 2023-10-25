@@ -1,6 +1,6 @@
 import { Stack, Typography } from "@mui/material"
 import _ from "lodash"
-import { useAppDispatch, useAppSelector } from "../../app/hooks"
+import { useAppSelector } from "../../app/hooks"
 import useTheme, { ThemeColors } from "../../common/useTheme"
 import {
   calculateDuration,
@@ -9,24 +9,22 @@ import {
 } from "../../common/utils"
 import Icon, { IconNames } from "../../components/icon"
 import Modal, { ModalActionProps } from "../../components/modal"
-import { generateCustomNotification } from "../core/coreUtils"
 import {
-  addUseCountFinalComment,
-  editUseCountFinalComment,
-  removeUseCountFinalComment,
-  resetUseCount,
-  setUseCount,
-  useCountStore,
+  addCountUIFinalComment,
+  editCountUIFinalComment,
+  removeCountUIFinalComment,
+  resetCountUI,
+  setCountUI,
+  useCountUI,
 } from "./count"
 import {
   CountMetadataProps,
-  deleteCount,
   selectCountMetadata,
   selectCountType,
   selectCountersList,
   selectOrganiser,
 } from "./countSlice"
-import { removeCount, submitCount, updateCountStep } from "./countSliceUtils"
+import { submitCount } from "./countSliceUtils"
 import {
   CommentsList,
   PreparationItem as FinalizationItem,
@@ -58,7 +56,7 @@ export function FinalizationBody() {
 */
 type FinalizationItemsProps = PreparationItemProps
 function FinalizationItems() {
-  const comments = useCountStore((state) => state.finalComments)
+  const comments = useCountUI((state) => state.finalComments)
 
   const finalItems: FinalizationItemsProps[] = [
     {
@@ -67,12 +65,12 @@ function FinalizationItems() {
     },
     {
       label: "Comments:",
-      onClick: () => addUseCountFinalComment(""),
+      onClick: () => addCountUIFinalComment(""),
       item: (
         <CommentsList
           comments={comments}
-          handleAccept={editUseCountFinalComment}
-          handleDelete={removeUseCountFinalComment}
+          handleAccept={editCountUIFinalComment}
+          handleDelete={removeCountUIFinalComment}
         />
       ),
     },
@@ -249,17 +247,17 @@ export function DataPill(props: DataPillProps) {
 */
 function FinalizeCountConfirmation() {
   const theme = useTheme()
-  const isSubmittingFinalization = useCountStore(
+  const isSubmittingFinalization = useCountUI(
     (state: any) => state.isSubmittingFinalization,
   )
 
   function handleAccept() {
     submitCount()
-    resetUseCount()
+    resetCountUI()
   }
 
   function handleClose() {
-    setUseCount("isSubmittingFinalization", false)
+    setCountUI("isSubmittingFinalization", false)
   }
 
   const actions: ModalActionProps[] = [

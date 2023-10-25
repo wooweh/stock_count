@@ -12,10 +12,10 @@ import {
 import { ScrollToTop } from "../../components/scrollToTop"
 import { SearchBar, SearchListProps } from "../../components/searchBar"
 import {
-  addUseHistorySelectedItem,
-  removeUseHistorySelectedItem,
-  setUseHistory,
-  useHistoryStore,
+  addHistoryUISelectedItem,
+  removeHistoryUISelectedItem,
+  setHistoryUI,
+  useHistoryUI,
 } from "./history"
 import {
   selectHistoryIdList,
@@ -62,7 +62,7 @@ export function HistoryList() {
 function Header() {
   const theme = useTheme()
   const historyList = useAppSelector(selectHistoryList)
-  const isSelecting = useHistoryStore((state: any) => state.isSelecting)
+  const isSelecting = useHistoryUI((state: any) => state.isSelecting)
 
   return (
     !!historyList.length && (
@@ -88,7 +88,7 @@ function HistorySearchBar() {
       historySearchList,
       (historyItem) => historyItem.id === item.id,
     )
-    setUseHistory("scrollIndex", index)
+    setHistoryUI("scrollIndex", index)
   }
 
   function formatResult(item: SearchListProps) {
@@ -119,14 +119,14 @@ function HistorySearchBar() {
 */
 function HistorySelectionBar() {
   const theme = useTheme()
-  const selectedItems = useHistoryStore((state: any) => state.selectedItems)
+  const selectedItems = useHistoryUI((state: any) => state.selectedItems)
   const historyIdList = useAppSelector(selectHistoryIdList)
 
   const isAllSelected =
     !!selectedItems.length && historyIdList.length === selectedItems.length
 
   function handleSelectAll() {
-    setUseHistory("selectedItems", historyIdList)
+    setHistoryUI("selectedItems", historyIdList)
   }
 
   function handleDelete() {
@@ -135,8 +135,8 @@ function HistorySelectionBar() {
   }
 
   function handleBack() {
-    setUseHistory("selectedItems", [])
-    setUseHistory("isSelecting", false)
+    setHistoryUI("selectedItems", [])
+    setHistoryUI("isSelecting", false)
   }
 
   return (
@@ -186,17 +186,16 @@ function Body() {
 
   const historySearchList = useAppSelector(selectHistorySearchList)
 
-  const scrollIndex = useHistoryStore((state: any) => state.scrollIndex)
-  const isSelecting = useHistoryStore((state: any) => state.isSelecting)
-  const selectedItems = useHistoryStore((state: any) => state.selectedItems)
+  const scrollIndex = useHistoryUI((state: any) => state.scrollIndex)
+  const isSelecting = useHistoryUI((state: any) => state.isSelecting)
+  const selectedItems = useHistoryUI((state: any) => state.selectedItems)
 
   const virtuoso: any = useRef(null)
 
   const [showScrollToTop, setShowScrollToTop] = useState(false)
 
   useEffect(() => {
-    if (isSelecting && !selectedItems.length)
-      setUseHistory("isSelecting", false)
+    if (isSelecting && !selectedItems.length) setHistoryUI("isSelecting", false)
   }, [isSelecting, selectedItems])
 
   useEffect(() => {
@@ -209,9 +208,9 @@ function Body() {
   }, [virtuoso, scrollIndex])
 
   function handleScrollToTopClick() {
-    setUseHistory("scrollIndex", 1)
+    setHistoryUI("scrollIndex", 1)
     setTimeout(() => {
-      setUseHistory("scrollIndex", 0)
+      setHistoryUI("scrollIndex", 0)
     }, 50)
   }
 
@@ -262,14 +261,14 @@ function Body() {
             const item = historySearchList[index]
 
             function handleLongPress() {
-              setUseHistory("isSelecting", true)
-              addUseHistorySelectedItem(item.id)
+              setHistoryUI("isSelecting", true)
+              addHistoryUISelectedItem(item.id)
             }
 
             const options: ListItemOptionProps[] = [
               {
                 iconName: "visible",
-                onClick: () => setUseHistory("reviewItemUuid", item.id),
+                onClick: () => setHistoryUI("reviewItemUuid", item.id),
               },
               {
                 iconName: "delete",
@@ -285,8 +284,8 @@ function Body() {
                   iconName={"history"}
                   options={options}
                   onLongPress={handleLongPress}
-                  onSelection={() => addUseHistorySelectedItem(item.id)}
-                  onDeselection={() => removeUseHistorySelectedItem(item.id)}
+                  onSelection={() => addHistoryUISelectedItem(item.id)}
+                  onDeselection={() => removeHistoryUISelectedItem(item.id)}
                   isSelecting={isSelecting}
                   isSelected={_.find(selectedItems, (id) => id === item.id)}
                 />

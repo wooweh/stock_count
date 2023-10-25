@@ -5,7 +5,7 @@ import { Button } from "../../components/button"
 import { CSVParser, downloadCSVTemplate } from "../../components/csvParser"
 import Modal, { ModalActionProps } from "../../components/modal"
 import VirtualizedTable, { ColumnData } from "../../components/table"
-import { setUseStock, useStockStore } from "./stock"
+import { setStockUI, useStockUI } from "./stock"
 import { StockItemProps } from "./stockSlice"
 import { uploadStockList } from "./stockSliceUtils"
 /*
@@ -16,16 +16,16 @@ import { uploadStockList } from "./stockSliceUtils"
 */
 export function UploadItems() {
   const theme = useTheme()
-  const isUploading = useStockStore((state: any) => state.isUploading)
+  const isUploading = useStockUI((state: any) => state.isUploading)
   const [data, setData]: any = useState([])
 
   function handleAccept() {
     uploadStockList(data)
-    setUseStock("isUploading", false)
+    setStockUI("isUploading", false)
   }
 
   function handleClose() {
-    setUseStock("isUploading", false)
+    setStockUI("isUploading", false)
   }
 
   function handleOnComplete(results: StockItemProps[]) {

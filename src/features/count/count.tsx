@@ -1,48 +1,18 @@
-import { ClickAwayListener, Stack, Typography } from "@mui/material"
+import { Stack, Typography } from "@mui/material"
 import _ from "lodash"
-import { useEffect, useState } from "react"
 import { create } from "zustand"
 import { createJSONStorage, persist } from "zustand/middleware"
-import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
-import { getTimeStamp } from "../../common/utils"
-import Animation from "../../components/animation"
-import { Button } from "../../components/button"
-import { IconNames } from "../../components/icon"
 import Modal, { ModalActionProps } from "../../components/modal"
-import {
-  CountSteps,
-  CountTypes,
-  selectCountStep,
-  selectCountersUuidList,
-  selectIsOrganiserFinalizing,
-  selectIsStockCountCompleted,
-  selectIsUserCounting,
-  selectIsUserOnlyOrganiser,
-  selectIsUserOrganiser,
-} from "./countSlice"
-import {
-  createCountMetadata,
-  leaveCount,
-  removeCount,
-  updateCountComments,
-  updateCountMetadata,
-  updateCountStep,
-  updateUserCountMember,
-} from "./countSliceUtils"
-import { DashboardBody } from "./dashboard"
-import { FinalizationBody } from "./finalization"
-import { PreparationBody } from "./preparation"
-import { ReviewBody } from "./review"
-import { SetupBody } from "./setup"
-import { StockCountBody } from "./stockCount"
+import { leaveCount, removeCount } from "./countSliceUtils"
+import { Steps } from "./steps"
 /*
 
 
 
 
 */
-type UseCountState = {
+type CountUIState = {
   isSettingUp: boolean
   isManagingCheckList: boolean
   isCounterRequirementMet: boolean
@@ -67,8 +37,8 @@ type UseCountState = {
   finalComments: string[]
   tempCountType: string
 }
-type UseCountKeys = keyof UseCountState
-const initialState: UseCountState = {
+type CountUIKeys = keyof CountUIState
+const initialState: CountUIState = {
   isSettingUp: false,
   isManagingCheckList: false,
   isCounterRequirementMet: false,
@@ -93,7 +63,7 @@ const initialState: UseCountState = {
   finalComments: [],
   tempCountType: "",
 }
-export const useCountStore = create<UseCountState>()(
+export const useCountUI = create<CountUIState>()(
   persist(
     (set) => ({
       ...initialState,
@@ -102,79 +72,79 @@ export const useCountStore = create<UseCountState>()(
   ),
 )
 
-export function setUseCount(path: UseCountKeys, value: any) {
-  useCountStore.setState({ [path]: value })
+export function setCountUI(path: CountUIKeys, value: any) {
+  useCountUI.setState({ [path]: value })
 }
-export function addUseCountSelectedMemberUuid(uuid: string) {
-  const uuids = useCountStore.getState().selectedMemberUuids
+export function addCountUISelectedMemberUuid(uuid: string) {
+  const uuids = useCountUI.getState().selectedMemberUuids
   const index = _.indexOf(uuids, uuid)
   if (index === -1) {
     const newUuids = [uuid, ...uuids]
-    useCountStore.setState({ selectedMemberUuids: newUuids })
+    useCountUI.setState({ selectedMemberUuids: newUuids })
   }
 }
-export function removeUseCountSelectedMemberUuid(uuid: string) {
-  const uuids = useCountStore.getState().selectedMemberUuids
+export function removeCountUISelectedMemberUuid(uuid: string) {
+  const uuids = useCountUI.getState().selectedMemberUuids
   const indexToRemove = _.indexOf(uuids, uuid)
   const newUuids = [...uuids]
   newUuids.splice(indexToRemove, 1)
-  useCountStore.setState({ selectedMemberUuids: newUuids })
+  useCountUI.setState({ selectedMemberUuids: newUuids })
 }
-export function addUseCountSatisfiedCheckUuid(uuid: string) {
-  const uuids = useCountStore.getState().satisfiedCheckUuids
+export function addCountUISatisfiedCheckUuid(uuid: string) {
+  const uuids = useCountUI.getState().satisfiedCheckUuids
   const index = _.indexOf(uuids, uuid)
   if (index === -1) {
     const newUuids = [uuid, ...uuids]
-    useCountStore.setState({ satisfiedCheckUuids: newUuids })
+    useCountUI.setState({ satisfiedCheckUuids: newUuids })
   }
 }
-export function removeUseCountSatisfiedCheckUuid(uuid: string) {
-  const uuids = useCountStore.getState().satisfiedCheckUuids
+export function removeCountUISatisfiedCheckUuid(uuid: string) {
+  const uuids = useCountUI.getState().satisfiedCheckUuids
   const indexToRemove = _.indexOf(uuids, uuid)
   const newUuids = [...uuids]
   newUuids.splice(indexToRemove, 1)
-  useCountStore.setState({ satisfiedCheckUuids: newUuids })
+  useCountUI.setState({ satisfiedCheckUuids: newUuids })
 }
-export function addUseCountPrepComment(comment: string) {
-  const comments = useCountStore.getState().prepCommments
+export function addCountUIPrepComment(comment: string) {
+  const comments = useCountUI.getState().prepCommments
   const newComments = [...comments, comment]
-  useCountStore.setState({ prepCommments: newComments })
+  useCountUI.setState({ prepCommments: newComments })
 }
-export function editUseCountPrepComment(index: number, comment: string) {
-  const comments = useCountStore.getState().prepCommments
+export function editCountUIPrepComment(index: number, comment: string) {
+  const comments = useCountUI.getState().prepCommments
   if (index >= 0 && index < comments.length) {
     const newComments = [...comments]
     newComments[index] = comment
-    useCountStore.setState({ prepCommments: newComments })
+    useCountUI.setState({ prepCommments: newComments })
   }
 }
-export function removeUseCountPrepComment(index: number) {
-  const comments = useCountStore.getState().prepCommments
+export function removeCountUIPrepComment(index: number) {
+  const comments = useCountUI.getState().prepCommments
   const newComments = [...comments]
   newComments.splice(index, 1)
-  useCountStore.setState({ prepCommments: newComments })
+  useCountUI.setState({ prepCommments: newComments })
 }
-export function addUseCountFinalComment(comment: string) {
-  const comments = useCountStore.getState().finalComments
+export function addCountUIFinalComment(comment: string) {
+  const comments = useCountUI.getState().finalComments
   const newComments = [...comments, comment]
-  useCountStore.setState({ finalComments: newComments })
+  useCountUI.setState({ finalComments: newComments })
 }
-export function editUseCountFinalComment(index: number, comment: string) {
-  const comments = useCountStore.getState().finalComments
+export function editCountUIFinalComment(index: number, comment: string) {
+  const comments = useCountUI.getState().finalComments
   if (index >= 0 && index < comments.length) {
     const newComments = [...comments]
     newComments[index] = comment
-    useCountStore.setState({ finalComments: newComments })
+    useCountUI.setState({ finalComments: newComments })
   }
 }
-export function removeUseCountFinalComment(index: number) {
-  const comments = useCountStore.getState().finalComments
+export function removeCountUIFinalComment(index: number) {
+  const comments = useCountUI.getState().finalComments
   const newComments = [...comments]
   newComments.splice(index, 1)
-  useCountStore.setState({ finalComments: newComments })
+  useCountUI.setState({ finalComments: newComments })
 }
-export function resetUseCount() {
-  useCountStore.setState(initialState)
+export function resetCountUI() {
+  useCountUI.setState(initialState)
 }
 /*
 
@@ -183,408 +153,12 @@ export function resetUseCount() {
 
 */
 export function Count() {
-  return <CountSteps />
-}
-/*
-
-
-
-
-*/
-type CountStepsPropsCreator<CountStepsProperties extends string> = {
-  [key in CountStepsProperties as key]: CountStepProps
-}
-type CountStepsProps = CountStepsPropsCreator<CountSteps>
-function CountSteps() {
-  const theme = useTheme()
-
-  const countStep = useAppSelector(selectCountStep)
-  const counterUuids = useAppSelector(selectCountersUuidList)
-  const isCountCompleted = useAppSelector(selectIsStockCountCompleted)
-  const isOrganiser = useAppSelector(selectIsUserOrganiser)
-  const isOnlyOrganiser = useAppSelector(selectIsUserOnlyOrganiser)
-  const isFinalizing = useAppSelector(selectIsOrganiserFinalizing)
-
-  const countType = useCountStore((state) => state.tempCountType) as CountTypes
-  const isCounterRequirementMet = useCountStore(
-    (state) => state.isCounterRequirementMet,
-  )
-  const isReviewMetadataSubmitted = useCountStore(
-    (state) => state.isReviewMetadataSubmitted,
-  )
-  const finalComments = useCountStore((state) => state.finalComments)
-
-  useEffect(() => {
-    if (isCountCompleted && isOrganiser && !isReviewMetadataSubmitted) {
-      updateCountMetadata({ reviewStartTime: getTimeStamp() })
-      setUseCount("isReviewMetadataSubmitted", true)
-    }
-  }, [isCountCompleted, isReviewMetadataSubmitted, isOrganiser])
-
-  function handleSetupPrev() {
-    updateCountStep("dashboard")
-  }
-
-  function handleSetupNext() {
-    createCountMetadata(countType, counterUuids)
-    updateCountStep("preparation")
-  }
-
-  function handlePreparationPrev() {
-    updateCountStep("setup")
-  }
-
-  function handlePreparationNext() {
-    setUseCount("isStartingCount", true)
-  }
-
-  function handleStockCountNext() {
-    updateCountStep("review", true)
-  }
-
-  function handleReviewPrev() {
-    updateCountStep("stockCount", true)
-  }
-
-  function handleReviewNext() {
-    setUseCount("isStartingFinalization", true)
-  }
-
-  function handleFinalizationSubmit() {
-    updateCountComments({ finalization: finalComments })
-    updateCountMetadata({ finalSubmissionTime: getTimeStamp() })
-    setUseCount("isSubmittingFinalization", true)
-  }
-
-  const isSetupNextButtonDisabled = !isCounterRequirementMet
-
-  const countSteps: CountStepsProps = {
-    dashboard: {
-      label: "Dashboard",
-      body: <DashboardBody />,
-    },
-    setup: {
-      label: "Setup",
-      body: <SetupBody />,
-      prevButton: { label: "Dashboard", onClick: handleSetupPrev },
-      nextButton: {
-        label: "Preparation",
-        onClick: handleSetupNext,
-        disabled: isSetupNextButtonDisabled,
-      },
-    },
-    preparation: {
-      label: "Preparation",
-      body: <PreparationBody />,
-      prevButton: { label: "Setup", onClick: handlePreparationPrev },
-      nextButton: { label: "Count", onClick: handlePreparationNext },
-    },
-    stockCount: {
-      label: "Stock Count",
-      body: <StockCountBody />,
-      nextButton: { label: "Review", onClick: handleStockCountNext },
-    },
-    review: {
-      label: "Review",
-      body: <ReviewBody />,
-    },
-    finalization: {
-      label: "Finalization",
-      body: <FinalizationBody />,
-      submitButton: { label: "Submit", onClick: handleFinalizationSubmit },
-    },
-  }
-
-  if (!isOnlyOrganiser && !isFinalizing)
-    _.set(countSteps, "review.prevButton", {
-      label: "Count",
-      onClick: handleReviewPrev,
-    })
-
-  if (isOrganiser)
-    _.set(countSteps, "review.nextButton", {
-      label: "Finalize",
-      onClick: handleReviewNext,
-      disabled: !isCountCompleted,
-    })
-
   return (
-    <Stack
-      width={"100%"}
-      height={"100%"}
-      padding={theme.module[4]}
-      boxSizing={"border-box"}
-    >
-      <CountStep {...countSteps[countStep]} />
+    <>
+      <Steps />
       <LeaveCountConfirmation />
       <DeleteCountConfirmation />
-    </Stack>
-  )
-}
-/*
-
-
-
-
-*/
-type CountStepProps = {
-  label: string
-  body: any
-  nextButton?: ButtonProps
-  prevButton?: ButtonProps
-  submitButton?: ButtonProps
-}
-type ButtonProps = {
-  label: string
-  onClick: any
-  disabled?: boolean
-}
-function CountStep(props: CountStepProps) {
-  const theme = useTheme()
-
-  return (
-    <Stack
-      width={"100%"}
-      height={"100%"}
-      gap={theme.module[3]}
-      alignItems={"center"}
-      boxSizing={"border-box"}
-    >
-      <Header {...props} />
-      <Body {...props} />
-      <ButtonTray {...props} />
-    </Stack>
-  )
-}
-/*
-
-
-
-
-*/
-function Header({ label }: { label: string }) {
-  const theme = useTheme()
-  const isOptionsOpen = useCountStore((state) => state.isCountOptionsOpen)
-
-  return (
-    <Stack
-      direction={"row"}
-      width={"min-content"}
-      gap={theme.module[2]}
-      padding={theme.module[2]}
-      boxSizing={"border-box"}
-      bgcolor={theme.scale.gray[9]}
-      borderRadius={theme.module[5]}
-      boxShadow={theme.shadow.neo[3]}
-      sx={{
-        outline: `1px solid ${theme.scale.gray[7]}`,
-      }}
-    >
-      {isOptionsOpen ? <OptionsTray /> : <StepLabel label={label} />}
-    </Stack>
-  )
-}
-/*
-
-
-
-
-*/
-function StepLabel({ label }: { label: string }) {
-  const theme = useTheme()
-  const isUserCounting = useAppSelector(selectIsUserCounting)
-
-  return (
-    <Stack
-      direction={"row"}
-      gap={theme.module[2]}
-      alignItems={"center"}
-      paddingLeft={theme.module[4]}
-      paddingRight={isUserCounting ? 0 : theme.module[4]}
-      boxSizing={"border-box"}
-      height={"100%"}
-    >
-      <Typography fontWeight={"bold"} variant={"subtitle1"} noWrap>
-        {label}
-      </Typography>
-      {isUserCounting && (
-        <Button
-          variation={"pill"}
-          iconName={"options"}
-          onClick={() => setUseCount("isCountOptionsOpen", true)}
-        />
-      )}
-    </Stack>
-  )
-}
-/*
-
-
-
-
-*/
-type CountOptions = {
-  label?: string
-  iconName: IconNames
-  onClick: any
-}
-function OptionsTray() {
-  const theme = useTheme()
-
-  const isOptionsOpen = useCountStore((state) => state.isCountOptionsOpen)
-  const isOrganiser = useAppSelector(selectIsUserOrganiser)
-
-  const [isOpen, setIsOpen] = useState(false)
-
-  function handleCancel() {
-    setIsOpen(false)
-    setTimeout(() => {
-      setUseCount("isCountOptionsOpen", false)
-    }, 150)
-  }
-
-  function handleLeave() {
-    setUseCount("isLeavingCount", true)
-    handleCancel()
-  }
-
-  function handleDelete() {
-    setUseCount("isLeavingCount", true)
-    handleCancel()
-  }
-
-  useEffect(() => {
-    if (!isOpen) {
-      setIsOpen(isOptionsOpen)
-    }
-  }, [isOptionsOpen, isOpen])
-
-  const options: CountOptions[] = [
-    {
-      label: "Leave",
-      iconName: "leave",
-      onClick: handleLeave,
-    },
-    {
-      iconName: "cancel",
-      onClick: handleCancel,
-    },
-  ]
-
-  if (isOrganiser) {
-    options.unshift({
-      label: "Delete",
-      iconName: "delete",
-      onClick: handleDelete,
-    })
-  }
-
-  return (
-    <ClickAwayListener onClickAway={handleCancel}>
-      <Stack
-        direction={"row"}
-        gap={theme.module[2]}
-        alignItems={"center"}
-        width={"min-content"}
-        height={"100%"}
-        padding={`0 ${theme.module[2]}`}
-      >
-        <Animation
-          from={{ opacity: 0, width: "8.5rem" }}
-          to={{ opacity: 1, width: isOrganiser ? "15rem" : "8.5rem" }}
-          duration={150}
-          start={isOpen}
-        >
-          <Stack
-            direction={"row"}
-            gap={theme.module[2]}
-            alignItems={"center"}
-            justifyContent={"center"}
-            boxSizing={"border-box"}
-          >
-            {options.map((option) => (
-              <Stack
-                direction={"row"}
-                gap={theme.module[1]}
-                alignItems={"center"}
-                key={option.iconName}
-              >
-                <Button
-                  variation={"pill"}
-                  iconName={option.iconName}
-                  iconColor={theme.scale.green[6]}
-                  label={option.label}
-                  onClick={option.onClick}
-                />
-              </Stack>
-            ))}
-          </Stack>
-        </Animation>
-      </Stack>
-    </ClickAwayListener>
-  )
-}
-/*
-
-
-
-
-*/
-function Body({ body }: { body: any }) {
-  return (
-    <Stack
-      width={"100%"}
-      height={"100%"}
-      boxSizing={"border-box"}
-      overflow={"hidden"}
-      sx={{ overflowX: "visible", overflowY: "hidden" }}
-    >
-      {body}
-    </Stack>
-  )
-}
-/*
-
-
-
-
-*/
-function ButtonTray(props: CountStepProps) {
-  const theme = useTheme()
-  const showButtons = props.nextButton || props.prevButton || props.submitButton
-
-  return (
-    showButtons && (
-      <Stack width={"100%"} direction={"row"} gap={theme.module[4]}>
-        {props.prevButton && (
-          <Button
-            variation={"navPrev"}
-            label={props.prevButton.label}
-            onClick={props.prevButton.onClick}
-            disabled={props.prevButton.disabled}
-          />
-        )}
-        {props.nextButton && (
-          <Button
-            variation={"navNext"}
-            label={props.nextButton.label}
-            onClick={props.nextButton.onClick}
-            disabled={props.nextButton.disabled}
-          />
-        )}
-        {props.submitButton && (
-          <Button
-            variation={"profile"}
-            label={props.submitButton.label}
-            onClick={props.submitButton.onClick}
-            disabled={props.submitButton.disabled}
-            bgColor={theme.scale.gray[7]}
-            outlineColor={theme.scale.gray[6]}
-            justifyCenter
-          />
-        )}
-      </Stack>
-    )
+    </>
   )
 }
 /*
@@ -594,15 +168,15 @@ function ButtonTray(props: CountStepProps) {
 
 */
 function LeaveCountConfirmation() {
-  const isOpen = useCountStore((state) => state.isLeavingCount)
+  const isOpen = useCountUI((state) => state.isLeavingCount)
 
   function handleClose() {
-    setUseCount("isLeavingCount", false)
+    setCountUI("isLeavingCount", false)
   }
 
   function handleAccept() {
     leaveCount()
-    setUseCount("isLeavingCount", false)
+    setCountUI("isLeavingCount", false)
   }
 
   const actions: ModalActionProps[] = [
@@ -651,15 +225,15 @@ function LeaveCountConfirmationBody() {
 
 */
 function DeleteCountConfirmation() {
-  const isOpen = useCountStore((state) => state.isDeletingCount)
+  const isOpen = useCountUI((state) => state.isDeletingCount)
 
   function handleClose() {
-    setUseCount("isDeletingCount", false)
+    setCountUI("isDeletingCount", false)
   }
 
   function handleAccept() {
     removeCount()
-    resetUseCount()
+    resetCountUI()
   }
 
   const actions: ModalActionProps[] = [

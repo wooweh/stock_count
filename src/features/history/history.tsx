@@ -11,22 +11,22 @@ import { Review } from "./review"
 
 
 */
-export type UseHistoryState = {
+export type HistoryUIState = {
   isSelecting: boolean
   reviewItemUuid: string
   reviewSectionName: "details" | "comments" | "results"
   scrollIndex: number
   selectedItems: string[]
 }
-type UseHistoryKeys = keyof UseHistoryState
-const initialState: UseHistoryState = {
+type HistoryUIKeys = keyof HistoryUIState
+const initialState: HistoryUIState = {
   isSelecting: false,
   reviewItemUuid: "",
   reviewSectionName: "details",
   scrollIndex: 0,
   selectedItems: [],
 }
-export const useHistoryStore = create<UseHistoryState>()(
+export const useHistoryUI = create<HistoryUIState>()(
   persist(
     (set) => ({
       ...initialState,
@@ -38,26 +38,26 @@ export const useHistoryStore = create<UseHistoryState>()(
   ),
 )
 
-export function setUseHistory(path: UseHistoryKeys, value: any) {
-  useHistoryStore.setState({ [path]: value })
+export function setHistoryUI(path: HistoryUIKeys, value: any) {
+  useHistoryUI.setState({ [path]: value })
 }
-export function addUseHistorySelectedItem(id: string) {
-  const selectedItems = useHistoryStore.getState().selectedItems
+export function addHistoryUISelectedItem(id: string) {
+  const selectedItems = useHistoryUI.getState().selectedItems
   const index = _.indexOf(selectedItems, id)
   if (index === -1) {
     const newSelectedItems = [id, ...selectedItems]
-    useHistoryStore.setState({ selectedItems: newSelectedItems })
+    useHistoryUI.setState({ selectedItems: newSelectedItems })
   }
 }
-export function removeUseHistorySelectedItem(id: string) {
-  const selectedItems = useHistoryStore.getState().selectedItems
+export function removeHistoryUISelectedItem(id: string) {
+  const selectedItems = useHistoryUI.getState().selectedItems
   const indexToRemove = _.indexOf(selectedItems, id)
   const newSelectedItems = [...selectedItems]
   newSelectedItems.splice(indexToRemove, 1)
-  useHistoryStore.setState({ selectedItems: newSelectedItems })
+  useHistoryUI.setState({ selectedItems: newSelectedItems })
 }
-export function resetUseHistory() {
-  useHistoryStore.setState(initialState)
+export function resetHistoryUI() {
+  useHistoryUI.setState(initialState)
 }
 /*
 
@@ -66,8 +66,8 @@ export function resetUseHistory() {
 
 */
 export function History() {
-  const isReviewing = useHistoryStore(
-    (state: UseHistoryState) => state.reviewItemUuid,
+  const isReviewing = useHistoryUI(
+    (state: HistoryUIState) => state.reviewItemUuid,
   )
   return <Outer>{!!isReviewing ? <Review /> : <HistoryList />}</Outer>
 }

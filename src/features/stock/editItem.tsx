@@ -4,7 +4,7 @@ import { useAppDispatch } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { Input } from "../../components/control"
 import Modal from "../../components/modal"
-import { setUseStock, useStockStore } from "./stock"
+import { setStockUI, useStockUI } from "./stock"
 import { updateStockItem } from "./stockSliceUtils"
 /*
 
@@ -15,7 +15,7 @@ import { updateStockItem } from "./stockSliceUtils"
 export function EditItem() {
   const theme = useTheme()
 
-  const isEditing = useStockStore((state: any) => state.isEditing)
+  const isEditing = useStockUI((state: any) => state.isEditing)
 
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
@@ -32,12 +32,12 @@ export function EditItem() {
   function handleAccept(event: any) {
     if (id && name) {
       updateStockItem(id, name, description)
-      setUseStock("isEditing", false)
+      setStockUI("isEditing", false)
     }
   }
 
   function handleClose() {
-    setUseStock("isEditing", false)
+    setStockUI("isEditing", false)
   }
 
   const inputs = [

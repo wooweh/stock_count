@@ -27,7 +27,7 @@ import {
 import { MembersProps, selectOrgMembers } from "../org/orgSlice"
 import { getMemberShortName, getMembersShortNames } from "../org/orgUtils"
 import { selectStock } from "../stock/stockSlice"
-import { UseHistoryState, setUseHistory, useHistoryStore } from "./history"
+import { HistoryUIState, setHistoryUI, useHistoryUI } from "./history"
 import {
   HistoryItemCommentsProps,
   HistoryItemMetadataProps,
@@ -86,7 +86,7 @@ function Header() {
         variation={"pill"}
         iconName={"cancel"}
         bgColor={theme.scale.gray[7]}
-        onClick={() => setUseHistory("reviewItemUuid", "")}
+        onClick={() => setHistoryUI("reviewItemUuid", "")}
         iconSize={"small"}
         outlineColor={theme.scale.gray[6]}
         sx={{ padding: theme.module[3], boxShadow: theme.shadow.neo[3] }}
@@ -105,9 +105,9 @@ function Body() {
 
   const history = useAppSelector(selectHistory)
 
-  const uuid = useHistoryStore((state: UseHistoryState) => state.reviewItemUuid)
-  const sectionName = useHistoryStore(
-    (state: UseHistoryState) => state.reviewSectionName,
+  const uuid = useHistoryUI((state: HistoryUIState) => state.reviewItemUuid)
+  const sectionName = useHistoryUI(
+    (state: HistoryUIState) => state.reviewSectionName,
   )
 
   const historyItem: HistoryItemProps = history[uuid]
@@ -372,7 +372,7 @@ function ButtonTray() {
   const theme = useTheme()
 
   const handleClick = (section: string) => {
-    setUseHistory("reviewSectionName", section)
+    setHistoryUI("reviewSectionName", section)
   }
 
   const options: ToggleButtonGroupOptionsProps[] = [

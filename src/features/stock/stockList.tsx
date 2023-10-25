@@ -12,10 +12,10 @@ import {
 import { ScrollToTop } from "../../components/scrollToTop"
 import { SearchBar } from "../../components/searchBar"
 import {
-  addUseStockSelectedItem,
-  removeUseStockSelectedItem,
-  setUseStock,
-  useStockStore,
+  addStockUISelectedItem,
+  removeStockUISelectedItem,
+  setStockUI,
+  useStockUI,
 } from "./stock"
 import {
   StockItemProps,
@@ -61,7 +61,7 @@ export function StockList() {
 function Header() {
   const theme = useTheme()
   const stockList = useAppSelector(selectStockList)
-  const isSelecting = useStockStore((state: any) => state.isSelecting)
+  const isSelecting = useStockUI((state: any) => state.isSelecting)
 
   return (
     !!stockList.length && (
@@ -86,7 +86,7 @@ function StockSearchBar() {
       stockList,
       (stockItem) => stockItem.id === item.id,
     )
-    setUseStock("scrollIndex", index)
+    setStockUI("scrollIndex", index)
   }
 
   function formatResult(item: StockItemProps) {
@@ -116,14 +116,14 @@ function StockSearchBar() {
 */
 function StockSelectionBar() {
   const theme = useTheme()
-  const selectedItems = useStockStore((state: any) => state.selectedItems)
+  const selectedItems = useStockUI((state: any) => state.selectedItems)
   const stockIdList = useAppSelector(selectStockIdList)
 
   const isAllSelected =
     !!selectedItems.length && stockIdList.length === selectedItems.length
 
   function handleSelectAll() {
-    setUseStock("selectedItems", stockIdList)
+    setStockUI("selectedItems", stockIdList)
   }
 
   function handleDelete() {
@@ -132,13 +132,13 @@ function StockSelectionBar() {
     } else {
       removeStockItems(selectedItems)
     }
-    setUseStock("selectedItems", [])
-    setUseStock("isSelecting", false)
+    setStockUI("selectedItems", [])
+    setStockUI("isSelecting", false)
   }
 
   function handleBack() {
-    setUseStock("selectedItems", [])
-    setUseStock("isSelecting", false)
+    setStockUI("selectedItems", [])
+    setStockUI("isSelecting", false)
   }
 
   return (
@@ -187,16 +187,16 @@ function Body() {
 
   const stockList = useAppSelector(selectStockList)
 
-  const scrollIndex = useStockStore((state: any) => state.scrollIndex)
-  const isSelecting = useStockStore((state: any) => state.isSelecting)
-  const selectedItems = useStockStore((state: any) => state.selectedItems)
+  const scrollIndex = useStockUI((state: any) => state.scrollIndex)
+  const isSelecting = useStockUI((state: any) => state.isSelecting)
+  const selectedItems = useStockUI((state: any) => state.selectedItems)
 
   const [showScrollToTop, setShowScrollToTop] = useState(false)
 
   const virtuoso: any = useRef(null)
 
   useEffect(() => {
-    if (isSelecting && !selectedItems.length) setUseStock("isSelecting", false)
+    if (isSelecting && !selectedItems.length) setStockUI("isSelecting", false)
   }, [isSelecting, selectedItems])
 
   useEffect(() => {
@@ -209,9 +209,9 @@ function Body() {
   }, [virtuoso, scrollIndex])
 
   function handleScrollToTopClick() {
-    setUseStock("scrollIndex", 1)
+    setStockUI("scrollIndex", 1)
     setTimeout(() => {
-      setUseStock("scrollIndex", 0)
+      setStockUI("scrollIndex", 0)
     }, 50)
   }
 
@@ -271,7 +271,7 @@ function Body() {
             const options: ListItemOptionProps[] = [
               {
                 iconName: "edit",
-                onClick: () => setUseStock("isEditing", item),
+                onClick: () => setStockUI("isEditing", item),
               },
               {
                 iconName: "delete",
@@ -286,11 +286,11 @@ function Body() {
                   iconName={"stock"}
                   options={options}
                   onLongPress={() => {
-                    setUseStock("isSelecting", true)
-                    addUseStockSelectedItem(item.id)
+                    setStockUI("isSelecting", true)
+                    addStockUISelectedItem(item.id)
                   }}
-                  onSelection={() => addUseStockSelectedItem(item.id)}
-                  onDeselection={() => removeUseStockSelectedItem(item.id)}
+                  onSelection={() => addStockUISelectedItem(item.id)}
+                  onDeselection={() => removeStockUISelectedItem(item.id)}
                   isSelecting={isSelecting}
                   isSelected={_.find(selectedItems, (id) => id === item.id)}
                 />
@@ -313,11 +313,11 @@ function ButtonTray() {
   const theme = useTheme()
 
   function handleAddClick() {
-    setUseStock("isAdding", true)
+    setStockUI("isAdding", true)
   }
 
   function handleIsUploading() {
-    setUseStock("isUploading", true)
+    setStockUI("isUploading", true)
   }
 
   return (

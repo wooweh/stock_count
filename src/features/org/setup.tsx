@@ -7,7 +7,7 @@ import Icon, { IconNames } from "../../components/icon"
 import { ListGroup } from "../../components/list"
 import { ListItem } from "../../components/listItem"
 import Modal from "../../components/modal"
-import { setUseOrg, useOrgStore } from "./org"
+import { setOrgUI, useOrgUI } from "./org"
 import { createOrg, joinOrg } from "./orgSliceUtils"
 /*
 
@@ -41,16 +41,16 @@ function OrgSetupActions() {
 
   const actionItems: ActionItemProps[] = [
     {
-      label: "Create organisation",
-      description: "Create a new organisation for your team",
+      label: "Create org",
+      description: "Create a new org for your team",
       iconName: "org",
-      onChange: () => setUseOrg("isCreating", true),
+      onChange: () => setOrgUI("isCreating", true),
     },
     {
-      label: "Join organisation",
-      description: "Join an existing organisation with a key",
+      label: "Join org",
+      description: "Join an existing org with a key",
       iconName: "group",
-      onChange: () => setUseOrg("isJoining", true),
+      onChange: () => setOrgUI("isJoining", true),
     },
   ]
 
@@ -85,11 +85,11 @@ function OrgSetupActions() {
 */
 function CreateOrg() {
   const theme = useTheme()
-  const isCreating = useOrgStore((state: any) => state.isCreating)
+  const isCreating = useOrgUI((state: any) => state.isCreating)
   const [orgName, setOrgName] = useState("")
 
   function handleClose() {
-    setUseOrg("isCreating", false)
+    setOrgUI("isCreating", false)
   }
 
   function handleChange(event: any) {
@@ -98,7 +98,7 @@ function CreateOrg() {
 
   function handleCreate() {
     createOrg(orgName)
-    setUseOrg("isCreating", false)
+    setOrgUI("isCreating", false)
   }
 
   return (
@@ -139,11 +139,11 @@ function CreateOrg() {
 */
 function JoinOrg() {
   const theme = useTheme()
-  const isJoining = useOrgStore((state: any) => state.isJoining)
+  const isJoining = useOrgUI((state: any) => state.isJoining)
   const [inviteKey, setInviteKey] = useState("")
 
   function handleClose() {
-    setUseOrg("isJoining", false)
+    setOrgUI("isJoining", false)
   }
 
   function handleChange(event: any) {
@@ -152,7 +152,7 @@ function JoinOrg() {
 
   function handleJoin() {
     joinOrg(inviteKey)
-    setUseOrg("isJoining", false)
+    setOrgUI("isJoining", false)
   }
 
   return (

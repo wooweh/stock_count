@@ -13,7 +13,7 @@ import { OrgSetup } from "./setup"
 
 
 */
-type UseOrgState = {
+type OrgUIState = {
   isRemoving: boolean
   isEditing: boolean
   isJoining: boolean
@@ -22,8 +22,8 @@ type UseOrgState = {
   isViewingMembers: boolean
   isViewingInvites: boolean
 }
-type UseOrgKeys = keyof UseOrgState
-const initialState: UseOrgState = {
+type OrgUIKeys = keyof OrgUIState
+const initialState: OrgUIState = {
   isRemoving: false,
   isEditing: false,
   isJoining: false,
@@ -32,24 +32,24 @@ const initialState: UseOrgState = {
   isViewingMembers: false,
   isViewingInvites: false,
 }
-export const useOrgStore = create<UseOrgState>()(
+export const useOrgUI = create<OrgUIState>()(
   persist(
     (set) => ({
       ...initialState,
     }),
     {
-      name: "organisation-storage",
+      name: "org-storage",
       storage: createJSONStorage(() => sessionStorage),
     },
   ),
 )
 
-export function setUseOrg(path: UseOrgKeys, value: boolean | string) {
-  useOrgStore.setState({ [path]: value })
+export function setOrgUI(path: OrgUIKeys, value: boolean | string) {
+  useOrgUI.setState({ [path]: value })
 }
 
-export function resetUseOrg() {
-  useOrgStore.setState(initialState)
+export function resetOrgUI() {
+  useOrgUI.setState(initialState)
 }
 /*
 
@@ -64,7 +64,7 @@ export function Org() {
 
   return isProfileComplete ? (
     isJoiningOrg ? (
-      <Loader narration={"joining organisation..."} />
+      <Loader narration={"joining org..."} />
     ) : isOrgSetup ? (
       <OrgProfile />
     ) : (

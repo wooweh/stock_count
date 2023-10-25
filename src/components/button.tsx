@@ -312,7 +312,7 @@ function PillButton(props: ButtonVariationProps) {
         {!!props.iconName && (
           <Icon
             variation={props.iconName}
-            color={props.iconColor ?? theme.scale.gray[4]}
+            color={props.iconColor}
             fontSize={props.iconSize ?? "medium"}
           />
         )}

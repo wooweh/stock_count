@@ -9,7 +9,6 @@ import {
   deleteUserOrgDetails,
   setUserOrgDetails,
 } from "../user/userSlice"
-import { getOrgFromDB, getOrgUuidWithInviteKeyFromDB } from "./orgSliceRemote"
 import {
   MemberProps,
   MemberStatuses,
@@ -25,6 +24,7 @@ import {
   setOrgMember,
   setOrgName,
 } from "./orgSlice"
+import { getOrgFromDB, getOrgUuidWithInviteKeyFromDB } from "./orgSliceRemote"
 import { getInviteKeyValidation } from "./orgUtils"
 /*
 
@@ -48,7 +48,7 @@ export function createOrg(name: string) {
   const lastName = store.getState().user.user.name?.last ?? "surname"
   const role = "admin"
 
-  const member: MemberProps = { firstName, lastName, role, uuid }
+  const member: MemberProps = { firstName, lastName, role, uuid: memberUuid }
   const members: MembersProps = { [memberUuid]: member }
   const org: OrgProps = { name, uuid, members }
 

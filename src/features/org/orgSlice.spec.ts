@@ -21,7 +21,7 @@ import orgReducer, {
 
 
 */
-describe("organisation reducer", () => {
+describe("org reducer", () => {
   const initialState: OrgState = {
     memberStatus: "notJoined",
     org: {},

@@ -3,18 +3,17 @@ import { useResizeDetector } from "react-resize-detector"
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom"
 import { useAppSelector } from "../../app/hooks"
 import Container from "../../components/container"
-import { Count, resetUseCount } from "../count/count"
+import { Count, resetCountUI } from "../count/count"
 import { selectIsUserCounting } from "../count/countSlice"
-import { History, resetUseHistory } from "../history/history"
-import { Org, resetUseOrg } from "../org/org"
-import { Stock, resetUseStock } from "../stock/stock"
-import { Authentication, WithAuth, resetUseAuth } from "../user/authentication"
-import { UserProfile, resetUseUser } from "../user/user"
+import { History, resetHistoryUI } from "../history/history"
+import { Org, resetOrgUI } from "../org/org"
+import { Stock, resetStockUI } from "../stock/stock"
+import { Authentication, WithAuth, resetAuthUI } from "../user/authentication"
+import { UserProfile, resetUserUI } from "../user/user"
 import { toggleMobile } from "./coreSliceUtils"
 import { getRoutePaths } from "./coreUtils"
 import { Home } from "./home"
 /*
-
 
 
 
@@ -81,11 +80,9 @@ export const routes: Route[] = [
 
 
 
-
 */
 export const routePaths = getRoutePaths(routes)
 /*
-
 
 
 
@@ -112,12 +109,12 @@ export function Pages() {
     const isCountPath = path === routePaths.count.path
     const isHistoryPath = path === routePaths.history.path
 
-    if (!isAuthPath) resetUseAuth()
-    if (!isProfilePath) resetUseUser()
-    if (!isOrgPath) resetUseOrg()
-    if (!isStockPath) resetUseStock()
-    if (!isCountPath) resetUseCount()
-    if (!isHistoryPath) resetUseHistory()
+    if (!isAuthPath) resetAuthUI()
+    if (!isProfilePath) resetUserUI()
+    if (!isOrgPath) resetOrgUI()
+    if (!isStockPath) resetStockUI()
+    if (!isCountPath) resetCountUI()
+    if (!isHistoryPath) resetHistoryUI()
   }, [path])
 
   useEffect(() => {
