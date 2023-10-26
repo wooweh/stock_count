@@ -94,3 +94,26 @@ export function copyToClipboard(text: string, notification: NotificationNames) {
 
 
 */
+export function getIsElementScrolling(element: HTMLElement | null) {
+  let isScrolling = false
+
+  if (element) {
+    element.addEventListener("scroll", function () {
+      isScrolling = true
+
+      const scrollTimeout = setTimeout(function () {
+        isScrolling = false
+      }, 500)
+      clearTimeout(scrollTimeout)
+    })
+  }
+
+  return isScrolling
+}
+/*
+
+
+
+
+
+*/

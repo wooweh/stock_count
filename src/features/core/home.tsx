@@ -9,7 +9,7 @@ import useTheme from "../../common/useTheme"
 import { Button } from "../../components/button"
 import { Input } from "../../components/control"
 import Icon, { IconNames } from "../../components/icon"
-import { selectIsOrgSetup } from "../org/orgSlice"
+import { selectIsOrgSetup, selectOrgName } from "../org/orgSlice"
 import { createOrg, joinOrg } from "../org/orgSliceUtils"
 import { getInviteKeyValidation } from "../org/orgUtils"
 import { selectIsProfileComplete, selectIsUserAdmin } from "../user/userSlice"
@@ -264,40 +264,105 @@ function OrgSetupPromptAction(props: OrgSetupPromptActionProps) {
 */
 type HomeButton = {
   label: string
+  color: string
   icon: IconNames
+  iconColor: string
+  bgColor: string
+  outlineColor: string
   path: string
 }
 function HomeButtons() {
   const theme = useTheme()
   const navigate = useNavigate()
 
+  const orgName = useAppSelector(selectOrgName)
   const isAdmin = useAppSelector(selectIsUserAdmin)
 
   const adminButtons: HomeButton[] = [
-    { label: "Count", icon: "list", path: routePaths.count.path },
-    { label: "Stock", icon: "stock", path: routePaths.stock.path },
-    { label: "History", icon: "history", path: routePaths.history.path },
+    {
+      label: "Count",
+      color: theme.scale.blue[6],
+      icon: "list",
+      iconColor: theme.scale.blue[5],
+      bgColor: theme.scale.blue[7],
+      outlineColor: theme.scale.blue[7],
+      path: routePaths.count.path,
+    },
+    {
+      label: "Stock",
+      color: theme.scale.green[6],
+      icon: "stock",
+      iconColor: theme.scale.green[5],
+      bgColor: theme.scale.green[7],
+      outlineColor: theme.scale.green[7],
+      path: routePaths.stock.path,
+    },
+    {
+      label: "History",
+      color: theme.scale.yellow[6],
+      icon: "history",
+      iconColor: theme.scale.yellow[5],
+      bgColor: theme.scale.yellow[7],
+      outlineColor: theme.scale.yellow[7],
+      path: routePaths.history.path,
+    },
   ]
   const memberButtons = [adminButtons[0]]
   const buttons = isAdmin ? adminButtons : memberButtons
 
   return (
-    <Stack width={theme.module[10]} paddingBottom={theme.module[6]}>
-      <Grid container spacing={4}>
-        {buttons.map((button: HomeButton, index: number) => {
-          return (
-            <Grid width={"100%"} key={index}>
-              <Button
-                variation={"home"}
-                label={button.label}
-                iconName={button.icon}
-                onClick={() => navigate(button.path)}
-                animationDuration={150}
-              />
-            </Grid>
-          )
-        })}
-      </Grid>
+    <Stack
+      height={"100%"}
+      width={theme.module[10]}
+      paddingTop={theme.module[2]}
+      paddingBottom={theme.module[5]}
+      boxSizing={"border-box"}
+    >
+      <Stack
+        direction={"row"}
+        width={"100%"}
+        height={"18.75%"}
+        minHeight={theme.module[8]}
+        gap={theme.module[4]}
+        justifyContent={"center"}
+        alignItems={"center"}
+        boxSizing={"border-box"}
+      >
+        <Button
+          variation="profile"
+          label={orgName}
+          iconName="org"
+          bgColor={theme.scale.gray[8]}
+          iconColor={theme.scale.gray[6]}
+          color={theme.scale.gray[5]}
+          outlineColor={theme.scale.gray[6]}
+          iconSize="large"
+          onClick={() => navigate(routePaths.org.path)}
+          justifyCenter
+          animationDuration={150}
+        />
+      </Stack>
+      <Stack width={"100%"} height={"75%"} justifyContent={"start"}>
+        <Grid container spacing={4}>
+          {buttons.map((button: HomeButton, index: number) => {
+            return (
+              <Grid width={"100%"} key={index}>
+                <Button
+                  variation={"home"}
+                  label={button.label}
+                  bgColor={button.bgColor}
+                  color={button.color}
+                  iconName={button.icon}
+                  iconColor={button.iconColor}
+                  outlineColor={button.outlineColor}
+                  onClick={() => navigate(button.path)}
+                  animationDuration={150}
+                />
+              </Grid>
+            )
+          })}
+        </Grid>
+      </Stack>
     </Stack>
   )
 }

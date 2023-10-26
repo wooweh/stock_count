@@ -15,7 +15,7 @@ import { Route } from "./pages"
 export type GetRoutePathsReturnProps = {
   [key: string]: {
     path: string
-    name: boolean
+    name: string
   }
 }
 export function getRoutePaths(routes: Route[]): GetRoutePathsReturnProps {

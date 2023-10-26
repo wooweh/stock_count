@@ -19,6 +19,7 @@ import countReducer, {
   setCountChecks,
   setCountComments,
   setCountMember,
+  setCountMemberResults,
   setCountMembers,
   setCountMetaData,
   setCountResults,
@@ -235,6 +236,24 @@ describe("Count Reducer", () => {
     const actual = countReducer(initialState, setCountResults(mockResults))
     const results = actual.count.results as CountResultsProps
     expect(results).toEqual(mockResults)
+  })
+
+  it("should handle setCountMemberResults", () => {
+    const results = {
+      mockStockId: {
+        id: "mockStockId",
+        useableCount: 1,
+        damagedCount: 2,
+        obsoleteCount: 4,
+      },
+    }
+    const memberUuid = "mockUuid"
+    const actual = countReducer(
+      mockState,
+      setCountMemberResults({ memberUuid, results }),
+    )
+    const countResults = actual.count.results as CountResultsProps
+    expect(countResults[memberUuid]).toEqual(results)
   })
 
   it("should handle setCount", () => {

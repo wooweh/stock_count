@@ -1,10 +1,10 @@
+import { Stack, Typography } from "@mui/material"
 import ButtonBase from "@mui/material/ButtonBase"
+import MuiToggleButton from "@mui/material/ToggleButton"
+import MuiToggleButtonGroup from "@mui/material/ToggleButtonGroup"
 import { useState } from "react"
 import useTheme from "../common/useTheme"
 import Icon, { IconNames } from "./icon"
-import { Stack, Typography } from "@mui/material"
-import MuiToggleButton from "@mui/material/ToggleButton"
-import MuiToggleButtonGroup from "@mui/material/ToggleButtonGroup"
 /*
 
 
@@ -229,11 +229,16 @@ function HomeButton(props: ButtonVariationProps) {
     width: "100%",
     borderRadius: theme.module[3],
     boxShadow: theme.shadow.neo[props.isPressed ? 3 : 6],
-    overflow: "hidden",
+    overflow: "visible",
     justifyContent: "flex-start",
     transform: `scale(${props.isPressed ? 0.99 : 1})`,
+    outline: `3px solid ${
+      props.outlineColor ?? theme.scale.gray[6]
+    } !important`,
+    outlineOffset: "-3px",
     ...props.sx,
   }
+
   return (
     <ButtonBase
       onClick={props.onClick}
@@ -244,16 +249,17 @@ function HomeButton(props: ButtonVariationProps) {
     >
       <Stack
         width={"100%"}
-        direction={"row"}
-        gap={theme.module[5]}
+        direction={"column"}
         alignItems={"center"}
-        padding={theme.module[2]}
         boxSizing={"border-box"}
       >
         <Stack
-          bgcolor={theme.scale.gray[9]}
-          borderRadius={theme.module[2]}
+          width={"100%"}
+          alignItems={"center"}
+          bgcolor={props.bgColor ?? theme.scale.gray[7]}
+          borderRadius={`${theme.module[3]} ${theme.module[3]} 0 0`}
           padding={theme.module[5]}
+          boxSizing={"border-box"}
         >
           <Icon
             color={props.iconColor ?? theme.scale.gray[5]}
@@ -261,8 +267,15 @@ function HomeButton(props: ButtonVariationProps) {
             fontSize="large"
           />
         </Stack>
-        <Stack>
-          <Typography color={theme.scale.gray[5]} variant="h5">
+        <Stack
+          padding={theme.module[3]}
+          bgcolor={theme.scale.gray[7]}
+          boxSizing={"border-box"}
+          width={"100%"}
+          boxShadow={theme.shadow.std[props.boxShadowScale ?? 5]}
+          borderRadius={theme.module[3]}
+        >
+          <Typography color={props.color ?? theme.scale.gray[5]} variant="h5">
             {props.label}
           </Typography>
         </Stack>

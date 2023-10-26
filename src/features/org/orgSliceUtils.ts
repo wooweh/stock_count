@@ -42,7 +42,7 @@ export function updateMemberStatus(memberStatus: MemberStatuses) {
 
 */
 export function createOrg(name: string) {
-  const uuid = uuidv4()
+  const orgUuid = uuidv4()
   const memberUuid = store.getState().user.user.uuid as string
   const firstName = store.getState().user.user.name?.first ?? "name"
   const lastName = store.getState().user.user.name?.last ?? "surname"
@@ -50,10 +50,10 @@ export function createOrg(name: string) {
 
   const member: MemberProps = { firstName, lastName, role, uuid: memberUuid }
   const members: MembersProps = { [memberUuid]: member }
-  const org: OrgProps = { name, uuid, members }
+  const org: OrgProps = { name, uuid: orgUuid, members }
 
   store.dispatch(setMemberStatus("isJoined"))
-  store.dispatch(setUserOrgDetails({ uuid, role }))
+  store.dispatch(setUserOrgDetails({ uuid: orgUuid, role }))
   store.dispatch(setOrg({ org, updateDB: true }))
 }
 /*
@@ -131,6 +131,15 @@ export function removeOrg() {
     store.dispatch(deleteUserOrgDetails())
     store.dispatch(deleteOrg({ uuid }))
   }
+}
+/*
+
+
+
+
+*/
+export function updateOrg(org: OrgProps, updateDB: boolean = false) {
+  store.dispatch(setOrg({ org, updateDB }))
 }
 /*
 

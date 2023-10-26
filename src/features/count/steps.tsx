@@ -62,7 +62,7 @@ export function Steps() {
 
   useEffect(() => {
     if (isCountCompleted && isOrganiser && !isReviewMetadataSubmitted) {
-      updateCountMetadata({ reviewStartTime: getTimeStamp() })
+      updateCountMetadata({ reviewStartTime: getTimeStamp() }, true)
       setCountUI("isReviewMetadataSubmitted", true)
     }
   }, [isCountCompleted, isReviewMetadataSubmitted, isOrganiser])
@@ -97,8 +97,8 @@ export function Steps() {
   }
 
   function handleFinalizationSubmit() {
-    updateCountComments({ finalization: finalComments })
-    updateCountMetadata({ finalSubmissionTime: getTimeStamp() })
+    updateCountComments({ finalization: finalComments }, true)
+    updateCountMetadata({ finalSubmissionTime: getTimeStamp() }, true)
     setCountUI("isSubmittingFinalization", true)
   }
 

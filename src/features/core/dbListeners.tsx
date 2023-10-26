@@ -1,249 +1,278 @@
 import { onValue, ref } from "firebase/database"
 import _ from "lodash"
 import { useEffect } from "react"
-import { useAppDispatch, useAppSelector } from "../../app/hooks"
+import { useLocation } from "react-router-dom"
+import { useAppSelector } from "../../app/hooks"
 import { dbReal } from "../../remote"
 import { getDBPath } from "../../remote/dbPaths"
 import {
   CountCheckProps,
   CountCommentsProps,
+  CountMemberResultsProps,
   CountMembersProps,
   CountMetadataProps,
-  CountResultsProps,
-  deleteCount,
   selectCountMembers,
   selectCountMetadata,
-  setCountChecks,
-  setCountComments,
-  setCountMembers,
-  setCountMetaData,
-  setCountResults,
+  selectCountersUuidList,
+  selectIsUserOrganiser,
 } from "../count/countSlice"
-import { updateCountStep } from "../count/countSliceUtils"
-import { HistoryProps, setHistory } from "../history/historySlice"
 import {
-  OrgProps,
-  selectIsJoined,
-  selectOrg,
-  setMemberStatus,
-  setOrg,
-} from "../org/orgSlice"
-import { leaveOrg } from "../org/orgSliceUtils"
-import { StockProps, setStock } from "../stock/stockSlice"
-import {
-  UserProps,
-  selectIsLocalUserOrgDetails,
-  selectUser,
-} from "../user/userSlice"
+  removeCount,
+  updateCountChecks,
+  updateCountComments,
+  updateCountMemberResults,
+  updateCountMembers,
+  updateCountMetadata,
+} from "../count/countSliceUtils"
+import { HistoryProps } from "../history/historySlice"
+import { updateHistory } from "../history/historySliceUtils"
+import { OrgProps, selectOrgUuid } from "../org/orgSlice"
+import { leaveOrg, updateMemberStatus, updateOrg } from "../org/orgSliceUtils"
+import { StockProps } from "../stock/stockSlice"
+import { updateStock } from "../stock/stockSliceUtils"
+import { UserProps, selectUserOrgUuid, selectUserUuid } from "../user/userSlice"
 import { updateUser } from "../user/userSliceUtils"
 import { selectIsSystemActive, selectIsSystemBooting } from "./coreSlice"
 import { setSystemIsBooted } from "./coreSliceUtils"
+import { routePaths } from "./pages"
 /*
-
 
 
 
 
 */
 export function DBListeners() {
-  const dispatch = useAppDispatch()
-  const isSystemActive = useAppSelector(selectIsSystemActive)
+  return (
+    <>
+      <UserDBListener />
+      <OrgDBListener />
+      <StockDBListener />
+      <CountDBListener />
+      <HistoryDBListener />
+    </>
+  )
+}
+/*
+
+
+
+
+*/
+export function UserDBListener() {
   const isSystemBooting = useAppSelector(selectIsSystemBooting)
-  const localUser = useAppSelector(selectUser)
-  const localOrg = useAppSelector(selectOrg)
-  const localCountMembers = useAppSelector(selectCountMembers)
-  const localCountMetadata = useAppSelector(selectCountMetadata)
-  const isJoined = useAppSelector(selectIsJoined)
-  const isLocalUserOrgDetails = useAppSelector(selectIsLocalUserOrgDetails)
+  const isSystemActive = useAppSelector(selectIsSystemActive)
+  const userUuid = useAppSelector(selectUserUuid)
+  const userOrgUuid = useAppSelector(selectUserOrgUuid)
+  const orgUuid = useAppSelector(selectOrgUuid)
+
+  const isSafeToBoot =
+    isSystemBooting && ((userOrgUuid && orgUuid) || !userOrgUuid)
 
   useEffect(() => {
-    if (isSystemBooting && localUser.org?.uuid && localOrg.uuid) {
+    if (isSafeToBoot) {
       setSystemIsBooted()
     }
-    if (isSystemBooting && !localUser.org?.uuid) {
-      setSystemIsBooted()
-    }
-  }, [isSystemBooting, localUser, localOrg])
+  }, [isSafeToBoot])
 
-  // USER LISTENER
+  const isSafeToSync = !!userUuid && isSystemActive
 
   useEffect(() => {
-    if (!!localUser && isSystemActive) {
-      const dbUserRef = ref(
-        dbReal,
-        getDBPath.user(localUser.uuid as string).user,
-      )
+    if (isSafeToSync) {
+      const dbUserRef = ref(dbReal, getDBPath.user(userUuid).user)
       onValue(dbUserRef, (snapshot) => {
         const dbUser: UserProps = snapshot.val()
-        if (!_.isEqual(localUser, dbUser)) {
-          updateUser(dbUser)
-        }
+        updateUser(dbUser)
       })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, localUser, isSystemActive])
+  }, [isSafeToSync])
 
-  // ORG SET & LISTENER
+  return undefined
+}
+/*
+
+
+
+
+*/
+export function OrgDBListener() {
+  const isSystemActive = useAppSelector(selectIsSystemActive)
+  const userUuid = useAppSelector(selectUserUuid)
+  const orgUuid = useAppSelector(selectUserOrgUuid)
+
+  const isSafeToSync = !!userUuid && !!orgUuid && isSystemActive
 
   useEffect(() => {
-    if (!!localUser && isSystemActive) {
-      const dbOrgRef = ref(
-        dbReal,
-        getDBPath.org(localUser.org?.uuid as string).org,
-      )
+    if (isSafeToSync) {
+      const dbOrgRef = ref(dbReal, getDBPath.org(orgUuid).org)
       onValue(dbOrgRef, (snapshot) => {
         const dbOrg: OrgProps = snapshot.val()
-        if (
-          !!dbOrg &&
-          isLocalUserOrgDetails &&
-          localUser.uuid! in dbOrg.members!
-        ) {
-          dispatch(setOrg({ org: dbOrg, updateDB: false }))
-          dispatch(setMemberStatus("isJoined"))
+        const isUserJoined = !!dbOrg.members![userUuid]
+        if (!!dbOrg && !!orgUuid && isUserJoined) {
+          updateOrg(dbOrg)
+          updateMemberStatus("isJoined")
         }
-        if (
-          (!dbOrg || !(localUser.uuid! in dbOrg.members!)) &&
-          isLocalUserOrgDetails
-        ) {
+        if ((!dbOrg || !isUserJoined) && !!orgUuid) {
           leaveOrg()
         }
       })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, localUser, isSystemActive])
-
-  // STOCK SET & LISTENER
-
-  useEffect(() => {
-    if (!!localUser && isSystemActive) {
-      const dbStockRef = ref(
-        dbReal,
-        getDBPath.stock(localUser.org?.uuid as string).stock,
-      )
-      onValue(dbStockRef, (snapshot) => {
-        const dbStock: StockProps = snapshot.val()
-        if (!!dbStock) {
-          dispatch(setStock({ stock: dbStock, updateDB: false }))
-        }
-      })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, localUser, isSystemActive])
-
-  // COUNT SET & LISTENER
-
-  useEffect(() => {
-    if (!!localUser && isSystemActive) {
-      const dbCountChecksRef = ref(
-        dbReal,
-        getDBPath.count(localUser.org?.uuid as string).checks,
-      )
-      onValue(dbCountChecksRef, (snapshot) => {
-        const dbCountChecks: CountCheckProps[] = snapshot.val()
-        if (!!dbCountChecks) {
-          dispatch(setCountChecks({ checks: dbCountChecks, updateDB: false }))
-        }
-      })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, localUser, isSystemActive])
-
-  useEffect(() => {
-    if (!!localUser && isSystemActive) {
-      const dbCountCommentsRef = ref(
-        dbReal,
-        getDBPath.count(localUser.org?.uuid as string).comments,
-      )
-      onValue(dbCountCommentsRef, (snapshot) => {
-        const dbCountComments: CountCommentsProps = snapshot.val()
-        if (!!dbCountComments) {
-          dispatch(
-            setCountComments({ comments: dbCountComments, updateDB: false }),
-          )
-        }
-      })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, localUser, isSystemActive])
-
-  useEffect(() => {
-    if (!!localUser && isSystemActive) {
-      const dbCountMembersRef = ref(
-        dbReal,
-        getDBPath.count(localUser.org?.uuid as string).members,
-      )
-      onValue(dbCountMembersRef, (snapshot) => {
-        const dbCountMembers: CountMembersProps = snapshot.val()
-        if (!!dbCountMembers) {
-          dispatch(
-            setCountMembers({ members: dbCountMembers, updateDB: false }),
-          )
-        }
-        if (!dbCountMembers && !!localCountMembers) {
-          updateCountStep("dashboard", false)
-        }
-      })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, localUser, isSystemActive])
-
-  useEffect(() => {
-    if (!!localUser && isSystemActive) {
-      const dbCountMetadataRef = ref(
-        dbReal,
-        getDBPath.count(localUser.org?.uuid as string).metadata,
-      )
-      onValue(dbCountMetadataRef, (snapshot) => {
-        const dbCountMetadata: CountMetadataProps = snapshot.val()
-        if (!!dbCountMetadata) {
-          dispatch(
-            setCountMetaData({ metadata: dbCountMetadata, updateDB: false }),
-          )
-        } else if (!dbCountMetadata && !!localCountMetadata) {
-          dispatch(deleteCount())
-        }
-      })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, localUser, isSystemActive])
-
-  useEffect(() => {
-    if (!!localUser && isSystemActive) {
-      const dbCountResultsRef = ref(
-        dbReal,
-        getDBPath.count(localUser.org?.uuid as string).results,
-      )
-      onValue(dbCountResultsRef, (snapshot) => {
-        const dbCountResults: CountResultsProps = snapshot.val()
-        if (!!dbCountResults) {
-          dispatch(setCountResults(dbCountResults))
-        } else if (dbCountResults === null) {
-          dispatch(setCountResults({}))
-        }
-      })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, localUser, isSystemActive])
-
-  // HISTORY SET & LISTENER
-
-  useEffect(() => {
-    if (!!localUser && isSystemActive) {
-      const dbHistoryRef = ref(
-        dbReal,
-        getDBPath.history(localUser.org?.uuid as string).history,
-      )
-      onValue(dbHistoryRef, (snapshot) => {
-        const dbHistory: HistoryProps = snapshot.val()
-        if (!!dbHistory) {
-          dispatch(setHistory(dbHistory))
-        } else if (dbHistory === null) {
-          dispatch(setHistory({}))
-        }
-      })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, localUser, isSystemActive, isJoined])
+  }, [isSafeToSync])
 
   return undefined
 }
+/*
+
+
+
+
+*/
+export function StockDBListener() {
+  const isSystemActive = useAppSelector(selectIsSystemActive)
+  const userUuid = useAppSelector(selectUserUuid)
+  const orgUuid = useAppSelector(selectUserOrgUuid)
+
+  const isSafeToSync = !!userUuid && !!orgUuid && isSystemActive
+
+  useEffect(() => {
+    if (isSafeToSync) {
+      const dbStockRef = ref(dbReal, getDBPath.stock(orgUuid).stock)
+      onValue(dbStockRef, (snapshot) => {
+        const dbStock: StockProps = snapshot.val()
+        updateStock(dbStock)
+      })
+    }
+  }, [isSafeToSync])
+
+  return undefined
+}
+/*
+
+
+
+
+*/
+export function CountDBListener() {
+  const location = useLocation()
+
+  const userUuid = useAppSelector(selectUserUuid)
+  const orgUuid = useAppSelector(selectUserOrgUuid)
+  const isSystemActive = useAppSelector(selectIsSystemActive)
+  const localCountMembers = useAppSelector(selectCountMembers)
+  const localCountMetadata = useAppSelector(selectCountMetadata)
+  const isOrganiser = useAppSelector(selectIsUserOrganiser)
+  const counterUuids = useAppSelector(selectCountersUuidList)
+
+  const pathName = location.pathname
+  const isCountPath = pathName === routePaths.count.path
+  const isSafeToSync = !!userUuid && !!orgUuid && isSystemActive && isCountPath
+
+  useEffect(() => {
+    if (isSafeToSync) {
+      const dbCountChecksRef = ref(dbReal, getDBPath.count(orgUuid).checks)
+      onValue(dbCountChecksRef, (snapshot) => {
+        const dbCountChecks: CountCheckProps[] = snapshot.val()
+        if (!!dbCountChecks) {
+          updateCountChecks(dbCountChecks)
+        }
+      })
+    }
+  }, [isSafeToSync])
+
+  useEffect(() => {
+    if (isSafeToSync) {
+      const dbCountCommentsRef = ref(dbReal, getDBPath.count(orgUuid).comments)
+      onValue(dbCountCommentsRef, (snapshot) => {
+        const dbCountComments: CountCommentsProps = snapshot.val()
+        if (!!dbCountComments) {
+          updateCountComments(dbCountComments)
+        }
+      })
+    }
+  }, [isSafeToSync])
+
+  useEffect(() => {
+    if (isSafeToSync) {
+      const dbCountMembersRef = ref(dbReal, getDBPath.count(orgUuid).members)
+      onValue(dbCountMembersRef, (snapshot) => {
+        const dbCountMembers: CountMembersProps = snapshot.val()
+        if (!!dbCountMembers) {
+          updateCountMembers(dbCountMembers)
+        } else if (!!localCountMembers && !isOrganiser) {
+          removeCount()
+        }
+      })
+    }
+  }, [isSafeToSync])
+
+  useEffect(() => {
+    if (isSafeToSync) {
+      const dbCountMetadataRef = ref(dbReal, getDBPath.count(orgUuid).metadata)
+      onValue(dbCountMetadataRef, (snapshot) => {
+        const dbCountMetadata: CountMetadataProps = snapshot.val()
+        if (!!dbCountMetadata) {
+          updateCountMetadata(dbCountMetadata)
+        } else if (!!localCountMetadata && !isOrganiser) {
+          removeCount()
+        }
+      })
+    }
+  }, [isSafeToSync])
+
+  useEffect(() => {
+    if (isSafeToSync) {
+      _.forEach(counterUuids, (uuid) => {
+        if (userUuid !== uuid) {
+          const dbCounterResultsRef = ref(
+            dbReal,
+            getDBPath.count(orgUuid).memberResults(uuid).results,
+          )
+          onValue(dbCounterResultsRef, (snapshot) => {
+            const dbCounterResults: CountMemberResultsProps = snapshot.val()
+            if (!!dbCounterResults) {
+              updateCountMemberResults(uuid, dbCounterResults)
+            } else {
+              updateCountMemberResults(uuid, {})
+            }
+          })
+        }
+      })
+    }
+  }, [isSafeToSync, counterUuids])
+
+  return undefined
+}
+/*
+
+
+
+
+*/
+export function HistoryDBListener() {
+  const isSystemActive = useAppSelector(selectIsSystemActive)
+  const userUuid = useAppSelector(selectUserUuid)
+  const orgUuid = useAppSelector(selectUserOrgUuid)
+
+  const isSafeToSync = !!userUuid && !!orgUuid && isSystemActive
+
+  useEffect(() => {
+    if (isSafeToSync) {
+      const dbHistoryRef = ref(dbReal, getDBPath.history(orgUuid).history)
+      onValue(dbHistoryRef, (snapshot) => {
+        const dbHistory: HistoryProps = snapshot.val()
+        if (!!dbHistory) {
+          updateHistory(dbHistory)
+        } else {
+          updateHistory({})
+        }
+      })
+    }
+  }, [isSafeToSync])
+
+  return undefined
+}
+/*
+
+
+
+
+*/

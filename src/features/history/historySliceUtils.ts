@@ -1,6 +1,20 @@
 import _ from "lodash"
 import { store } from "../../app/store"
-import { deleteHistory, deleteHistoryItem } from "./historySlice"
+import {
+  HistoryProps,
+  deleteHistory,
+  deleteHistoryItem,
+  setHistory,
+} from "./historySlice"
+/*
+
+
+
+
+*/
+export function updateHistory(history: HistoryProps) {
+  store.dispatch(setHistory(history))
+}
 /*
 
 

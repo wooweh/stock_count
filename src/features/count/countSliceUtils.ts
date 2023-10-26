@@ -30,6 +30,7 @@ import {
   setCountChecks,
   setCountComments,
   setCountMember,
+  setCountMemberResults,
   setCountMembers,
   setCountMetaData,
   setCountResultsItem,
@@ -50,15 +51,25 @@ export function updateCountStep(step: CountSteps, updateMember?: boolean) {
 
 
 */
-export function updateCountComments(payload: Partial<CountCommentsProps>) {
+export function updateCountComments(
+  payload: Partial<CountCommentsProps>,
+  updateDB: boolean = false,
+) {
   const prevComments = store.getState().count.count.comments
   const comments = prevComments ? { ...prevComments, ...payload } : payload
+  store.dispatch(setCountComments({ comments, updateDB }))
+}
+/*
 
-  if (prevComments) {
-    store.dispatch(setCountComments({ comments, updateDB: true }))
-  } else {
-    store.dispatch(setCountComments({ comments, updateDB: true }))
-  }
+
+
+
+*/
+export function updateCountMemberResults(
+  memberUuid: string,
+  results: CountMemberResultsProps,
+) {
+  store.dispatch(setCountMemberResults({ memberUuid, results }))
 }
 /*
 
@@ -114,7 +125,6 @@ export function createCountMembers() {
 
 */
 export function prepareCountMembers(memberUuids: string[]) {
-  console.log(memberUuids)
   const userUuid = store.getState().user.user.uuid as string
   const orgMembers = store.getState().org.org.members as MembersProps
   const members = prepareCountMembersPayload(memberUuids, userUuid, orgMembers)
@@ -153,6 +163,18 @@ export function prepareCountMembersPayload(
     _.set(countMembers, key, countMember)
   })
   return countMembers
+}
+/*
+
+
+
+
+*/
+export function updateCountMembers(
+  members: CountMembersProps,
+  updateDB: boolean = false,
+) {
+  store.dispatch(setCountMembers({ members, updateDB }))
 }
 /*
 
@@ -228,12 +250,15 @@ export function createCountMetadata(
 
 
 */
-export function updateCountMetadata(payload: Partial<CountMetadataProps>) {
+export function updateCountMetadata(
+  payload: Partial<CountMetadataProps>,
+  updateDB: boolean = false,
+) {
   const prevMetadata = store.getState().count.count.metadata
-  if (prevMetadata) {
-    const metadata = { ...prevMetadata, ...payload }
-    store.dispatch(setCountMetaData({ metadata, updateDB: true }))
-  }
+  const metadata = (
+    prevMetadata ? { ...prevMetadata, ...payload } : payload
+  ) as CountMetadataProps
+  store.dispatch(setCountMetaData({ metadata, updateDB }))
 }
 /*
 
@@ -273,44 +298,22 @@ export function createCountChecksPayload(
 
 
 */
-export function submitCount() {
-  const countResults = store.getState().count.count.results
-  const metadata = store.getState().count.count
-    .metadata as HistoryItemMetadataProps
-  const comments = store.getState().count.count.comments
-
-  if (!!countResults && !!metadata && !!comments) {
-    const uuid = uuidv4()
-    const results = prepareFinalResults(countResults)
-    store.dispatch(setHistoryItem({ uuid, metadata, results, comments }))
-    store.dispatch(setCountStep({ step: "dashboard", updateMember: false }))
-    store.dispatch(deleteCount())
-    generateCustomNotification("success", "Count submitted to History")
-  }
-}
-/*
-
-
-
-
-*/
-export function prepareFinalResults(results: CountResultsProps) {
-  let finalResults: CountMemberResultsProps = {}
-  _.forIn(results, (value, key) => {
-    finalResults = { ...finalResults, ...value }
-  })
-  return finalResults
-}
-/*
-
-
-
-
-*/
 export function createCountCheck() {
   const id = uuidv4()
   const check = ""
   store.dispatch(setCountCheck({ id, check }))
+}
+/*
+
+
+
+
+*/
+export function updateCountChecks(
+  checks: CountCheckProps[],
+  updateDB: boolean = false,
+) {
+  store.dispatch(setCountChecks({ checks, updateDB }))
 }
 /*
 
@@ -329,6 +332,42 @@ export function updateCountCheck(id: string, check: string) {
 */
 export function removeCountCheck(id: string) {
   store.dispatch(deleteCountCheck({ id }))
+}
+/*
+
+
+
+
+*/
+export function submitCount() {
+  const countResults = store.getState().count.count.results
+  const metadata = store.getState().count.count
+    .metadata as HistoryItemMetadataProps
+  const countComments = store.getState().count.count.comments
+  if (!!countResults && !!metadata) {
+    const uuid = uuidv4()
+    const results = prepareFinalResults(countResults)
+    const comments = { ...countComments }
+    store.dispatch(setHistoryItem({ uuid, metadata, results, comments }))
+    store.dispatch(setCountStep({ step: "dashboard", updateMember: false }))
+    store.dispatch(deleteCount())
+    generateCustomNotification("success", "Count submitted to History.")
+  } else {
+    generateCustomNotification("error", "No results to submit.")
+  }
+}
+/*
+
+
+
+
+*/
+export function prepareFinalResults(results: CountResultsProps) {
+  let finalResults: CountMemberResultsProps = {}
+  _.forIn(results, (value, key) => {
+    finalResults = { ...finalResults, ...value }
+  })
+  return finalResults
 }
 /*
 
@@ -355,8 +394,8 @@ export function startCount(
   createCountMembers()
   updateCountStep(step, true)
   createCountChecks(checkUuids)
-  updateCountMetadata({ countStartTime })
-  updateCountComments({ preparation: comments })
+  updateCountMetadata({ countStartTime }, true)
+  updateCountComments({ preparation: comments }, true)
 }
 /*
 
@@ -375,7 +414,7 @@ export function leaveCount() {
 
 */
 export function completeReview() {
-  updateCountMetadata({ finalizationStartTime: getTimeStamp() })
+  updateCountMetadata({ finalizationStartTime: getTimeStamp() }, true)
   updateCountStep("finalization", true)
 }
 /*

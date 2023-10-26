@@ -8,6 +8,7 @@ import { selectIsUserCounting } from "../count/countSlice"
 import { selectIsSystemBooted } from "./coreSlice"
 import { Menu } from "./menu"
 import { routePaths, routes } from "./pages"
+import { getIsElementScrolling } from "../../common/utils"
 /*
 
 
@@ -20,11 +21,15 @@ export function Bar() {
   const isSystemBooted = useAppSelector(selectIsSystemBooted)
   const isUserCounting = useAppSelector(selectIsUserCounting)
 
+  const myElement = document.getElementById("pages_container")
+  const isScrolling = getIsElementScrolling(myElement)
+  console.log(isScrolling)
+
   return (
     isSystemBooted && (
       <Stack
         direction={"row"}
-        position={"absolute"}
+        position={"fixed"}
         top={0}
         width={"100%"}
         height={theme.module[6]}
@@ -33,7 +38,9 @@ export function Bar() {
         alignItems={"center"}
         paddingLeft={theme.module[3]}
         paddingRight={theme.module[3]}
+        boxShadow={theme.shadow.neo[4]}
         boxSizing={"border-box"}
+        zIndex={1000}
       >
         {isUserCounting ? <CountBanner /> : <NavigationBar />}
       </Stack>

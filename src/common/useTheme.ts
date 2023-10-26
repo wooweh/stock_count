@@ -69,8 +69,8 @@ export default function useTheme() {
       const largeShadow = index > 4 || index < 2
       const darkShadowScale = isDarkmode
         ? largeShadow
-          ? 9
-          : 10
+          ? 10
+          : 8
         : largeShadow
         ? 7
         : 6

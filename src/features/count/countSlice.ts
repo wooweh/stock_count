@@ -84,6 +84,10 @@ export type SetCountResultsItemProps = {
   item: CountItemProps
   memberUuid: string
 }
+export type SetCountMemberResultsProps = {
+  results: CountMemberResultsProps
+  memberUuid: string
+}
 export type DeleteCountMemberProps = {
   uuid: string
 }
@@ -156,6 +160,17 @@ export const countSlice = createSlice({
     setCountResults: (state, action: PayloadAction<CountResultsProps>) => {
       state.count.results = action.payload
     },
+    setCountMemberResults: (
+      state,
+      action: PayloadAction<SetCountMemberResultsProps>,
+    ) => {
+      const member = state.count.results
+      const uuid = action.payload.memberUuid
+      const results = action.payload.results
+      if (member) {
+        member[uuid] = results
+      }
+    },
     setCount: (state, action: PayloadAction<CountProps>) => {
       state.count = action.payload
     },
@@ -177,6 +192,7 @@ export const {
   setCountChecks,
   setCountComments,
   setCountResults,
+  setCountMemberResults,
   setCount,
   deleteCount,
 } = countSlice.actions
@@ -276,8 +292,8 @@ export const selectCountersList = createSelector(selectCounters, (counters) => {
 })
 export const selectCountersUuidList = createSelector(
   selectCounters,
-  (members) => {
-    return _.keys(members)
+  (counters) => {
+    return _.keys(counters)
   },
 )
 export const selectAvailableCountersList = createSelector(

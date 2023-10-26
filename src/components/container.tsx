@@ -17,16 +17,19 @@ export default function Container(props: ContainerProps) {
 
   return (
     <Stack
+      id={"pages_container"}
       ref={props.resizeRef}
       width={"100vw"}
       height={"100vh"}
+      minHeight={"710px"}
+      minWidth={"350px"}
       paddingTop={theme.module[6]}
-      bgcolor={theme.scale.gray[8]}
+      bgcolor={theme.scale.gray[9]}
       bottom={0}
       alignItems="center"
       justifyContent="center"
       boxSizing={"border-box"}
-      overflow={"hidden"}
+      overflow={"scroll"}
     >
       {props.children}
     </Stack>

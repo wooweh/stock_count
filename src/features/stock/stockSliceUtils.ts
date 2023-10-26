@@ -2,11 +2,21 @@ import _ from "lodash"
 import { store } from "../../app/store"
 import {
   StockItemProps,
+  StockProps,
   deleteStock,
   deleteStockItem,
   setStock,
   setStockItem,
 } from "./stockSlice"
+/*
+
+
+
+
+*/
+export function updateStock(stock: StockProps, updateDB: boolean = false) {
+  store.dispatch(setStock({ stock, updateDB }))
+}
 /*
 
 
