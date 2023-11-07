@@ -64,7 +64,7 @@ export function Org() {
 
   return isProfileComplete ? (
     isJoiningOrg ? (
-      <Loader narration={"joining org..."} />
+      <Loader narration={"joining org"} />
     ) : isOrgSetup ? (
       <OrgProfile />
     ) : (

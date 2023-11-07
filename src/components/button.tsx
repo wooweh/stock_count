@@ -16,7 +16,7 @@ type ButtonProps = {
   variation: ButtonVariations
   animationDuration?: AnimationDurations
 } & Omit<ButtonVariationProps, "isPressed">
-type AnimationDurations = 150 | 200
+type AnimationDurations = 0 | 150 | 200
 type ButtonVariations =
   | "profile"
   | "modal"
@@ -228,14 +228,13 @@ function HomeButton(props: ButtonVariationProps) {
     background: theme.scale.gray[8],
     width: "100%",
     borderRadius: theme.module[3],
-    boxShadow: theme.shadow.neo[props.isPressed ? 3 : 6],
     overflow: "visible",
     justifyContent: "flex-start",
     transform: `scale(${props.isPressed ? 0.99 : 1})`,
-    outline: `3px solid ${
+    outline: `2px solid ${
       props.outlineColor ?? theme.scale.gray[6]
     } !important`,
-    outlineOffset: "-3px",
+    outlineOffset: "-2px",
     ...props.sx,
   }
 
@@ -256,7 +255,7 @@ function HomeButton(props: ButtonVariationProps) {
         <Stack
           width={"100%"}
           alignItems={"center"}
-          bgcolor={props.bgColor ?? theme.scale.gray[7]}
+          bgcolor={props.bgColor ?? theme.scale.gray[9]}
           borderRadius={`${theme.module[3]} ${theme.module[3]} 0 0`}
           padding={theme.module[5]}
           boxSizing={"border-box"}
@@ -265,14 +264,16 @@ function HomeButton(props: ButtonVariationProps) {
             color={props.iconColor ?? theme.scale.gray[5]}
             variation={props.iconName as IconNames}
             fontSize="large"
+            sx={{
+              transform: `scale(1.5)`,
+            }}
           />
         </Stack>
         <Stack
           padding={theme.module[3]}
-          bgcolor={theme.scale.gray[7]}
+          bgcolor={theme.scale.gray[8]}
           boxSizing={"border-box"}
           width={"100%"}
-          boxShadow={theme.shadow.std[props.boxShadowScale ?? 5]}
           borderRadius={theme.module[3]}
         >
           <Typography color={props.color ?? theme.scale.gray[5]} variant="h5">
@@ -315,7 +316,7 @@ function PillButton(props: ButtonVariationProps) {
 
   return (
     <ButtonBase
-      onClick={props.onClick}
+      onMouseDown={props.onClick}
       disabled={props.disabled ?? false}
       disableRipple
       disableTouchRipple
@@ -325,12 +326,18 @@ function PillButton(props: ButtonVariationProps) {
         {!!props.iconName && (
           <Icon
             variation={props.iconName}
-            color={props.iconColor}
+            color={props.disabled ? theme.scale.gray[4] : props.iconColor}
             fontSize={props.iconSize ?? "medium"}
           />
         )}
         {!!props.label && (
-          <Typography color={props.color ?? theme.scale.gray[4]}>
+          <Typography
+            color={
+              props.disabled
+                ? theme.scale.gray[4]
+                : props.color ?? theme.scale.gray[4]
+            }
+          >
             {props.label}
           </Typography>
         )}
@@ -411,7 +418,7 @@ export type ToggleButtonGroupOptionsProps = {
 }
 export function ToggleButtonGroup(props: ToggleButtonGroupProps) {
   const theme = useTheme()
-  const [alignment, setAlignment] = useState(props.options[0].label)
+  const [alignment, setAlignment] = useState("")
 
   const handleAlignment = (
     event: React.MouseEvent<HTMLElement>,

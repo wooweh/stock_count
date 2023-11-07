@@ -1,4 +1,4 @@
-import { Typography } from "@mui/material"
+import { Divider, Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
 import Grid from "@mui/material/Unstable_Grid2/Grid2"
 import _ from "lodash"
@@ -81,7 +81,7 @@ export function CompleteProfilePrompt() {
           fontSize="large"
           color={theme.scale.blue[7]}
         />
-        <Typography color={theme.scale.gray[6]} variant="h5">
+        <Typography color={theme.scale.blue[7]} variant="h5">
           Complete your profile
         </Typography>
         <PromptInput
@@ -99,7 +99,7 @@ export function CompleteProfilePrompt() {
         variation={"profile"}
         label={"Complete"}
         iconName={"done"}
-        iconColor={theme.scale.blue[5]}
+        iconColor={theme.scale.blue[6]}
         outlineColor={theme.scale.gray[6]}
         onClick={handleClick}
         justifyCenter
@@ -121,22 +121,25 @@ type PromptInputProps = {
 function PromptInput(props: PromptInputProps) {
   const [placeholder, setPlacehoder] = useState(props.placeholder ?? "")
 
+  const inputProps = {
+    style: {
+      textAlign: "center",
+    },
+  }
+  const styles = {
+    fontSize: "1.125rem",
+    fontWeight: "medium",
+    height: "3.5rem",
+  }
+
   return (
     <Input
       value={props.value}
       placeholder={placeholder}
       onFocus={() => setPlacehoder("")}
       onBlur={() => setPlacehoder(props.placeholder ?? "")}
-      inputProps={{
-        style: {
-          textAlign: "center",
-        },
-      }}
-      sx={{
-        fontSize: "1.125rem",
-        fontWeight: "medium",
-        height: "3.5rem",
-      }}
+      inputProps={inputProps}
+      sx={styles}
       onChange={(event: any) => props.onChange(event.target.value)}
     />
   )
@@ -177,16 +180,16 @@ function SetupOrgPrompt() {
       paddingTop={theme.module[6]}
       boxSizing={"border-box"}
     >
-      <Icon variation="org" fontSize="large" color={theme.scale.gray[5]} />
-      <Typography color={theme.scale.gray[6]} variant="h5">
-        Setup your Org
-      </Typography>
+      <Icon variation="org" fontSize="large" color={theme.scale.green[7]} />
       <Stack
         height={"100%"}
         width={"100%"}
         gap={theme.module[5]}
         alignItems={"center"}
       >
+        <Typography color={theme.scale.green[7]} variant="h5">
+          Setup Org
+        </Typography>
         <OrgSetupPromptAction
           placeholder={"Org Name"}
           value={orgName}
@@ -197,12 +200,15 @@ function SetupOrgPrompt() {
           disabled={!orgName}
           key={"create"}
         />
-        <Typography
-          color={theme.scale.gray[6]}
-          fontWeight={"bold"}
-          variant="h5"
-        >
-          OR
+        <Divider
+          sx={{
+            width: "100%",
+            borderColor: theme.scale.gray[7],
+            paddingTop: theme.module[3],
+          }}
+        />
+        <Typography color={theme.scale.green[7]} variant="h5">
+          Join Org
         </Typography>
         <OrgSetupPromptAction
           placeholder={"Org invite key"}
@@ -264,11 +270,11 @@ function OrgSetupPromptAction(props: OrgSetupPromptActionProps) {
 */
 type HomeButton = {
   label: string
-  color: string
+  color?: string
   icon: IconNames
-  iconColor: string
-  bgColor: string
-  outlineColor: string
+  iconColor?: string
+  bgColor?: string
+  outlineColor?: string
   path: string
 }
 function HomeButtons() {
@@ -281,29 +287,26 @@ function HomeButtons() {
   const adminButtons: HomeButton[] = [
     {
       label: "Count",
-      color: theme.scale.blue[6],
       icon: "list",
-      iconColor: theme.scale.blue[5],
-      bgColor: theme.scale.blue[7],
-      outlineColor: theme.scale.blue[7],
+      iconColor: theme.scale.blue[7],
+      outlineColor: theme.scale.blue[8],
+      bgColor: theme.scale.blue[9],
       path: routePaths.count.path,
     },
     {
       label: "Stock",
-      color: theme.scale.green[6],
       icon: "stock",
-      iconColor: theme.scale.green[5],
-      bgColor: theme.scale.green[7],
-      outlineColor: theme.scale.green[7],
+      iconColor: theme.scale.green[7],
+      outlineColor: theme.scale.green[8],
+      bgColor: theme.scale.green[9],
       path: routePaths.stock.path,
     },
     {
       label: "History",
-      color: theme.scale.yellow[6],
       icon: "history",
-      iconColor: theme.scale.yellow[5],
-      bgColor: theme.scale.yellow[7],
-      outlineColor: theme.scale.yellow[7],
+      iconColor: theme.scale.yellow[7],
+      outlineColor: theme.scale.yellow[8],
+      bgColor: theme.scale.yellow[9],
       path: routePaths.history.path,
     },
   ]
@@ -332,8 +335,8 @@ function HomeButtons() {
           variation="profile"
           label={orgName}
           iconName="org"
-          bgColor={theme.scale.gray[8]}
-          iconColor={theme.scale.gray[6]}
+          bgColor={theme.scale.gray[9]}
+          iconColor={theme.scale.gray[5]}
           color={theme.scale.gray[5]}
           outlineColor={theme.scale.gray[6]}
           iconSize="large"

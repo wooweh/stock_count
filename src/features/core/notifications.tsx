@@ -1,5 +1,4 @@
 import { useEffect } from "react"
-import { useDispatch } from "react-redux"
 import { Slide, ToastContainer, toast } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import { useAppSelector } from "../../app/hooks"
@@ -27,12 +26,12 @@ export function Notifications() {
     }
   }, [showNotification, notification])
 
-  const AUTO_CLOSE = 2000
+  const AUTO_CLOSE_TIMEOUT = 2000
 
   return (
     <ToastContainer
       position="bottom-center"
-      autoClose={AUTO_CLOSE}
+      autoClose={AUTO_CLOSE_TIMEOUT}
       hideProgressBar={true}
       newestOnTop={true}
       closeOnClick

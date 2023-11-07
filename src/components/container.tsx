@@ -29,7 +29,7 @@ export default function Container(props: ContainerProps) {
       alignItems="center"
       justifyContent="center"
       boxSizing={"border-box"}
-      overflow={"scroll"}
+      overflow={"auto"}
     >
       {props.children}
     </Stack>

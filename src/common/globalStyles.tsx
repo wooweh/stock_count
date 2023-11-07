@@ -174,10 +174,12 @@ export default function GlobalStyles() {
         .MuiAccordionSummary-root {
           min-height: ${theme.module[0]} !important;
           height: ${theme.module[0]} !important;
+          background-color: transparent !important;
         }
         .MuiAccordion-root {
           width: 100% !important;
           background-color: transparent !important;
+          color: transparent !important;
           box-shadow: none !important;
         }
         .MuiCheckbox-root {

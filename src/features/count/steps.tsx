@@ -158,6 +158,7 @@ export function Steps() {
     <Stack
       width={"100%"}
       height={"100%"}
+      bgcolor={theme.scale.gray[8]}
       padding={theme.module[4]}
       boxSizing={"border-box"}
     >

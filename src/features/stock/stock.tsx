@@ -86,11 +86,13 @@ export function Stock() {
 */
 function Outer({ children }: { children: any }) {
   const theme = useTheme()
+  
   return (
     <Stack
       width={"100%"}
       height={"100%"}
       padding={theme.module[3]}
+      bgcolor={theme.scale.gray[8]}
       boxSizing={"border-box"}
     >
       {children}

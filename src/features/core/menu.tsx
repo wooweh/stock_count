@@ -1,17 +1,17 @@
-import { PopoverOrigin, Stack } from "@mui/material"
+import { Divider, PopoverOrigin, Stack } from "@mui/material"
 import ButtonBase from "@mui/material/ButtonBase"
 import MuiMenu from "@mui/material/Menu"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { useAppDispatch, useAppSelector } from "../../app/hooks"
+import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { Switch } from "../../components/control"
 import Icon, { IconNames } from "../../components/icon"
 import { ListItem } from "../../components/listItem"
+import { signOut } from "../user/userAuth"
 import { selectIsDarkmode } from "./coreSlice"
 import { toggleDarkmode } from "./coreSliceUtils"
 import { routePaths } from "./pages"
-import { signOut } from "../user/userAuth"
 /*
 
 
@@ -92,6 +92,7 @@ export function Menu() {
         sx={{
           "& .MuiPaper-root": {
             borderRadius: theme.module[3],
+            outline: `2px solid ${theme.scale.gray[6]}`,
           },
         }}
       >
@@ -104,22 +105,35 @@ export function Menu() {
           boxSizing={"border-box"}
         >
           {menuItems.map((item: MenuItemProps, index: number) => (
-            <ListItem
-              label={item.label}
-              primarySlot={<Icon variation={item.iconName} />}
-              secondarySlot={
-                !index ? (
-                  <Switch value={isDarkmode} onChange={item.onChange} />
-                ) : undefined
-              }
-              bgColor={theme.scale.gray[!index ? 9 : 7]}
-              onChange={item.onChange}
-              tappable
-              key={index}
-            />
+            <>
+              <ListItem
+                label={item.label}
+                primarySlot={<Icon variation={item.iconName} />}
+                secondarySlot={
+                  !index ? (
+                    <Switch value={isDarkmode} onChange={item.onChange} />
+                  ) : undefined
+                }
+                bgColor={theme.scale.gray[!index ? 9 : 7]}
+                onChange={item.onChange}
+                tappable
+                key={index}
+              />
+              {index !== menuItems.length - 1 && (
+                <Divider
+                  sx={{ width: "100%", borderColor: theme.scale.gray[6] }}
+                />
+              )}
+            </>
           ))}
         </Stack>
       </MuiMenu>
     </>
   )
 }
+/*
+
+
+
+
+*/

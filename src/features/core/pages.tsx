@@ -102,7 +102,8 @@ export function Pages() {
   }, [width])
 
   useEffect(() => {
-    const isAuthPath = path === routePaths.signIn.path
+    const isAuthPath =
+      path === routePaths.signIn.path || path === routePaths.register.path
     const isProfilePath = path === routePaths.profile.path
     const isOrgPath = path === routePaths.org.path
     const isStockPath = path === routePaths.stock.path

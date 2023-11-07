@@ -83,7 +83,9 @@ export function joinOrg(inviteKey: string) {
       })
       .then((org: OrgProps) => {
         store.dispatch(setOrg({ org, updateDB: false }))
-        store.dispatch(setMemberStatus("isJoined"))
+        setTimeout(() => {
+          store.dispatch(setMemberStatus("isJoined"))
+        }, 1000)
         store.dispatch(deleteInvite({ inviteKey }))
         generateCustomNotification("success", `You have joined ${org.name}`)
         return { isJoined: true }

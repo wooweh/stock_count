@@ -86,7 +86,7 @@ export function PreparationItem(props: PreparationItemProps) {
   const theme = useTheme()
 
   return (
-    <Stack gap={theme.module[3]} maxHeight={"47.5%"}>
+    <Stack gap={theme.module[3]} height={"47.5%"}>
       <Stack
         paddingLeft={theme.module[1]}
         direction={"row"}

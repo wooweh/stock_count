@@ -43,7 +43,7 @@ export function getMembersShortNames(members: MembersProps, uuids: string[]) {
 
 */
 export function getMemberName(member: MemberProps | CountMemberProps) {
-  const name = `${member.firstName}. ${member.lastName}`
+  const name = `${member.firstName} ${member.lastName}`
   return name
 }
 /*

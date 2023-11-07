@@ -1,7 +1,8 @@
+import { Stack, Typography } from "@mui/material"
 import { CSSProperties } from "react"
 import { SquareLoader } from "react-spinners"
 import useTheme from "../common/useTheme"
-import { Stack, Typography } from "@mui/material"
+import Icon from "./icon"
 /*
 
 
@@ -12,10 +13,12 @@ import { Stack, Typography } from "@mui/material"
 export function Loader({ narration }: { narration: string }) {
   const theme = useTheme()
   const styles: CSSProperties = {
-    display: "block",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
     borderRadius: theme.module[3],
     outline: `1px solid ${theme.scale.gray[7]}`,
-    boxShadow: `0 0 15px 0px ${theme.scale.gray[7]}`,
+    boxShadow: `0 0 10px 0px ${theme.scale.blue[7]}`,
   }
   const firstChar = narration.charAt(0).toUpperCase()
   const modifiedNarration = firstChar + narration.slice(1)
@@ -25,23 +28,30 @@ export function Loader({ narration }: { narration: string }) {
       height={"100%"}
       flexShrink={0}
       top={0}
-      bgcolor={theme.scale.gray[8]}
+      bgcolor={theme.scale.gray[9]}
       position={"absolute"}
       justifyContent={"center"}
       alignContent={"center"}
       zIndex={100}
-      gap={theme.module[5]}
+      gap={theme.module[6]}
       alignItems={"center"}
     >
       <SquareLoader
-        color={theme.scale.gray[8]}
+        color={theme.scale.gray[9]}
         loading={true}
         cssOverride={styles}
         speedMultiplier={0.75}
-        size={100}
-      />
-      <Typography color={theme.scale.gray[6]} fontWeight={"light"} variant="h6">
-        {modifiedNarration}...
+        size={150}
+      >
+        <Icon
+          variation="stock"
+          fontSize="large"
+          color={theme.scale.blue[8]}
+          sx={{ transform: "scale(1.5)" }}
+        />
+      </SquareLoader>
+      <Typography color={theme.scale.blue[8]} variant="h6">
+        {modifiedNarration} ...
       </Typography>
     </Stack>
   )

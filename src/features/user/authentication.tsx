@@ -121,18 +121,21 @@ function AuthenticationInput({ isRegistering }: { isRegistering: boolean }) {
   const isVerifying = useAuthUI((state) => state.isVerifying)
   const validationReport = useAuthUI((state) => state.passwordValidation)
 
-  return !isSigningIn && !isVerifying ? (
-    <Outer>
-      <Logo />
-      <CredentialInputs />
-      <ButtonTray isRegistering={isRegistering} />
-      <PasswordValidationCheck
-        isActive={isRegistering}
-        validationReport={validationReport}
-      />
-      <ForgotPassword isRegistering={isRegistering} />
-    </Outer>
-  ) : undefined
+  return (
+    !isSigningIn &&
+    !isVerifying && (
+      <Outer>
+        <Logo />
+        <CredentialInputs />
+        <ButtonTray isRegistering={isRegistering} />
+        <PasswordValidationCheck
+          isActive={isRegistering}
+          validationReport={validationReport}
+        />
+        <ForgotPassword isRegistering={isRegistering} />
+      </Outer>
+    )
+  )
 }
 /*
 
@@ -169,10 +172,14 @@ function Logo() {
       width={"100%"}
       direction={"row"}
       alignItems={"center"}
-      gap={theme.module[3]}
+      gap={theme.module[2]}
     >
-      <Icon variation="stock" />
-      <Typography variant="h5" justifyContent={"flex-end"}>
+      <Icon variation="stock" color={theme.scale.gray[5]} />
+      <Typography
+        variant="h5"
+        justifyContent={"center"}
+        color={theme.scale.gray[5]}
+      >
         StockCount
       </Typography>
     </Stack>
@@ -243,10 +250,7 @@ function ButtonTray({ isRegistering }: { isRegistering: boolean }) {
       setAuthUI("password", "")
     }
   }
-  /*
-  
-  
-  */
+
   return (
     <Stack
       width={"100%"}
@@ -259,7 +263,7 @@ function ButtonTray({ isRegistering }: { isRegistering: boolean }) {
         label={isRegistering ? "Register" : "Sign in"}
         onClick={handleClick}
         disabled={isDetailsIncomplete}
-        color={theme.scale.gray[isDetailsIncomplete ? 4 : 3]}
+        color={theme.scale.green[6]}
       />
       <Button
         variation={"pill"}
@@ -267,7 +271,8 @@ function ButtonTray({ isRegistering }: { isRegistering: boolean }) {
         onClick={() =>
           navigate(routePaths[isRegistering ? "signIn" : "register"].path)
         }
-        color={theme.scale.gray[5]}
+        animationDuration={0}
+        color={theme.scale.blue[6]}
       />
     </Stack>
   )
@@ -289,22 +294,20 @@ function ForgotPassword({ isRegistering }: { isRegistering: boolean }) {
       generateNotification("invalidEmail")
     }
   }
-  /*
-    
-    
-    */
+
   return (
     <Stack
       width={"100%"}
       alignItems={"flex-start"}
       paddingLeft={theme.module[0]}
+      sx={{ opacity: isRegistering ? 0 : 1 }}
     >
       <Button
         variation={"pill"}
         label={"Forgot password"}
         onClick={handleClick}
-        disabled={isRegistering}
-        color={isRegistering ? "transparent" : theme.scale.gray[5]}
+        disabled={!email || isRegistering}
+        color={theme.scale.orange[6]}
       />
     </Stack>
   )
@@ -413,7 +416,7 @@ function CheckLineItem({
 export function SigningInLoader() {
   const isSigningIn = useAuthUI((state) => state.isSigningIn)
 
-  return isSigningIn ? <Loader narration="signing in..." /> : undefined
+  return isSigningIn ? <Loader narration="signing in" /> : undefined
 }
 /*
 

@@ -18,7 +18,6 @@ import {
 } from "../../components/listItem"
 import Modal, { ModalActionProps } from "../../components/modal"
 import { ProfileSurface } from "../../components/profileSurface"
-import { generateNotification } from "../core/coreUtils"
 import { selectIsUserAdmin } from "../user/userSlice"
 import { setOrgUI, useOrgUI } from "./org"
 import {
@@ -37,6 +36,7 @@ import {
   updateOrgMemberRole,
   updateOrgName,
 } from "./orgSliceUtils"
+import { getMemberName } from "./orgUtils"
 /*
 
 
@@ -158,10 +158,9 @@ function ButtonTray() {
   ]
 
   return (
-    <>
+    <Stack height={"100%"} justifyContent={"space-between"}>
       <Stack
         width={"100%"}
-        height={"100%"}
         gap={theme.module[5]}
         paddingTop={theme.module[3]}
         boxSizing={"border-box"}
@@ -185,7 +184,7 @@ function ButtonTray() {
         iconName={isAdmin ? "delete" : "leave"}
         justifyCenter
       />
-    </>
+    </Stack>
   )
 }
 /*
@@ -247,7 +246,7 @@ function MemberListItem({ member }: { member: MemberProps }) {
       onClick: () => removeOrgMember(uuid),
     },
   ]
-  const name = `${member.firstName} ${member.lastName}`
+  const name = getMemberName(member)
 
   return (
     <ListItemWithOptions

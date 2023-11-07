@@ -5,6 +5,14 @@
 
 
 */
+const rootPath = import.meta.env.VITE_DB_ROOT_PATH
+/*
+
+
+
+
+
+*/
 type OrgPathsReturnProps = {
   org: string
   invites: string
@@ -30,7 +38,7 @@ type CountCheckReturnProps = {
   check: string
 }
 function orgPaths(orgUuid: string): OrgPathsReturnProps {
-  const org = `orgs/${orgUuid}`
+  const org = `${rootPath}/orgs/${orgUuid}`
   const invites = `${org}/invites`
   const members = `${org}/members`
   const countChecks = `${org}/countChecks`
@@ -88,7 +96,7 @@ type UserPathsReturnProps = {
   org: string
 }
 function userPaths(userUuid: string): UserPathsReturnProps {
-  const user = `users/${userUuid}`
+  const user = `${rootPath}/users/${userUuid}`
   const uuid = `${user}/uuid`
   const email = `${user}/email`
   const name = `${user}/name`
@@ -111,7 +119,7 @@ function userPaths(userUuid: string): UserPathsReturnProps {
 */
 type InvitePathsReturnProps = { invite: string }
 function invitePaths(inviteKey: string): InvitePathsReturnProps {
-  const invite = `invites/${inviteKey}`
+  const invite = `${rootPath}/invites/${inviteKey}`
   return { invite }
 }
 /*
@@ -128,7 +136,7 @@ type StockPathsReturnProps = {
 }
 
 function stockPaths(orgUuid: string): StockPathsReturnProps {
-  const stock = `stock/${orgUuid}`
+  const stock = `${rootPath}/stock/${orgUuid}`
 
   function stockItem(stockId: string): StockItemReturnProps {
     const item = `${stock}/${stockId}`
@@ -164,7 +172,7 @@ type MemberResultsReturnProps = {
 type ResultsItemReturnProps = StockItemReturnProps
 type CountMemberReturnProps = { member: string }
 function countPaths(orgUuid: string): CountPathsReturnProps {
-  const count = `counts/${orgUuid}`
+  const count = `${rootPath}/counts/${orgUuid}`
   const metadata = `${count}/metadata`
   const checks = `${count}/checks`
   const comments = `${count}/comments`
@@ -213,7 +221,7 @@ type HistoryPathsReturnProps = {
 }
 
 function historyPaths(orgUuid: string): HistoryPathsReturnProps {
-  const history = `history/${orgUuid}`
+  const history = `${rootPath}/history/${orgUuid}`
 
   function historyItem(countUuid: string): HistoryItemReturnProps {
     const item = `${history}/${countUuid}`

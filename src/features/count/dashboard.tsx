@@ -21,6 +21,7 @@ import {
   updateCountStep,
   updateUserCountMember,
 } from "./countSliceUtils"
+import _ from "lodash"
 /*
 
 
@@ -325,7 +326,7 @@ function CheckList() {
   return (
     <Stack width={"100%"} gap={theme.module[3]}>
       {!!checkList.length ? (
-        checkList.map((check: any) => {
+        _.reverse(checkList).map((check: any) => {
           return <CheckListItem countCheck={check} key={check.id} />
         })
       ) : (

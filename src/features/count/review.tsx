@@ -6,6 +6,7 @@ import Icon from "../../components/icon"
 import Modal, { ModalActionProps } from "../../components/modal"
 import VirtualizedTable from "../../components/table"
 import { MembersProps, selectOrgMembers } from "../org/orgSlice"
+import { getMemberShortName } from "../org/orgUtils"
 import { selectStock } from "../stock/stockSlice"
 import { setCountUI, useCountUI } from "./count"
 import {
@@ -160,9 +161,7 @@ function CounterSummaryItem({
   const members = useAppSelector(selectCountMembers) as CountMembersProps
 
   const countValue = `${_.keys(results).length} items`
-  const nameInitial = members[uuid].firstName[0]
-  const surname = members[uuid].lastName
-  const fullName = `${nameInitial}. ${surname}`
+  const name = getMemberShortName(members[uuid])
   const step = members[uuid].step
   const isCounting = members[uuid].isCounting
 
@@ -197,7 +196,7 @@ function CounterSummaryItem({
           fontSize={"small"}
           color={theme.scale.blue[6]}
         />
-        <Typography variant={"body2"}>{fullName}</Typography>
+        <Typography variant={"body2"}>{name}</Typography>
       </Stack>
       <Stack
         direction={"row"}

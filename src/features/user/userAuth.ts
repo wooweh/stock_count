@@ -114,12 +114,8 @@ export async function changeEmail(email: string, oldEmail: string) {
 
 
 */
-const codeSettings = {
-  // TODO: Set url env variable for production vs development
-  url: "http://localhost:5173/sign_in",
-  handleCodeInApp: false,
-}
-
+const url = import.meta.env.VITE_EMAIL_VERIFICATION_REDIRECT_URL
+const codeSettings = { url }
 export async function register(email: string, password: string) {
   return createUserOnAuth(auth, email, password)
     .then((credential) => {

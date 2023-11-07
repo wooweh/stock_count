@@ -86,7 +86,8 @@ function Outer({ children }: { children: any }) {
       width={"100%"}
       height={"100%"}
       padding={theme.module[3]}
-      marginBottom={theme.module[2]}
+      bgcolor={theme.scale.gray[8]}
+      paddingBottom={theme.module[2]}
       boxSizing={"border-box"}
     >
       {children}

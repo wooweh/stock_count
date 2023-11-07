@@ -98,6 +98,7 @@ export function OrgDBListener() {
   const isSystemActive = useAppSelector(selectIsSystemActive)
   const userUuid = useAppSelector(selectUserUuid)
   const orgUuid = useAppSelector(selectUserOrgUuid)
+  const localOrgUuid = useAppSelector(selectOrgUuid)
 
   const isSafeToSync = !!userUuid && !!orgUuid && isSystemActive
 
@@ -106,12 +107,18 @@ export function OrgDBListener() {
       const dbOrgRef = ref(dbReal, getDBPath.org(orgUuid).org)
       onValue(dbOrgRef, (snapshot) => {
         const dbOrg: OrgProps = snapshot.val()
-        const isUserJoined = !!dbOrg.members![userUuid]
-        if (!!dbOrg && !!orgUuid && isUserJoined) {
-          updateOrg(dbOrg)
+        const isUserMember = !!dbOrg.members![userUuid]
+
+        const shouldJoinOrg = !!dbOrg && !localOrgUuid
+        if (shouldJoinOrg) {
           updateMemberStatus("isJoined")
         }
-        if ((!dbOrg || !isUserJoined) && !!orgUuid) {
+        const shouldUpdateOrg = !!dbOrg && isUserMember
+        if (shouldUpdateOrg) {
+          updateOrg(dbOrg)
+        }
+        const shouldLeaveOrg = (!dbOrg || !isUserMember) && !!orgUuid
+        if (shouldLeaveOrg) {
           leaveOrg()
         }
       })

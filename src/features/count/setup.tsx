@@ -1,17 +1,15 @@
 import { Stack, Typography } from "@mui/material"
-import _ from "lodash"
 import { useEffect } from "react"
 import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
-import { Button } from "../../components/button"
-import { Select } from "../../components/control"
+import { Button, ToggleButtonGroup } from "../../components/button"
 import Icon from "../../components/icon"
 import { List } from "../../components/list"
 import { ListItem } from "../../components/listItem"
 import Modal, { ModalActionProps } from "../../components/modal"
 import { generateCustomNotification } from "../core/coreUtils"
 import { MemberProps } from "../org/orgSlice"
-import { getMemberName } from "../org/orgUtils"
+import { getMemberName, getMemberShortName } from "../org/orgUtils"
 import {
   addCountUISelectedMemberUuid,
   removeCountUISelectedMemberUuid,
@@ -45,9 +43,9 @@ export function SetupBody() {
   const isSolo = countType === "solo"
 
   const COUNT_TYPE_DESCRIPTIONS: any = {
-    solo: "A single counter will count the entire stock holding.",
-    dual: "Two counters will each count the entire stock holding and compare results.",
-    team: "Two or more counters will together count the entire stock holding.",
+    solo: "Solo count: A single counter will count the entire stock holding.",
+    dual: "Dual count: Two counters will each count the entire stock holding and compare results.",
+    team: "Team count: Two or more counters will together count the entire stock holding.",
   }
 
   useEffect(() => {
@@ -63,13 +61,26 @@ export function SetupBody() {
   const options: SetupOptionProps[] = [
     {
       label: "Count Type",
-      description: COUNT_TYPE_DESCRIPTIONS[countType] ?? "",
+      description: COUNT_TYPE_DESCRIPTIONS[countType ?? "solo"],
       control: (
-        <Select
-          value={countType}
-          onChange={handleCountTypeSelect}
-          options={_.keys(COUNT_TYPE_DESCRIPTIONS)}
-          placeholder="Choose Count Type"
+        <ToggleButtonGroup
+          options={[
+            {
+              label: "Solo",
+              iconName: "profile",
+              onClick: () => handleCountTypeSelect("solo"),
+            },
+            {
+              label: "Dual",
+              iconName: "dual",
+              onClick: () => handleCountTypeSelect("dual"),
+            },
+            {
+              label: "Team",
+              iconName: "group",
+              onClick: () => handleCountTypeSelect("team"),
+            },
+          ]}
         />
       ),
     },
@@ -153,9 +164,7 @@ function WarningBox() {
 */
 function AddMembers() {
   const availableMembers = useAppSelector(selectAvailableCountersList)
-  const countType: CountTypes = useCountUI(
-    (state: any) => state.tempCountType,
-  )
+  const countType: CountTypes = useCountUI((state: any) => state.tempCountType)
   const isAddingMembers = useCountUI((state: any) => state.isAddingMembers)
   const selectedMemberUuids = useCountUI(
     (state: any) => state.selectedMemberUuids,
@@ -244,9 +253,7 @@ function MembersList({
 }) {
   const availableMembers = useAppSelector(selectAvailableCountersList)
 
-  const countType: CountTypes = useCountUI(
-    (state: any) => state.tempCountType,
-  )
+  const countType: CountTypes = useCountUI((state: any) => state.tempCountType)
   const selectedMemberUuids = useCountUI(
     (state: any) => state.selectedMemberUuids,
   )
@@ -256,7 +263,7 @@ function MembersList({
   return (
     <List>
       {availableMembers.map((member: MemberProps) => {
-        const name = `${member.firstName} ${member.lastName}`
+        const name = getMemberName(member)
         const selected = selectedMemberUuids.includes(member.uuid)
         return (
           <ListItem
@@ -312,7 +319,7 @@ function CountersList() {
               removeCountUISelectedMemberUuid(uuid)
             }
 
-            const name = getMemberName(counter)
+            const name = getMemberShortName(counter)
 
             return (
               <ListItem
