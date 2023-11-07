@@ -3,12 +3,12 @@ import Typography from "@mui/material/Typography"
 import { useEffect, useState } from "react"
 import { create } from "zustand"
 import { createJSONStorage, persist } from "zustand/middleware"
-import { useAppDispatch, useAppSelector } from "../../app/hooks"
+import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { Button } from "../../components/button"
 import { Input } from "../../components/control"
 import { Loader } from "../../components/loader"
-import Modal from "../../components/modal"
+import Modal, { ModalActionProps } from "../../components/modal"
 import { ProfileSurface } from "../../components/profileSurface"
 import { generateNotification } from "../core/coreUtils"
 import { PasswordValidationCheck } from "./authentication"
@@ -21,7 +21,6 @@ import {
 } from "./userSlice"
 import { removeUser, updateUserName } from "./userSliceUtils"
 import { checkNewPassword, getPasswordValidation } from "./userUtils"
-import { ClickAwayListener } from "@mui/material"
 /*
 
 
@@ -100,7 +99,7 @@ function ProfileFields() {
     if (email) setUserUI("email", email)
   }, [isEditing, name, email])
 
-  const fields = [
+  const fields: ProfileFieldProps[] = [
     {
       label: "Name",
       value: editableName ? editableName : name?.first,
@@ -120,16 +119,14 @@ function ProfileFields() {
 
   return (
     <Stack gap={theme.module[5]}>
-      {fields.map((field: any, index: number) => {
-        return (
-          <ProfileField
-            label={field.label}
-            value={field.value ?? ""}
-            handleChange={field.handleChange}
-            key={index}
-          />
-        )
-      })}
+      {fields.map((field: ProfileFieldProps, index: number) => (
+        <ProfileField
+          label={field.label}
+          value={field.value ?? ""}
+          handleChange={field.handleChange}
+          key={index}
+        />
+      ))}
     </Stack>
   )
 }
@@ -191,7 +188,6 @@ function ProfileField(props: ProfileFieldProps) {
 */
 function ButtonTray() {
   const theme = useTheme()
-  const dispatch = useAppDispatch()
 
   const oldEmail = useAppSelector(selectUserEmail)
 
@@ -209,8 +205,8 @@ function ButtonTray() {
 
   function handleAccept() {
     if (isProfileComplete) {
-      setUserUI("isEditing", false)
       updateUserName(name, surname)
+      setUserUI("isEditing", false)
       if (isChangingEmail) changeEmail(oldEmail, newEmail)
     } else {
       generateNotification("incompleteProfileDetails")
@@ -276,6 +272,17 @@ function DeleteProfileConfirmation() {
     setUserUI("isDeleting", false)
   }
 
+  const actions: ModalActionProps[] = [
+    {
+      iconName: "cancel",
+      handleClick: handleClose,
+    },
+    {
+      iconName: "done",
+      handleClick: handleAccept,
+    },
+  ]
+
   return (
     <Modal
       open={isDeleting}
@@ -291,10 +298,7 @@ function DeleteProfileConfirmation() {
           />
         </Stack>
       }
-      actions={[
-        { iconName: "cancel", handleClick: handleClose },
-        { iconName: "done", handleClick: handleAccept },
-      ]}
+      actions={actions}
       onClose={handleClose}
     />
   )
@@ -336,7 +340,7 @@ function ChangePassword() {
     }, 250)
   }
 
-  const inputs: InputsProps[] = [
+  const inputs: PasswordInputsProps[] = [
     {
       placeholder: "Password",
       value: password,
@@ -360,6 +364,11 @@ function ChangePassword() {
     confirmedNewPassword,
   ).isConfirmed
 
+  const actions: ModalActionProps[] = [
+    { iconName: "cancel", handleClick: handleClose },
+    { iconName: "done", handleClick: handleAccept },
+  ]
+
   return (
     <Modal
       open={isChangingPassword}
@@ -370,16 +379,12 @@ function ChangePassword() {
             inputs={inputs}
             isNewPasswordConfirmed={isNewPasswordConfirmed}
           />
-          {isPasswordChangePending ||
-            (isPasswordChangeSuccess && (
-              <Loader narration="Changing password..." />
-            ))}
+          {isPasswordChangePending && (
+            <Loader narration="Changing password..." />
+          )}
         </>
       }
-      actions={[
-        { iconName: "cancel", handleClick: handleClose },
-        { iconName: "done", handleClick: handleAccept },
-      ]}
+      actions={actions}
       onClose={handleClose}
     />
   )
@@ -390,7 +395,7 @@ function ChangePassword() {
 
 
 */
-type InputsProps = {
+type PasswordInputsProps = {
   placeholder: string
   value: string
   onChange: (event: any) => void
@@ -399,7 +404,7 @@ function PasswordInputs({
   inputs,
   isNewPasswordConfirmed,
 }: {
-  inputs: InputsProps[]
+  inputs: PasswordInputsProps[]
   isNewPasswordConfirmed: boolean
 }) {
   const theme = useTheme()
@@ -409,7 +414,7 @@ function PasswordInputs({
 
   return (
     <Stack gap={theme.module[4]} padding={theme.module[4]}>
-      {inputs.map((input: InputsProps, index: number) => {
+      {inputs.map((input: PasswordInputsProps, index: number) => {
         const styles = {
           background: theme.scale.gray[8],
           outline:

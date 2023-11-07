@@ -8,7 +8,7 @@ import { selectIsUserCounting } from "../count/countSlice"
 import { History, resetHistoryUI } from "../history/history"
 import { Org, resetOrgUI } from "../org/org"
 import { Stock, resetStockUI } from "../stock/stock"
-import { Authentication, WithAuth, resetAuthUI } from "../user/authentication"
+import { Authentication, AuthWrapper, resetAuthUI } from "../user/authentication"
 import { UserProfile, resetUserUI } from "../user/user"
 import { toggleMobile } from "./coreSliceUtils"
 import { getRoutePaths } from "./coreUtils"
@@ -130,7 +130,7 @@ export function Pages() {
           return (
             <Route
               path={route.path}
-              element={<WithAuth route={route} />}
+              element={<AuthWrapper route={route} />}
               key={index}
             />
           )

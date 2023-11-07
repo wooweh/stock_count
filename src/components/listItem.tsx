@@ -82,7 +82,7 @@ function ListItemOuterWrapper(props: {
       minHeight={theme.module[6]}
       width={"100%"}
       padding={theme.module[4]}
-      sx={props.sx}
+      sx={{ outline: `1px solid ${theme.scale.gray[7]}`, ...props.sx }}
     >
       {props.children}
     </Stack>
@@ -202,7 +202,7 @@ function SecondarySlot(props: {
       justifyContent={"center"}
       minWidth={theme.module[7]}
       sx={{
-        width: "50%",
+        // width: "50%",
         "&: hover": {
           filter: "brightness(1.15)",
         },
@@ -310,20 +310,20 @@ export function SelectableListItemWithOptions(
 ) {
   const theme = useTheme()
   const [isLongPressing, setIsLongPressing] = useState(true)
-  
+
   function handleSelectionClick() {
     if (props.isSelecting) {
       if (!props.isSelected) props.onSelection()
       if (props.isSelected) props.onDeselection()
     }
   }
-  
+
   function handleLongPress() {
     if (!props.isSelecting) {
       props.onLongPress()
     }
   }
-  
+
   useEffect(() => {
     if (!props.isSelecting) setIsLongPressing(true)
     if (props.isSelecting)

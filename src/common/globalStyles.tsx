@@ -38,6 +38,10 @@ export default function GlobalStyles() {
         input[type="file"] {
           color: ${theme.scale.gray[4]};
         }
+        .MuiBackdrop-root {
+          background: ${theme.scale.gray[9]} !important;
+          opacity: 0.65 !important;
+        }
         .MuiToggleButtonGroup-grouped {
           box-shadow: ${theme.shadow.neo[4]};
           outline: 1px solid ${theme.scale.gray[6]} !important;

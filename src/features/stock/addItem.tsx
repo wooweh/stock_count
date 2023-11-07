@@ -1,9 +1,8 @@
 import { Stack, Typography } from "@mui/material"
 import { useState } from "react"
-import { useAppDispatch } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { Input } from "../../components/control"
-import Modal from "../../components/modal"
+import Modal, { ModalActionProps } from "../../components/modal"
 import { generateCustomNotification } from "../core/coreUtils"
 import { setStockUI, useStockUI } from "./stock"
 import { updateStockItem } from "./stockSliceUtils"
@@ -14,17 +13,17 @@ import { updateStockItem } from "./stockSliceUtils"
 
 */
 export function AddItem() {
-  const theme = useTheme()
-
   const isAdding = useStockUI((state: any) => state.isAdding)
 
   const [name, setName] = useState("")
-  const [description, setDescription] = useState("")
+  const [unit, setUnit] = useState("")
   const [id, setId] = useState("")
 
+  const isAllFieldsComplete = !!id && !!name && !!unit
+
   function handleAccept() {
-    if (id && name && description) {
-      updateStockItem(id, name, description)
+    if (isAllFieldsComplete) {
+      updateStockItem(id, name, unit)
       setStockUI("isAdding", false)
       resetFields()
     } else {
@@ -36,7 +35,7 @@ export function AddItem() {
     setTimeout(() => {
       setId("")
       setName("")
-      setDescription("")
+      setUnit("")
     }, 250)
   }
 
@@ -44,7 +43,7 @@ export function AddItem() {
     setStockUI("isAdding", false)
   }
 
-  const inputs = [
+  const inputs: StockItemInputFieldProps[] = [
     {
       label: "Code",
       value: id,
@@ -56,54 +55,72 @@ export function AddItem() {
       onChange: (event: any) => setName(event.target.value),
     },
     {
-      label: "Descr.",
-      value: description,
-      onChange: (event: any) => setDescription(event.target.value),
+      label: "Unit",
+      value: unit,
+      onChange: (event: any) => setUnit(event.target.value),
     },
+  ]
+
+  const actions: ModalActionProps[] = [
+    { iconName: "cancel", handleClick: handleClose },
+    { iconName: "done", handleClick: handleAccept },
   ]
 
   return (
     <Modal
       open={isAdding}
       heading={"Add Stock Item"}
-      body={
-        <Stack
-          width={"100%"}
-          padding={theme.module[3]}
-          boxSizing={"border-box"}
-          gap={theme.module[4]}
-        >
-          <Stack width={"100%"} alignItems={"center"} gap={theme.module[3]}>
-            {inputs.map((input: (typeof inputs)[number], index: number) => {
-              return (
-                <Stack
-                  width={"100%"}
-                  direction={"row"}
-                  alignItems={"center"}
-                  key={index}
-                >
-                  <Typography width={theme.module[7]}>
-                    {input.label}:
-                  </Typography>
-                  <Input
-                    value={input.value}
-                    onChange={input.onChange}
-                    sx={{
-                      background: theme.scale.gray[8],
-                    }}
-                  />
-                </Stack>
-              )
-            })}
-          </Stack>
-        </Stack>
-      }
-      actions={[
-        { iconName: "cancel", handleClick: handleClose },
-        { iconName: "done", handleClick: handleAccept },
-      ]}
+      body={<StockItemInputFields inputs={inputs} />}
+      actions={actions}
       onClose={handleClose}
     />
+  )
+}
+/*
+
+
+
+
+*/
+export type StockItemInputFieldProps = {
+  label: string
+  value: string
+  onChange: (event: any) => void
+}
+
+export function StockItemInputFields(props: {
+  inputs: StockItemInputFieldProps[]
+}) {
+  const theme = useTheme()
+
+  return (
+    <Stack
+      width={"100%"}
+      alignItems={"center"}
+      padding={theme.module[3]}
+      gap={theme.module[3]}
+      boxSizing={"border-box"}
+    >
+      {props.inputs.map((input: StockItemInputFieldProps) => {
+        return (
+          <Stack
+            width={"100%"}
+            direction={"row"}
+            alignItems={"center"}
+            key={input.label}
+          >
+            <Typography width={theme.module[7]}>{input.label}:</Typography>
+            <Input
+              onChange={input.onChange}
+              value={input.value}
+              sx={{
+                background: theme.scale.gray[8],
+              }}
+            />
+          </Stack>
+        )
+      })}
+    </Stack>
   )
 }
 /*

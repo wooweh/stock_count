@@ -11,6 +11,7 @@ import {
 } from "../../components/listItem"
 import { ScrollToTop } from "../../components/scrollToTop"
 import { SearchBar } from "../../components/searchBar"
+import { StockSearchKeys } from "../count/stockCount"
 import {
   addStockUISelectedItem,
   removeStockUISelectedItem,
@@ -37,7 +38,12 @@ export function StockList() {
   const theme = useTheme()
 
   return (
-    <Stack width={"100%"} height={"100%"} gap={theme.module[4]}>
+    <Stack
+      width={"100%"}
+      height={"100%"}
+      gap={theme.module[4]}
+      bgcolor={theme.scale.gray[8]}
+    >
       <Stack
         width={"100%"}
         height={"100%"}
@@ -93,16 +99,18 @@ function StockSearchBar() {
     return (
       <Stack>
         <Typography>{item.name}</Typography>
-        <Typography color={theme.scale.gray[5]}>{item.description}</Typography>
+        <Typography color={theme.scale.gray[5]}>{item.unit}</Typography>
       </Stack>
     )
   }
 
+  const searchKeys: StockSearchKeys[] = ["name", "unit"]
+
   return (
     <SearchBar
-      heading={"Stock List:"}
+      heading={"Stock List"}
       list={stockList}
-      searchKeys={["name", "description"]}
+      searchKeys={searchKeys}
       handleSelect={handleSelect}
       formatResult={formatResult}
     />
@@ -237,7 +245,7 @@ function Body() {
     <Stack
       width={"100%"}
       height={"100%"}
-      padding={theme.module[2]}
+      padding={theme.module[1]}
       boxSizing={"border-box"}
       borderRadius={theme.module[3]}
       boxShadow={theme.shadow.neo[2]}
@@ -278,11 +286,13 @@ function Body() {
                 onClick: () => removeStockItem(id),
               },
             ]
+            const isSelected = _.find(selectedItems, (id) => id === item.id)
+
             return (
               <Stack padding={theme.module[0]} boxSizing={"border-box"}>
                 <SelectableListItemWithOptions
                   label={item.name}
-                  description={item.description}
+                  description={item.unit}
                   iconName={"stock"}
                   options={options}
                   onLongPress={() => {
@@ -292,7 +302,7 @@ function Body() {
                   onSelection={() => addStockUISelectedItem(item.id)}
                   onDeselection={() => removeStockUISelectedItem(item.id)}
                   isSelecting={isSelecting}
-                  isSelected={_.find(selectedItems, (id) => id === item.id)}
+                  isSelected={isSelected}
                 />
               </Stack>
             )
@@ -312,11 +322,11 @@ function Body() {
 function ButtonTray() {
   const theme = useTheme()
 
-  function handleAddClick() {
+  function handleAdd() {
     setStockUI("isAdding", true)
   }
 
-  function handleIsUploading() {
+  function handleUpload() {
     setStockUI("isUploading", true)
   }
 
@@ -331,15 +341,17 @@ function ButtonTray() {
       <Button
         variation={"profile"}
         iconName={"add"}
-        onClick={handleAddClick}
+        onClick={handleAdd}
         bgColor={theme.scale.gray[7]}
+        outlineColor={theme.scale.gray[6]}
         justifyCenter
       />
       <Button
         variation={"profile"}
         iconName={"upload"}
-        onClick={handleIsUploading}
+        onClick={handleUpload}
         bgColor={theme.scale.gray[7]}
+        outlineColor={theme.scale.gray[6]}
         justifyCenter
       />
     </Stack>

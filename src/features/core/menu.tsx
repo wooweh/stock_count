@@ -1,4 +1,4 @@
-import { Divider, PopoverOrigin, Stack } from "@mui/material"
+import { Box, Divider, PopoverOrigin, Stack } from "@mui/material"
 import ButtonBase from "@mui/material/ButtonBase"
 import MuiMenu from "@mui/material/Menu"
 import { useState } from "react"
@@ -101,34 +101,58 @@ export function Menu() {
           height={"100%"}
           padding={theme.module[2]}
           justifyContent={"flex-start"}
-          gap={theme.module[3]}
           boxSizing={"border-box"}
         >
           {menuItems.map((item: MenuItemProps, index: number) => (
-            <>
-              <ListItem
-                label={item.label}
-                primarySlot={<Icon variation={item.iconName} />}
-                secondarySlot={
-                  !index ? (
-                    <Switch value={isDarkmode} onChange={item.onChange} />
-                  ) : undefined
-                }
-                bgColor={theme.scale.gray[!index ? 9 : 7]}
-                onChange={item.onChange}
-                tappable
-                key={index}
-              />
-              {index !== menuItems.length - 1 && (
-                <Divider
-                  sx={{ width: "100%", borderColor: theme.scale.gray[6] }}
-                />
-              )}
-            </>
+            <MenuListitem
+              item={item}
+              control={
+                !index ? (
+                  <Switch value={isDarkmode} onChange={item.onChange} />
+                ) : undefined
+              }
+              divider={index !== menuItems.length - 1}
+              key={index}
+            />
           ))}
         </Stack>
       </MuiMenu>
     </>
+  )
+}
+/*
+
+
+
+
+*/
+type MenuListitemProps = {
+  item: MenuItemProps
+  control?: React.ReactElement
+  divider?: boolean
+}
+function MenuListitem(props: MenuListitemProps) {
+  const theme = useTheme()
+
+  return (
+    <Stack
+      width={"100%"}
+      height={!props.divider ? "min-content" : theme.module[7]}
+      justifyContent={"center"}
+      gap={theme.module[2]}
+    >
+      <ListItem
+        label={props.item.label}
+        primarySlot={<Icon variation={props.item.iconName} />}
+        secondarySlot={props.control}
+        bgColor={theme.scale.gray[props.control ? 9 : 7]}
+        onChange={props.item.onChange}
+        tappable
+      />
+      {props.divider && (
+        <Divider sx={{ width: "100%", borderColor: theme.scale.gray[6] }} />
+      )}
+    </Stack>
   )
 }
 /*

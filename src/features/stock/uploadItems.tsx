@@ -33,7 +33,7 @@ export function UploadItems() {
   }
 
   function handleDownload() {
-    const data = [{ id: "", name: "", description: "" }]
+    const data = [{ id: "", name: "", unit: "" }]
     downloadCSVTemplate(data)
   }
 
@@ -45,7 +45,7 @@ export function UploadItems() {
     {
       width: "min-content",
       align: "left",
-      label: "ID",
+      label: "Code",
       dataKey: "id",
     },
     {
@@ -57,17 +57,16 @@ export function UploadItems() {
     {
       width: "min-content",
       align: "left",
-      label: "Description",
-      dataKey: "description",
+      label: "Unit",
+      dataKey: "unit",
     },
   ]
 
-  const modalActions: ModalActionProps[] = [
+  const actions: ModalActionProps[] = [
     { iconName: "cancel", handleClick: handleClose },
   ]
 
-  if (data.length)
-    modalActions.push({ iconName: "done", handleClick: handleAccept })
+  if (data.length) actions.push({ iconName: "done", handleClick: handleAccept })
 
   return (
     <Modal
@@ -102,7 +101,7 @@ export function UploadItems() {
           )}
         </Stack>
       }
-      actions={modalActions}
+      actions={actions}
       onClose={handleClose}
     />
   )

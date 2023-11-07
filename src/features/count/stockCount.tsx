@@ -64,9 +64,7 @@ export function StockCountBody() {
 
 */
 function SearchControls() {
-  const isAddingStockItem = useCountUI(
-    (state: any) => state.isAddingStockItem,
-  )
+  const isAddingStockItem = useCountUI((state: any) => state.isAddingStockItem)
 
   return isAddingStockItem ? <AddStockItemSearchBar /> : <CountSearchBar />
 }
@@ -77,6 +75,7 @@ function SearchControls() {
 
 
 */
+export type StockSearchKeys = keyof StockItemProps
 function CountSearchBar() {
   const theme = useTheme()
   const countList = useAppSelector(selectUserCountResultsList)
@@ -93,17 +92,19 @@ function CountSearchBar() {
     return (
       <Stack>
         <Typography>{item.name}</Typography>
-        <Typography color={theme.scale.gray[5]}>{item.description}</Typography>
+        <Typography color={theme.scale.gray[5]}>{item.unit}</Typography>
       </Stack>
     )
   }
 
+  const searchKeys: StockSearchKeys[] = ["name", "unit"]
+
   return (
     <Stack width={"100%"}>
       <SearchBar
-        heading={"Count Sheet:"}
+        heading={"Count Sheet"}
         list={countList}
-        searchKeys={["name", "description"]}
+        searchKeys={searchKeys}
         handleSelect={handleSelect}
         formatResult={formatResult}
         placeholder={"Search count sheet"}
@@ -144,7 +145,7 @@ function AddStockItemSearchBar() {
     return (
       <Stack>
         <Typography>{item.name}</Typography>
-        <Typography color={theme.scale.gray[5]}>{item.description}</Typography>
+        <Typography color={theme.scale.gray[5]}>{item.unit}</Typography>
       </Stack>
     )
   }
@@ -272,7 +273,7 @@ function CountSheetListItem({
     <Stack padding={theme.module[0]} boxSizing={"border-box"}>
       <ListItem
         label={item.name}
-        description={item.description}
+        description={item.unit}
         primarySlot={<Icon variation={"stock"} color={theme.scale.blue[7]} />}
         secondarySlot={
           <Button
@@ -489,14 +490,8 @@ function RecordStockItemCountBody({ handleClose }: { handleClose: Function }) {
 
   useEffect(() => {
     if (!!stockItem) {
-      setCountUI(
-        "currentlyViewedStockItemUseableCount",
-        stockItem.useableCount,
-      )
-      setCountUI(
-        "currentlyViewedStockItemDamagedCount",
-        stockItem.damagedCount,
-      )
+      setCountUI("currentlyViewedStockItemUseableCount", stockItem.useableCount)
+      setCountUI("currentlyViewedStockItemDamagedCount", stockItem.damagedCount)
       setCountUI(
         "currentlyViewedStockItemObsoleteCount",
         stockItem.obsoleteCount,

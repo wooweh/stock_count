@@ -6,7 +6,7 @@ import { Input } from "../../components/control"
 import Icon, { IconNames } from "../../components/icon"
 import { ListGroup } from "../../components/list"
 import { ListItem } from "../../components/listItem"
-import Modal from "../../components/modal"
+import Modal, { ModalActionProps } from "../../components/modal"
 import { setOrgUI, useOrgUI } from "./org"
 import { createOrg, joinOrg } from "./orgSliceUtils"
 /*
@@ -101,6 +101,11 @@ function CreateOrg() {
     setOrgUI("isCreating", false)
   }
 
+  const actions: ModalActionProps[] = [
+    { iconName: "cancel", handleClick: handleClose },
+    { iconName: "addOrg", handleClick: handleCreate },
+  ]
+
   return (
     <Modal
       open={isCreating}
@@ -124,10 +129,7 @@ function CreateOrg() {
           />
         </Stack>
       }
-      actions={[
-        { iconName: "cancel", handleClick: handleClose },
-        { iconName: "addOrg", handleClick: handleCreate },
-      ]}
+      actions={actions}
     />
   )
 }
@@ -155,6 +157,11 @@ function JoinOrg() {
     setOrgUI("isJoining", false)
   }
 
+  const actions: ModalActionProps[] = [
+    { iconName: "cancel", handleClick: handleClose },
+    { iconName: "joinGroup", handleClick: handleJoin },
+  ]
+
   return (
     <Modal
       open={isJoining}
@@ -178,10 +185,7 @@ function JoinOrg() {
           />
         </Stack>
       }
-      actions={[
-        { iconName: "cancel", handleClick: handleClose },
-        { iconName: "joinGroup", handleClick: handleJoin },
-      ]}
+      actions={actions}
     />
   )
 }

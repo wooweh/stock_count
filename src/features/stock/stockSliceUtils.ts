@@ -50,12 +50,12 @@ export function removeStockItem(id: string) {
 
 
 */
-export function updateStockItem(id: string, name: string, description: string) {
+export function updateStockItem(id: string, name: string, unit: string) {
   store.dispatch(
     setStockItem({
       id,
       name,
-      description,
+      unit,
     }),
   )
 }

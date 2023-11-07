@@ -14,7 +14,6 @@ import { Input } from "../../components/control"
 import Icon from "../../components/icon"
 import { Loader } from "../../components/loader"
 import { selectIsSystemBooted } from "../core/coreSlice"
-import { generateNotification } from "../core/coreUtils"
 import { Home } from "../core/home"
 import { Route, routePaths } from "../core/pages"
 import { register, resetPassword, signIn } from "./userAuth"
@@ -66,26 +65,31 @@ export function resetAuthUI() {
 
 
 */
-export function WithAuth({ route }: { route: Route }) {
-  const isSignedIn = useAppSelector(selectIsSignedIn)
-  const isSystemBooted = useAppSelector(selectIsSystemBooted)
+export function AuthWrapper({ route }: { route: Route }) {
   const navigate = useNavigate()
 
+  const isSignedIn = useAppSelector(selectIsSignedIn)
+  const isSystemBooted = useAppSelector(selectIsSystemBooted)
+
+  const shouldNavigateHome = isSystemBooted && isSignedIn && !route.requiresAuth
+
   useEffect(() => {
-    if (isSystemBooted && isSignedIn && !route.requiresAuth) {
+    if (shouldNavigateHome) {
       navigate(routePaths.home.path)
     }
-  }, [isSystemBooted, route, navigate, isSignedIn])
+  }, [shouldNavigateHome])
+
+  const shouldNavigateSignIn = !isSignedIn && route.requiresAuth
 
   useEffect(() => {
-    if (!isSignedIn && route.requiresAuth) {
+    if (shouldNavigateSignIn) {
       navigate(routePaths.signIn.path)
     }
-  }, [isSignedIn, route, navigate])
+  }, [shouldNavigateSignIn])
 
-  if (isSystemBooted && !route.requiresAuth) {
+  if (shouldNavigateHome) {
     return <Home />
-  } else if (!isSignedIn && route.requiresAuth) {
+  } else if (shouldNavigateSignIn) {
     return <Authentication />
   } else {
     return route.element
@@ -193,6 +197,7 @@ function Logo() {
 */
 function CredentialInputs() {
   const theme = useTheme()
+
   const email = useAuthUI((state) => state.email)
   const password = useAuthUI((state) => state.password)
 
@@ -231,6 +236,7 @@ function ButtonTray({ isRegistering }: { isRegistering: boolean }) {
   const email = useAuthUI((state) => state.email)
   const password = useAuthUI((state) => state.password)
   const passwordValidation = useAuthUI((state) => state.passwordValidation)
+
   const isPasswordValid = passwordValidation.isValid
   const isDetailsIncomplete =
     (isRegistering && !isPasswordValid) || !email || !password
@@ -251,6 +257,10 @@ function ButtonTray({ isRegistering }: { isRegistering: boolean }) {
     }
   }
 
+  const actionLabel = isRegistering ? "Register" : "Sign in"
+  const navigationLabel = isRegistering ? "Sign in?" : "Register?"
+  const path = routePaths[isRegistering ? "signIn" : "register"].path
+
   return (
     <Stack
       width={"100%"}
@@ -260,19 +270,17 @@ function ButtonTray({ isRegistering }: { isRegistering: boolean }) {
     >
       <Button
         variation={"pill"}
-        label={isRegistering ? "Register" : "Sign in"}
+        label={actionLabel}
         onClick={handleClick}
         disabled={isDetailsIncomplete}
         color={theme.scale.green[6]}
       />
       <Button
         variation={"pill"}
-        label={isRegistering ? "Sign in?" : "Register?"}
-        onClick={() =>
-          navigate(routePaths[isRegistering ? "signIn" : "register"].path)
-        }
-        animationDuration={0}
+        label={navigationLabel}
+        onClick={() => navigate(path)}
         color={theme.scale.blue[6]}
+        animationDuration={0}
       />
     </Stack>
   )
@@ -288,12 +296,10 @@ function ForgotPassword({ isRegistering }: { isRegistering: boolean }) {
   const email = useAuthUI((state) => state.email)
 
   function handleClick() {
-    if (!!email) {
-      resetPassword(email)
-    } else {
-      generateNotification("invalidEmail")
-    }
+    if (!!email) resetPassword(email)
   }
+
+  const isDisabled = !email || isRegistering
 
   return (
     <Stack
@@ -306,7 +312,7 @@ function ForgotPassword({ isRegistering }: { isRegistering: boolean }) {
         variation={"pill"}
         label={"Forgot password"}
         onClick={handleClick}
-        disabled={!email || isRegistering}
+        disabled={isDisabled}
         color={theme.scale.orange[6]}
       />
     </Stack>
@@ -318,6 +324,10 @@ function ForgotPassword({ isRegistering }: { isRegistering: boolean }) {
 
 
 */
+type PasswordCheckProps = {
+  isValid: boolean
+  description: string
+}
 export function PasswordValidationCheck({
   isActive,
   validationReport,
@@ -327,7 +337,7 @@ export function PasswordValidationCheck({
 }) {
   const theme = useTheme()
 
-  const checks = [
+  const checks: PasswordCheckProps[] = [
     {
       isValid: validationReport.minCharCount,
       description: "At least 6 characters long",
@@ -367,7 +377,7 @@ export function PasswordValidationCheck({
           >
             Password Check:
           </Typography>
-          {checks.map((check: (typeof checks)[number], index: number) => {
+          {checks.map((check: PasswordCheckProps, index: number) => {
             return <CheckLineItem key={index} check={check} />
           })}
         </Stack>
@@ -381,12 +391,9 @@ export function PasswordValidationCheck({
 
 
 */
-function CheckLineItem({
-  check,
-}: {
-  check: { isValid: boolean; description: string }
-}) {
+function CheckLineItem({ check }: { check: PasswordCheckProps }) {
   const theme = useTheme()
+
   return (
     <Stack
       width={"100%"}
@@ -416,7 +423,7 @@ function CheckLineItem({
 export function SigningInLoader() {
   const isSigningIn = useAuthUI((state) => state.isSigningIn)
 
-  return isSigningIn ? <Loader narration="signing in" /> : undefined
+  return isSigningIn && <Loader narration="signing in" />
 }
 /*
 
@@ -426,7 +433,6 @@ export function SigningInLoader() {
 */
 export function VerifyEmailPrompt() {
   const theme = useTheme()
-
   const isVerifying = useAuthUI((state) => state.isVerifying)
 
   return (

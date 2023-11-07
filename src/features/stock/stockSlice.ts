@@ -15,7 +15,7 @@ export type SetStockProps = UpdateDB & { stock: StockProps }
 export type StockItemProps = {
   id: string
   name: string
-  description: string
+  unit: string
 }
 export type DeleteStockItemProps = {
   id: string
