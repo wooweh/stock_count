@@ -13,10 +13,8 @@ import { Button } from "../components/button"
 
 */
 type SearchBarProps = {
-  list: any[]
-  searchKeys: string[]
-  handleSelect: (item: any) => void
-  formatResult: (item: any) => JSX.Element
+  list: SearchListProps
+  onSelect: (item: SearchItemProps) => void
   heading?: string
   isOpen?: boolean
   borderColor?: string
@@ -35,15 +33,15 @@ export function SearchBar(props: SearchBarProps) {
   }
 
   function handleSelect(item: any) {
-    props.handleSelect(item)
+    props.onSelect(item)
     setIsSearching(props.isOpen ?? false)
   }
 
   const searchProps = {
     ...props,
     isSearching,
-    handleSelect,
-    handleIconClick,
+    onSelect: handleSelect,
+    onIconClick: handleIconClick,
   }
 
   return (
@@ -117,16 +115,28 @@ function Heading({ heading }: { heading: string | undefined }) {
 */
 type SearchProps = SearchBarProps & {
   isSearching: boolean
-  handleSelect: any
-  handleIconClick: any
+  onSelect: any
+  onIconClick: any
 }
-export type SearchListProps = {
+export type SearchItemProps = {
   id: string
   name: string
   description: string
 }
+export type SearchListProps = SearchItemProps[]
 function Search(props: SearchProps) {
   const theme = useTheme()
+
+  function formatResult(item: SearchItemProps) {
+    return (
+      <Stack>
+        <Typography>{item.name}</Typography>
+        <Typography color={theme.scale.gray[5]}>{item.description}</Typography>
+      </Stack>
+    )
+  }
+
+  const searchKeys = ["name", "description"]
 
   return (
     <Stack
@@ -154,9 +164,9 @@ function Search(props: SearchProps) {
           >
             <ReactSearchAutocomplete
               items={props.list}
-              onSelect={props.handleSelect}
-              fuseOptions={{ threshold: 0.4, keys: props.searchKeys }}
-              formatResult={props.formatResult}
+              onSelect={props.onSelect}
+              fuseOptions={{ threshold: 0.4, keys: searchKeys }}
+              formatResult={formatResult}
               showClear={false}
               maxResults={7}
               placeholder={props.placeholder ?? ""}
@@ -200,7 +210,7 @@ function ToggleButton(props: SearchProps) {
         <Button
           variation={"pill"}
           iconName={props.isSearching ? "cancel" : "search"}
-          onClick={props.handleIconClick}
+          onClick={props.onIconClick}
           outlineColor={props.isSearching ? "none" : theme.scale.gray[7]}
           bgColor={theme.scale.gray[9]}
           iconSize={"small"}
