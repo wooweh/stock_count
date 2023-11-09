@@ -271,7 +271,7 @@ function HomeButton(props: ButtonVariationProps) {
         </Stack>
         <Stack
           padding={theme.module[3]}
-          bgcolor={theme.scale.gray[8]}
+          bgcolor={theme.scale.gray[9]}
           boxSizing={"border-box"}
           width={"100%"}
           borderRadius={theme.module[3]}
@@ -410,6 +410,7 @@ export function NavigationButton(props: NavigationButtonProps) {
 */
 export type ToggleButtonGroupProps = {
   options: ToggleButtonGroupOptionsProps[]
+  initialAlignment?: string
 }
 export type ToggleButtonGroupOptionsProps = {
   label: string
@@ -418,12 +419,9 @@ export type ToggleButtonGroupOptionsProps = {
 }
 export function ToggleButtonGroup(props: ToggleButtonGroupProps) {
   const theme = useTheme()
-  const [alignment, setAlignment] = useState("")
+  const [alignment, setAlignment] = useState(props.initialAlignment ?? "")
 
-  const handleAlignment = (
-    event: React.MouseEvent<HTMLElement>,
-    newAlignment: string | null,
-  ) => {
+  const handleAlignment = (event: any, newAlignment: string | null) => {
     if (newAlignment !== null) {
       setAlignment(newAlignment)
     }
@@ -446,7 +444,7 @@ export function ToggleButtonGroup(props: ToggleButtonGroupProps) {
             disableRipple
             key={option.label}
             sx={{
-              background: theme.scale.gray[7],
+              background: theme.scale.gray[8],
               transition: "background 250ms",
             }}
           >

@@ -6,6 +6,7 @@ import useTheme from "../../common/useTheme"
 import Modal, { ModalActionProps } from "../../components/modal"
 import { leaveCount, removeCount } from "./countSliceUtils"
 import { Steps } from "./steps"
+import { CountTypes } from "./countSlice"
 /*
 
 
@@ -35,7 +36,7 @@ type CountUIState = {
   satisfiedCheckUuids: string[]
   prepCommments: string[]
   finalComments: string[]
-  tempCountType: string
+  tempCountType: CountTypes
 }
 type CountUIKeys = keyof CountUIState
 const initialState: CountUIState = {
@@ -61,7 +62,7 @@ const initialState: CountUIState = {
   satisfiedCheckUuids: [],
   prepCommments: [],
   finalComments: [],
-  tempCountType: "",
+  tempCountType: "solo",
 }
 export const useCountUI = create<CountUIState>()(
   persist(

@@ -48,10 +48,10 @@ export function Review() {
     <Stack
       width={"100%"}
       height={"100%"}
-      padding={`0 ${theme.module[2]}`}
+      padding={`0 ${theme.module[2]} ${theme.module[2]} ${theme.module[2]}`}
       gap={theme.module[2]}
       boxSizing={"border-box"}
-      overflow={"hidden"}
+      flexShrink={10}
     >
       <Header />
       <Body />
@@ -85,7 +85,7 @@ function Header() {
       <Button
         variation={"pill"}
         iconName={"cancel"}
-        bgColor={theme.scale.gray[7]}
+        bgColor={theme.scale.gray[9]}
         onClick={() => setHistoryUI("reviewItemUuid", "")}
         iconSize={"small"}
         outlineColor={theme.scale.gray[6]}
@@ -126,6 +126,7 @@ function Body() {
       boxSizing={"border-box"}
       borderRadius={theme.module[3]}
       bgcolor={theme.scale.gray[9]}
+      flexShrink={10}
       padding={theme.module[2]}
       sx={{
         outline: `1px solid ${theme.scale.gray[7]}`,
@@ -146,7 +147,7 @@ function Body() {
           {_.capitalize(sectionName)}
         </Typography>
       </Stack>
-      <Stack width={"100%"} height={"100%"}>
+      <Stack width={"100%"} height={"100%"} flexShrink={1}>
         {sections[sectionName]}
       </Stack>
     </Stack>
@@ -162,12 +163,7 @@ function Details(props: Required<HistoryItemMetadataProps>) {
   const theme = useTheme()
 
   return (
-    <Stack
-      width={"100%"}
-      height={"100%"}
-      paddingTop={theme.module[2]}
-      boxSizing={"border-box"}
-    >
+    <Stack width={"100%"} height={"100%"} justifyContent={"space-evenly"}>
       <DetailsList {...props} />
       <DurationChart {...props} />
     </Stack>
@@ -180,6 +176,8 @@ function Details(props: Required<HistoryItemMetadataProps>) {
 
 */
 function DetailsList(props: Required<HistoryItemMetadataProps>) {
+  const theme = useTheme()
+
   const members = useAppSelector(selectOrgMembers) as MembersProps
 
   const organizer = members[props.organiser]
@@ -224,7 +222,14 @@ function DetailsList(props: Required<HistoryItemMetadataProps>) {
   ]
 
   return (
-    <Stack width={"100%"}>
+    <Stack
+      width={"100%"}
+      height={"45%"}
+      justifyContent={"flex-start"}
+      padding={theme.module[2]}
+      gap={theme.module[2]}
+      boxSizing={"border-box"}
+    >
       {dataItems.map((item: DataLineItemProps) => (
         <DataLineItem
           label={item.label}
@@ -266,7 +271,16 @@ function DurationChart(props: Required<HistoryItemMetadataProps>) {
     { name: "Finalize", value: finalizeDuration, color: color("orange") },
   ]
 
-  return <PieChart data={data} />
+  return (
+    <Stack
+      width={"100%"}
+      height={"55%"}
+      paddingBottom={theme.module[2]}
+      boxSizing={"border-box"}
+    >
+      <PieChart data={data} />
+    </Stack>
+  )
 }
 /*
 
@@ -349,16 +363,24 @@ function Results(props: Required<HistoryItemResultsProps>) {
 
   return (
     <Stack width={"100%"} height={"100%"} justifyContent={"space-between"}>
-      <VirtualizedTable rows={rows} columns={columns} />
-      <Button
-        variation={"modal"}
-        label={"CSV Download"}
-        iconName={"download"}
-        outlineColor={theme.scale.gray[7]}
-        bgColor={theme.scale.gray[8]}
-        onClick={() => downloadCSVTemplate(rows)}
-        sx={{ borderRadius: theme.module[2], boxShadow: "none" }}
-      />
+      <Stack width={"100%"}>
+        <VirtualizedTable rows={rows} columns={columns} />
+      </Stack>
+      <Stack width={"100%"} padding={theme.module[1]} boxSizing={"border-box"}>
+        <Button
+          variation={"modal"}
+          label={"Download CSV"}
+          iconName={"download"}
+          outlineColor={theme.scale.gray[6]}
+          bgColor={theme.scale.gray[8]}
+          onClick={() => downloadCSVTemplate(rows)}
+          sx={{
+            borderRadius: theme.module[2],
+            boxShadow: "none",
+            padding: theme.module[4],
+          }}
+        />
+      </Stack>
     </Stack>
   )
 }
@@ -393,14 +415,14 @@ function ButtonTray() {
     },
   ]
 
+  const initialAlignment = options[0].label
+
   return (
-    <Stack
-      width={"100%"}
-      height={"min-content"}
-      paddingTop={theme.module[3]}
-      boxSizing={"border-box"}
-    >
-      <ToggleButtonGroup options={options} />
+    <Stack width={"100%"} paddingTop={theme.module[1]} boxSizing={"border-box"}>
+      <ToggleButtonGroup
+        options={options}
+        initialAlignment={initialAlignment}
+      />
     </Stack>
   )
 }

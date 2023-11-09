@@ -63,7 +63,7 @@ export function PieChart({ data }: { data: PieChartDataProps[] }) {
             endAngle={450}
             cx="50%"
             cy="50%"
-            outerRadius={80}
+            outerRadius={85}
             innerRadius={60}
             stroke={theme.scale.gray[3]}
             strokeOpacity={0.5}

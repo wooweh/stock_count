@@ -21,7 +21,7 @@ export function prepareSoloResultsTableRows(
       rows.push({
         id: key,
         name: stock[key].name,
-        description: stock[key].description,
+        unit: stock[key].unit,
         useable: formatCommaSeparatedNumber(value.useableCount),
         damaged: formatCommaSeparatedNumber(value.damagedCount),
         obsolete: formatCommaSeparatedNumber(value.obsoleteCount),
@@ -62,7 +62,7 @@ export function prepareDualResultsTableRows(
       const setInstructions = {
         [`${key}.id`]: key,
         [`${key}.name`]: stock[key].name,
-        [`${key}.description`]: stock[key].description,
+        [`${key}.unit`]: stock[key].unit,
         [`${key}.useable_${counterUuid}`]: formatCommaSeparatedNumber(
           value.useableCount,
         ),
@@ -103,7 +103,7 @@ export function prepareTeamResultsTableRows(
       rows.push({
         id: key,
         name: stock[key].name,
-        description: stock[key].description,
+        unit: stock[key].unit,
         useable: formatCommaSeparatedNumber(value.useableCount),
         damaged: formatCommaSeparatedNumber(value.damagedCount),
         obsolete: formatCommaSeparatedNumber(value.obsoleteCount),
@@ -121,14 +121,7 @@ export function prepareTeamResultsTableRows(
 
 */
 export function prepareSoloResultsTableColumns(): ColumnData[] {
-  const columnIds = [
-    "id",
-    "name",
-    "description",
-    "useable",
-    "damaged",
-    "obsolete",
-  ]
+  const columnIds = ["id", "name", "unit", "useable", "damaged", "obsolete"]
   const columns: ColumnData[] = []
   _.forEach(columnIds, (columnId, index) => {
     columns.push({
@@ -149,7 +142,7 @@ export function prepareSoloResultsTableColumns(): ColumnData[] {
 export function prepareDualResultsTableColumns(
   results: CountResultsProps,
 ): ColumnData[] {
-  const columnIds = ["id", "name", "description"]
+  const columnIds = ["id", "name", "unit"]
   const counterIds = _.keys(results)
   _.forEach(counterIds, (counterId) => {
     columnIds.push(`useable_${counterId}`)
@@ -179,7 +172,7 @@ export function prepareTeamResultsTableColumns(): ColumnData[] {
   const columnIds = [
     "id",
     "name",
-    "description",
+    "unit",
     "useable",
     "damaged",
     "obsolete",

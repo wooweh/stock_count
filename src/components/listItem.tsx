@@ -443,6 +443,7 @@ function ItemOptions(props: ItemOptionsProps) {
         {props.options.map((option: ListItemOptionProps, index: number) => {
           function onClick() {
             if (option.onClick) option.onClick()
+            props.setShow(false)
           }
 
           return (

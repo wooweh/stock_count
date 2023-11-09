@@ -1,4 +1,8 @@
-import { CountMemberProps } from "../count/countSlice"
+import { CountMemberProps, CountMembersProps } from "../count/countSlice"
+import {
+  HistoryItemMemberProps,
+  HistoryItemMembersProps,
+} from "../history/historySlice"
 import { MemberProps, MembersProps } from "./orgSlice"
 
 /*
@@ -20,7 +24,8 @@ export function getInviteKeyValidation(key: string) {
 
 
 */
-export function getMemberShortName(member: MemberProps | CountMemberProps) {
+type NameMemberProps = MemberProps | CountMemberProps | HistoryItemMemberProps
+export function getMemberShortName(member: NameMemberProps) {
   const shortName = `${member.firstName[0]}. ${member.lastName}`
   return shortName
 }
@@ -30,7 +35,14 @@ export function getMemberShortName(member: MemberProps | CountMemberProps) {
 
 
 */
-export function getMembersShortNames(members: MembersProps, uuids: string[]) {
+type NameMembersProps =
+  | MembersProps
+  | CountMembersProps
+  | HistoryItemMembersProps
+export function getMembersShortNames(
+  members: NameMembersProps,
+  uuids: string[],
+) {
   const shortNames = uuids.map(
     (uuid) => `${members[uuid].firstName[0]}. ${members[uuid].lastName}`,
   )
@@ -42,7 +54,7 @@ export function getMembersShortNames(members: MembersProps, uuids: string[]) {
 
 
 */
-export function getMemberName(member: MemberProps | CountMemberProps) {
+export function getMemberName(member: NameMemberProps) {
   const name = `${member.firstName} ${member.lastName}`
   return name
 }

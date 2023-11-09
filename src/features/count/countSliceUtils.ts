@@ -4,6 +4,7 @@ import { store } from "../../app/store"
 import { getTimeStamp } from "../../common/utils"
 import { generateCustomNotification } from "../core/coreUtils"
 import {
+  HistoryItemMembersProps,
   HistoryItemMetadataProps,
   setHistoryItem,
 } from "../history/historySlice"
@@ -211,7 +212,7 @@ export function updateCountMember(
 ) {
   const members = store.getState().count.count.members
   if (members) {
-    const member = { ...members[memberUuid], payload }
+    const member = { ...members[memberUuid], ...payload }
     store.dispatch(setCountMember({ member, updateDB: false }))
   }
 }
@@ -344,11 +345,15 @@ export function submitCount() {
   const metadata = store.getState().count.count
     .metadata as HistoryItemMetadataProps
   const countComments = store.getState().count.count.comments
-  if (!!countResults && !!metadata) {
+  const countMembers = store.getState().count.count.members
+  if (!!countResults && !!metadata && !!countMembers) {
     const uuid = uuidv4()
     const results = prepareFinalResults(countResults)
     const comments = { ...countComments }
-    store.dispatch(setHistoryItem({ uuid, metadata, results, comments }))
+    const members = prepareFinalMembers(countMembers)
+    store.dispatch(
+      setHistoryItem({ uuid, metadata, results, comments, members }),
+    )
     store.dispatch(setCountStep({ step: "dashboard", updateMember: false }))
     store.dispatch(deleteCount())
     generateCustomNotification("success", "Count submitted to History.")
@@ -368,6 +373,22 @@ export function prepareFinalResults(results: CountResultsProps) {
     finalResults = { ...finalResults, ...value }
   })
   return finalResults
+}
+/*
+
+
+
+
+*/
+export function prepareFinalMembers(
+  members: CountMembersProps,
+): HistoryItemMembersProps {
+  const finalMembers = {}
+  _.forIn(members, (value, key) => {
+    const finalMember = _.pick(value, ["uuid", "firstName", "lastName"])
+    _.set(finalMembers, key, finalMember)
+  })
+  return finalMembers
 }
 /*
 

@@ -43,9 +43,9 @@ export function SetupBody() {
   const isSolo = countType === "solo"
 
   const COUNT_TYPE_DESCRIPTIONS: any = {
-    solo: "Solo count: A single counter will count the entire stock holding.",
-    dual: "Dual count: Two counters will each count the entire stock holding and compare results.",
-    team: "Team count: Two or more counters will together count the entire stock holding.",
+    solo: "Solo: A single counter will count the entire stock holding.",
+    dual: "Dual: Two counters will each count the entire stock holding and compare results.",
+    team: "Team: Two or more counters will together count the entire stock holding.",
   }
 
   useEffect(() => {
@@ -64,6 +64,7 @@ export function SetupBody() {
       description: COUNT_TYPE_DESCRIPTIONS[countType ?? "solo"],
       control: (
         <ToggleButtonGroup
+          initialAlignment={"Solo"}
           options={[
             {
               label: "Solo",
@@ -106,11 +107,10 @@ export function SetupBody() {
       control: <CountersList />,
     },
   ]
-  const setupOptions = countType ? options : [options[0]]
 
   return (
     <Stack height={"100%"} gap={theme.module[5]}>
-      {setupOptions.map((option: SetupOptionProps) => (
+      {options.map((option: SetupOptionProps) => (
         <SetupOption
           label={option.label}
           description={option.description}
@@ -185,6 +185,8 @@ function AddMembers() {
     },
   }
   const requirement = counterRequirement[countType ? countType : "solo"]
+  console.log(countType)
+  console.log(requirement)
   const isRequirementMet = requirement.isMet
   const verbose = requirement.verbose
   const warningMessage = `${verbose} required for ${countType} count.`
@@ -378,7 +380,7 @@ function SetupOption(props: SetupOptionProps) {
       <Stack>{props.control}</Stack>
       {!!props.description && (
         <Stack paddingLeft={theme.module[1]}>
-          <Typography color={theme.scale.gray[5]}>
+          <Typography color={theme.scale.gray[5]} fontWeight={"bold"}>
             {props.description}
           </Typography>
         </Stack>

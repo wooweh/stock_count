@@ -40,7 +40,7 @@ function manageSelectedItems(
 
   switch (action.type) {
     case "set":
-      if (ids) return { ...state, selectedItems: [ids] }
+      if (ids) return { ...state, selectedItems: [...ids] }
     case "clear":
       return { ...state, selectedItems: [] }
     case "add":
@@ -93,11 +93,10 @@ export type ManagedListProps = {
   heading: string
   list: SearchListProps
   bulletIconName: IconNames
-  onSearchItemSelect: (item: SearchItemProps) => void
   onDeleteSelection: (itemIds: string[]) => void
   onDeleteAll: () => void
   options: (item: SearchItemProps) => ListItemOptionProps[]
-  bodyPlaceholder: React.ReactElement
+  emptyListPlaceholder: React.FunctionComponent
 }
 export function ManagedList(props: ManagedListProps) {
   const theme = useTheme()
@@ -108,12 +107,14 @@ export function ManagedList(props: ManagedListProps) {
     selectedItems: [],
   })
 
+  const selectedItems = state.selectedItems
   const headerProps: HeaderProps = {
     ...props,
-    selectedItems: state.selectedItems,
+    selectedItems,
     dispatch,
     isSelecting,
     setIsSelecting,
+    setScrollIndex,
   }
   const bodyProps: BodyProps = {
     ...headerProps,
@@ -164,9 +165,19 @@ type HeaderProps = ManagedListProps & {
   dispatch: ManagedListDispatch
   isSelecting: boolean
   setIsSelecting: any
+  setScrollIndex: any
 }
 function Header(props: HeaderProps) {
   const theme = useTheme()
+
+  function handleSelect(item: SearchItemProps) {
+    const selectedItem = item
+    const index = _.findIndex(
+      props.list,
+      (listItem) => listItem.id === selectedItem.id,
+    )
+    props.setScrollIndex(index)
+  }
 
   return (
     <Stack width={"100%"} height={theme.module[6]} flexShrink={0}>
@@ -176,7 +187,7 @@ function Header(props: HeaderProps) {
         <SearchBar
           heading={props.heading}
           list={props.list}
-          onSelect={props.onSearchItemSelect}
+          onSelect={handleSelect}
         />
       )}
     </Stack>
@@ -297,7 +308,7 @@ function Body(props: BodyProps) {
   }
 
   return !props.list.length ? (
-    props.bodyPlaceholder
+    <props.emptyListPlaceholder />
   ) : (
     <Stack
       width={"100%"}
@@ -336,7 +347,7 @@ function Body(props: BodyProps) {
             const options = props.options(item)
             const isSelected = !!_.find(
               props.selectedItems,
-              (id) => id === item.id,
+              (selectedId) => selectedId === item.id,
             )
 
             return (

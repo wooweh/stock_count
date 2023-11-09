@@ -10,8 +10,9 @@ import { Input } from "../../components/control"
 import Icon, { IconNames } from "../../components/icon"
 import { ListItem } from "../../components/listItem"
 import Modal, { ModalActionProps } from "../../components/modal"
-import { SearchBar } from "../../components/searchBar"
+import { SearchBar, SearchItemProps } from "../../components/searchBar"
 import { StockItemProps } from "../stock/stockSlice"
+import { prepareStockSearchList } from "../stock/stockUtils"
 import { selectUserUuid } from "../user/userSlice"
 import { setCountUI, useCountUI } from "./count"
 import {
@@ -77,10 +78,9 @@ function SearchControls() {
 */
 export type StockSearchKeys = keyof StockItemProps
 function CountSearchBar() {
-  const theme = useTheme()
   const countList = useAppSelector(selectUserCountResultsList)
 
-  function handleSelect(item: CountItemProps & StockItemProps) {
+  function handleSelect(item: SearchItemProps) {
     const index = _.findIndex(
       countList,
       (countItem) => countItem.id === item.id,
@@ -88,25 +88,14 @@ function CountSearchBar() {
     setCountUI("scrollIndex", index)
   }
 
-  function formatResult(item: StockItemProps) {
-    return (
-      <Stack>
-        <Typography>{item.name}</Typography>
-        <Typography color={theme.scale.gray[5]}>{item.unit}</Typography>
-      </Stack>
-    )
-  }
-
-  const searchKeys: StockSearchKeys[] = ["name", "unit"]
+  const list = prepareStockSearchList(countList)
 
   return (
     <Stack width={"100%"}>
       <SearchBar
         heading={"Count Sheet"}
-        list={countList}
-        searchKeys={searchKeys}
-        handleSelect={handleSelect}
-        formatResult={formatResult}
+        list={list}
+        onSelect={handleSelect}
         placeholder={"Search count sheet"}
       />
     </Stack>
@@ -127,11 +116,8 @@ function AddStockItemSearchBar() {
   const remainingDualStockList = useAppSelector(selectRemainingDualStockList)
   const countType = useAppSelector(selectCountType) as CountTypes
 
-  const list =
-    countType === "dual" ? remainingDualStockList : remainingStockList
-
-  function handleSelect(selectedItem: any) {
-    const id = selectedItem.id
+  function handleSelect(item: SearchItemProps) {
+    const id = item.id
     addCountResultItem(id, userUuid)
     setCountUI("currentlyViewedStockItemId", id)
     setCountUI("isAddingStockItem", false)
@@ -141,14 +127,9 @@ function AddStockItemSearchBar() {
     setCountUI("isAddingStockItem", false)
   }
 
-  function formatResult(item: StockItemProps) {
-    return (
-      <Stack>
-        <Typography>{item.name}</Typography>
-        <Typography color={theme.scale.gray[5]}>{item.unit}</Typography>
-      </Stack>
-    )
-  }
+  const stockList =
+    countType === "dual" ? remainingDualStockList : remainingStockList
+  const list = prepareStockSearchList(stockList)
 
   return (
     <ClickAwayListener onClickAway={handleClickAway}>
@@ -161,9 +142,7 @@ function AddStockItemSearchBar() {
         <SearchBar
           isOpen
           list={list}
-          searchKeys={["name", "description"]}
-          handleSelect={handleSelect}
-          formatResult={formatResult}
+          onSelect={handleSelect}
           borderColor={theme.scale.blue[6]}
           placeholder={"Search stock items"}
         />
@@ -573,7 +552,7 @@ function RecordStockItemCountBody({ handleClose }: { handleClose: Function }) {
                 Unit:
               </Typography>
               <Typography fontWeight={"bold"} color={theme.scale.gray[4]}>
-                {stockItem.description}
+                {stockItem.unit}
               </Typography>
             </Stack>
           </Stack>

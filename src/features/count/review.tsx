@@ -67,7 +67,7 @@ function OrganiserReviewBody() {
 
   return (
     <>
-      <Stack height={"95%"} gap={theme.module[4]} flexShrink={0}>
+      <Stack height={"100%"} gap={theme.module[4]}>
         <ReviewResultsTable />
         <CounterSummary />
       </Stack>

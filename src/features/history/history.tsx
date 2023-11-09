@@ -1,9 +1,8 @@
 import { Stack } from "@mui/material"
-import _ from "lodash"
 import { create } from "zustand"
 import { createJSONStorage, persist } from "zustand/middleware"
-import { HistoryList } from "./historyList"
 import useTheme from "../../common/useTheme"
+import { HistoryList } from "./historyList"
 import { Review } from "./review"
 /*
 
@@ -12,19 +11,13 @@ import { Review } from "./review"
 
 */
 export type HistoryUIState = {
-  isSelecting: boolean
   reviewItemUuid: string
   reviewSectionName: "details" | "comments" | "results"
-  scrollIndex: number
-  selectedItems: string[]
 }
 type HistoryUIKeys = keyof HistoryUIState
 const initialState: HistoryUIState = {
-  isSelecting: false,
   reviewItemUuid: "",
   reviewSectionName: "details",
-  scrollIndex: 0,
-  selectedItems: [],
 }
 export const useHistoryUI = create<HistoryUIState>()(
   persist(
@@ -40,21 +33,6 @@ export const useHistoryUI = create<HistoryUIState>()(
 
 export function setHistoryUI(path: HistoryUIKeys, value: any) {
   useHistoryUI.setState({ [path]: value })
-}
-export function addHistoryUISelectedItem(id: string) {
-  const selectedItems = useHistoryUI.getState().selectedItems
-  const index = _.indexOf(selectedItems, id)
-  if (index === -1) {
-    const newSelectedItems = [id, ...selectedItems]
-    useHistoryUI.setState({ selectedItems: newSelectedItems })
-  }
-}
-export function removeHistoryUISelectedItem(id: string) {
-  const selectedItems = useHistoryUI.getState().selectedItems
-  const indexToRemove = _.indexOf(selectedItems, id)
-  const newSelectedItems = [...selectedItems]
-  newSelectedItems.splice(indexToRemove, 1)
-  useHistoryUI.setState({ selectedItems: newSelectedItems })
 }
 export function resetHistoryUI() {
   useHistoryUI.setState(initialState)
