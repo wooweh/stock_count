@@ -4,9 +4,9 @@ import { create } from "zustand"
 import { createJSONStorage, persist } from "zustand/middleware"
 import useTheme from "../../common/useTheme"
 import Modal, { ModalActionProps } from "../../components/modal"
+import { CountTypes } from "./countSlice"
 import { leaveCount, removeCount } from "./countSliceUtils"
 import { Steps } from "./steps"
-import { CountTypes } from "./countSlice"
 /*
 
 
@@ -34,7 +34,7 @@ type CountUIState = {
   scrollIndex: number
   selectedMemberUuids: string[]
   satisfiedCheckUuids: string[]
-  prepCommments: string[]
+  prepComments: string[]
   finalComments: string[]
   tempCountType: CountTypes
 }
@@ -60,7 +60,7 @@ const initialState: CountUIState = {
   scrollIndex: 0,
   selectedMemberUuids: [],
   satisfiedCheckUuids: [],
-  prepCommments: [],
+  prepComments: [],
   finalComments: [],
   tempCountType: "solo",
 }
@@ -78,71 +78,59 @@ export function setCountUI(path: CountUIKeys, value: any) {
 }
 export function addCountUISelectedMemberUuid(uuid: string) {
   const uuids = useCountUI.getState().selectedMemberUuids
-  const index = _.indexOf(uuids, uuid)
-  if (index === -1) {
-    const newUuids = [uuid, ...uuids]
-    useCountUI.setState({ selectedMemberUuids: newUuids })
-  }
+  const selectedMemberUuids = _.uniq([uuid, ...uuids])
+  useCountUI.setState({ selectedMemberUuids })
 }
 export function removeCountUISelectedMemberUuid(uuid: string) {
   const uuids = useCountUI.getState().selectedMemberUuids
-  const indexToRemove = _.indexOf(uuids, uuid)
-  const newUuids = [...uuids]
-  newUuids.splice(indexToRemove, 1)
-  useCountUI.setState({ selectedMemberUuids: newUuids })
+  const selectedMemberUuids = _.without(uuids, uuid)
+  useCountUI.setState({ selectedMemberUuids })
 }
 export function addCountUISatisfiedCheckUuid(uuid: string) {
   const uuids = useCountUI.getState().satisfiedCheckUuids
-  const index = _.indexOf(uuids, uuid)
-  if (index === -1) {
-    const newUuids = [uuid, ...uuids]
-    useCountUI.setState({ satisfiedCheckUuids: newUuids })
-  }
+  const satisfiedCheckUuids = _.uniq([uuid, ...uuids])
+  useCountUI.setState({ satisfiedCheckUuids })
 }
 export function removeCountUISatisfiedCheckUuid(uuid: string) {
   const uuids = useCountUI.getState().satisfiedCheckUuids
-  const indexToRemove = _.indexOf(uuids, uuid)
-  const newUuids = [...uuids]
-  newUuids.splice(indexToRemove, 1)
-  useCountUI.setState({ satisfiedCheckUuids: newUuids })
+  const satisfiedCheckUuids = _.without(uuids, uuid)
+  useCountUI.setState({ satisfiedCheckUuids })
 }
 export function addCountUIPrepComment(comment: string) {
-  const comments = useCountUI.getState().prepCommments
-  const newComments = [...comments, comment]
-  useCountUI.setState({ prepCommments: newComments })
+  const comments = useCountUI.getState().prepComments
+  const prepComments = [...comments, comment]
+  useCountUI.setState({ prepComments })
 }
 export function editCountUIPrepComment(index: number, comment: string) {
-  const comments = useCountUI.getState().prepCommments
+  const comments = useCountUI.getState().prepComments
   if (index >= 0 && index < comments.length) {
-    const newComments = [...comments]
-    newComments[index] = comment
-    useCountUI.setState({ prepCommments: newComments })
+    const prepComments = [...comments]
+    prepComments[index] = comment
+    useCountUI.setState({ prepComments })
   }
 }
 export function removeCountUIPrepComment(index: number) {
-  const comments = useCountUI.getState().prepCommments
-  const newComments = [...comments]
-  newComments.splice(index, 1)
-  useCountUI.setState({ prepCommments: newComments })
+  const comments = useCountUI.getState().prepComments
+  const prepComments = [...comments].splice(index, 1)
+  useCountUI.setState({ prepComments })
 }
 export function addCountUIFinalComment(comment: string) {
   const comments = useCountUI.getState().finalComments
-  const newComments = [...comments, comment]
-  useCountUI.setState({ finalComments: newComments })
+  const finalComments = [...comments, comment]
+  useCountUI.setState({ finalComments })
 }
 export function editCountUIFinalComment(index: number, comment: string) {
   const comments = useCountUI.getState().finalComments
   if (index >= 0 && index < comments.length) {
-    const newComments = [...comments]
-    newComments[index] = comment
-    useCountUI.setState({ finalComments: newComments })
+    const finalComments = [...comments]
+    finalComments[index] = comment
+    useCountUI.setState({ finalComments })
   }
 }
 export function removeCountUIFinalComment(index: number) {
   const comments = useCountUI.getState().finalComments
-  const newComments = [...comments]
-  newComments.splice(index, 1)
-  useCountUI.setState({ finalComments: newComments })
+  const finalComments = [...comments].splice(index, 1)
+  useCountUI.setState({ finalComments })
 }
 export function resetCountUI() {
   useCountUI.setState(initialState)

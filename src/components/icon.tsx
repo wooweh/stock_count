@@ -49,7 +49,6 @@ import WarningIcon from "@mui/icons-material/WarningRounded"
 import LightModeIcon from "@mui/icons-material/WbSunnyRounded"
 import StockIcon from "@mui/icons-material/WidgetsRounded"
 import { useAppSelector } from "../app/hooks"
-import { SxProps } from "../common/types"
 import useTheme from "../common/useTheme"
 import { selectIsDarkmode } from "../features/core/coreSlice"
 /*
@@ -116,7 +115,7 @@ type IconProps = {
   color?: string
   transition?: string
   fontSize?: "small" | "medium" | "large"
-  sx?: SxProps
+  sx?: any
 }
 export default function Icon(props: IconProps) {
   const theme = useTheme()

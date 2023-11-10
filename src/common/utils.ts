@@ -2,7 +2,6 @@ import {
   NotificationNames,
   generateNotification,
 } from "../features/core/coreUtils"
-
 /*
 
 
@@ -55,7 +54,6 @@ export function calculateDuration(
   endTimestamp: number,
 ) {
   const durationInMs = endTimestamp - startTimestamp
-
   return durationInMs
 }
 /*

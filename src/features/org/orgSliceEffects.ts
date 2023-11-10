@@ -163,10 +163,10 @@ orgListenerMiddleware.startListening({
     const userUuid = store.getState().user.user.uuid
     const memberUuid = action.payload.memberUuid
     const orgUuid = action.payload.orgUuid
-    const isLeaving = userUuid === memberUuid
+    const isUserLeaving = userUuid === memberUuid
     deleteOrgMemberOnDB(orgUuid, memberUuid)
       .then(() => {
-        if (isLeaving) {
+        if (isUserLeaving) {
           generateNotification("leaveOrg")
         } else {
           generateNotification("deleteOrgMember")

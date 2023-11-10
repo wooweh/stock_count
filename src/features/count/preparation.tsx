@@ -44,7 +44,7 @@ export function PreparationBody() {
 
 */
 function PreparationItems() {
-  const comments = useCountUI((state) => state.prepCommments)
+  const comments = useCountUI((state) => state.prepComments)
   const prepItems: PreparationItemProps[] = [
     {
       label: "Checklist:",
@@ -307,7 +307,7 @@ function StartCountConfirmation() {
 
   const isStartingCount = useCountUI((state: any) => state.isStartingCount)
   const checkUuids = useCountUI((state) => state.satisfiedCheckUuids)
-  const comments = useCountUI((state) => state.prepCommments)
+  const comments = useCountUI((state) => state.prepComments)
 
   const step: CountSteps = isOnlyOrganiser ? "review" : "stockCount"
 

@@ -27,11 +27,9 @@ import { updateUserCountMember } from "./countSliceUtils"
 
 
 
-
 */
 export const countListenerMiddleware = createListenerMiddleware()
 /*
-
 
 
 
@@ -42,13 +40,10 @@ countListenerMiddleware.startListening({
   effect: async (action) => {
     const updateMember = action.payload.updateMember
     const step = action.payload.step
-    if (updateMember) {
-      updateUserCountMember({ step })
-    }
+    if (updateMember) updateUserCountMember({ step })
   },
 })
 /*
-
 
 
 
@@ -57,17 +52,12 @@ countListenerMiddleware.startListening({
 countListenerMiddleware.startListening({
   actionCreator: setCountMember,
   effect: async (action) => {
-    const orgUuid = store.getState().org.org.uuid
-    const members = store.getState().count.count.members
     const updateDB = action.payload.updateDB
     const member = action.payload.member
-    if (!!orgUuid && !!members && !!updateDB) {
-      setCountMemberOnDB(member)
-    }
+    if (updateDB) setCountMemberOnDB(member)
   },
 })
 /*
-
 
 
 
@@ -85,7 +75,6 @@ countListenerMiddleware.startListening({
 
 
 
-
 */
 countListenerMiddleware.startListening({
   actionCreator: setCountResultsItem,
@@ -99,7 +88,6 @@ countListenerMiddleware.startListening({
 
 
 
-
 */
 countListenerMiddleware.startListening({
   actionCreator: deleteCountResultsItem,
@@ -109,7 +97,6 @@ countListenerMiddleware.startListening({
   },
 })
 /*
-
 
 
 
@@ -128,7 +115,6 @@ countListenerMiddleware.startListening({
 
 
 
-
 */
 countListenerMiddleware.startListening({
   actionCreator: setCountMetaData,
@@ -139,7 +125,6 @@ countListenerMiddleware.startListening({
   },
 })
 /*
-
 
 
 
@@ -158,17 +143,15 @@ countListenerMiddleware.startListening({
 
 
 
-
 */
 countListenerMiddleware.startListening({
   actionCreator: deleteCount,
-  effect: async (action) => {
+  effect: async () => {
     const orgUuid = store.getState().org.org.uuid
     if (!!orgUuid) deleteCountOnDB(orgUuid)
   },
 })
 /*
-
 
 
 
