@@ -93,6 +93,7 @@ export const {
   deleteUser,
 } = userSlice.actions
 
+export const userSelector = (state: RootState) => state.user
 export const selectIsSignedIn = (state: RootState) => state.user.isSignedIn
 export const selectUser = (state: RootState) => state.user.user
 export const selectUserName = (state: RootState) => state.user.user.name

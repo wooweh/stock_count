@@ -58,6 +58,7 @@ export const {
   setNotification,
 } = coreSlice.actions
 
+export const coreSelector = (state: RootState) => state.core
 export const selectIsMobile = (state: RootState) => state.core.isMobile
 export const selectIsDarkmode = (state: RootState) => state.core.isDarkmode
 export const selectShowNotification = (state: RootState) =>
