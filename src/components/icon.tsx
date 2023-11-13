@@ -50,7 +50,7 @@ import LightModeIcon from "@mui/icons-material/WbSunnyRounded"
 import StockIcon from "@mui/icons-material/WidgetsRounded"
 import { useAppSelector } from "../app/hooks"
 import useTheme from "../common/useTheme"
-import { selectIsDarkmode } from "../features/core/coreSlice"
+import { selectIsDarkmode } from "../features/core/coreSliceSelectors"
 /*
 
 

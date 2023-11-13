@@ -18,7 +18,7 @@ import {
   selectIsPasswordChangeSuccess,
   selectUserEmail,
   selectUserName,
-} from "./userSlice"
+} from "./userSliceSelectors"
 import { removeUser, updateUserName } from "./userSliceUtils"
 import { checkNewPassword, getPasswordValidation } from "./userUtils"
 /*

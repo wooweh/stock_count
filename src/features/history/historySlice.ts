@@ -1,5 +1,4 @@
-import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit"
-import _ from "lodash"
+import { PayloadAction, createSlice } from "@reduxjs/toolkit"
 import { RootState } from "../../app/store"
 import {
   CountCommentsProps,
@@ -34,7 +33,6 @@ export type HistoryItemMemberProps = {
   firstName: string
   lastName: string
 }
-
 export type DeleteHistoryProps = UpdateDB
 export type DeleteHistoryItemProps = { uuid: string }
 
@@ -73,12 +71,6 @@ export const historySlice = createSlice({
 export const { setHistory, deleteHistory, setHistoryItem, deleteHistoryItem } =
   historySlice.actions
 
-export const selectHistory = (state: RootState) => state.history.history
-export const selectHistoryList = createSelector(selectHistory, (history) =>
-  _.values(history),
-)
-export const selectHistoryIdList = createSelector(selectHistory, (history) =>
-  _.keys(history),
-)
+export const historySelector = (state: RootState) => state.history
 
 export default historySlice.reducer

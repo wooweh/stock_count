@@ -1,9 +1,7 @@
-import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit"
+import { PayloadAction, createSlice } from "@reduxjs/toolkit"
 import _ from "lodash"
 import { RootState } from "../../app/store"
-import { selectOrgMembers } from "../org/orgSlice"
-import { StockItemProps, selectStock } from "../stock/stockSlice"
-import { UpdateDB, selectUserUuid } from "../user/userSlice"
+import { UpdateDB } from "../user/userSlice"
 /*
 
 
@@ -45,12 +43,6 @@ export type CountResultsProps = {
 export type CountMemberResultsProps = {
   [key: string]: CountItemProps
 }
-export type SelectCountMemberResultsProps = {
-  [key: string]: CountItemProps & StockItemProps
-}
-export type SelectCountMemberResultsListProps = (CountItemProps &
-  StockItemProps)[]
-
 export type CountItemProps = {
   id: string
   useableCount: number
@@ -197,175 +189,6 @@ export const {
   deleteCount,
 } = countSlice.actions
 
-export const selectCount = (state: RootState) => state.count.count
-export const selectCountMetadata = (state: RootState) =>
-  state.count.count.metadata
-export const selectCountType = (state: RootState) =>
-  state.count.count.metadata?.type
-export const selectCountStep = (state: RootState) => state.count.step
-export const selectCountChecks = (state: RootState) => state.count.count.checks
-export const selectCountComments = (state: RootState) =>
-  state.count.count.comments
-export const selectCountMembers = (state: RootState) =>
-  state.count.count.members
-export const selectCountResults = (state: RootState) =>
-  state.count.count.results
-export const selectIsCountInProgress = createSelector(
-  selectCount,
-  (count) => count,
-)
-export const selectIsStockCountCompleted = createSelector(
-  selectCountMembers,
-  (members) => {
-    return _.every(members, (value) => {
-      return value.step === "review"
-    })
-  },
-)
-export const selectUserCountMember = createSelector(
-  [selectCountMembers, selectUserUuid],
-  (members, userUuid) => {
-    if (members) {
-      return members[userUuid]
-    }
-  },
-)
-export const selectUserCountMemberStep = createSelector(
-  selectUserCountMember,
-  (member) => {
-    if (member) {
-      const step = member.step
-      return step
-    } else {
-      return "dashboard"
-    }
-  },
-)
-export const selectIsUserAwayFromCount = createSelector(
-  selectUserCountMember,
-  (member) => {
-    if (member) {
-      return member.isJoined && !member.isCounting
-    } else {
-      return false
-    }
-  },
-)
-export const selectOrganiser = createSelector(selectCountMembers, (members) => {
-  const organiser: CountMemberProps[] = []
-  _.forIn(members, (value: CountMemberProps, key) => {
-    if (value.isOrganiser) {
-      organiser.push(value)
-    }
-  })
-  return organiser[0]
-})
-export const selectIsUserOrganiser = createSelector(
-  selectUserCountMember,
-  (user) => user?.isOrganiser,
-)
-export const selectIsUserOnlyOrganiser = createSelector(
-  selectUserCountMember,
-  (user) => user?.isOrganiser && !user.isCounter,
-)
-export const selectIsOrganiserFinalizing = createSelector(
-  selectOrganiser,
-  (organiser) => {
-    if (!!organiser) {
-      return organiser.step === "finalization"
-    } else {
-      return false
-    }
-  },
-)
-export const selectCounters = createSelector(selectCountMembers, (members) => {
-  const counters: CountMembersProps = {}
-  _.forIn(members, (value: CountMemberProps, key) => {
-    if (value.isCounter) {
-      counters[key] = value
-    }
-  })
-  return counters
-})
-export const selectCountersList = createSelector(selectCounters, (counters) => {
-  return _.values(counters)
-})
-export const selectCountersUuidList = createSelector(
-  selectCounters,
-  (counters) => {
-    return _.keys(counters)
-  },
-)
-export const selectAvailableCountersList = createSelector(
-  [selectOrgMembers, selectCounters],
-  (orgMembers, counters) => {
-    const countMembersKeys = _.keys(counters)
-    const availableOrgMembers = _.omit(orgMembers, countMembersKeys)
-    return _.values(availableOrgMembers)
-  },
-)
-export const selectIsCountInvitePending = createSelector(
-  [selectUserUuid, selectCountMembers],
-  (userUuid, members) => {
-    if (!!members) {
-      const user = members[userUuid as string]
-      return !!user && !user.isJoined
-    } else {
-      return false
-    }
-  },
-)
-export const selectCountResultsStockIdsList = createSelector(
-  selectCountResults,
-  (results) => {
-    const ids: string[] = []
-    _.forIn(results, (value, key) => {
-      _.forIn(value, (value, key) => {
-        if (!ids.includes(key)) ids.push(key)
-      })
-    })
-    return ids
-  },
-)
-export const selectUserCountResults = createSelector(
-  [selectCountResults, selectUserUuid, selectStock],
-  (results, userUuid, stock) => {
-    const modifiedUserResults = {} as SelectCountMemberResultsProps
-    if (!!results) {
-      const userResults = { ...results[userUuid] }
-      _.forIn(userResults, (value, key) => {
-        const name = _.get(stock[value.id], "name")
-        const description = _.get(stock[value.id], "description")
-        _.set(modifiedUserResults, `${key}`, { ...value })
-        _.set(modifiedUserResults, `${key}.name`, name)
-        _.set(modifiedUserResults, `${key}.description`, description)
-      })
-    }
-    return modifiedUserResults
-  },
-)
-export const selectUserCountResultsList = createSelector(
-  selectUserCountResults,
-  (results) => {
-    return _.values(results)
-  },
-)
-export const selectRemainingStockList = createSelector(
-  [selectStock, selectCountResultsStockIdsList],
-  (stock, ids) => {
-    return _.filter(stock, (value, key) => !ids.includes(key))
-  },
-)
-export const selectRemainingDualStockList = createSelector(
-  [selectStock, selectUserCountResults],
-  (stock, results) => {
-    const ids = _.keys(results)
-    return _.filter(stock, (value, key) => !ids.includes(key))
-  },
-)
-export const selectIsUserCounting = createSelector(selectCountStep, (step) => {
-  const countingSteps: CountSteps[] = ["stockCount", "review", "finalization"]
-  return countingSteps.includes(step)
-})
+export const countSelector = (state: RootState) => state.count
 
 export default countSlice.reducer

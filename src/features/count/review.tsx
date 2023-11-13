@@ -5,22 +5,25 @@ import useTheme from "../../common/useTheme"
 import Icon from "../../components/icon"
 import Modal, { ModalActionProps } from "../../components/modal"
 import VirtualizedTable from "../../components/table"
-import { MembersProps, selectOrgMembers } from "../org/orgSlice"
+import { MembersProps } from "../org/orgSlice"
+import { selectOrgMembers } from "../org/orgSliceSelectors"
 import { getMemberShortName } from "../org/orgUtils"
-import { selectStock } from "../stock/stockSlice"
+import { selectStock } from "../stock/stockSliceSelectors"
 import { setCountUI, useCountUI } from "./count"
 import {
   CountMemberResultsProps,
   CountMembersProps,
   CountResultsProps,
   CountTypes,
+} from "./countSlice"
+import {
   selectCountMembers,
   selectCountResults,
   selectCountType,
   selectIsOrganiserFinalizing,
   selectIsStockCountCompleted,
   selectIsUserOrganiser,
-} from "./countSlice"
+} from "./countSliceSelectors"
 import { completeReview } from "./countSliceUtils"
 import {
   prepareDualResultsTableColumnGroups,

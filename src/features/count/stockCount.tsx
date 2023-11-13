@@ -13,19 +13,19 @@ import Modal, { ModalActionProps } from "../../components/modal"
 import { SearchBar, SearchItemProps } from "../../components/searchBar"
 import { StockItemProps } from "../stock/stockSlice"
 import { prepareStockSearchList } from "../stock/stockUtils"
-import { selectUserUuid } from "../user/userSlice"
-import { setCountUI, useCountUI } from "./count"
 import {
-  CountItemProps,
-  CountTypes,
-  SelectCountMemberResultsListProps,
-  SelectCountMemberResultsProps,
+  selectUserUuid,
+  selectUserUuidString,
+} from "../user/userSliceSelectors"
+import { setCountUI, useCountUI } from "./count"
+import { CountItemProps, CountTypes } from "./countSlice"
+import {
   selectCountType,
+  selectModifiedUserCountResults,
+  selectModifiedUserCountResultsList,
   selectRemainingDualStockList,
   selectRemainingStockList,
-  selectUserCountResults,
-  selectUserCountResultsList,
-} from "./countSlice"
+} from "./countSliceSelectors"
 import {
   addCountResultItem,
   removeCountResultsItem,
@@ -78,7 +78,7 @@ function SearchControls() {
 */
 export type StockSearchKeys = keyof StockItemProps
 function CountSearchBar() {
-  const countList = useAppSelector(selectUserCountResultsList)
+  const countList = useAppSelector(selectModifiedUserCountResultsList)
 
   function handleSelect(item: SearchItemProps) {
     const index = _.findIndex(
@@ -175,12 +175,8 @@ function AddStockItemSearchBar() {
 */
 function CountSheet() {
   const theme = useTheme()
-  const countList = useAppSelector(
-    selectUserCountResultsList,
-  ) as SelectCountMemberResultsListProps
-
+  const countList = useAppSelector(selectModifiedUserCountResultsList)
   const scrollIndex = useCountUI((state: any) => state.scrollIndex)
-
   const virtuoso: any = useRef(null)
 
   useEffect(() => {
@@ -449,10 +445,8 @@ function RecordStockItemCount() {
 function RecordStockItemCountBody({ handleClose }: { handleClose: Function }) {
   const theme = useTheme()
 
-  const memberUuid = useAppSelector(selectUserUuid)
-  const stock: SelectCountMemberResultsProps = useAppSelector(
-    selectUserCountResults,
-  )
+  const userUuid = useAppSelector(selectUserUuidString)
+  const stock = useAppSelector(selectModifiedUserCountResults)
 
   const id = useCountUI((state: any) => state.currentlyViewedStockItemId)
   const useableCount = useCountUI(
@@ -481,7 +475,7 @@ function RecordStockItemCountBody({ handleClose }: { handleClose: Function }) {
   function handleDelete() {
     handleClose()
     setTimeout(() => {
-      removeCountResultsItem(id, memberUuid)
+      removeCountResultsItem(id, userUuid)
     }, 250)
   }
 

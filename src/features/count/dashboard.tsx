@@ -1,4 +1,5 @@
 import { ClickAwayListener, Stack, Typography } from "@mui/material"
+import _ from "lodash"
 import { useState } from "react"
 import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
@@ -6,14 +7,14 @@ import { Button } from "../../components/button"
 import { Input } from "../../components/control"
 import Icon from "../../components/icon"
 import Modal, { ModalActionProps } from "../../components/modal"
-import { selectOrgCountChecksList } from "../org/orgSlice"
-import { selectIsUserAdmin } from "../user/userSlice"
+import { selectOrgCountChecksList } from "../org/orgSliceSelectors"
+import { selectIsUserAdmin } from "../user/userSliceSelectors"
 import { resetCountUI, setCountUI, useCountUI } from "./count"
 import {
   selectIsCountInvitePending,
   selectIsUserAwayFromCount,
   selectUserCountMemberStep,
-} from "./countSlice"
+} from "./countSliceSelectors"
 import {
   createCountCheck,
   removeCountCheck,
@@ -21,7 +22,6 @@ import {
   updateCountStep,
   updateUserCountMember,
 } from "./countSliceUtils"
-import _ from "lodash"
 /*
 
 

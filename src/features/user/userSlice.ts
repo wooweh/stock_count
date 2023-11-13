@@ -94,33 +94,5 @@ export const {
 } = userSlice.actions
 
 export const userSelector = (state: RootState) => state.user
-export const selectIsSignedIn = (state: RootState) => state.user.isSignedIn
-export const selectUser = (state: RootState) => state.user.user
-export const selectUserName = (state: RootState) => state.user.user.name
-export const selectUserEmail = (state: RootState) => state.user.user.email
-export const selectUserUuid = (state: RootState) =>
-  state.user.user.uuid as string
-export const selectUserOrgDetails = (state: RootState) => state.user.user.org
-export const selectUserOrgUuid = (state: RootState) => state.user.user.org?.uuid
-export const selectIsLocalUserOrgDetails = createSelector(
-  [selectUserOrgDetails],
-  (org: any) => {
-    if (!!org) {
-      return !!org.role && !!org.uuid
-    } else {
-      return false
-    }
-  },
-)
-export const selectIsPasswordChangeFailed = (state: RootState) =>
-  state.user.passwordChangeStatus === "isFailed"
-export const selectIsPasswordChangeSuccess = (state: RootState) =>
-  state.user.passwordChangeStatus === "isSuccess"
-export const selectIsPasswordChangePending = (state: RootState) =>
-  state.user.passwordChangeStatus === "isPending"
-export const selectIsUserAdmin = (state: RootState) =>
-  state.user.user.org?.role === "admin"
-export const selectIsProfileComplete = (state: RootState) =>
-  state.user.user.name?.first && state.user.user.name.last
 
 export default userSlice.reducer

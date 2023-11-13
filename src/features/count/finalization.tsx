@@ -17,13 +17,13 @@ import {
   setCountUI,
   useCountUI,
 } from "./count"
+import { CountMetadataProps } from "./countSlice"
 import {
-  CountMetadataProps,
   selectCountMetadata,
   selectCountType,
   selectCountersList,
   selectOrganiser,
-} from "./countSlice"
+} from "./countSliceSelectors"
 import { submitCount } from "./countSliceUtils"
 import {
   CommentsList,

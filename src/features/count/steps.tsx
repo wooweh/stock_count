@@ -8,9 +8,8 @@ import Animation from "../../components/animation"
 import { Button } from "../../components/button"
 import { IconNames } from "../../components/icon"
 import { setCountUI, useCountUI } from "./count"
+import { CountSteps, CountTypes } from "./countSlice"
 import {
-  CountSteps,
-  CountTypes,
   selectCountStep,
   selectCountersUuidList,
   selectIsOrganiserFinalizing,
@@ -18,7 +17,7 @@ import {
   selectIsUserCounting,
   selectIsUserOnlyOrganiser,
   selectIsUserOrganiser,
-} from "./countSlice"
+} from "./countSliceSelectors"
 import {
   createCountMetadata,
   updateCountComments,

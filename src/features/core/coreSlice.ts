@@ -59,20 +59,5 @@ export const {
 } = coreSlice.actions
 
 export const coreSelector = (state: RootState) => state.core
-export const selectIsMobile = (state: RootState) => state.core.isMobile
-export const selectIsDarkmode = (state: RootState) => state.core.isDarkmode
-export const selectShowNotification = (state: RootState) =>
-  state.core.showNotification
-export const selectNotification = (state: RootState) => state.core.notificaiton
-export const selectIsSystemBooted = (state: RootState) =>
-  state.core.systemStatus === "isBooted"
-export const selectIsSystemBooting = (state: RootState) =>
-  state.core.systemStatus === "isBooting"
-export const selectIsSystemActive = createSelector(
-  [selectIsSystemBooted, selectIsSystemBooting],
-  (isBooted, isBooting) => {
-    return isBooted || isBooting
-  },
-)
 
 export default coreSlice.reducer

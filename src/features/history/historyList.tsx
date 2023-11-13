@@ -5,7 +5,7 @@ import { ListItemOptionProps } from "../../components/listItem"
 import { ManagedList } from "../../components/managedList"
 import { SearchItemProps } from "../../components/searchBar"
 import { setHistoryUI } from "./history"
-import { selectHistoryList } from "./historySlice"
+import { selectHistoryList } from "./historySliceSelectors"
 import {
   removeHistory,
   removeHistoryItem,

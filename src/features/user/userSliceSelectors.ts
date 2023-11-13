@@ -51,6 +51,16 @@ export const selectUserUuid = createSelector(
 
 
 */
+export const selectUserUuidString = createSelector(
+  [selectUserUuid],
+  (uuid) => uuid as string,
+)
+/*
+
+
+
+
+*/
 export const selectUserOrgDetails = createSelector(
   [userSelector],
   (user) => user.user.org,
@@ -70,22 +80,6 @@ export const selectUserOrgUuid = createSelector(
 
 
 
-*/
-export const selectIsLocalUserOrgDetails = createSelector(
-  [selectUserOrgDetails],
-  (org: any) => {
-    if (!!org) {
-      return !!org.role && !!org.uuid
-    } else {
-      return false
-    }
-  },
-)
-/*
-    
-    
-    
-    
 */
 export const selectPasswordChangeStatus = createSelector(
   [userSelector],

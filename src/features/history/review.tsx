@@ -24,17 +24,18 @@ import {
   DataLineItemProps,
   DataPill,
 } from "../count/finalization"
-import { MembersProps, selectOrgMembers } from "../org/orgSlice"
+import { MembersProps } from "../org/orgSlice"
+import { selectOrgMembers } from "../org/orgSliceSelectors"
 import { getMemberShortName, getMembersShortNames } from "../org/orgUtils"
-import { selectStock } from "../stock/stockSlice"
+import { selectStock } from "../stock/stockSliceSelectors"
 import { HistoryUIState, setHistoryUI, useHistoryUI } from "./history"
 import {
   HistoryItemCommentsProps,
   HistoryItemMetadataProps,
   HistoryItemProps,
   HistoryItemResultsProps,
-  selectHistory,
 } from "./historySlice"
+import { selectHistory } from "./historySliceSelectors"
 /*
 
 

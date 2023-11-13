@@ -16,14 +16,13 @@ import {
   setCountUI,
   useCountUI,
 } from "./count"
+import { CountMemberProps, CountTypes } from "./countSlice"
 import {
-  CountMemberProps,
-  CountTypes,
   selectAvailableCountersList,
   selectCounters,
   selectCountersList,
   selectCountersUuidList,
-} from "./countSlice"
+} from "./countSliceSelectors"
 import {
   prepareCountMembers,
   removeCountMember,

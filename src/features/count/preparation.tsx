@@ -9,7 +9,7 @@ import Icon from "../../components/icon"
 import { List } from "../../components/list"
 import { ListItem } from "../../components/listItem"
 import Modal, { ModalActionProps } from "../../components/modal"
-import { selectOrgCountChecksList } from "../org/orgSlice"
+import { selectOrgCountChecksList } from "../org/orgSliceSelectors"
 import {
   addCountUIPrepComment,
   addCountUISatisfiedCheckUuid,
@@ -19,7 +19,8 @@ import {
   setCountUI,
   useCountUI,
 } from "./count"
-import { CountSteps, selectIsUserOnlyOrganiser } from "./countSlice"
+import { CountSteps } from "./countSlice"
+import { selectIsUserOnlyOrganiser } from "./countSliceSelectors"
 import { startCount } from "./countSliceUtils"
 /*
 

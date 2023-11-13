@@ -78,9 +78,7 @@ export const selectIsSystemBooting = createSelector(
 */
 export const selectIsSystemActive = createSelector(
   [selectIsSystemBooted, selectIsSystemBooting],
-  (isBooted, isBooting) => {
-    return isBooted || isBooting
-  },
+  (isBooted, isBooting) => isBooted || isBooting,
 )
 /*
 

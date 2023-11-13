@@ -1,7 +1,7 @@
 import { useMemo } from "react"
 import { z } from "zod"
 import { useAppSelector } from "../app/hooks"
-import { selectIsDarkmode } from "../features/core/coreSlice"
+import { selectIsDarkmode } from "../features/core/coreSliceSelectors"
 import colorScales from "./colorScales"
 
 export const GOLDEN_RATIO = 1.618

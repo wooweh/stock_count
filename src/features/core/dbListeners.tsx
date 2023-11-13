@@ -11,11 +11,13 @@ import {
   CountMemberResultsProps,
   CountMembersProps,
   CountMetadataProps,
+} from "../count/countSlice"
+import {
   selectCountMembers,
   selectCountMetadata,
   selectCountersUuidList,
   selectIsUserOrganiser,
-} from "../count/countSlice"
+} from "../count/countSliceSelectors"
 import {
   removeCount,
   updateCountChecks,
@@ -26,13 +28,18 @@ import {
 } from "../count/countSliceUtils"
 import { HistoryProps } from "../history/historySlice"
 import { updateHistory } from "../history/historySliceUtils"
-import { OrgProps, selectOrgUuid } from "../org/orgSlice"
+import { OrgProps } from "../org/orgSlice"
+import { selectOrgUuid } from "../org/orgSliceSelectors"
 import { leaveOrg, updateMemberStatus, updateOrg } from "../org/orgSliceUtils"
 import { StockProps } from "../stock/stockSlice"
 import { updateStock } from "../stock/stockSliceUtils"
-import { UserProps, selectUserOrgUuid, selectUserUuid } from "../user/userSlice"
+import { UserProps } from "../user/userSlice"
+import { selectUserOrgUuid, selectUserUuid } from "../user/userSliceSelectors"
 import { updateUser } from "../user/userSliceUtils"
-import { selectIsSystemActive, selectIsSystemBooting } from "./coreSlice"
+import {
+  selectIsSystemActive,
+  selectIsSystemBooting,
+} from "./coreSliceSelectors"
 import { setSystemIsBooted } from "./coreSliceUtils"
 import { routePaths } from "./pages"
 /*
@@ -97,14 +104,14 @@ export function UserDBListener() {
 export function OrgDBListener() {
   const isSystemActive = useAppSelector(selectIsSystemActive)
   const userUuid = useAppSelector(selectUserUuid)
-  const orgUuid = useAppSelector(selectUserOrgUuid)
+  const userOrgUuid = useAppSelector(selectUserOrgUuid)
   const localOrgUuid = useAppSelector(selectOrgUuid)
 
-  const isSafeToSync = !!userUuid && !!orgUuid && isSystemActive
+  const isSafeToSync = !!userUuid && !!userOrgUuid && isSystemActive
 
   useEffect(() => {
     if (isSafeToSync) {
-      const dbOrgRef = ref(dbReal, getDBPath.org(orgUuid).org)
+      const dbOrgRef = ref(dbReal, getDBPath.org(userOrgUuid).org)
       onValue(dbOrgRef, (snapshot) => {
         const dbOrg: OrgProps = snapshot.val()
         const isUserMember = !!dbOrg.members![userUuid]
@@ -117,7 +124,7 @@ export function OrgDBListener() {
         if (shouldUpdateOrg) {
           updateOrg(dbOrg)
         }
-        const shouldLeaveOrg = (!dbOrg || !isUserMember) && !!orgUuid
+        const shouldLeaveOrg = (!dbOrg || !isUserMember) && !!userOrgUuid
         if (shouldLeaveOrg) {
           leaveOrg()
         }

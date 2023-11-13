@@ -53,13 +53,7 @@ export const stockSlice = createSlice({
 export const { setStockItem, deleteStockItem, setStock, deleteStock } =
   stockSlice.actions
 
-export const selectStock = (state: RootState) => state.stock.stock
-export const selectStockList = createSelector([selectStock], (stock) =>
-  _.values(stock),
-)
-export const selectStockIdList = createSelector([selectStock], (stock) =>
-  _.keys(stock),
-)
+export const stockSelector = (state: RootState) => state.stock
 
 export default stockSlice.reducer
 /*

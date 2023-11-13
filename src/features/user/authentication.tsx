@@ -13,11 +13,11 @@ import { Button } from "../../components/button"
 import { Input } from "../../components/control"
 import Icon from "../../components/icon"
 import { Loader } from "../../components/loader"
-import { selectIsSystemBooted } from "../core/coreSlice"
+import { selectIsSystemBooted } from "../core/coreSliceSelectors"
 import { Home } from "../core/home"
 import { Route, routePaths } from "../core/pages"
 import { register, resetPassword, signIn } from "./userAuth"
-import { selectIsSignedIn } from "./userSlice"
+import { selectIsSignedIn } from "./userSliceSelectors"
 import {
   PasswordValidationReturnProps,
   getPasswordValidation,

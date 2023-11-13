@@ -1,6 +1,6 @@
 import { Global, css } from "@emotion/react"
 import { useAppSelector } from "../app/hooks"
-import { selectIsMobile } from "../features/core/coreSlice"
+import { selectIsMobile } from "../features/core/coreSliceSelectors"
 import useTheme from "./useTheme"
 
 export default function GlobalStyles() {

@@ -18,7 +18,7 @@ import {
 } from "../../components/listItem"
 import Modal, { ModalActionProps } from "../../components/modal"
 import { ProfileSurface } from "../../components/profileSurface"
-import { selectIsUserAdmin } from "../user/userSlice"
+import { selectIsUserAdmin } from "../user/userSliceSelectors"
 import { setOrgUI, useOrgUI } from "./org"
 import {
   InviteProps,
@@ -280,7 +280,7 @@ function InvitesList() {
       open={isViewingInvites}
       heading={"Invites"}
       body={
-        invites?.length ? (
+        invites.length ? (
           <List>
             {invites.map((invite: InviteProps, index: number) => {
               return <InviteListItem invite={invite} key={index} />
