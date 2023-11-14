@@ -21,6 +21,7 @@ import {
 } from "./userSliceSelectors"
 import { removeUser, updateUserName } from "./userSliceUtils"
 import { checkNewPassword, getPasswordValidation } from "./userUtils"
+import _ from "lodash"
 /*
 
 
@@ -329,15 +330,13 @@ function ChangePassword() {
 
   function handleClose() {
     setUserUI("isChangingPassword", false)
-    resetInputs()
+    _.delay(resetInputs, 250)
   }
 
   function resetInputs() {
-    setTimeout(() => {
-      setPassword("")
-      setNewPassword("")
-      setConfiredNewPassword("")
-    }, 250)
+    setPassword("")
+    setNewPassword("")
+    setConfiredNewPassword("")
   }
 
   const inputs: PasswordInputsProps[] = [

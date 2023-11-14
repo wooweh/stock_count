@@ -2,6 +2,7 @@ import { Stack, Typography } from "@mui/material"
 import ButtonBase from "@mui/material/ButtonBase"
 import MuiToggleButton from "@mui/material/ToggleButton"
 import MuiToggleButtonGroup from "@mui/material/ToggleButtonGroup"
+import _ from "lodash"
 import { useState } from "react"
 import useTheme from "../common/useTheme"
 import Icon, { IconNames } from "./icon"
@@ -44,14 +45,14 @@ export function Button(props: ButtonProps) {
   const [isThrottled, setIsThrottled] = useState(false)
   const duration = props.animationDuration ? props.animationDuration : 150
 
-  if (isThrottled) setTimeout(() => setIsThrottled(false), duration)
+  if (isThrottled) _.delay(() => setIsThrottled(false), duration)
 
   function handleClick() {
     if (!isThrottled) {
       setIsThrottled(true)
       setIsPressed(true)
-      setTimeout(() => setIsPressed(false), duration / 2)
-      setTimeout(() => props.onClick(), duration + 50)
+      _.delay(() => setIsPressed(false), duration / 2)
+      _.delay(() => props.onClick(), duration + 50)
     }
   }
 

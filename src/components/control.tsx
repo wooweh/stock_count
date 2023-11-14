@@ -74,9 +74,20 @@ export function Input(props: InputProps) {
   const theme = useTheme()
 
   const [showPassword, setShowPassword] = useState(false)
+  const [showPlaceholder, setShowPlaceholder] = useState(true)
 
   function handleClickShowPassword() {
     setShowPassword((show) => !show)
+  }
+
+  function handleFocus() {
+    setShowPlaceholder(false)
+    props.onFocus && props.onFocus()
+  }
+
+  function handleBlur() {
+    setShowPlaceholder(true)
+    props.onBlur && props.onBlur()
   }
 
   const type = props.isNumber
@@ -87,18 +98,20 @@ export function Input(props: InputProps) {
       : "password"
     : "text"
 
+  const placeholder = showPlaceholder ? props.placeholder : ""
+
   return (
     <MuiInput
       fullWidth={true}
       autoFocus={props.autoFocus}
       type={type}
-      placeholder={props.placeholder}
+      placeholder={placeholder}
       onChange={props.onChange}
       value={props.value}
       disabled={props.disabled}
       multiline={props.multiline}
-      onFocus={props.onFocus}
-      onBlur={props.onBlur}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
       readOnly={props.readOnly}
       inputProps={props.inputProps}
       spellCheck={!!props.spellCheck}

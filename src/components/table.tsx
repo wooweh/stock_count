@@ -43,7 +43,7 @@ export default function VirtualizedTable(props: VirtualizedTableProps) {
     TableBody: React.forwardRef<HTMLTableSectionElement>((props, ref) => (
       <TableBody
         {...props}
-        sx={{ paddingTop: theme.module[0], overflow: "hidden" }}
+        sx={{ paddingTop: theme.module[0], overflow: "hidden", background: theme.scale.gray[9] }}
         ref={ref}
       />
     )),
@@ -54,12 +54,12 @@ export default function VirtualizedTable(props: VirtualizedTableProps) {
     outline: `1px solid ${theme.scale.gray[8]}`,
   }
   const headerCellStyles = {
-    outline: `1px solid ${theme.scale.gray[8]}`,
+    outline: `1px solid ${theme.scale.gray[7]}`,
     boxSizing: "border-box",
     width: "min-content",
     padding: theme.module[2],
     color: theme.scale.gray[4],
-    background: theme.scale.gray[9],
+    background: theme.scale.gray[8],
     border: 0,
   }
   function fixedHeaderContent() {

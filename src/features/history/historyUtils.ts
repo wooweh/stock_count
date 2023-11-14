@@ -17,7 +17,7 @@ export function prepareHistorySearchList(
     const members = item.members
     const organiser = members[item.metadata.organiser]
     const organiserName = getMemberName(organiser)
-    const description = `Organizer: ${organiserName}`
+    const description = `Organizer - ${organiserName}`
     const searchItem: SearchItemProps = { id, name, description }
     return searchItem
   })

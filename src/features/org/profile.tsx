@@ -20,13 +20,12 @@ import Modal, { ModalActionProps } from "../../components/modal"
 import { ProfileSurface } from "../../components/profileSurface"
 import { selectIsUserAdmin } from "../user/userSliceSelectors"
 import { setOrgUI, useOrgUI } from "./org"
+import { InviteProps, MemberProps } from "./orgSlice"
 import {
-  InviteProps,
-  MemberProps,
   selectOrgInvitesList,
   selectOrgName,
   selectOtherOrgMembersList,
-} from "./orgSlice"
+} from "./orgSliceSelectors"
 import {
   createInvite,
   leaveOrg,
@@ -348,11 +347,7 @@ function NewInvite() {
   }, [isInviting])
 
   useEffect(() => {
-    if (isCopied) {
-      setTimeout(() => {
-        setIsCopied(false)
-      }, 2000)
-    }
+    if (isCopied) _.delay(() => setIsCopied(false), 2000)
   }, [isCopied])
 
   function handleClose() {

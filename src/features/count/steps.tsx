@@ -283,9 +283,7 @@ function OptionsTray() {
 
   function handleCancel() {
     setIsOpen(false)
-    setTimeout(() => {
-      setCountUI("isCountOptionsOpen", false)
-    }, 150)
+    _.delay(() => setCountUI("isCountOptionsOpen", false), 150)
   }
 
   function handleLeave() {

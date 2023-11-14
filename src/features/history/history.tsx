@@ -34,6 +34,7 @@ export const useHistoryUI = create<HistoryUIState>()(
 export function setHistoryUI(path: HistoryUIKeys, value: any) {
   useHistoryUI.setState({ [path]: value })
 }
+
 export function resetHistoryUI() {
   useHistoryUI.setState(initialState)
 }
@@ -44,10 +45,19 @@ export function resetHistoryUI() {
 
 */
 export function History() {
-  const isReviewing = useHistoryUI(
+  const isReviewing = !!useHistoryUI(
     (state: HistoryUIState) => state.reviewItemUuid,
   )
-  return <Outer>{!!isReviewing ? <Review /> : <HistoryList />}</Outer>
+
+  function HistoryBody() {
+    return isReviewing ? <Review /> : <HistoryList />
+  }
+
+  return (
+    <Outer>
+      <HistoryBody />
+    </Outer>
+  )
 }
 /*
 

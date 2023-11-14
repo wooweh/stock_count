@@ -1,3 +1,4 @@
+import _ from "lodash"
 import { store } from "../../app/store"
 import { setCount } from "../count/countSlice"
 import { setMemberStatus, setOrg } from "../org/orgSlice"
@@ -71,7 +72,7 @@ export function toggleMobile(width: number) {
 export function showNotification(notificaiton: NotificationProps) {
   store.dispatch(setShowNotification(true))
   store.dispatch(setNotification(notificaiton))
-  resetShowNotification()
+  _.delay(() => resetShowNotification(), 250)
 }
 /*
 
@@ -80,10 +81,8 @@ export function showNotification(notificaiton: NotificationProps) {
 
 */
 function resetShowNotification() {
-  setTimeout(() => {
-    store.dispatch(setShowNotification(false))
-    store.dispatch(setNotification(undefined))
-  }, 250)
+  store.dispatch(setShowNotification(false))
+  store.dispatch(setNotification(undefined))
 }
 /*
 

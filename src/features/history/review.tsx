@@ -43,8 +43,26 @@ import { selectHistory } from "./historySliceSelectors"
 
 */
 export function Review() {
-  const theme = useTheme()
+  return (
+    <Outer>
+      <Header />
+      <Body />
+      <ButtonTray />
+    </Outer>
+  )
+}
+/*
 
+
+
+
+*/
+function Outer({
+  children,
+}: {
+  children: React.ReactElement | React.ReactElement[]
+}) {
+  const theme = useTheme()
   return (
     <Stack
       width={"100%"}
@@ -54,9 +72,7 @@ export function Review() {
       boxSizing={"border-box"}
       flexShrink={10}
     >
-      <Header />
-      <Body />
-      <ButtonTray />
+      {children}
     </Stack>
   )
 }
@@ -89,7 +105,7 @@ function Header() {
         bgColor={theme.scale.gray[9]}
         onClick={() => setHistoryUI("reviewItemUuid", "")}
         iconSize={"small"}
-        outlineColor={theme.scale.gray[6]}
+        outlineColor={theme.scale.red[7]}
         sx={{ padding: theme.module[3], boxShadow: theme.shadow.neo[3] }}
       />
     </Stack>
@@ -144,7 +160,11 @@ function Body() {
           outlineOffset: "-1px",
         }}
       >
-        <Typography fontWeight={"bold"} textAlign={"center"}>
+        <Typography
+          fontWeight={"bold"}
+          textAlign={"center"}
+          color={theme.scale.gray[4]}
+        >
           {_.capitalize(sectionName)}
         </Typography>
       </Stack>

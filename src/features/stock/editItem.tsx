@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-import useTheme from "../../common/useTheme"
 import Modal, { ModalActionProps } from "../../components/modal"
 import { StockItemInputFieldProps, StockItemInputFields } from "./addItem"
 import { setStockUI, useStockUI } from "./stock"

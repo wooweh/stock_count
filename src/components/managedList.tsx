@@ -302,9 +302,7 @@ function Body(props: BodyProps) {
 
   function handleScrollToTopClick() {
     props.setScrollIndex(1)
-    setTimeout(() => {
-      props.setScrollIndex(0)
-    }, 50)
+    _.delay(() => props.setScrollIndex(0), 50)
   }
 
   return !props.list.length ? (

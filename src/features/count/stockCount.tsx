@@ -409,9 +409,7 @@ function RecordStockItemCount() {
 
   function handleClose() {
     setIsOpen(false)
-    setTimeout(() => {
-      setCountUI("currentlyViewedStockItemId", false)
-    }, 250)
+    _.delay(() => setCountUI("currentlyViewedStockItemId", false), 250)
   }
 
   const actions: ModalActionProps[] = [
@@ -474,9 +472,7 @@ function RecordStockItemCountBody({ handleClose }: { handleClose: Function }) {
 
   function handleDelete() {
     handleClose()
-    setTimeout(() => {
-      removeCountResultsItem(id, userUuid)
-    }, 250)
+    _.delay(() => removeCountResultsItem(id, userUuid), 250)
   }
 
   function setUseableCount(count: number) {

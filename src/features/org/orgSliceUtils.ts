@@ -1,3 +1,4 @@
+import _ from "lodash"
 import { v4 as uuidv4 } from "uuid"
 import { store } from "../../app/store"
 import { generateCustomNotification } from "../core/coreUtils"
@@ -83,9 +84,7 @@ export function joinOrg(inviteKey: string) {
       })
       .then((org: OrgProps) => {
         store.dispatch(setOrg({ org, updateDB: false }))
-        setTimeout(() => {
-          store.dispatch(setMemberStatus("isJoined"))
-        }, 1000)
+        _.delay(() => store.dispatch(setMemberStatus("isJoined")), 1000)
         store.dispatch(deleteInvite({ inviteKey }))
         generateCustomNotification("success", `You have joined ${org.name}`)
         return { isJoined: true }
@@ -96,7 +95,6 @@ export function joinOrg(inviteKey: string) {
         return { isJoined: false }
       })
   } else {
-    console.log(isInviteKeyValid)
     generateCustomNotification("error", "Invite key is invalid.")
     return { isJoined: false }
   }

@@ -1,4 +1,5 @@
 import { User, deleteUser as deleteUserOnAuth } from "firebase/auth"
+import _ from "lodash"
 import { store } from "../../app/store"
 import { auth } from "../../remote"
 import { generateErrorNotification } from "../core/coreUtils"
@@ -91,7 +92,7 @@ export function removeUserOrgDetails() {
 
 */
 export function resetPasswordChangeStatus() {
-  setTimeout(() => updateUserPasswordChangeStatus("notChanged"), 250)
+  _.delay(() => updateUserPasswordChangeStatus("notChanged"), 250)
 }
 /*
 

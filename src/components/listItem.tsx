@@ -8,6 +8,7 @@ import useTheme from "../common/useTheme"
 import { Button } from "./button"
 import Icon, { IconNames } from "./icon"
 import { ListGroupContext } from "./list"
+import _ from "lodash"
 /* 
 
 
@@ -198,7 +199,6 @@ function SecondarySlot(props: {
       justifyContent={"center"}
       minWidth={theme.module[7]}
       sx={{
-        // width: "50%",
         "&: hover": {
           filter: "brightness(1.15)",
         },
@@ -231,12 +231,13 @@ function ItemBody(props: {
           fontWeight={"bold"}
           maxWidth={props.noWrap ? `calc(${theme.module[8]} * 2)` : "100%"}
           noWrap={props.noWrap}
-        >
+          >
           {props.label}
         </Typography>
         <Typography
           variant="body2"
-          color={theme.scale.gray[4]}
+          fontWeight={"bold"}
+          color={theme.scale.gray[5]}
           maxWidth={props.secondarySlot ? theme.module[9] : "none"}
           noWrap
         >
@@ -322,10 +323,7 @@ export function SelectableListItemWithOptions(
 
   useEffect(() => {
     if (!props.isSelecting) setIsLongPressing(true)
-    if (props.isSelecting)
-      setTimeout(() => {
-        setIsLongPressing(false)
-      }, 500)
+    if (props.isSelecting) _.delay(() => setIsLongPressing(false), 500)
   }, [props.isSelecting])
 
   return props.isSelecting ? (

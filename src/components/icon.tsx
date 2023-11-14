@@ -115,6 +115,7 @@ type IconProps = {
   color?: string
   transition?: string
   fontSize?: "small" | "medium" | "large"
+  fontWeight?: "normal" | "bold"
   sx?: any
 }
 export default function Icon(props: IconProps) {
@@ -129,6 +130,7 @@ export default function Icon(props: IconProps) {
     settings: (
       <SettingsIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -139,6 +141,7 @@ export default function Icon(props: IconProps) {
     colorTheme: isDarkmode ? (
       <DarkModeIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -148,6 +151,7 @@ export default function Icon(props: IconProps) {
     ) : (
       <LightModeIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -158,6 +162,7 @@ export default function Icon(props: IconProps) {
     home: (
       <HomeIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -168,6 +173,7 @@ export default function Icon(props: IconProps) {
     stock: (
       <StockIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -178,6 +184,7 @@ export default function Icon(props: IconProps) {
     menu: (
       <MenuIcon
         fontSize={props.fontSize ? props.fontSize : "medium"}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -188,6 +195,7 @@ export default function Icon(props: IconProps) {
     add: (
       <AddIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -198,6 +206,7 @@ export default function Icon(props: IconProps) {
     history: (
       <HistoryIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -208,6 +217,7 @@ export default function Icon(props: IconProps) {
     timeline: (
       <TimelineIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -218,6 +228,7 @@ export default function Icon(props: IconProps) {
     list: (
       <ListIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -228,6 +239,7 @@ export default function Icon(props: IconProps) {
     profile: (
       <ProfileIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -238,6 +250,7 @@ export default function Icon(props: IconProps) {
     signOut: (
       <SignOutIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -248,6 +261,7 @@ export default function Icon(props: IconProps) {
     invite: (
       <InviteIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -258,6 +272,7 @@ export default function Icon(props: IconProps) {
     edit: (
       <EditIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -268,6 +283,7 @@ export default function Icon(props: IconProps) {
     options: (
       <OptionsIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -278,6 +294,7 @@ export default function Icon(props: IconProps) {
     copy: (
       <CopyIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -288,6 +305,7 @@ export default function Icon(props: IconProps) {
     key: (
       <KeyIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -298,6 +316,7 @@ export default function Icon(props: IconProps) {
     admin: (
       <AdminIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -308,6 +327,7 @@ export default function Icon(props: IconProps) {
     visible: (
       <VisibilityIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -318,6 +338,7 @@ export default function Icon(props: IconProps) {
     notVisible: (
       <VisibilityOffIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -328,6 +349,7 @@ export default function Icon(props: IconProps) {
     upload: (
       <UploadIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -338,6 +360,7 @@ export default function Icon(props: IconProps) {
     search: (
       <SearchIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -348,6 +371,7 @@ export default function Icon(props: IconProps) {
     backArrow: (
       <ArrowBackIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -358,6 +382,7 @@ export default function Icon(props: IconProps) {
     org: (
       <OrgIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -368,6 +393,7 @@ export default function Icon(props: IconProps) {
     group: (
       <GroupIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -378,6 +404,7 @@ export default function Icon(props: IconProps) {
     download: (
       <DownloadIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -388,6 +415,7 @@ export default function Icon(props: IconProps) {
     arrowRight: (
       <ArrowRightIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -398,6 +426,7 @@ export default function Icon(props: IconProps) {
     arrowLeft: (
       <ArrowLeftIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -408,6 +437,7 @@ export default function Icon(props: IconProps) {
     submit: (
       <SubmitIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -418,6 +448,7 @@ export default function Icon(props: IconProps) {
     notification: (
       <NotificationIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -428,6 +459,7 @@ export default function Icon(props: IconProps) {
     addMembers: (
       <AddMembersIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -438,6 +470,7 @@ export default function Icon(props: IconProps) {
     obsolete: (
       <ObsoleteIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -448,6 +481,7 @@ export default function Icon(props: IconProps) {
     step: (
       <StepIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -458,6 +492,7 @@ export default function Icon(props: IconProps) {
     dual: (
       <DualIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -468,6 +503,7 @@ export default function Icon(props: IconProps) {
     date: (
       <CalendarIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -478,6 +514,7 @@ export default function Icon(props: IconProps) {
     time: (
       <TimeIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -488,6 +525,7 @@ export default function Icon(props: IconProps) {
     clipboard: (
       <ClipboardIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -498,6 +536,7 @@ export default function Icon(props: IconProps) {
     checklist: (
       <ChecklistIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -508,6 +547,7 @@ export default function Icon(props: IconProps) {
     comments: (
       <CommentsIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -518,6 +558,7 @@ export default function Icon(props: IconProps) {
     scrollToTop: (
       <ScrollToTopIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -529,6 +570,7 @@ export default function Icon(props: IconProps) {
     useable: (
       <UseableIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -539,6 +581,7 @@ export default function Icon(props: IconProps) {
     damaged: (
       <DamagedIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -549,6 +592,7 @@ export default function Icon(props: IconProps) {
     warning: (
       <WarningIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -559,6 +603,7 @@ export default function Icon(props: IconProps) {
     joinGroup: (
       <GroupIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -569,6 +614,7 @@ export default function Icon(props: IconProps) {
     addOrg: (
       <AddOrgIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -579,6 +625,7 @@ export default function Icon(props: IconProps) {
     checked: (
       <CheckedIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -589,6 +636,7 @@ export default function Icon(props: IconProps) {
     unchecked: (
       <UncheckedIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -599,6 +647,7 @@ export default function Icon(props: IconProps) {
     done: (
       <DoneIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -609,6 +658,7 @@ export default function Icon(props: IconProps) {
     cancel: (
       <ClearIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -619,6 +669,7 @@ export default function Icon(props: IconProps) {
     delete: (
       <DeleteIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,
@@ -629,6 +680,7 @@ export default function Icon(props: IconProps) {
     leave: (
       <LeaveIcon
         fontSize={fontSize}
+        fontWeight={props.fontWeight}
         sx={{
           ...styles,
           ...props.sx,

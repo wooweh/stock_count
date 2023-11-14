@@ -84,7 +84,9 @@ export default function Modal(props: ModalProps) {
             boxShadow={theme.shadow.neo[4]}
             boxSizing={"border-box"}
           >
-            <Typography>{props.heading}</Typography>
+            <Typography fontWeight={"bold"} color={theme.scale.gray[5]}>
+              {props.heading}
+            </Typography>
           </Stack>
           <Stack
             alignItems={"center"}
@@ -107,6 +109,7 @@ export default function Modal(props: ModalProps) {
                 <Button
                   variation={"modal"}
                   iconName={action.iconName}
+                  outlineColor={theme.scale.gray[6]}
                   onClick={action.handleClick}
                   key={index}
                 />

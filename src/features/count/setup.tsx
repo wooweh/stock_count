@@ -201,7 +201,7 @@ function AddMembers() {
   function handleAccept() {
     if (isRequirementMet) {
       setCountUI("isAddingMembers", false)
-      setTimeout(() => prepareCountMembers(selectedMemberUuids), 150)
+      _.delay(() => prepareCountMembers(selectedMemberUuids), 150)
     } else {
       generateCustomNotification("warning", warningMessage)
     }

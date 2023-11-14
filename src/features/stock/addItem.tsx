@@ -1,4 +1,5 @@
 import { Stack, Typography } from "@mui/material"
+import _ from "lodash"
 import { useState } from "react"
 import useTheme from "../../common/useTheme"
 import { Input } from "../../components/control"
@@ -25,37 +26,39 @@ export function AddItem() {
     if (isAllFieldsComplete) {
       updateStockItem(id, name, unit)
       setStockUI("isAdding", false)
-      resetFields()
+      _.delay(resetFields, 250)
     } else {
       generateCustomNotification("error", "Please complete all fields.")
     }
   }
 
-  function resetFields() {
-    setTimeout(() => {
-      setId("")
-      setName("")
-      setUnit("")
-    }, 250)
+  function handleClose() {
+    setStockUI("isAdding", false)
+    _.delay(resetFields, 250)
   }
 
-  function handleClose(event: any) {
-    setStockUI("isAdding", false)
+  function resetFields() {
+    setId("")
+    setName("")
+    setUnit("")
   }
 
   const inputs: StockItemInputFieldProps[] = [
     {
       label: "Code",
+      placeholder: "COFF01",
       value: id,
       onChange: (event: any) => setId(event.target.value),
     },
     {
       label: "Name",
+      placeholder: "Coffee Beans",
       value: name,
       onChange: (event: any) => setName(event.target.value),
     },
     {
       label: "Unit",
+      placeholder: "grams",
       value: unit,
       onChange: (event: any) => setUnit(event.target.value),
     },
@@ -84,6 +87,7 @@ export function AddItem() {
 */
 export type StockItemInputFieldProps = {
   label: string
+  placeholder?: string
   value: string
   onChange: (event: any) => void
 }
@@ -98,28 +102,48 @@ export function StockItemInputFields(props: {
       width={"100%"}
       alignItems={"center"}
       padding={theme.module[3]}
+      paddingRight={theme.module[2]}
       gap={theme.module[3]}
       boxSizing={"border-box"}
     >
-      {props.inputs.map((input: StockItemInputFieldProps) => {
-        return (
-          <Stack
-            width={"100%"}
-            direction={"row"}
-            alignItems={"center"}
-            key={input.label}
-          >
-            <Typography width={theme.module[7]}>{input.label}:</Typography>
-            <Input
-              onChange={input.onChange}
-              value={input.value}
-              sx={{
-                background: theme.scale.gray[8],
-              }}
-            />
-          </Stack>
-        )
-      })}
+      {props.inputs.map((input: StockItemInputFieldProps) => (
+        <StockItemInputField key={input.label} {...input} />
+      ))}
+    </Stack>
+  )
+}
+/*
+
+
+
+
+*/
+function StockItemInputField(props: StockItemInputFieldProps) {
+  const theme = useTheme()
+
+  return (
+    <Stack
+      width={"100%"}
+      direction={"row"}
+      alignItems={"center"}
+      gap={theme.module[1]}
+      key={props.label}
+    >
+      <Typography
+        width={theme.module[7]}
+        fontWeight={"bold"}
+        color={theme.scale.gray[4]}
+      >
+        {props.label}:
+      </Typography>
+      <Input
+        onChange={props.onChange}
+        value={props.value}
+        placeholder={props.placeholder}
+        sx={{
+          background: theme.scale.gray[8],
+        }}
+      />
     </Stack>
   )
 }
