@@ -1,5 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit"
 import _ from "lodash"
+import { selectOrgMembers } from "../org/orgSliceSelectors"
 import { StockItemProps, StockProps } from "../stock/stockSlice"
 import { selectStock } from "../stock/stockSliceSelectors"
 import { selectUserUuidString } from "../user/userSliceSelectors"
@@ -8,7 +9,6 @@ import {
   CountMemberResultsProps,
   CountResultsProps,
   CountSteps,
-  SelectCountMemberResultsProps,
   countSelector,
 } from "./countSlice"
 
@@ -139,8 +139,8 @@ export const selectOrganiser = createSelector(
     
 */
 export const selectIsUserOrganiser = createSelector(
-  [selectUserCountMember],
-  (user) => !!user?.isOrganiser,
+  [selectCountMetadata, selectUserUuidString],
+  (metadata, userUuid) => metadata?.organiser === userUuid,
 )
 /*
         
@@ -148,9 +148,19 @@ export const selectIsUserOrganiser = createSelector(
         
         
 */
-export const selectIsUserOnlyOrganiser = createSelector(
-  [selectUserCountMember],
-  (user) => user?.isOrganiser && !user.isCounter,
+export const selectIsUserCounter = createSelector(
+  [selectCountMetadata, selectUserUuidString],
+  (metadata, userUuid) => !!metadata?.counters.includes(userUuid),
+)
+/*
+        
+        
+        
+        
+*/
+export const selectIsUserJustOrganiser = createSelector(
+  [selectIsUserOrganiser, selectIsUserCounter],
+  (isOrganiser, isCounter) => isOrganiser && !isCounter,
 )
 /*
            
@@ -196,19 +206,11 @@ export const selectCountersUuidList = createSelector(
                     
                     
 */
-const selectCountMembersUuidList = createSelector(
-  [selectCountMembers],
-  (members) => _.keys(members),
-)
-/*
-                    
-                    
-                    
-                    
-*/
 const selectAvailableCounters = createSelector(
-  [selectCountMembers, selectCountMembersUuidList],
-  (orgMembers, counterUuids) => _.omit(orgMembers, counterUuids),
+  [selectOrgMembers, selectCountersUuidList],
+  (orgMembers, counterUuids) => {
+    return _.omit(orgMembers, counterUuids)
+  },
 )
 /*
                     
@@ -229,6 +231,19 @@ export const selectAvailableCountersList = createSelector(
 export const selectIsCountInvitePending = createSelector(
   [selectUserCountMember],
   (user) => !!user && !user.isJoined,
+)
+/*
+                            
+                            
+                            
+                            
+*/
+export const selectIsCountInProgress = createSelector(
+  [selectCountMetadata],
+  (metadata) =>
+    !!metadata?.counters.length &&
+    !!metadata?.organiser &&
+    !!metadata?.countStartTime,
 )
 /*
                             

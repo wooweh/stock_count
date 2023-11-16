@@ -7,7 +7,7 @@ import { getTimeStamp } from "../../common/utils"
 import Animation from "../../components/animation"
 import { Button } from "../../components/button"
 import { IconNames } from "../../components/icon"
-import { setCountUI, useCountUI } from "./count"
+import { resetCountUI, setCountUI, useCountUI } from "./count"
 import { CountSteps, CountTypes } from "./countSlice"
 import {
   selectCountStep,
@@ -15,11 +15,12 @@ import {
   selectIsOrganiserFinalizing,
   selectIsStockCountCompleted,
   selectIsUserCounting,
-  selectIsUserOnlyOrganiser,
+  selectIsUserJustOrganiser,
   selectIsUserOrganiser,
 } from "./countSliceSelectors"
 import {
   createCountMetadata,
+  removeCountMembers,
   updateCountComments,
   updateCountMetadata,
   updateCountStep,
@@ -47,7 +48,7 @@ export function Steps() {
   const counterUuids = useAppSelector(selectCountersUuidList)
   const isCountCompleted = useAppSelector(selectIsStockCountCompleted)
   const isOrganiser = useAppSelector(selectIsUserOrganiser)
-  const isOnlyOrganiser = useAppSelector(selectIsUserOnlyOrganiser)
+  const isJustOrganiser = useAppSelector(selectIsUserJustOrganiser)
   const isFinalizing = useAppSelector(selectIsOrganiserFinalizing)
 
   const countType = useCountUI((state) => state.tempCountType) as CountTypes
@@ -59,15 +60,22 @@ export function Steps() {
   )
   const finalComments = useCountUI((state) => state.finalComments)
 
+  const shouldUpdateReviewMetadata =
+    isCountCompleted && isOrganiser && !isReviewMetadataSubmitted
+
   useEffect(() => {
-    if (isCountCompleted && isOrganiser && !isReviewMetadataSubmitted) {
-      updateCountMetadata({ reviewStartTime: getTimeStamp() }, true)
-      setCountUI("isReviewMetadataSubmitted", true)
-    }
-  }, [isCountCompleted, isReviewMetadataSubmitted, isOrganiser])
+    if (shouldUpdateReviewMetadata) updateReviewMetadata()
+  }, [shouldUpdateReviewMetadata])
+
+  function updateReviewMetadata() {
+    updateCountMetadata({ reviewStartTime: getTimeStamp() }, true)
+    setCountUI("isReviewMetadataSubmitted", true)
+  }
 
   function handleSetupPrev() {
     updateCountStep("dashboard")
+    removeCountMembers()
+    resetCountUI()
   }
 
   function handleSetupNext() {
@@ -140,7 +148,7 @@ export function Steps() {
     },
   }
 
-  if (!isOnlyOrganiser && !isFinalizing)
+  if (!isJustOrganiser && !isFinalizing)
     _.set(countSteps, "review.prevButton", {
       label: "Count",
       onClick: handleReviewPrev,
@@ -296,6 +304,12 @@ function OptionsTray() {
     handleCancel()
   }
 
+  function handleManage() {
+    // TODO: implement
+    // setCountUI("isManagingCount", true)
+    // handleCancel()
+  }
+
   useEffect(() => {
     if (!isOpen) {
       setIsOpen(isOptionsOpen)
@@ -315,11 +329,18 @@ function OptionsTray() {
   ]
 
   if (isOrganiser) {
-    options.unshift({
-      label: "Delete",
-      iconName: "delete",
-      onClick: handleDelete,
-    })
+    options.unshift(
+      {
+        label: "Manage",
+        iconName: "settings",
+        onClick: handleManage,
+      },
+      {
+        label: "Delete",
+        iconName: "delete",
+        onClick: handleDelete,
+      },
+    )
   }
 
   return (
@@ -334,7 +355,7 @@ function OptionsTray() {
       >
         <Animation
           from={{ opacity: 0, width: "8.5rem" }}
-          to={{ opacity: 1, width: isOrganiser ? "15rem" : "8.5rem" }}
+          to={{ opacity: 1, width: isOrganiser ? "20rem" : "8.5rem" }}
           duration={150}
           start={isOpen}
         >

@@ -17,29 +17,24 @@ import { IconNames } from "./icon"
 export type ModalActionProps = {
   iconName: IconNames
   handleClick: Function
+  isDisabled?: boolean
 }
 type ModalProps = {
   open: boolean
   heading: string
   body: React.ReactElement
   actions?: ModalActionProps[]
-  onClose: Function
+  onClose?: Function
 }
 export default function Modal(props: ModalProps) {
   const theme = useTheme()
   const [open, setOpen] = useState(false)
-  /*
-  
 
-  */
   function handleClose() {
     setOpen(false)
-    props.onClose()
+    props.onClose && props.onClose()
   }
-  /*
-  
 
-  */
   useEffect(() => {
     setOpen(props.open)
   }, [props.open])
@@ -108,6 +103,7 @@ export default function Modal(props: ModalProps) {
               props.actions.map((action, index) => (
                 <Button
                   variation={"modal"}
+                  disabled={action.isDisabled}
                   iconName={action.iconName}
                   outlineColor={theme.scale.gray[6]}
                   onClick={action.handleClick}

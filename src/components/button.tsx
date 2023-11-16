@@ -47,12 +47,13 @@ export function Button(props: ButtonProps) {
 
   if (isThrottled) _.delay(() => setIsThrottled(false), duration)
 
-  function handleClick() {
+  function handleClick(e: any) {
+    e.nativeEvent.stopImmediatePropagation()
     if (!isThrottled) {
       setIsThrottled(true)
       setIsPressed(true)
       _.delay(() => setIsPressed(false), duration / 2)
-      _.delay(() => props.onClick(), duration + 50)
+      _.delay(() => props.onClick(e), duration + 50)
     }
   }
 
@@ -317,7 +318,7 @@ function PillButton(props: ButtonVariationProps) {
 
   return (
     <ButtonBase
-      onMouseDown={props.onClick}
+      onClick={props.onClick}
       disabled={props.disabled ?? false}
       disableRipple
       disableTouchRipple
@@ -338,6 +339,9 @@ function PillButton(props: ButtonVariationProps) {
                 ? theme.scale.gray[4]
                 : props.color ?? theme.scale.gray[4]
             }
+            lineHeight={"1.5rem"}
+            fontSize={"small"}
+            fontWeight={"bold"}
           >
             {props.label}
           </Typography>

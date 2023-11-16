@@ -1,4 +1,5 @@
 import { Stack, Typography } from "@mui/material"
+import _ from "lodash"
 import { useEffect } from "react"
 import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
@@ -11,6 +12,7 @@ import { generateCustomNotification } from "../core/coreUtils"
 import { MemberProps } from "../org/orgSlice"
 import { getMemberName, getMemberShortName } from "../org/orgUtils"
 import {
+  CountUIState,
   addCountUISelectedMemberUuid,
   removeCountUISelectedMemberUuid,
   setCountUI,
@@ -19,7 +21,6 @@ import {
 import { CountMemberProps, CountTypes } from "./countSlice"
 import {
   selectAvailableCountersList,
-  selectCounters,
   selectCountersList,
   selectCountersUuidList,
 } from "./countSliceSelectors"
@@ -27,7 +28,6 @@ import {
   prepareCountMembers,
   removeCountMember,
   removeCountMembers,
-  updateCountMember,
 } from "./countSliceUtils"
 /*
 
@@ -36,20 +36,59 @@ import {
 
 */
 export function SetupBody() {
+  return (
+    <Outer>
+      <SetupOptions />
+      <AddMembers />
+      <WarningBox />
+    </Outer>
+  )
+}
+/*
+
+
+
+
+*/
+function Outer({
+  children,
+}: {
+  children: React.ReactElement | React.ReactElement[]
+}) {
   const theme = useTheme()
+  return (
+    <Stack height={"100%"} gap={theme.module[5]}>
+      {children}
+    </Stack>
+  )
+}
+/*
+
+
+
+
+*/
+function SetupOptions() {
+  const theme = useTheme()
+
   const counterUuids = useAppSelector(selectCountersUuidList)
-  const countType = useCountUI((state: any) => state.tempCountType)
-  const isSolo = countType === "solo"
+
+  const countType = useCountUI((state: CountUIState) => state.tempCountType)
+  const selectedMemberUuids = useCountUI(
+    (state: any) => state.selectedMemberUuids,
+  )
 
   const COUNT_TYPE_DESCRIPTIONS: any = {
     solo: "Solo: A single counter will count the entire stock holding.",
     dual: "Dual: Two counters will each count the entire stock holding and compare results.",
     team: "Team: Two or more counters will together count the entire stock holding.",
   }
+  const isSolo = countType === "solo"
 
   useEffect(() => {
-    setCountUI("selectedMemberUuids", counterUuids)
-  }, [counterUuids])
+    if (!selectedMemberUuids.length)
+      setCountUI("selectedMemberUuids", counterUuids)
+  }, [counterUuids, selectedMemberUuids])
 
   function handleCountTypeSelect(value: any) {
     setCountUI("tempCountType", value)
@@ -63,7 +102,7 @@ export function SetupBody() {
       description: COUNT_TYPE_DESCRIPTIONS[countType ?? "solo"],
       control: (
         <ToggleButtonGroup
-          initialAlignment={"Solo"}
+          initialAlignment={_.capitalize(countType ?? "solo")}
           options={[
             {
               label: "Solo",
@@ -106,21 +145,14 @@ export function SetupBody() {
       control: <CountersList />,
     },
   ]
-
-  return (
-    <Stack height={"100%"} gap={theme.module[5]}>
-      {options.map((option: SetupOptionProps) => (
-        <SetupOption
-          label={option.label}
-          description={option.description}
-          control={option.control}
-          key={option.label}
-        />
-      ))}
-      <AddMembers />
-      <WarningBox />
-    </Stack>
-  )
+  return options.map((option: SetupOptionProps) => (
+    <SetupOption
+      label={option.label}
+      description={option.description}
+      control={option.control}
+      key={option.label}
+    />
+  ))
 }
 /*
 
@@ -130,7 +162,8 @@ export function SetupBody() {
 */
 function WarningBox() {
   const theme = useTheme()
-  const countType = useCountUI((state: any) => state.tempCountType)
+
+  const countType = useCountUI((state: CountUIState) => state.tempCountType)
   const isCounterRequirementMet = useCountUI(
     (state: any) => state.isCounterRequirementMet,
   )
@@ -163,13 +196,17 @@ function WarningBox() {
 */
 function AddMembers() {
   const availableMembers = useAppSelector(selectAvailableCountersList)
-  const countType: CountTypes = useCountUI((state: any) => state.tempCountType)
-  const isAddingMembers = useCountUI((state: any) => state.isAddingMembers)
+
+  const countType = useCountUI((state: CountUIState) => state.tempCountType)
+  const isAddingMembers = useCountUI(
+    (state: CountUIState) => state.isAddingMembers,
+  )
   const selectedMemberUuids = useCountUI(
     (state: any) => state.selectedMemberUuids,
   )
 
-  const counterRequirement = {
+  //TODO: Refactor into Count utils function to reuse in Manage feature
+  const counterRequirements = {
     solo: {
       isMet: selectedMemberUuids.length === 1,
       verbose: "1 Counter",
@@ -183,9 +220,7 @@ function AddMembers() {
       verbose: "At least 2 Counters",
     },
   }
-  const requirement = counterRequirement[countType ? countType : "solo"]
-  console.log(countType)
-  console.log(requirement)
+  const requirement = counterRequirements[countType]
   const isRequirementMet = requirement.isMet
   const verbose = requirement.verbose
   const warningMessage = `${verbose} required for ${countType} count.`
@@ -219,24 +254,22 @@ function AddMembers() {
   ]
 
   return (
-    !!countType && (
-      <Modal
-        open={isAddingMembers}
-        heading={"Add Counters"}
-        body={
-          !availableMembers.length ? (
-            <Typography>No additional members available.</Typography>
-          ) : (
-            <MembersList
-              isRequirementMet={isRequirementMet}
-              warningMessage={warningMessage}
-            />
-          )
-        }
-        actions={modalActions}
-        onClose={handleClose}
-      />
-    )
+    <Modal
+      open={isAddingMembers}
+      heading={"Add Counters"}
+      body={
+        !availableMembers.length ? (
+          <Typography>No additional members available.</Typography>
+        ) : (
+          <MembersList
+            isRequirementMet={isRequirementMet}
+            warningMessage={warningMessage}
+          />
+        )
+      }
+      actions={modalActions}
+      onClose={handleClose}
+    />
   )
 }
 /*
@@ -254,7 +287,9 @@ function MembersList({
 }) {
   const availableMembers = useAppSelector(selectAvailableCountersList)
 
-  const countType: CountTypes = useCountUI((state: any) => state.tempCountType)
+  const countType: CountTypes = useCountUI(
+    (state: CountUIState) => state.tempCountType,
+  )
   const selectedMemberUuids = useCountUI(
     (state: any) => state.selectedMemberUuids,
   )
@@ -265,20 +300,24 @@ function MembersList({
     <List>
       {availableMembers.map((member: MemberProps) => {
         const name = getMemberName(member)
-        const selected = selectedMemberUuids.includes(member.uuid)
+        const isSelected = selectedMemberUuids.includes(member.uuid)
+        const memberUuid = member.uuid
+
+        function handleChange() {
+          isSelected
+            ? removeCountUISelectedMemberUuid(memberUuid)
+            : isRequirementMet && !isTeamCount
+            ? generateCustomNotification("warning", warningMessage)
+            : addCountUISelectedMemberUuid(memberUuid)
+        }
+
         return (
           <ListItem
             label={name}
             primarySlot={
-              <Icon variation={selected ? "checked" : "unchecked"} />
+              <Icon variation={isSelected ? "checked" : "unchecked"} />
             }
-            onChange={() =>
-              selected
-                ? removeCountUISelectedMemberUuid(member.uuid)
-                : isRequirementMet && !isTeamCount
-                ? generateCustomNotification("warning", warningMessage)
-                : addCountUISelectedMemberUuid(member.uuid)
-            }
+            onChange={handleChange}
             tappable
             key={name}
           />
@@ -296,27 +335,21 @@ function MembersList({
 function CountersList() {
   const theme = useTheme()
   const counters = useAppSelector(selectCountersList)
-  const counter = useAppSelector(selectCounters)
-  console.log(counter)
 
   return (
     <Stack
       boxShadow={theme.shadow.neo[1]}
-      padding={theme.module[3]}
+      padding={theme.module[2]}
+      boxSizing={"border-box"}
       borderRadius={theme.module[3]}
     >
       <List gapScale={1} maxHeight={theme.module[9]}>
         {counters.length ? (
           counters.map((counter: CountMemberProps) => {
-            const isOrganiser = counter.isOrganiser
             const uuid = counter.uuid
 
             function handleDelete() {
-              if (isOrganiser) {
-                updateCountMember(uuid, { isCounter: false })
-              } else {
-                removeCountMember(uuid)
-              }
+              removeCountMember(uuid)
               removeCountUISelectedMemberUuid(uuid)
             }
 

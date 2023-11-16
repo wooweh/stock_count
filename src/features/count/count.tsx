@@ -13,9 +13,10 @@ import { Steps } from "./steps"
 
 
 */
-type CountUIState = {
+export type CountUIState = {
   isSettingUp: boolean
   isManagingCheckList: boolean
+  isEditingCheckList: boolean
   isCounterRequirementMet: boolean
   isAddingMembers: boolean
   isAddingPrepComment: boolean
@@ -27,10 +28,10 @@ type CountUIState = {
   isLeavingCount: boolean
   isStartingFinalization: boolean
   isSubmittingFinalization: boolean
-  currentlyViewedStockItemId: false | string
-  currentlyViewedStockItemUseableCount: number
-  currentlyViewedStockItemDamagedCount: number
-  currentlyViewedStockItemObsoleteCount: number
+  currentStockItemId: false | string
+  currentStockItemUseableCount: number
+  currentStockItemDamagedCount: number
+  currentStockItemObsoleteCount: number
   scrollIndex: number
   selectedMemberUuids: string[]
   satisfiedCheckUuids: string[]
@@ -42,6 +43,7 @@ type CountUIKeys = keyof CountUIState
 const initialState: CountUIState = {
   isSettingUp: false,
   isManagingCheckList: false,
+  isEditingCheckList: false,
   isCounterRequirementMet: false,
   isAddingMembers: false,
   isAddingPrepComment: false,
@@ -53,10 +55,10 @@ const initialState: CountUIState = {
   isLeavingCount: false,
   isStartingFinalization: false,
   isSubmittingFinalization: false,
-  currentlyViewedStockItemId: false,
-  currentlyViewedStockItemUseableCount: 0,
-  currentlyViewedStockItemDamagedCount: 0,
-  currentlyViewedStockItemObsoleteCount: 0,
+  currentStockItemId: false,
+  currentStockItemUseableCount: 0,
+  currentStockItemDamagedCount: 0,
+  currentStockItemObsoleteCount: 0,
   scrollIndex: 0,
   selectedMemberUuids: [],
   satisfiedCheckUuids: [],
@@ -201,7 +203,8 @@ function LeaveCountConfirmationBody() {
   return (
     <Stack width={"100%"} gap={theme.module[3]} alignItems={"center"}>
       <Typography textAlign={"center"}>
-        You are leaving the count. You can return using the Dashboard.
+        You are leaving the count. You can re-join using the
+        Dashboard. No data will be lost.
       </Typography>
       <Typography>Are you sure you want to leave?</Typography>
     </Stack>

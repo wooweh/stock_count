@@ -17,7 +17,7 @@ import {
   selectUserUuid,
   selectUserUuidString,
 } from "../user/userSliceSelectors"
-import { setCountUI, useCountUI } from "./count"
+import { CountUIState, setCountUI, useCountUI } from "./count"
 import { CountItemProps, CountTypes } from "./countSlice"
 import {
   selectCountType,
@@ -36,24 +36,32 @@ import {
 
 
 
-
 */
 export function StockCountBody() {
+  return (
+    <Outer>
+      <Body />
+      <AddStockItemButton />
+      <RecordStockItemCount />
+    </Outer>
+  )
+}
+/*
+
+
+
+
+*/
+function Outer({
+  children,
+}: {
+  children: React.ReactElement | React.ReactElement[]
+}) {
   const theme = useTheme()
 
   return (
-    <Stack
-      height={"100%"}
-      gap={theme.module[4]}
-      paddingBottom={theme.module[1]}
-      boxSizing={"border-box"}
-    >
-      <Stack height={"100%"} gap={theme.module[2]}>
-        <SearchControls />
-        <CountSheet />
-      </Stack>
-      <AddStockItemButton />
-      <RecordStockItemCount />
+    <Stack gap={theme.module[3]} height={"100%"}>
+      {children}
     </Stack>
   )
 }
@@ -62,15 +70,31 @@ export function StockCountBody() {
 
 
 
+*/
+function Body() {
+  const theme = useTheme()
+
+  return (
+    <Stack height={"100%"} gap={theme.module[2]}>
+      <SearchControls />
+      <CountSheet />
+    </Stack>
+  )
+}
+/*
+
+
+
 
 */
 function SearchControls() {
-  const isAddingStockItem = useCountUI((state: any) => state.isAddingStockItem)
+  const isAddingStockItem = useCountUI(
+    (state: CountUIState) => state.isAddingStockItem,
+  )
 
   return isAddingStockItem ? <AddStockItemSearchBar /> : <CountSearchBar />
 }
 /*
-
 
 
 
@@ -106,7 +130,6 @@ function CountSearchBar() {
 
 
 
-
 */
 function AddStockItemSearchBar() {
   const theme = useTheme()
@@ -119,7 +142,7 @@ function AddStockItemSearchBar() {
   function handleSelect(item: SearchItemProps) {
     const id = item.id
     addCountResultItem(id, userUuid)
-    setCountUI("currentlyViewedStockItemId", id)
+    setCountUI("currentStockItemId", id)
     setCountUI("isAddingStockItem", false)
   }
 
@@ -171,12 +194,11 @@ function AddStockItemSearchBar() {
 
 
 
-
 */
 function CountSheet() {
   const theme = useTheme()
   const countList = useAppSelector(selectModifiedUserCountResultsList)
-  const scrollIndex = useCountUI((state: any) => state.scrollIndex)
+  const scrollIndex = useCountUI((state: CountUIState) => state.scrollIndex)
   const virtuoso: any = useRef(null)
 
   useEffect(() => {
@@ -228,7 +250,6 @@ function CountSheet() {
 
 
 
-
 */
 function CountSheetListItem({
   item,
@@ -238,7 +259,7 @@ function CountSheetListItem({
   const theme = useTheme()
 
   function handleOptionsClick() {
-    setCountUI("currentlyViewedStockItemId", item.id)
+    setCountUI("currentStockItemId", item.id)
   }
 
   const countData =
@@ -274,7 +295,6 @@ function CountSheetListItem({
   )
 }
 /*
-
 
 
 
@@ -344,7 +364,6 @@ function CountItemInfoDisplay({
 
 
 
-
 */
 function AddStockItemButton() {
   const theme = useTheme()
@@ -373,21 +392,22 @@ function AddStockItemButton() {
 
 
 
-
 */
 function RecordStockItemCount() {
   const memberUuid = useAppSelector(selectUserUuid) as string
 
   const useableCount = useCountUI(
-    (state: any) => state.currentlyViewedStockItemUseableCount,
+    (state: any) => state.currentStockItemUseableCount,
   )
   const damagedCount = useCountUI(
-    (state: any) => state.currentlyViewedStockItemDamagedCount,
+    (state: any) => state.currentStockItemDamagedCount,
   )
   const obsoleteCount = useCountUI(
-    (state: any) => state.currentlyViewedStockItemObsoleteCount,
+    (state: any) => state.currentStockItemObsoleteCount,
   )
-  const id = useCountUI((state: any) => state.currentlyViewedStockItemId)
+  const id = useCountUI(
+    (state: CountUIState) => state.currentStockItemId,
+  ) as string
 
   const [isOpen, setIsOpen] = useState(false)
 
@@ -409,7 +429,7 @@ function RecordStockItemCount() {
 
   function handleClose() {
     setIsOpen(false)
-    _.delay(() => setCountUI("currentlyViewedStockItemId", false), 250)
+    _.delay(() => setCountUI("currentStockItemId", false), 250)
   }
 
   const actions: ModalActionProps[] = [
@@ -438,7 +458,6 @@ function RecordStockItemCount() {
 
 
 
-
 */
 function RecordStockItemCountBody({ handleClose }: { handleClose: Function }) {
   const theme = useTheme()
@@ -446,138 +465,23 @@ function RecordStockItemCountBody({ handleClose }: { handleClose: Function }) {
   const userUuid = useAppSelector(selectUserUuidString)
   const stock = useAppSelector(selectModifiedUserCountResults)
 
-  const id = useCountUI((state: any) => state.currentlyViewedStockItemId)
-  const useableCount = useCountUI(
-    (state: any) => state.currentlyViewedStockItemUseableCount,
-  )
-  const damagedCount = useCountUI(
-    (state: any) => state.currentlyViewedStockItemDamagedCount,
-  )
-  const obsoleteCount = useCountUI(
-    (state: any) => state.currentlyViewedStockItemObsoleteCount,
-  )
+  const id = useCountUI(
+    (state: CountUIState) => state.currentStockItemId,
+  ) as string
 
   const stockItem = stock[id as string]
-
-  useEffect(() => {
-    if (!!stockItem) {
-      setCountUI("currentlyViewedStockItemUseableCount", stockItem.useableCount)
-      setCountUI("currentlyViewedStockItemDamagedCount", stockItem.damagedCount)
-      setCountUI(
-        "currentlyViewedStockItemObsoleteCount",
-        stockItem.obsoleteCount,
-      )
-    }
-  }, [stockItem])
 
   function handleDelete() {
     handleClose()
     _.delay(() => removeCountResultsItem(id, userUuid), 250)
   }
 
-  function setUseableCount(count: number) {
-    setCountUI("currentlyViewedStockItemUseableCount", count)
-  }
-
-  function setDamagedCount(count: number) {
-    setCountUI("currentlyViewedStockItemDamagedCount", count)
-  }
-
-  function setObsoleteCount(count: number) {
-    setCountUI("currentlyViewedStockItemObsoleteCount", count)
-  }
-
-  const inputs: StockItemCountInputProps[] = [
-    {
-      label: "Useable",
-      count: useableCount,
-      setCount: setUseableCount,
-      iconName: "useable",
-      color: theme.scale.green[5],
-      outlineColor: theme.scale.green[7],
-    },
-    {
-      label: "Damaged",
-      count: damagedCount,
-      setCount: setDamagedCount,
-      iconName: "damaged",
-      color: theme.scale.red[4],
-      outlineColor: theme.scale.red[6],
-    },
-    {
-      label: "Obsolete",
-      count: obsoleteCount,
-      setCount: setObsoleteCount,
-      iconName: "obsolete",
-      color: theme.scale.gray[3],
-      outlineColor: theme.scale.gray[5],
-    },
-  ]
-
   return (
     <Stack width={"100%"} gap={theme.module[4]} justifyContent={"flex-start"}>
       {!!stockItem && (
         <>
-          <Stack
-            gap={theme.module[2]}
-            paddingLeft={theme.module[0]}
-            boxSizing={"border-box"}
-          >
-            <Stack direction={"row"} gap={theme.module[3]}>
-              <Typography
-                fontWeight={"bold"}
-                width={theme.module[6]}
-                color={theme.scale.gray[5]}
-              >
-                Name:
-              </Typography>
-              <Typography fontWeight={"bold"}>{stockItem.name}</Typography>
-            </Stack>
-            <Stack direction={"row"} gap={theme.module[3]}>
-              <Typography
-                fontWeight={"bold"}
-                width={theme.module[6]}
-                color={theme.scale.gray[5]}
-              >
-                Unit:
-              </Typography>
-              <Typography fontWeight={"bold"} color={theme.scale.gray[4]}>
-                {stockItem.unit}
-              </Typography>
-            </Stack>
-          </Stack>
-          <Stack
-            width={"100%"}
-            boxShadow={theme.shadow.neo[4]}
-            borderRadius={theme.module[3]}
-            sx={{
-              outline: `1px solid ${theme.scale.gray[6]}`,
-              outlineOffset: "-1px",
-            }}
-          >
-            <Stack
-              width={"100%"}
-              padding={`${theme.module[2]} ${theme.module[3]} ${theme.module[1]} ${theme.module[3]}`}
-              boxSizing={"border-box"}
-              bgcolor={theme.scale.gray[8]}
-              borderRadius={`${theme.module[3]} ${theme.module[3]} 0 0`}
-              boxShadow={theme.shadow.neo[3]}
-            >
-              <Typography color={theme.scale.gray[4]} fontWeight={"bold"}>
-                Count Data
-              </Typography>
-            </Stack>
-            <Stack
-              width={"100%"}
-              padding={theme.module[4]}
-              boxSizing={"border-box"}
-              gap={theme.module[3]}
-            >
-              {inputs.map((input: StockItemCountInputProps) => (
-                <StockItemCountInput {...input} key={input.label} />
-              ))}
-            </Stack>
-          </Stack>
+          <StockDetails stockItem={stockItem} />
+          <CountData />
           <Button
             variation={"profile"}
             color={theme.scale.red[6]}
@@ -599,6 +503,150 @@ function RecordStockItemCountBody({ handleClose }: { handleClose: Function }) {
 
 
 
+*/
+function StockDetails({
+  stockItem,
+}: {
+  stockItem: CountItemProps & StockItemProps
+}) {
+  const theme = useTheme()
+
+  return (
+    <Stack
+      gap={theme.module[2]}
+      paddingLeft={theme.module[0]}
+      boxSizing={"border-box"}
+    >
+      <Stack direction={"row"} gap={theme.module[3]}>
+        <Typography
+          fontWeight={"bold"}
+          width={theme.module[6]}
+          color={theme.scale.gray[5]}
+        >
+          Name:
+        </Typography>
+        <Typography fontWeight={"bold"}>{stockItem.name}</Typography>
+      </Stack>
+      <Stack direction={"row"} gap={theme.module[3]}>
+        <Typography
+          fontWeight={"bold"}
+          width={theme.module[6]}
+          color={theme.scale.gray[5]}
+        >
+          Unit:
+        </Typography>
+        <Typography fontWeight={"bold"} color={theme.scale.gray[4]}>
+          {stockItem.unit}
+        </Typography>
+      </Stack>
+    </Stack>
+  )
+}
+/*
+
+
+
+
+*/
+function CountData() {
+  const theme = useTheme()
+
+  const stock = useAppSelector(selectModifiedUserCountResults)
+
+  const id = useCountUI(
+    (state: CountUIState) => state.currentStockItemId,
+  ) as string
+  const useableCount = useCountUI(
+    (state: CountUIState) => state.currentStockItemUseableCount,
+  )
+  const damagedCount = useCountUI(
+    (state: CountUIState) => state.currentStockItemDamagedCount,
+  )
+  const obsoleteCount = useCountUI(
+    (state: CountUIState) => state.currentStockItemObsoleteCount,
+  )
+
+  const stockItem = stock[id as string]
+
+  useEffect(() => {
+    if (!!stockItem) setExistingCountValues()
+  }, [stockItem])
+
+  function setExistingCountValues() {
+    setCountUI("currentStockItemUseableCount", stockItem.useableCount)
+    setCountUI("currentStockItemDamagedCount", stockItem.damagedCount)
+    setCountUI("currentStockItemObsoleteCount", stockItem.obsoleteCount)
+  }
+
+  const inputs: StockItemCountInputProps[] = [
+    {
+      label: "Useable",
+      count: useableCount,
+      setCount: (count: number) =>
+        setCountUI("currentStockItemUseableCount", count),
+      iconName: "useable",
+      color: theme.scale.green[5],
+      outlineColor: theme.scale.green[7],
+    },
+    {
+      label: "Damaged",
+      count: damagedCount,
+      setCount: (count: number) =>
+        setCountUI("currentStockItemDamagedCount", count),
+      iconName: "damaged",
+      color: theme.scale.red[4],
+      outlineColor: theme.scale.red[6],
+    },
+    {
+      label: "Obsolete",
+      count: obsoleteCount,
+      setCount: (count: number) =>
+        setCountUI("currentStockItemObsoleteCount", count),
+      iconName: "obsolete",
+      color: theme.scale.gray[3],
+      outlineColor: theme.scale.gray[5],
+    },
+  ]
+
+  return (
+    <Stack
+      width={"100%"}
+      boxShadow={theme.shadow.neo[4]}
+      borderRadius={theme.module[3]}
+      sx={{
+        outline: `1px solid ${theme.scale.gray[6]}`,
+        outlineOffset: "-1px",
+      }}
+    >
+      <Stack
+        width={"100%"}
+        padding={`${theme.module[2]} ${theme.module[3]} ${theme.module[1]} ${theme.module[3]}`}
+        boxSizing={"border-box"}
+        bgcolor={theme.scale.gray[8]}
+        borderRadius={`${theme.module[3]} ${theme.module[3]} 0 0`}
+        boxShadow={theme.shadow.neo[3]}
+      >
+        <Typography color={theme.scale.gray[4]} fontWeight={"bold"}>
+          Count Data
+        </Typography>
+      </Stack>
+      <Stack
+        width={"100%"}
+        padding={theme.module[4]}
+        boxSizing={"border-box"}
+        gap={theme.module[3]}
+      >
+        {inputs.map((input: StockItemCountInputProps) => (
+          <StockItemCountInput {...input} key={input.label} />
+        ))}
+      </Stack>
+    </Stack>
+  )
+}
+/*
+
+
+
 
 */
 type StockItemCountInputProps = {
@@ -613,6 +661,41 @@ function StockItemCountInput(props: StockItemCountInputProps) {
   const theme = useTheme()
 
   const [isEditing, setIsEditing] = useState(false)
+
+  const inputProps = isEditing
+    ? {
+        key: "isEditing",
+        autoFocus: true,
+        value: !!props.count ? props.count : "",
+        onChange: (e: any) => props.setCount(Number(e.target.value)),
+        onBlur: () => setIsEditing(false),
+        isNumber: true,
+        sx: {
+          paddingRight: theme.module[3],
+          outline: `2px solid ${props.outlineColor}`,
+        },
+      }
+    : {
+        key: "notEditing",
+        value: formatCommaSeparatedNumber(props.count),
+        onChange: () => undefined,
+        onFocus: () => setIsEditing(true),
+        readOnly: true,
+        sx: {
+          color: `${props.color} !important`,
+          background: theme.scale.gray[8],
+          outline: `2px solid ${props.outlineColor}`,
+          paddingRight: theme.module[3],
+          fontWeight: "bold",
+        },
+      }
+
+  const inputWidth =
+    props.count < 10000
+      ? theme.module[7]
+      : props.count > 999999
+      ? `calc(${theme.module[7]} * 1.5)`
+      : `calc(${theme.module[7]} * 1.25)`
 
   return (
     <Stack
@@ -633,47 +716,13 @@ function StockItemCountInput(props: StockItemCountInputProps) {
           {props.label}:
         </Typography>
       </Stack>
-      <Stack
-        width={
-          props.count < 10000
-            ? theme.module[7]
-            : props.count > 999999
-            ? `calc(${theme.module[7]} * 1.5)`
-            : `calc(${theme.module[7]} * 1.25)`
-        }
-      >
-        {isEditing ? (
-          <Input
-            value={!!props.count ? props.count : ""}
-            onChange={(e: any) => props.setCount(Number(e.target.value))}
-            onBlur={() => setIsEditing(false)}
-            isNumber
-            sx={{
-              paddingRight: theme.module[3],
-              outline: `2px solid ${props.outlineColor}`,
-            }}
-          />
-        ) : (
-          <Input
-            value={formatCommaSeparatedNumber(props.count)}
-            onChange={() => undefined}
-            onFocus={() => setIsEditing(true)}
-            readOnly
-            sx={{
-              color: `${props.color} !important`,
-              background: theme.scale.gray[8],
-              outline: `2px solid ${props.outlineColor}`,
-              paddingRight: theme.module[3],
-              fontWeight: "bold",
-            }}
-          />
-        )}
+      <Stack width={inputWidth}>
+        <Input {...inputProps} />
       </Stack>
     </Stack>
   )
 }
 /*
-
 
 
 

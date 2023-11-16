@@ -11,6 +11,7 @@ import { ListItem } from "../../components/listItem"
 import Modal, { ModalActionProps } from "../../components/modal"
 import { selectOrgCountChecksList } from "../org/orgSliceSelectors"
 import {
+  CountUIState,
   addCountUIPrepComment,
   addCountUISatisfiedCheckUuid,
   editCountUIPrepComment,
@@ -20,7 +21,7 @@ import {
   useCountUI,
 } from "./count"
 import { CountSteps } from "./countSlice"
-import { selectIsUserOnlyOrganiser } from "./countSliceSelectors"
+import { selectIsUserJustOrganiser } from "./countSliceSelectors"
 import { startCount } from "./countSliceUtils"
 /*
 
@@ -29,12 +30,29 @@ import { startCount } from "./countSliceUtils"
 
 */
 export function PreparationBody() {
+  return (
+    <Outer>
+      <PreparationItems />
+      <StartCountConfirmation />
+    </Outer>
+  )
+}
+/*
+
+
+
+
+*/
+function Outer({
+  children,
+}: {
+  children: React.ReactElement | React.ReactElement[]
+}) {
   const theme = useTheme()
 
   return (
     <Stack gap={theme.module[4]} height={"100%"}>
-      <PreparationItems />
-      <StartCountConfirmation />
+      {children}
     </Stack>
   )
 }
@@ -124,10 +142,10 @@ export function PreparationItem(props: PreparationItemProps) {
         boxSizing={"border-box"}
         overflow={"hidden"}
         boxShadow={theme.shadow.neo[0]}
+        padding={`${theme.module[3]} 0`}
+        paddingRight={theme.module[1]}
         sx={{
           outline: `1px solid ${theme.scale.gray[7]}`,
-          padding: `${theme.module[3]} 0`,
-          paddingRight: theme.module[1],
         }}
       >
         {props.item}
@@ -174,6 +192,12 @@ function CheckListItem({ check }: { check: { id: string; check: string } }) {
       : addCountUISatisfiedCheckUuid(check.id)
   }
 
+  const listItemStyles = {
+    padding: theme.module[2],
+    paddingLeft: theme.module[4],
+    outline: "none",
+  }
+
   return (
     <ListItem
       label={check.check}
@@ -181,10 +205,7 @@ function CheckListItem({ check }: { check: { id: string; check: string } }) {
       tappable
       onChange={handleClick}
       bgColor={"transparant"}
-      sx={{
-        padding: theme.module[2],
-        paddingLeft: theme.module[4],
-      }}
+      sx={listItemStyles}
       key={check.id}
     />
   )
@@ -261,6 +282,11 @@ function CommentListItem(props: CommentListProps) {
   }
 
   const isDisabled = !isEditing && !!props.comment
+  const inputStyles = {
+    background: theme.scale.gray[isDisabled ? 8 : 7],
+    color: theme.scale.gray[isDisabled ? 8 : 4],
+    padding: theme.module[2],
+  }
 
   return (
     <ClickAwayListener onClickAway={!!value ? handleAccept : handleDelete}>
@@ -279,11 +305,7 @@ function CommentListItem(props: CommentListProps) {
           placeholder={"New comment..."}
           multiline
           autoFocus
-          sx={{
-            background: theme.scale.gray[isDisabled ? 8 : 7],
-            color: theme.scale.gray[isDisabled ? 8 : 4],
-            padding: theme.module[2],
-          }}
+          sx={inputStyles}
         />
         <Button
           variation={"pill"}
@@ -304,11 +326,15 @@ function CommentListItem(props: CommentListProps) {
 function StartCountConfirmation() {
   const theme = useTheme()
 
-  const isOnlyOrganiser = useAppSelector(selectIsUserOnlyOrganiser)
+  const isOnlyOrganiser = useAppSelector(selectIsUserJustOrganiser)
 
-  const isStartingCount = useCountUI((state: any) => state.isStartingCount)
-  const checkUuids = useCountUI((state) => state.satisfiedCheckUuids)
-  const comments = useCountUI((state) => state.prepComments)
+  const comments = useCountUI((state: CountUIState) => state.prepComments)
+  const checkUuids = useCountUI(
+    (state: CountUIState) => state.satisfiedCheckUuids,
+  )
+  const isStartingCount = useCountUI(
+    (state: CountUIState) => state.isStartingCount,
+  )
 
   const step: CountSteps = isOnlyOrganiser ? "review" : "stockCount"
 
@@ -332,13 +358,22 @@ function StartCountConfirmation() {
     },
   ]
 
+  const START_MESSAGE =
+    "You are about to start the count. Please read the following:"
+
+  const DISCLAIMER = `Once the count has been started you will not be able 
+  to go back to Setup or Preparation. You can change count type and manage 
+  counters in the 'Manage' count option.`
+
+  const PROCEED_MESSAGE = "Are you sure you want to proceed?"
+
   return (
     <Modal
       open={isStartingCount}
       heading={"Start Count"}
       body={
         <Stack gap={theme.module[4]} alignItems={"center"}>
-          <Typography>You are about to start the count.</Typography>
+          <Typography>{START_MESSAGE}</Typography>
           <Stack
             padding={theme.module[3]}
             borderRadius={theme.module[2]}
@@ -354,11 +389,10 @@ function StartCountConfirmation() {
               fontWeight={"bold"}
               color={theme.scale.red[3]}
             >
-              Once the count has been started you will not be able to edit any
-              information in Setup or Preparation.
+              {DISCLAIMER}
             </Typography>
           </Stack>
-          <Typography>Are you sure you want to proceed?</Typography>
+          <Typography>{PROCEED_MESSAGE}</Typography>
         </Stack>
       }
       actions={actions}

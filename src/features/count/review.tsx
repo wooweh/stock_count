@@ -43,8 +43,20 @@ import {
 
 */
 export function ReviewBody() {
+  return (
+    <Outer>
+      <Body />
+    </Outer>
+  )
+}
+/*
+
+
+
+
+*/
+function Outer({ children }: { children: React.ReactElement }) {
   const theme = useTheme()
-  const isOrganiser = useAppSelector(selectIsUserOrganiser)
 
   return (
     <Stack
@@ -55,9 +67,20 @@ export function ReviewBody() {
       boxSizing={"border-box"}
       overflow={"hidden"}
     >
-      {isOrganiser ? <OrganiserReviewBody /> : <CounterReviewBody />}
+      {children}
     </Stack>
   )
+}
+/*
+
+
+
+
+*/
+function Body() {
+  const isOrganiser = useAppSelector(selectIsUserOrganiser)
+
+  return isOrganiser ? <OrganiserReviewBody /> : <CounterReviewBody />
 }
 /*
 
@@ -131,8 +154,8 @@ function CounterSummary() {
           counterUuids.map((uuid) => {
             return (
               <CounterSummaryItem
-                uuid={uuid}
                 results={results[uuid]}
+                uuid={uuid}
                 key={uuid}
               />
             )

@@ -3,8 +3,9 @@ import Accordion from "@mui/material/Accordion"
 import AccordionDetails from "@mui/material/AccordionDetails"
 import AccordionSummary from "@mui/material/AccordionSummary"
 import Stack from "@mui/material/Stack"
+import _ from "lodash"
 import { useEffect } from "react"
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import { create } from "zustand"
 import { createJSONStorage, persist } from "zustand/middleware"
 import { useAppSelector } from "../../app/hooks"
@@ -232,29 +233,31 @@ function CredentialInputs() {
 function ButtonTray({ isRegistering }: { isRegistering: boolean }) {
   const theme = useTheme()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const email = useAuthUI((state) => state.email)
   const password = useAuthUI((state) => state.password)
   const passwordValidation = useAuthUI((state) => state.passwordValidation)
 
+  const isSignInPath = location.pathname === routePaths.signIn.path
   const isPasswordValid = passwordValidation.isValid
   const isDetailsIncomplete =
     (isRegistering && !isPasswordValid) || !email || !password
+  const isDetailsComplete = !isDetailsIncomplete
 
   function handleClick() {
-    if (!!email && !!password) {
-      if (isRegistering && isPasswordValid) {
-        setAuthUI("isVerifying", true)
-        register(email, password)
-      } else {
-        setAuthUI("isSigningIn", true)
-        signIn(email, password).catch(() => {
-          setAuthUI("isSigningIn", false)
-        })
-      }
-      setAuthUI("email", "")
-      setAuthUI("password", "")
-    }
+    if (isDetailsComplete) isRegistering ? registerUser() : signInUser()
+  }
+
+  function registerUser() {
+    setAuthUI("isVerifying", true)
+    register(email, password)
+  }
+
+  function signInUser() {
+    setAuthUI("isVerifying", true)
+    signIn(email, password).catch(() => setAuthUI("isSigningIn", false))
+    _.delay(() => setAuthUI("isSigningIn", false), 5000)
   }
 
   const actionLabel = isRegistering ? "Register" : "Sign in"

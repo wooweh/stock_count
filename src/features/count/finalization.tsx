@@ -9,6 +9,7 @@ import {
 } from "../../common/utils"
 import Icon, { IconNames } from "../../components/icon"
 import Modal, { ModalActionProps } from "../../components/modal"
+import { getMemberShortName } from "../org/orgUtils"
 import {
   addCountUIFinalComment,
   editCountUIFinalComment,
@@ -17,7 +18,7 @@ import {
   setCountUI,
   useCountUI,
 } from "./count"
-import { CountMetadataProps } from "./countSlice"
+import { CountMemberProps, CountMetadataProps } from "./countSlice"
 import {
   selectCountMetadata,
   selectCountType,
@@ -35,20 +36,34 @@ import {
 
 
 
-
 */
 export function FinalizationBody() {
-  const theme = useTheme()
-
   return (
-    <Stack gap={theme.module[4]} height={"100%"}>
+    <Outer>
       <FinalizationItems />
       <FinalizeCountConfirmation />
-    </Stack>
+    </Outer>
   )
 }
 /*
 
+
+
+
+*/
+function Outer({
+  children,
+}: {
+  children: React.ReactElement | React.ReactElement[]
+}) {
+  const theme = useTheme()
+  return (
+    <Stack gap={theme.module[4]} height={"100%"}>
+      {children}
+    </Stack>
+  )
+}
+/*
 
 
 
@@ -88,10 +103,9 @@ function FinalizationItems() {
 
 
 
-
 */
 function CountSummary() {
-  const organiser = useAppSelector(selectOrganiser)
+  const organiser = useAppSelector(selectOrganiser) as CountMemberProps
   const counters = useAppSelector(selectCountersList)
   const countType = useAppSelector(selectCountType)
   const metadata = useAppSelector(
@@ -99,12 +113,11 @@ function CountSummary() {
   ) as Required<CountMetadataProps>
 
   const countDate = formatLongDate(metadata.finalizationStartTime)
-  const countDuration = calculateDuration(
-    metadata.countStartTime,
-    metadata.finalizationStartTime,
-  )
+  const start = metadata.countStartTime
+  const end = metadata.finalizationStartTime
+  const countDuration = calculateDuration(start, end)
   const durationLabel = formatDuration(countDuration)
-  const organiserFullName = `${organiser.firstName[0]}. ${organiser.lastName}`
+  const organiserName = getMemberShortName(organiser)
 
   const dataItems: DataLineItemProps[] = [
     {
@@ -125,19 +138,15 @@ function CountSummary() {
     {
       label: "Organiser",
       iconName: "profile",
-      data: <DataPill label={organiserFullName} color={"purple"} />,
+      data: <DataPill label={organiserName} color={"purple"} />,
     },
     {
       label: "Counters",
       iconName: "group",
       data: counters.map((counter) => {
-        const counterFullName = `${counter.firstName[0]}. ${counter.lastName}`
+        const counterName = getMemberShortName(counter)
         return (
-          <DataPill
-            label={counterFullName}
-            key={counter.uuid}
-            color={"coral"}
-          />
+          <DataPill label={counterName} key={counter.uuid} color={"coral"} />
         )
       }),
     },
@@ -157,7 +166,6 @@ function CountSummary() {
   )
 }
 /*
-
 
 
 
@@ -204,7 +212,6 @@ export function DataLineItem(props: DataLineItemProps) {
 
 
 
-
 */
 type DataPillProps = {
   label: string
@@ -239,7 +246,6 @@ export function DataPill(props: DataPillProps) {
   )
 }
 /*
-
 
 
 
@@ -287,7 +293,6 @@ function FinalizeCountConfirmation() {
   )
 }
 /*
-
 
 
 

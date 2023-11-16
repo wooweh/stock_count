@@ -5,7 +5,7 @@ import MuiSelect, { SelectChangeEvent } from "@mui/material/Select"
 import MuiSlider from "@mui/material/Slider"
 import MuiSwitch from "@mui/material/Switch"
 import _ from "lodash"
-import { useState } from "react"
+import React, { useState } from "react"
 import useTheme from "../common/useTheme"
 import { Button } from "./button"
 /*
@@ -64,6 +64,7 @@ type InputProps = {
   multiline?: boolean
   autoFocus?: boolean
   spellCheck?: boolean
+  endAdornment?: React.ReactElement
   onFocus?: any
   onBlur?: any
   readOnly?: any
@@ -80,9 +81,15 @@ export function Input(props: InputProps) {
     setShowPassword((show) => !show)
   }
 
-  function handleFocus() {
+  function handleFocus(e: any) {
     setShowPlaceholder(false)
-    props.onFocus && props.onFocus()
+    props.onFocus && props.onFocus(e)
+    !props.isNumber && moveCursorToEnd(e)
+  }
+
+  function moveCursorToEnd(e: any) {
+    const lengthOfInput = e.target.value.length
+    return e.target.setSelectionRange(lengthOfInput, lengthOfInput)
   }
 
   function handleBlur() {
@@ -115,17 +122,30 @@ export function Input(props: InputProps) {
       readOnly={props.readOnly}
       inputProps={props.inputProps}
       spellCheck={!!props.spellCheck}
-      sx={props.sx}
+      sx={{ ...props.sx, position: "relative" }}
       endAdornment={
-        props.isPassword && (
-          <InputAdornment position="end">
-            <Button
-              variation={"pill"}
-              onClick={handleClickShowPassword}
-              iconName={showPassword ? "notVisible" : "visible"}
-              iconColor={theme.scale.gray[6]}
-            />
+        !!props.endAdornment ? (
+          <InputAdornment
+            position="end"
+            sx={{
+              position: "absolute",
+              bottom: theme.module[3],
+              right: theme.module[2],
+            }}
+          >
+            {props.endAdornment}
           </InputAdornment>
+        ) : (
+          props.isPassword && (
+            <InputAdornment position="end">
+              <Button
+                variation={"pill"}
+                onClick={handleClickShowPassword}
+                iconName={showPassword ? "notVisible" : "visible"}
+                iconColor={theme.scale.gray[6]}
+              />
+            </InputAdornment>
+          )
         )
       }
     />
