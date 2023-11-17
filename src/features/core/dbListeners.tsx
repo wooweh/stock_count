@@ -114,8 +114,7 @@ export function OrgDBListener() {
       const dbOrgRef = ref(dbReal, getDBPath.org(userOrgUuid).org)
       onValue(dbOrgRef, (snapshot) => {
         const dbOrg: OrgProps = snapshot.val()
-        const isUserMember = !!dbOrg.members![userUuid]
-
+        const isUserMember = !!dbOrg && !!dbOrg.members![userUuid]
         const shouldJoinOrg = !!dbOrg && !localOrgUuid
         if (shouldJoinOrg) {
           updateMemberStatus("isJoined")

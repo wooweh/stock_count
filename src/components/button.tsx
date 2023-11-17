@@ -341,7 +341,7 @@ function PillButton(props: ButtonVariationProps) {
             }
             lineHeight={"1.5rem"}
             fontSize={"small"}
-            fontWeight={"bold"}
+            fontWeight={"medium"}
           >
             {props.label}
           </Typography>

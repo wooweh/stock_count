@@ -31,9 +31,8 @@ export const selectUserName = createSelector([selectUser], (user) => user.name)
 
 
 */
-export const selectUserEmail = createSelector(
-  [selectUser],
-  (user) => user.email,
+export const selectUserEmail = createSelector([selectUser], (user) =>
+  !!user ? user.email : undefined,
 )
 /*
 
@@ -41,9 +40,8 @@ export const selectUserEmail = createSelector(
 
 
 */
-export const selectUserUuid = createSelector(
-  [userSelector],
-  (user) => user.user.uuid,
+export const selectUserUuid = createSelector([selectUser], (user) =>
+  !!user ? user.uuid : undefined,
 )
 /*
 
@@ -61,9 +59,8 @@ export const selectUserUuidString = createSelector(
 
 
 */
-export const selectUserOrgDetails = createSelector(
-  [userSelector],
-  (user) => user.user.org,
+export const selectUserOrgDetails = createSelector([selectUser], (user) =>
+  !!user ? user.org : undefined,
 )
 /*
 
@@ -71,9 +68,8 @@ export const selectUserOrgDetails = createSelector(
 
 
 */
-export const selectUserOrgUuid = createSelector(
-  [userSelector],
-  (user) => user.user.org?.uuid,
+export const selectUserOrgUuid = createSelector([selectUser], (user) =>
+  !!user ? user.org?.uuid : undefined,
 )
 /*
 

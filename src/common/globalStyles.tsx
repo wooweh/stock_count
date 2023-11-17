@@ -174,17 +174,25 @@ export default function GlobalStyles() {
         }
         .MuiAccordionDetails-root {
           padding: 0 !important;
+          background: transparent !important;
+          color: transparent !important;
+        }
+        .MuiAccordionSummary-gutters {
+          background: transparent !important;
+          color: transparent !important;
         }
         .MuiAccordionSummary-root {
           min-height: ${theme.module[0]} !important;
           height: ${theme.module[0]} !important;
-          background-color: transparent !important;
+          background: transparent !important;
+          color: transparent !important;
         }
         .MuiAccordion-root {
           width: 100% !important;
-          background-color: transparent !important;
+          background: transparent !important;
           color: transparent !important;
           box-shadow: none !important;
+          color: transparent !important;
         }
         .MuiCheckbox-root {
           padding: 0 !important;

@@ -7,6 +7,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBackRounded"
 import ArrowRightIcon from "@mui/icons-material/ArrowForwardIosRounded"
 import DamagedIcon from "@mui/icons-material/BrokenImageRounded"
 import CalendarIcon from "@mui/icons-material/CalendarTodayRounded"
+import CellularIcon from "@mui/icons-material/CellTowerRounded"
 import CommentsIcon from "@mui/icons-material/ChatRounded"
 import UncheckedIcon from "@mui/icons-material/CheckBoxOutlineBlankRounded"
 import CheckedIcon from "@mui/icons-material/CheckBoxRounded"
@@ -48,6 +49,7 @@ import KeyIcon from "@mui/icons-material/VpnKey"
 import WarningIcon from "@mui/icons-material/WarningRounded"
 import LightModeIcon from "@mui/icons-material/WbSunnyRounded"
 import StockIcon from "@mui/icons-material/WidgetsRounded"
+import WifiIcon from "@mui/icons-material/WifiRounded"
 import { useAppSelector } from "../app/hooks"
 import useTheme from "../common/useTheme"
 import { selectIsDarkmode } from "../features/core/coreSliceSelectors"
@@ -104,6 +106,8 @@ export type IconNames =
   | "damaged"
   | "step"
   | "dual"
+  | "cellular"
+  | "wifi"
   | "date"
   | "time"
   | "clipboard"
@@ -236,6 +240,17 @@ export default function Icon(props: IconProps) {
         }}
       />
     ),
+    cellular: (
+      <CellularIcon
+        fontSize={fontSize}
+        fontWeight={props.fontWeight}
+        sx={{
+          ...styles,
+          ...props.sx,
+          color: props.color ? props.color : theme.scale.gray[4],
+        }}
+      />
+    ),
     profile: (
       <ProfileIcon
         fontSize={fontSize}
@@ -260,6 +275,17 @@ export default function Icon(props: IconProps) {
     ),
     invite: (
       <InviteIcon
+        fontSize={fontSize}
+        fontWeight={props.fontWeight}
+        sx={{
+          ...styles,
+          ...props.sx,
+          color: props.color ? props.color : theme.scale.gray[4],
+        }}
+      />
+    ),
+    wifi: (
+      <WifiIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
         sx={{

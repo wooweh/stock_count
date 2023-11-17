@@ -390,7 +390,7 @@ function CheckListItem({ countCheck }: { countCheck: CountCheckProps }) {
   const isDisabled = !isEditing && !!countCheck.check
   const id = countCheck.id
 
-  function handleAccept(e: any) {
+  function handleAccept() {
     !!check ? updateCountCheck(id, check) : removeCountCheck(id)
     resetIsEditing()
   }
@@ -406,6 +406,7 @@ function CheckListItem({ countCheck }: { countCheck: CountCheckProps }) {
   }
 
   function handleClickAway() {
+    !!check ? updateCountCheck(id, check) : removeCountCheck(id)
     isEditing && _.delay(resetIsEditing, 250)
   }
 

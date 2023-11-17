@@ -7,7 +7,6 @@ import {
 
 
 
-
 */
 export function formatCommaSeparatedNumber(number: number) {
   if (number === 0) {
@@ -17,7 +16,6 @@ export function formatCommaSeparatedNumber(number: number) {
   }
 }
 /*
-
 
 
 
@@ -37,13 +35,11 @@ export function formatLongDate(timeStamp: number) {
 
 
 
-
 */
 export function getTimeStamp() {
   return Date.now()
 }
 /*
-
 
 
 
@@ -61,20 +57,15 @@ export function calculateDuration(
 
 
 
-
 */
 export function formatDuration(durationInMs: number) {
-  const hours = Math.floor(durationInMs / (1000 * 60 * 60))
-  const minutes = Math.floor((durationInMs % (1000 * 60 * 60)) / (1000 * 60))
+  const milliseconds = !!durationInMs ? durationInMs : 0
+  const hours = Math.floor(milliseconds / (1000 * 60 * 60))
+  const minutes = Math.floor((milliseconds % (1000 * 60 * 60)) / (1000 * 60))
 
-  if (!hours) {
-    return `${minutes} min`
-  } else {
-    return `${hours}h ${minutes}m`
-  }
+  return !!hours ? `${hours}h ${minutes}m` : `${minutes} min`
 }
 /*
-
 
 
 
@@ -90,7 +81,6 @@ export function copyToClipboard(text: string, notification: NotificationNames) {
 
 
 
-
 */
 export function trimEmptyLines(string: string) {
   const lines = string.split("\n")
@@ -100,7 +90,6 @@ export function trimEmptyLines(string: string) {
   return lines.join("\n")
 }
 /*
-
 
 
 

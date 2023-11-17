@@ -255,7 +255,7 @@ function ButtonTray({ isRegistering }: { isRegistering: boolean }) {
   }
 
   function signInUser() {
-    setAuthUI("isVerifying", true)
+    setAuthUI("isSigningIn", true)
     signIn(email, password).catch(() => setAuthUI("isSigningIn", false))
     _.delay(() => setAuthUI("isSigningIn", false), 5000)
   }
@@ -277,6 +277,8 @@ function ButtonTray({ isRegistering }: { isRegistering: boolean }) {
         onClick={handleClick}
         disabled={isDetailsIncomplete}
         color={theme.scale.green[6]}
+        outlineColor={theme.scale.green[8]}
+        bgColor={theme.scale.gray[8]}
       />
       <Button
         variation={"pill"}
@@ -309,7 +311,10 @@ function ForgotPassword({ isRegistering }: { isRegistering: boolean }) {
       width={"100%"}
       alignItems={"flex-start"}
       paddingLeft={theme.module[0]}
-      sx={{ opacity: isRegistering ? 0 : 1 }}
+      sx={{
+        opacity: isRegistering ? 0 : 1,
+        transition: `opacity ${isRegistering ? 0 : 350}ms`,
+      }}
     >
       <Button
         variation={"pill"}
@@ -360,7 +365,13 @@ export function PasswordValidationCheck({
   ]
 
   return (
-    <Accordion expanded={isActive}>
+    <Accordion
+      expanded={isActive}
+      sx={{
+        opacity: isActive ? 1 : 0,
+        transition: `opacity ${isActive ? 250 : 750}ms ease-out`,
+      }}
+    >
       <AccordionSummary />
       <AccordionDetails>
         <Stack
@@ -437,6 +448,15 @@ export function SigningInLoader() {
 export function VerifyEmailPrompt() {
   const theme = useTheme()
   const isVerifying = useAuthUI((state) => state.isVerifying)
+  const email = useAuthUI((state) => state.email)
+  const password = useAuthUI((state) => state.password)
+
+  function signInUser() {
+    setAuthUI("isVerifying", false)
+    setAuthUI("isSigningIn", true)
+    signIn(email, password).catch(() => setAuthUI("isSigningIn", false))
+    _.delay(() => setAuthUI("isSigningIn", false), 5000)
+  }
 
   return (
     isVerifying && (
@@ -448,16 +468,17 @@ export function VerifyEmailPrompt() {
         alignContent={"center"}
         position={"absolute"}
         zIndex={100}
-        padding={theme.module[4]}
+        padding={theme.module[6]}
         boxSizing={"border-box"}
       >
-        <Typography>
+        <Typography fontWeight={"bold"} color={theme.scale.gray[5]}>
           An email has been sent to you. Click the link to verify your account.
         </Typography>
         <Button
           variation={"pill"}
-          label={"Back to sign in"}
-          onClick={() => setAuthUI("isVerifying", false)}
+          label={"Continue to app"}
+          onClick={signInUser}
+          color={theme.scale.blue[6]}
         />
       </Stack>
     )

@@ -28,7 +28,12 @@ import { MembersProps } from "../org/orgSlice"
 import { selectOrgMembers } from "../org/orgSliceSelectors"
 import { getMemberShortName, getMembersShortNames } from "../org/orgUtils"
 import { selectStock } from "../stock/stockSliceSelectors"
-import { HistoryUIState, setHistoryUI, useHistoryUI } from "./history"
+import {
+  HistoryUIState,
+  resetHistoryUI,
+  setHistoryUI,
+  useHistoryUI,
+} from "./history"
 import {
   HistoryItemCommentsProps,
   HistoryItemMetadataProps,
@@ -63,6 +68,7 @@ function Outer({
   children: React.ReactElement | React.ReactElement[]
 }) {
   const theme = useTheme()
+
   return (
     <Stack
       width={"100%"}
@@ -103,7 +109,7 @@ function Header() {
         variation={"pill"}
         iconName={"cancel"}
         bgColor={theme.scale.gray[9]}
-        onClick={() => setHistoryUI("reviewItemUuid", "")}
+        onClick={resetHistoryUI}
         iconSize={"small"}
         outlineColor={theme.scale.red[7]}
         sx={{ padding: theme.module[3], boxShadow: theme.shadow.neo[3] }}
@@ -268,7 +274,6 @@ function DetailsList(props: Required<HistoryItemMetadataProps>) {
 
 
 */
-
 function DurationChart(props: Required<HistoryItemMetadataProps>) {
   const theme = useTheme()
 

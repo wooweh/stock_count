@@ -1,9 +1,11 @@
 import { Stack, Typography } from "@mui/material"
 import _ from "lodash"
 import { useLocation, useNavigate } from "react-router-dom"
+import { useNetworkState } from "react-use"
 import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { Button } from "../../components/button"
+import Icon from "../../components/icon"
 import { selectIsUserCounting } from "../count/countSliceSelectors"
 import { selectIsSystemBooted } from "./coreSliceSelectors"
 import { Menu } from "./menu"
@@ -81,11 +83,67 @@ function NavigationBar() {
 */
 function CountBanner() {
   const theme = useTheme()
+  const networkState = useNetworkState()
+  const isWifi = networkState.type === "wifi"
+  const isOnline = networkState.online
+  const speed = networkState.downlink ?? 0
+  const slow = speed < 1
+  const medium = speed >= 1 && speed < 10
+  console.log(speed)
+  const color = slow
+    ? theme.scale.red[6]
+    : medium
+    ? theme.scale.orange[6]
+    : theme.scale.green[6]
+  const status = isOnline
+    ? slow
+      ? "Slow"
+      : medium
+      ? "Medium"
+      : "Fast"
+    : "Offline"
+
+  const iconName = isWifi ? "wifi" : "cellular"
 
   return (
-    <Typography fontWeight={"bold"} color={theme.scale.gray[4]}>
-      Counting in Progress
-    </Typography>
+    <Stack
+      width={"100%"}
+      direction={"row"}
+      justifyContent={"space-between"}
+      padding={`0 ${theme.module[3]}`}
+      alignItems={"center"}
+      boxSizing={"border-box"}
+      position={"relative"}
+    >
+      <Stack
+        width={"100%"}
+        alignItems={"center"}
+        position={"absolute"}
+        left={0}
+        zIndex={10}
+      >
+        <Typography fontWeight={"bold"} color={theme.scale.gray[4]}>
+          Counting...
+        </Typography>
+      </Stack>
+      <Stack
+        width={"100%"}
+        direction={"row"}
+        gap={theme.module[3]}
+        alignItems={"center"}
+        justifyContent={"flex-end"}
+      >
+        <Icon variation={iconName} color={color} fontSize="small" />
+        <Typography
+          fontWeight={"medium"}
+          color={color}
+          variant={"caption"}
+          lineHeight={0}
+        >
+          {status}
+        </Typography>
+      </Stack>
+    </Stack>
   )
 }
 /*

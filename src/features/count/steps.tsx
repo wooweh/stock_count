@@ -64,6 +64,7 @@ export function Steps() {
     isCountCompleted && isOrganiser && !isReviewMetadataSubmitted
 
   useEffect(() => {
+    console.log(shouldUpdateReviewMetadata)
     if (shouldUpdateReviewMetadata) updateReviewMetadata()
   }, [shouldUpdateReviewMetadata])
 

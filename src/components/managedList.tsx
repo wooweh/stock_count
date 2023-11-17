@@ -179,18 +179,22 @@ function Header(props: HeaderProps) {
     props.setScrollIndex(index)
   }
 
+  const showHeader = !!props.list.length
+
   return (
-    <Stack width={"100%"} height={theme.module[6]} flexShrink={0}>
-      {props.isSelecting ? (
-        <SelectionBar {...props} />
-      ) : (
-        <SearchBar
-          heading={props.heading}
-          list={props.list}
-          onSelect={handleSelect}
-        />
-      )}
-    </Stack>
+    showHeader && (
+      <Stack width={"100%"} height={theme.module[6]} flexShrink={0}>
+        {props.isSelecting ? (
+          <SelectionBar {...props} />
+        ) : (
+          <SearchBar
+            heading={props.heading}
+            list={props.list}
+            onSelect={handleSelect}
+          />
+        )}
+      </Stack>
+    )
   )
 }
 /*
