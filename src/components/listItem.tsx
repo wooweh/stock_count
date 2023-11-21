@@ -2,13 +2,13 @@ import { ClickAwayListener } from "@mui/material"
 import ButtonBase from "@mui/material/ButtonBase"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
+import _ from "lodash"
 import { MouseEvent, useContext, useEffect, useState } from "react"
 import { useLongPress } from "use-long-press"
 import useTheme from "../common/useTheme"
 import { Button } from "./button"
 import Icon, { IconNames } from "./icon"
 import { ListGroupContext } from "./list"
-import _ from "lodash"
 /* 
 
 
@@ -231,7 +231,7 @@ function ItemBody(props: {
           fontWeight={"bold"}
           maxWidth={props.noWrap ? `calc(${theme.module[8]} * 2)` : "100%"}
           noWrap={props.noWrap}
-          >
+        >
           {props.label}
         </Typography>
         <Typography
@@ -412,43 +412,122 @@ type ItemOptionsProps = {
 function ItemOptions(props: ItemOptionsProps) {
   const theme = useTheme()
 
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false)
+  const [handleDelete, setHandleDelete] = useState({ onDelete: new Function() })
+
+  useEffect(() => {
+    if (!props.show) setShowDeleteConfirmation(false)
+  }, [props.show])
+
   return (
     props.show && (
       <Stack
         width={"100%"}
         height={"100%"}
-        direction={"row"}
         bgcolor={theme.scale.gray[9]}
-        boxSizing={"border-box"}
         position={"absolute"}
         borderRadius={theme.module[3]}
-        justifyContent={"space-between"}
-        alignItems={"center"}
-        padding={`0 ${theme.module[5]}`}
       >
-        {props.options.map((option: ListItemOptionProps, index: number) => {
-          function onClick() {
-            if (option.onClick) option.onClick()
-            props.setShow(false)
-          }
+        <Stack
+          width={"100%"}
+          height={"100%"}
+          direction={"row"}
+          boxSizing={"border-box"}
+          position={"relative"}
+          borderRadius={theme.module[3]}
+          justifyContent={"space-between"}
+          alignItems={"center"}
+          padding={`0 ${theme.module[5]}`}
+        >
+          {props.options.map((option: ListItemOptionProps, index: number) => {
+            const isDelete = option.iconName === "delete"
+            function onClick() {
+              if (option.onClick) {
+                if (isDelete) {
+                  setShowDeleteConfirmation(true)
+                  setHandleDelete({ onDelete: option.onClick })
+                } else {
+                  option.onClick()
+                  props.setShow(false)
+                }
+              }
+            }
 
-          return (
-            <Button
-              variation={"pill"}
-              onClick={onClick}
-              iconName={option.iconName}
-              key={index}
+            return (
+              <Button
+                variation={"pill"}
+                onClick={onClick}
+                iconName={option.iconName}
+                key={index}
+              />
+            )
+          })}
+          <Button
+            variation={"pill"}
+            onClick={() => props.setShow(false)}
+            iconName={"cancel"}
+            key={props.options.length}
+          />
+          {showDeleteConfirmation && (
+            <ItemOptionDeleteConfirmation
+              setShowOptions={props.setShow}
+              setShow={setShowDeleteConfirmation}
+              onDelete={handleDelete.onDelete}
             />
-          )
-        })}
-        <Button
-          variation={"pill"}
-          onClick={() => props.setShow(false)}
-          iconName={"cancel"}
-          key={props.options.length}
-        />
+          )}
+        </Stack>
       </Stack>
     )
+  )
+}
+/*
+
+
+
+
+
+*/
+type ItemOptionDeleteConfirmationProps = {
+  onDelete: Function | undefined
+  setShow: Function
+  setShowOptions: Function
+}
+function ItemOptionDeleteConfirmation(
+  props: ItemOptionDeleteConfirmationProps,
+) {
+  const theme = useTheme()
+
+  function handleAccept() {
+    !!props.onDelete && props.onDelete()
+    props.setShow(false)
+    props.setShowOptions(false)
+  }
+
+  function handleCancel() {
+    props.setShow(false)
+  }
+
+  return (
+    <Stack
+      width={"100%"}
+      height={"100%"}
+      position={"absolute"}
+      left={0}
+      direction={"row"}
+      borderRadius={theme.module[2]}
+      zIndex={100}
+      justifyContent={"space-between"}
+      alignItems={"center"}
+      padding={`0 ${theme.module[5]}`}
+      bgcolor={theme.scale.gray[8]}
+      boxSizing={"border-box"}
+    >
+      <Button variation="pill" iconName={"cancel"} onClick={handleCancel} />
+      <Typography variant="body2" color={theme.scale.gray[5]}>
+        Confirm Deletion
+      </Typography>
+      <Button variation="pill" iconName={"done"} onClick={handleAccept} />
+    </Stack>
   )
 }
 /*

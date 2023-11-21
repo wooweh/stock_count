@@ -15,6 +15,7 @@ import {
   SearchListProps,
 } from "../components/searchBar"
 import { IconNames } from "./icon"
+import Modal, { ModalActionProps } from "./modal"
 /*
 
 
@@ -99,8 +100,8 @@ export type ManagedListProps = {
   emptyListPlaceholder: React.FunctionComponent
 }
 export function ManagedList(props: ManagedListProps) {
-  const theme = useTheme()
-
+  const [isDeletingSelection, setIsDeletingSelection] = useState(false)
+  const [isDeletingAll, setIsDeletingAll] = useState(false)
   const [isSelecting, setIsSelecting] = useState(false)
   const [scrollIndex, setScrollIndex] = useState(0)
   const [state, dispatch] = useReducer(manageSelectedItems, {
@@ -115,6 +116,8 @@ export function ManagedList(props: ManagedListProps) {
     isSelecting,
     setIsSelecting,
     setScrollIndex,
+    setIsDeletingAll,
+    setIsDeletingSelection,
   }
   const bodyProps: BodyProps = {
     ...headerProps,
@@ -122,10 +125,33 @@ export function ManagedList(props: ManagedListProps) {
     setScrollIndex,
   }
 
+  const isOpen = isDeletingAll || isDeletingSelection
+  const onAccept = handleAccept
+  function handleAccept() {
+    isDeletingAll ? props.onDeleteAll() : props.onDeleteSelection(selectedItems)
+    handleCancel()
+  }
+
+  const onCancel = handleCancel
+  function handleCancel() {
+    setIsDeletingAll(false)
+    setIsDeletingSelection(false)
+    setIsSelecting(false)
+    dispatch({ type: "clear" })
+  }
+
+  const deleteConfirmationProps: DeleteConfirmationProps = {
+    isOpen,
+    onAccept,
+    onCancel,
+    setIsSelecting,
+  }
+
   return (
     <Outer>
       <Header {...headerProps} />
       <Body {...bodyProps} />
+      <DeleteConfirmation {...deleteConfirmationProps} />
     </Outer>
   )
 }
@@ -166,6 +192,8 @@ type HeaderProps = ManagedListProps & {
   isSelecting: boolean
   setIsSelecting: any
   setScrollIndex: any
+  setIsDeletingSelection: any
+  setIsDeletingAll: any
 }
 function Header(props: HeaderProps) {
   const theme = useTheme()
@@ -220,12 +248,9 @@ function SelectionBar(props: SelectionBarProps) {
   }
 
   function handleDelete() {
-    if (isAllSelected) {
-      props.onDeleteAll()
-    } else {
-      props.onDeleteSelection(props.selectedItems)
-    }
-    handleBack()
+    isAllSelected
+      ? props.setIsDeletingAll(true)
+      : props.setIsDeletingSelection(true)
   }
 
   function handleBack() {
@@ -375,6 +400,34 @@ function Body(props: BodyProps) {
       </Stack>
       {showScrollToTop && <ScrollToTop onClick={handleScrollToTopClick} />}
     </Stack>
+  )
+}
+/*
+
+
+
+
+*/
+type DeleteConfirmationProps = {
+  setIsSelecting: Function
+  onAccept: Function
+  onCancel: Function
+  isOpen: boolean
+}
+function DeleteConfirmation(props: DeleteConfirmationProps) {
+  const actions: ModalActionProps[] = [
+    { iconName: "cancel", handleClick: props.onCancel },
+    { iconName: "done", handleClick: props.onAccept },
+  ]
+
+  return (
+    <Modal
+      open={props.isOpen}
+      heading={"Confirm Deletion"}
+      body={<Typography>Continue with deletion?</Typography>}
+      onClose={props.onCancel}
+      actions={actions}
+    />
   )
 }
 /*

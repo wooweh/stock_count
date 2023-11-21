@@ -33,6 +33,7 @@ export function removeStock() {
 
 */
 export function removeStockItems(ids: string[]) {
+  console.log(ids)
   _.forEach(ids, (id) => store.dispatch(deleteStockItem({ id })))
 }
 /*
