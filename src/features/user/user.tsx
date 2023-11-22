@@ -1,5 +1,6 @@
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
+import _ from "lodash"
 import { useEffect, useState } from "react"
 import { create } from "zustand"
 import { createJSONStorage, persist } from "zustand/middleware"
@@ -14,6 +15,8 @@ import { generateNotification } from "../core/coreUtils"
 import { PasswordValidationCheck } from "./authentication"
 import { changeEmail, changePassword } from "./userAuth"
 import {
+  selectIsEmailChangePending,
+  selectIsEmailChangeSuccess,
   selectIsPasswordChangePending,
   selectIsPasswordChangeSuccess,
   selectUserEmail,
@@ -21,7 +24,6 @@ import {
 } from "./userSliceSelectors"
 import { removeUser, updateUserName } from "./userSliceUtils"
 import { checkNewPassword, getPasswordValidation } from "./userUtils"
-import _ from "lodash"
 /*
 
 
@@ -32,6 +34,7 @@ type UserUIState = {
   isEditing: boolean
   isDeleting: boolean
   isChangingPassword: boolean
+  isChangingEmail: boolean
   name: string
   surname: string
   email: string
@@ -41,6 +44,7 @@ const initialState: UserUIState = {
   isEditing: false,
   isDeleting: false,
   isChangingPassword: false,
+  isChangingEmail: false,
   name: "",
   surname: "",
   email: "",
@@ -73,6 +77,7 @@ export function UserProfile() {
       <ProfileFields />
       <ButtonTray />
       <ChangePassword />
+      <ChangeEmail />
       <DeleteProfileConfirmation />
     </ProfileSurface>
   )
@@ -97,23 +102,23 @@ function ProfileFields() {
   useEffect(() => {
     if (name?.first) setUserUI("name", name.first)
     if (name?.last) setUserUI("surname", name.last)
-    if (email) setUserUI("email", email)
+    if (email && !editableEmail) setUserUI("email", email)
   }, [isEditing, name, email])
 
   const fields: ProfileFieldProps[] = [
     {
       label: "Name",
-      value: editableName ? editableName : name?.first,
+      value: isEditing ? editableName : name?.first,
       handleChange: (event: any) => setUserUI("name", event.target.value),
     },
     {
       label: "Surname",
-      value: editableSurname ? editableSurname : name?.last,
+      value: isEditing ? editableSurname : name?.last,
       handleChange: (event: any) => setUserUI("surname", event.target.value),
     },
     {
       label: "Email",
-      value: editableEmail ? editableEmail : email,
+      value: isEditing ? editableEmail : email,
       handleChange: (event: any) => setUserUI("email", event.target.value),
     },
   ]
@@ -125,7 +130,7 @@ function ProfileFields() {
           label={field.label}
           value={field.value ?? ""}
           handleChange={field.handleChange}
-          key={index}
+          key={field.label}
         />
       ))}
     </Stack>
@@ -197,7 +202,7 @@ function ButtonTray() {
   const surname = useUserUI((state: any) => state.surname)
   const newEmail = useUserUI((state: any) => state.email)
 
-  const isChangingEmail = !!newEmail
+  const isChangingEmail = !!newEmail && newEmail !== oldEmail
   const isProfileComplete = !!name && !!surname && !!oldEmail
 
   function handleEdit() {
@@ -207,8 +212,8 @@ function ButtonTray() {
   function handleAccept() {
     if (isProfileComplete) {
       updateUserName(name, surname)
-      setUserUI("isEditing", false)
-      if (isChangingEmail) changeEmail(oldEmail, newEmail)
+
+      if (isChangingEmail) setUserUI("isChangingEmail", true)
     } else {
       generateNotification("incompleteProfileDetails")
     }
@@ -298,6 +303,70 @@ function DeleteProfileConfirmation() {
             isPassword
           />
         </Stack>
+      }
+      actions={actions}
+      onClose={handleClose}
+    />
+  )
+}
+/*
+
+
+
+
+*/
+function ChangeEmail() {
+  const isEmailChangePending = useAppSelector(selectIsEmailChangePending)
+  const isEmailChangeSuccess = useAppSelector(selectIsEmailChangeSuccess)
+  const oldEmail = useAppSelector(selectUserEmail)
+
+  const newEmail = useUserUI((state: any) => state.email)
+  const isChangingEmail = useUserUI((state: any) => state.isChangingEmail)
+  const [password, setPassword] = useState("")
+
+  const isCredentialsComplete = !!newEmail && !!oldEmail && !!password
+
+  useEffect(() => {
+    if (isEmailChangeSuccess) handleClose()
+  }, [isEmailChangeSuccess])
+
+  function handleAccept() {
+    if (isCredentialsComplete) {
+      changeEmail(newEmail, oldEmail, password).then(() => handleClose())
+    }
+  }
+
+  function handleClose() {
+    setUserUI("isChangingEmail", false)
+    setUserUI("isEditing", false)
+    _.delay(() => setPassword(""), 250)
+  }
+
+  const actions: ModalActionProps[] = [
+    {
+      iconName: "cancel",
+      handleClick: handleClose,
+    },
+    {
+      iconName: "done",
+      handleClick: handleAccept,
+    },
+  ]
+
+  return (
+    <Modal
+      open={isChangingEmail}
+      heading={"Change Email"}
+      body={
+        <>
+          <Input
+            isPassword
+            placeholder={"Password"}
+            onChange={(e: any) => setPassword(e.target.value)}
+            value={password}
+          />
+          {isEmailChangePending && <Loader narration="Changing email..." />}
+        </>
       }
       actions={actions}
       onClose={handleClose}

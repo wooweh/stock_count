@@ -117,6 +117,46 @@ export const selectIsPasswordChangePending = createSelector(
  
  
  */
+export const selectEmailChangeStatus = createSelector(
+  [userSelector],
+  (user) => user.emailChangeStatus,
+)
+/*
+    
+    
+    
+    
+*/
+export const selectIsEmailChangeFailed = createSelector(
+  [selectEmailChangeStatus],
+  (status) => status === "isFailed",
+)
+/*
+   
+   
+   
+   
+*/
+export const selectIsEmailChangeSuccess = createSelector(
+  [selectEmailChangeStatus],
+  (status) => status === "isSuccess",
+)
+/*
+  
+  
+  
+  
+*/
+export const selectIsEmailChangePending = createSelector(
+  [selectEmailChangeStatus],
+  (status) => status === "isPending",
+)
+/*
+ 
+ 
+ 
+ 
+ */
 export const selectIsUserAdmin = createSelector(
   [userSelector],
   (user) => user.user.org?.role === "admin",

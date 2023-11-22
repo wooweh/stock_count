@@ -1,8 +1,10 @@
+import { getAuth, onAuthStateChanged } from "firebase/auth"
+import { useEffect, useState } from "react"
 import { create } from "zustand"
 import { createJSONStorage, persist } from "zustand/middleware"
 import { useAppSelector } from "../../app/hooks"
 import { Loader } from "../../components/loader"
-import { CompleteProfilePrompt } from "../core/home"
+import { CompleteProfilePrompt, VerifyEmailPrompt } from "../core/home"
 import { selectIsProfileComplete } from "../user/userSliceSelectors"
 import { selectIsJoining, selectIsOrgSetup } from "./orgSliceSelectors"
 import { OrgProfile } from "./profile"
@@ -62,16 +64,28 @@ export function Org() {
   const isOrgSetup = useAppSelector(selectIsOrgSetup)
   const isJoiningOrg = useAppSelector(selectIsJoining)
 
-  return isProfileComplete ? (
-    isJoiningOrg ? (
-      <Loader narration={"joining org"} />
-    ) : isOrgSetup ? (
-      <OrgProfile />
-    ) : (
-      <OrgSetup />
-    )
-  ) : (
+  const [isEmailVerified, setIsEmailVerified] = useState(true)
+
+  useEffect(() => {
+    let initial = 0
+    setInterval(() => {
+      initial = 5000
+      onAuthStateChanged(getAuth(), (user) => {
+        if (!!user) setIsEmailVerified(user.emailVerified)
+      })
+    }, initial)
+  }, [])
+
+  return !isProfileComplete ? (
     <CompleteProfilePrompt />
+  ) : !isEmailVerified ? (
+    <VerifyEmailPrompt />
+  ) : isJoiningOrg ? (
+    <Loader narration={"joining org"} />
+  ) : isOrgSetup ? (
+    <OrgProfile />
+  ) : (
+    <OrgSetup />
   )
 }
 /*

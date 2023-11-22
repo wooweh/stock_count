@@ -1,18 +1,24 @@
 import { Divider, Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
 import Grid from "@mui/material/Unstable_Grid2/Grid2"
+import { getAuth, onAuthStateChanged } from "firebase/auth"
 import _ from "lodash"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { Button } from "../../components/button"
 import { Input } from "../../components/control"
 import Icon, { IconNames } from "../../components/icon"
+import { auth } from "../../remote"
 import { selectIsOrgSetup, selectOrgName } from "../org/orgSliceSelectors"
 import { createOrg, joinOrg } from "../org/orgSliceUtils"
 import { getInviteKeyValidation } from "../org/orgUtils"
-import { selectIsProfileComplete, selectIsUserAdmin } from "../user/userSliceSelectors"
+import { codeSettings, sendEmailVerification } from "../user/userAuth"
+import {
+  selectIsProfileComplete,
+  selectIsUserAdmin,
+} from "../user/userSliceSelectors"
 import { updateUserName } from "../user/userSliceUtils"
 import { generateCustomNotification } from "./coreUtils"
 import { routePaths } from "./pages"
@@ -26,14 +32,70 @@ export function Home() {
   const isProfileComplete = useAppSelector(selectIsProfileComplete)
   const isOrgSetup = useAppSelector(selectIsOrgSetup)
 
-  return isProfileComplete ? (
-    isOrgSetup ? (
-      <HomeButtons />
-    ) : (
-      <SetupOrgPrompt />
-    )
-  ) : (
+  const [isEmailVerified, setIsEmailVerified] = useState(true)
+
+  useEffect(() => {
+    let initial = 0
+    setInterval(() => {
+      initial = 5000
+      onAuthStateChanged(getAuth(), (user) => {
+        if (!!user) setIsEmailVerified(user.emailVerified)
+      })
+    }, initial)
+  }, [])
+
+  return !isEmailVerified ? (
+    <VerifyEmailPrompt />
+  ) : !isProfileComplete ? (
     <CompleteProfilePrompt />
+  ) : !isOrgSetup ? (
+    <SetupOrgPrompt />
+  ) : (
+    <HomeButtons />
+  )
+}
+/*
+
+
+
+
+*/
+export function VerifyEmailPrompt() {
+  const theme = useTheme()
+  const user = auth.currentUser
+
+  function handleResend() {
+    if (!!user)
+      sendEmailVerification(user, codeSettings).then(() =>
+        generateCustomNotification("success", "Email sent"),
+      )
+  }
+
+  function handleRefresh() {
+    window.location.reload()
+  }
+
+  return (
+    <Stack
+      width={"100%"}
+      height={"100%"}
+      justifyContent={"center"}
+      alignItems={"center"}
+      gap={theme.module[6]}
+      padding={theme.module[5]}
+      boxSizing={"border-box"}
+    >
+      <Typography textAlign={"center"} color={theme.scale.gray[4]}>
+        Verify your email using the link sent to you.
+      </Typography>
+      <Button
+        variation={"pill"}
+        onClick={handleResend}
+        label={"Resend email"}
+        outlineColor={theme.scale.gray[6]}
+        sx={{ width: theme.module[10] }}
+      />
+    </Stack>
   )
 }
 /*
@@ -52,11 +114,9 @@ export function CompleteProfilePrompt() {
   const INCOMPLETE_DETAILS_MESSAGE = "Please complete your name and surname."
 
   function handleClick() {
-    if (isProfileDetailsComplete) {
-      updateUserName(firstName, lastName)
-    } else {
-      generateCustomNotification("error", INCOMPLETE_DETAILS_MESSAGE)
-    }
+    isProfileDetailsComplete
+      ? updateUserName(firstName, lastName)
+      : generateCustomNotification("error", INCOMPLETE_DETAILS_MESSAGE)
   }
 
   return (

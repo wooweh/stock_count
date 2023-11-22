@@ -1,4 +1,4 @@
-import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit"
+import { PayloadAction, createSlice } from "@reduxjs/toolkit"
 import { RootState } from "../../app/store"
 /*
 
@@ -22,6 +22,7 @@ export type PasswordChangeStatuses =
   | "isPending"
   | "isSuccess"
   | "isFailed"
+export type EmailChangeStatuses = PasswordChangeStatuses
 export type UserNameProps = {
   first: string
   last: string
@@ -38,12 +39,14 @@ export type SetEmailProps = {
 export interface UserState {
   isSignedIn: boolean
   passwordChangeStatus: PasswordChangeStatuses
+  emailChangeStatus: EmailChangeStatuses
   user: UserProps
 }
 
 const initialState: UserState = {
   isSignedIn: false,
   passwordChangeStatus: "notChanged",
+  emailChangeStatus: "notChanged",
   user: {},
 }
 
@@ -73,6 +76,12 @@ export const userSlice = createSlice({
     ) => {
       state.passwordChangeStatus = action.payload
     },
+    setEmailChangeStatus: (
+      state,
+      action: PayloadAction<EmailChangeStatuses>,
+    ) => {
+      state.emailChangeStatus = action.payload
+    },
     setUser: (state, action: PayloadAction<SetUserProps>) => {
       state.user = action.payload.user
     },
@@ -89,6 +98,7 @@ export const {
   setUserOrgDetails,
   deleteUserOrgDetails,
   setPasswordChangeStatus,
+  setEmailChangeStatus,
   setUser,
   deleteUser,
 } = userSlice.actions

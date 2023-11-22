@@ -1,4 +1,5 @@
 import {
+  ActionCodeSettings,
   EmailAuthProvider,
   User,
   createUserWithEmailAndPassword as createUserOnAuth,
@@ -10,6 +11,7 @@ import {
   updateEmail as updateEmailOnAuth,
   updatePassword as updatePasswordOnAuth,
 } from "firebase/auth"
+import _ from "lodash"
 import { store } from "../../app/store"
 import { auth } from "../../remote"
 import {
@@ -18,17 +20,20 @@ import {
   setSystemNotBooted,
 } from "../core/coreSliceUtils"
 import {
+  generateCustomNotification,
   generateErrorNotification,
   generateNotification,
 } from "../core/coreUtils"
 import { getUserFromDB } from "./userSliceRemote"
 import {
   createNewUser,
+  resetEmailChangeStatus,
   resetPasswordChangeStatus,
   signUserIn,
   signUserOut,
   updateUser,
   updateUserEmail,
+  updateUserEmailChangeStatus,
   updateUserPasswordChangeStatus,
 } from "./userSliceUtils"
 import { checkNewPassword } from "./userUtils"
@@ -62,24 +67,11 @@ export async function syncUserDetails(user: User) {
 
   if (!isSystemBooted) {
     getUserFromDB()
-      .then((dbUser) => {
-        if (!!dbUser) {
-          console.log("Setting existing user in userSlice")
-          updateUser(dbUser)
-        } else {
-          console.log("Setting new user in userSlice and db")
-          createNewUser({ uuid, email })
-        }
-      })
-      .then(() => {
-        setSystemIsBooting()
-        console.log("System booting")
-      })
-      .catch((error) => {
-        setSystemNotBooted()
-        console.log("System booting stopped")
-        console.error(error)
-      })
+      .then((dbUser) =>
+        !!dbUser ? updateUser(dbUser) : createNewUser({ uuid, email }),
+      )
+      .then(() => setSystemIsBooting())
+      .catch((error) => setSystemNotBooted())
   }
 }
 /*
@@ -100,12 +92,33 @@ export async function signOut() {
 
 
 */
-export async function changeEmail(email: string, oldEmail: string) {
+const url = import.meta.env.VITE_EMAIL_VERIFICATION_REDIRECT_URL
+export const codeSettings = { url }
+export async function changeEmail(
+  newEmail: string,
+  oldEmail: string,
+  password: string,
+) {
   const authUser = auth.currentUser
-  if (!!authUser && email !== oldEmail) {
-    updateEmailOnAuth(authUser, email)
-      .then(() => updateUserEmail(email))
-      .catch((error) => generateErrorNotification(error.code))
+  if (!!authUser && newEmail !== oldEmail) {
+    updateUserEmailChangeStatus("isPending")
+    reauthenticate(authUser, password)
+      .then(() => updateUserEmail(newEmail))
+      .then(() => updateEmailOnAuth(authUser, newEmail))
+      .then(() => {
+        _.delay(() => {
+          updateUserEmailChangeStatus("isSuccess")
+          generateCustomNotification("success", "Your email has been changed.")
+        }, 1000)
+        sendEmailVerification(authUser, codeSettings)
+        resetEmailChangeStatus()
+      })
+      .catch((error) => {
+        updateUserEmail(oldEmail)
+        updateUserEmailChangeStatus("isFailed")
+        generateErrorNotification(error.code)
+        resetEmailChangeStatus()
+      })
   }
 }
 /*
@@ -114,19 +127,29 @@ export async function changeEmail(email: string, oldEmail: string) {
 
 
 */
-const url = import.meta.env.VITE_EMAIL_VERIFICATION_REDIRECT_URL
-const codeSettings = { url }
+export async function sendEmailVerification(
+  user: User,
+  settings: ActionCodeSettings,
+) {
+  sendAuthEmailVerification(user, codeSettings).catch((error) =>
+    generateErrorNotification(error.code),
+  )
+}
+/*
+
+
+
+
+*/
 export async function register(email: string, password: string) {
   return createUserOnAuth(auth, email, password)
     .then((credential) => {
-      if (!!credential.user) {
-        sendAuthEmailVerification(credential.user, codeSettings)
-      }
+      if (!!credential.user)
+        sendEmailVerification(credential.user, codeSettings)
     })
     .catch((error) => generateErrorNotification(error.code))
 }
 /*
-
 
 
 
@@ -144,7 +167,6 @@ export async function reauthenticate(user: User, password: string) {
 
 
 
-
 */
 export function resetPassword(email: string) {
   sendAuthPasswordReset(auth, email, codeSettings)
@@ -152,7 +174,6 @@ export function resetPassword(email: string) {
     .catch((error) => generateErrorNotification(error.code))
 }
 /*
-
 
 
 
@@ -197,7 +218,6 @@ export async function updatePassword(password: string, newPassword: string) {
     })
 }
 /*
-
 
 
 

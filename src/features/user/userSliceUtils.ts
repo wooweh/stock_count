@@ -6,11 +6,13 @@ import { generateErrorNotification } from "../core/coreUtils"
 import { setOrgMember } from "../org/orgSlice"
 import { reauthenticate, signOut } from "./userAuth"
 import {
+  EmailChangeStatuses,
   PasswordChangeStatuses,
   UserOrgRoles,
   UserProps,
   deleteUser,
   deleteUserOrgDetails,
+  setEmailChangeStatus,
   setIsSignedIn,
   setPasswordChangeStatus,
   setUser,
@@ -102,6 +104,24 @@ export function resetPasswordChangeStatus() {
 */
 export function updateUserPasswordChangeStatus(status: PasswordChangeStatuses) {
   store.dispatch(setPasswordChangeStatus(status))
+}
+/*
+
+
+
+
+*/
+export function resetEmailChangeStatus() {
+  _.delay(() => updateUserEmailChangeStatus("notChanged"), 250)
+}
+/*
+
+
+
+
+*/
+export function updateUserEmailChangeStatus(status: EmailChangeStatuses) {
+  store.dispatch(setEmailChangeStatus(status))
 }
 /*
 
