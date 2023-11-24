@@ -5,7 +5,7 @@ import AccordionSummary from "@mui/material/AccordionSummary"
 import Stack from "@mui/material/Stack"
 import _ from "lodash"
 import { useEffect } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { create } from "zustand"
 import { createJSONStorage, persist } from "zustand/middleware"
 import { useAppSelector } from "../../app/hooks"
@@ -233,13 +233,11 @@ function CredentialInputs() {
 function ButtonTray({ isRegistering }: { isRegistering: boolean }) {
   const theme = useTheme()
   const navigate = useNavigate()
-  const location = useLocation()
 
   const email = useAuthUI((state) => state.email)
   const password = useAuthUI((state) => state.password)
   const passwordValidation = useAuthUI((state) => state.passwordValidation)
 
-  const isSignInPath = location.pathname === routePaths.signIn.path
   const isPasswordValid = passwordValidation.isValid
   const isDetailsIncomplete =
     (isRegistering && !isPasswordValid) || !email || !password
