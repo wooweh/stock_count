@@ -28,4 +28,4 @@ build
 
 # Miscellaneous
 /src/zTodo.txt
-*.local
+*.local*
