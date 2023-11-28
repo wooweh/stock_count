@@ -10,7 +10,7 @@ import { Button } from "../../components/button"
 import { Input } from "../../components/control"
 import { Loader } from "../../components/loader"
 import Modal, { ModalActionProps } from "../../components/modal"
-import { ProfileSurface } from "../../components/profileSurface"
+import { ProfileWrapper } from "../../components/surface"
 import { generateNotification } from "../core/coreUtils"
 import { PasswordValidationCheck } from "./authentication"
 import { changeEmail, changePassword } from "./userAuth"
@@ -73,13 +73,13 @@ export function resetUserUI() {
 */
 export function UserProfile() {
   return (
-    <ProfileSurface>
+    <ProfileWrapper>
       <ProfileFields />
       <ButtonTray />
       <ChangePassword />
       <ChangeEmail />
       <DeleteProfileConfirmation />
-    </ProfileSurface>
+    </ProfileWrapper>
   )
 }
 /*

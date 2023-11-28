@@ -17,7 +17,7 @@ import {
   ListItemWithOptions,
 } from "../../components/listItem"
 import Modal, { ModalActionProps } from "../../components/modal"
-import { ProfileSurface } from "../../components/profileSurface"
+import { ProfileWrapper } from "../../components/surface"
 import { selectIsUserAdmin } from "../user/userSliceSelectors"
 import { setOrgUI, useOrgUI } from "./org"
 import { InviteProps, MemberProps } from "./orgSlice"
@@ -44,14 +44,14 @@ import { getMemberName } from "./orgUtils"
 */
 export function OrgProfile() {
   return (
-    <ProfileSurface>
+    <ProfileWrapper>
       <OrgNameHeader />
       <ButtonTray />
       <MembersList />
       <InvitesList />
       <NewInvite />
       <RemoveOrgConfirmation />
-    </ProfileSurface>
+    </ProfileWrapper>
   )
 }
 /*

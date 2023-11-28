@@ -6,6 +6,7 @@ import _ from "lodash"
 import { useState } from "react"
 import useTheme from "../common/useTheme"
 import Icon, { IconNames } from "./icon"
+import { Slot, Window } from "./surface"
 /*
 
 
@@ -151,11 +152,8 @@ function ProfileButton(props: ButtonVariationProps) {
       disableTouchRipple
       sx={styles}
     >
-      <Stack
-        width={"100%"}
-        height={"100%"}
+      <Window
         direction={"row"}
-        alignItems={"center"}
         justifyContent={props.justifyCenter ? "center" : "flex-start"}
         gap={props.justifyCenter ? theme.module[4] : theme.module[5]}
       >
@@ -171,7 +169,7 @@ function ProfileButton(props: ButtonVariationProps) {
             {props.label}
           </Typography>
         )}
-      </Stack>
+      </Window>
     </ButtonBase>
   )
 }
@@ -248,19 +246,12 @@ function HomeButton(props: ButtonVariationProps) {
       disableTouchRipple
       sx={styles}
     >
-      <Stack
-        width={"100%"}
-        direction={"column"}
-        alignItems={"center"}
-        boxSizing={"border-box"}
-      >
-        <Stack
-          width={"100%"}
-          alignItems={"center"}
+      <Window height={"min-content"}>
+        <Window
+          height={"min-content"}
           bgcolor={props.bgColor ?? theme.scale.gray[9]}
           borderRadius={`${theme.module[3]} ${theme.module[3]} 0 0`}
           padding={theme.module[5]}
-          boxSizing={"border-box"}
         >
           <Icon
             color={props.iconColor ?? theme.scale.gray[5]}
@@ -270,19 +261,18 @@ function HomeButton(props: ButtonVariationProps) {
               transform: `scale(1.5)`,
             }}
           />
-        </Stack>
-        <Stack
+        </Window>
+        <Window
           padding={theme.module[3]}
           bgcolor={theme.scale.gray[9]}
-          boxSizing={"border-box"}
-          width={"100%"}
+          height={"min-content"}
           borderRadius={theme.module[3]}
         >
           <Typography color={props.color ?? theme.scale.gray[5]} variant="h5">
             {props.label}
           </Typography>
-        </Stack>
-      </Stack>
+        </Window>
+      </Window>
     </ButtonBase>
   )
 }
@@ -433,7 +423,7 @@ export function ToggleButtonGroup(props: ToggleButtonGroupProps) {
   }
 
   return (
-    <Stack direction="row" width={"100%"}>
+    <Slot>
       <MuiToggleButtonGroup
         value={alignment}
         onChange={handleAlignment}
@@ -457,7 +447,7 @@ export function ToggleButtonGroup(props: ToggleButtonGroupProps) {
           </MuiToggleButton>
         ))}
       </MuiToggleButtonGroup>
-    </Stack>
+    </Slot>
   )
 }
 /*
