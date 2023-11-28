@@ -16,6 +16,7 @@ import { Steps } from "./steps"
 export type CountUIState = {
   isSettingUp: boolean
   isManagingCheckList: boolean
+  isManagingCount: boolean
   isEditingCheckList: boolean
   isCounterRequirementMet: boolean
   isAddingMembers: boolean
@@ -38,11 +39,32 @@ export type CountUIState = {
   prepComments: string[]
   finalComments: string[]
   tempCountType: CountTypes
+  tempAddedMembers: string[]
+  tempRemovedMembers: string[]
+  tempResultsTransfers: [string, string][]
 }
+type ConstructStringUnionFromKeyOfValueMatch<T, U> = {
+  [K in keyof T]: T[K] extends U ? K : never
+}[keyof T]
+type ConstructStringUnionFromKeyMatch<T, U extends string[]> = {
+  [K in keyof T]: K extends U[number] ? K : never
+}[keyof T]
+
 type CountUIKeys = keyof CountUIState
+export type CountUIKeysWithStringArrays =
+  ConstructStringUnionFromKeyOfValueMatch<CountUIState, string[]>
+export type CountUIKeysWithSubArrays = ConstructStringUnionFromKeyOfValueMatch<
+  CountUIState,
+  [string, string][]
+>
+export type ArrayWithEditableItemsUIState = ConstructStringUnionFromKeyMatch<
+  CountUIState,
+  ["finalComments", "prepComments"]
+>
 const initialState: CountUIState = {
   isSettingUp: false,
   isManagingCheckList: false,
+  isManagingCount: false,
   isEditingCheckList: false,
   isCounterRequirementMet: false,
   isAddingMembers: false,
@@ -60,11 +82,14 @@ const initialState: CountUIState = {
   currentStockItemDamagedCount: 0,
   currentStockItemObsoleteCount: 0,
   scrollIndex: 0,
+  tempCountType: "solo",
   selectedMemberUuids: [],
   satisfiedCheckUuids: [],
   prepComments: [],
   finalComments: [],
-  tempCountType: "solo",
+  tempAddedMembers: [],
+  tempRemovedMembers: [],
+  tempResultsTransfers: [],
 }
 export const useCountUI = create<CountUIState>()(
   persist(
@@ -78,62 +103,58 @@ export const useCountUI = create<CountUIState>()(
 export function setCountUI(path: CountUIKeys, value: any) {
   useCountUI.setState({ [path]: value })
 }
-export function addCountUISelectedMemberUuid(uuid: string) {
-  const uuids = useCountUI.getState().selectedMemberUuids
-  const selectedMemberUuids = _.uniq([uuid, ...uuids])
-  useCountUI.setState({ selectedMemberUuids })
+export function addCountUIArrayItem(
+  key: CountUIKeysWithStringArrays,
+  value: string,
+) {
+  useCountUI.setState((state) => ({
+    [key]: _.uniq([...state[key], value]),
+  }))
 }
-export function removeCountUISelectedMemberUuid(uuid: string) {
-  const uuids = useCountUI.getState().selectedMemberUuids
-  const selectedMemberUuids = _.without(uuids, uuid)
-  useCountUI.setState({ selectedMemberUuids })
+export function addCountUIArraySubArray(
+  key: CountUIKeysWithSubArrays,
+  value: [string, string],
+) {
+  useCountUI.setState((state) => ({
+    [key]: _.uniq([...state[key], value]),
+  }))
 }
-export function addCountUISatisfiedCheckUuid(uuid: string) {
-  const uuids = useCountUI.getState().satisfiedCheckUuids
-  const satisfiedCheckUuids = _.uniq([uuid, ...uuids])
-  useCountUI.setState({ satisfiedCheckUuids })
+export function removeCountUIArrayItem(
+  key: CountUIKeysWithStringArrays,
+  value: string,
+) {
+  useCountUI.setState((state) => ({
+    [key]: _.without(state[key], value),
+  }))
 }
-export function removeCountUISatisfiedCheckUuid(uuid: string) {
-  const uuids = useCountUI.getState().satisfiedCheckUuids
-  const satisfiedCheckUuids = _.without(uuids, uuid)
-  useCountUI.setState({ satisfiedCheckUuids })
+export function removeCountUIArraySubArray(
+  key: CountUIKeysWithSubArrays,
+  value: [string, string],
+) {
+  useCountUI.setState((state) => ({
+    [key]: _.without(state[key], value),
+  }))
 }
-export function addCountUIPrepComment(comment: string) {
-  const comments = useCountUI.getState().prepComments
-  const prepComments = [...comments, comment]
-  useCountUI.setState({ prepComments })
+export function editCountUIArrayItem(
+  key: ArrayWithEditableItemsUIState,
+  index: number,
+  value: string,
+) {
+  useCountUI.setState((state) => {
+    const isDuplicate = state[key].includes(value)
+    const isBlank = state[key][index] === ""
+    const first = state[key].slice(0, index)
+    const last = state[key].slice(index + 1)
+    if (isDuplicate && isBlank) {
+      return { [key]: _.without(state[key], "") }
+    } else if (isDuplicate && !isBlank) {
+      return state
+    } else {
+      return { [key]: [...first, value, ...last] }
+    }
+  })
 }
-export function editCountUIPrepComment(index: number, comment: string) {
-  const comments = useCountUI.getState().prepComments
-  if (index >= 0 && index < comments.length) {
-    const prepComments = [...comments]
-    prepComments[index] = comment
-    useCountUI.setState({ prepComments })
-  }
-}
-export function removeCountUIPrepComment(index: number) {
-  const comments = useCountUI.getState().prepComments
-  const prepComments = [...comments].splice(index, 1)
-  useCountUI.setState({ prepComments })
-}
-export function addCountUIFinalComment(comment: string) {
-  const comments = useCountUI.getState().finalComments
-  const finalComments = [...comments, comment]
-  useCountUI.setState({ finalComments })
-}
-export function editCountUIFinalComment(index: number, comment: string) {
-  const comments = useCountUI.getState().finalComments
-  if (index >= 0 && index < comments.length) {
-    const finalComments = [...comments]
-    finalComments[index] = comment
-    useCountUI.setState({ finalComments })
-  }
-}
-export function removeCountUIFinalComment(index: number) {
-  const comments = useCountUI.getState().finalComments
-  const finalComments = [...comments].splice(index, 1)
-  useCountUI.setState({ finalComments })
-}
+
 export function resetCountUI() {
   useCountUI.setState(initialState)
 }
@@ -203,8 +224,8 @@ function LeaveCountConfirmationBody() {
   return (
     <Stack width={"100%"} gap={theme.module[3]} alignItems={"center"}>
       <Typography textAlign={"center"}>
-        You are leaving the count. You can re-join using the
-        Dashboard. No data will be lost.
+        You are leaving the count. You can re-join using the Dashboard. No data
+        will be lost.
       </Typography>
       <Typography>Are you sure you want to leave?</Typography>
     </Stack>

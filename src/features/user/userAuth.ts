@@ -92,8 +92,12 @@ export async function signOut() {
 
 
 */
-const url = import.meta.env.VITE_EMAIL_VERIFICATION_REDIRECT_URL
+const DEV_EMAIL_VERIFICATION_REDIRECT_URL = "http://localhost:5173/sign_in"
+const url =
+  import.meta.env.VITE_EMAIL_VERIFICATION_REDIRECT_URL ??
+  DEV_EMAIL_VERIFICATION_REDIRECT_URL
 export const codeSettings = { url }
+
 export async function changeEmail(
   newEmail: string,
   oldEmail: string,

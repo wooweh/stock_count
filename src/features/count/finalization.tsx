@@ -11,9 +11,9 @@ import Icon, { IconNames } from "../../components/icon"
 import Modal, { ModalActionProps } from "../../components/modal"
 import { getMemberShortName } from "../org/orgUtils"
 import {
-  addCountUIFinalComment,
-  editCountUIFinalComment,
-  removeCountUIFinalComment,
+  addCountUIArrayItem,
+  editCountUIArrayItem,
+  removeCountUIArrayItem,
   resetCountUI,
   setCountUI,
   useCountUI,
@@ -73,6 +73,14 @@ type FinalizationItemsProps = PreparationItemProps
 function FinalizationItems() {
   const comments = useCountUI((state) => state.finalComments)
 
+  const props = {
+    comments,
+    handleAccept: (index: number, value: string) =>
+      editCountUIArrayItem("finalComments", index, value),
+    handleDelete: (value: string) =>
+      removeCountUIArrayItem("finalComments", value),
+  }
+
   const finalItems: FinalizationItemsProps[] = [
     {
       label: "Summary:",
@@ -80,14 +88,8 @@ function FinalizationItems() {
     },
     {
       label: "Comments:",
-      onClick: () => addCountUIFinalComment(""),
-      item: (
-        <CommentsList
-          comments={comments}
-          handleAccept={editCountUIFinalComment}
-          handleDelete={removeCountUIFinalComment}
-        />
-      ),
+      onClick: () => addCountUIArrayItem("finalComments", ""),
+      item: <CommentsList {...props} />,
     },
   ]
   return (

@@ -13,8 +13,8 @@ import { MemberProps } from "../org/orgSlice"
 import { getMemberName, getMemberShortName } from "../org/orgUtils"
 import {
   CountUIState,
-  addCountUISelectedMemberUuid,
-  removeCountUISelectedMemberUuid,
+  addCountUIArrayItem,
+  removeCountUIArrayItem,
   setCountUI,
   useCountUI,
 } from "./count"
@@ -84,61 +84,25 @@ function SetupOptions() {
     team: "Team: Two or more counters will together count the entire stock holding.",
   }
   const isSolo = countType === "solo"
+  const chooseTeamDescription = `Select the ${
+    isSolo ? "member" : "members"
+  } to perform the count.`
 
   useEffect(() => {
     if (!selectedMemberUuids.length)
       setCountUI("selectedMemberUuids", counterUuids)
   }, [counterUuids, selectedMemberUuids])
 
-  function handleCountTypeSelect(value: any) {
-    setCountUI("tempCountType", value)
-    setCountUI("selectedMemberUuids", [])
-    removeCountMembers()
-  }
-
   const options: SetupOptionProps[] = [
     {
       label: "Count Type",
       description: COUNT_TYPE_DESCRIPTIONS[countType ?? "solo"],
-      control: (
-        <ToggleButtonGroup
-          initialAlignment={_.capitalize(countType ?? "solo")}
-          options={[
-            {
-              label: "Solo",
-              iconName: "profile",
-              onClick: () => handleCountTypeSelect("solo"),
-            },
-            {
-              label: "Dual",
-              iconName: "dual",
-              onClick: () => handleCountTypeSelect("dual"),
-            },
-            {
-              label: "Team",
-              iconName: "group",
-              onClick: () => handleCountTypeSelect("team"),
-            },
-          ]}
-        />
-      ),
+      control: <CountTypeToggleButtons onTypeSelect={removeCountMembers} />,
     },
     {
       label: "Choose Team",
-      description: `Select the ${
-        isSolo ? "member" : "members"
-      } to perform the count.`,
-      control: (
-        <Button
-          variation={"profile"}
-          label={`Add ${isSolo ? "Counter" : "Counters"}`}
-          iconName={"addMembers"}
-          onClick={() => setCountUI("isAddingMembers", true)}
-          bgColor={theme.scale.gray[7]}
-          outlineColor={theme.scale.gray[6]}
-          justifyCenter
-        />
-      ),
+      description: chooseTeamDescription,
+      control: <ChooseTeamButton isSolo={isSolo} />,
     },
     {
       label: "Team",
@@ -153,6 +117,71 @@ function SetupOptions() {
       key={option.label}
     />
   ))
+}
+/*
+
+
+
+
+*/
+type ChooseTeamButtonProps = {
+  isSolo?: boolean
+}
+function ChooseTeamButton(props: ChooseTeamButtonProps) {
+  const theme = useTheme()
+
+  return (
+    <Button
+      variation={"profile"}
+      label={`Add ${props.isSolo ? "Counter" : "Counters"}`}
+      iconName={"addMembers"}
+      onClick={() => setCountUI("isAddingMembers", true)}
+      bgColor={theme.scale.gray[7]}
+      outlineColor={theme.scale.gray[6]}
+      justifyCenter
+    />
+  )
+}
+/*
+
+
+
+
+*/
+type CountTypeToggleButtonsProps = {
+  onTypeSelect?: () => void
+}
+export function CountTypeToggleButtons(props: CountTypeToggleButtonsProps) {
+  const countType = useCountUI((state: CountUIState) => state.tempCountType)
+
+  function handleCountTypeSelect(value: any) {
+    setCountUI("tempCountType", value)
+    setCountUI("selectedMemberUuids", [])
+    !!props.onTypeSelect && props.onTypeSelect()
+  }
+
+  return (
+    <ToggleButtonGroup
+      initialAlignment={_.capitalize(countType ?? "solo")}
+      options={[
+        {
+          label: "Solo",
+          iconName: "profile",
+          onClick: () => handleCountTypeSelect("solo"),
+        },
+        {
+          label: "Dual",
+          iconName: "dual",
+          onClick: () => handleCountTypeSelect("dual"),
+        },
+        {
+          label: "Team",
+          iconName: "group",
+          onClick: () => handleCountTypeSelect("team"),
+        },
+      ]}
+    />
+  )
 }
 /*
 
@@ -305,10 +334,10 @@ function MembersList({
 
         function handleChange() {
           isSelected
-            ? removeCountUISelectedMemberUuid(memberUuid)
+            ? removeCountUIArrayItem("selectedMemberUuids", memberUuid)
             : isRequirementMet && !isTeamCount
             ? generateCustomNotification("warning", warningMessage)
-            : addCountUISelectedMemberUuid(memberUuid)
+            : addCountUIArrayItem("selectedMemberUuids", memberUuid)
         }
 
         return (
@@ -350,7 +379,7 @@ function CountersList() {
 
             function handleDelete() {
               removeCountMember(uuid)
-              removeCountUISelectedMemberUuid(uuid)
+              removeCountUIArrayItem("selectedMemberUuids", uuid)
             }
 
             const name = getMemberShortName(counter)

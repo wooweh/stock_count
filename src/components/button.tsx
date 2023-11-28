@@ -227,7 +227,7 @@ function HomeButton(props: ButtonVariationProps) {
   const theme = useTheme()
   const styles = {
     opacity: props.disabled ? 0.5 : 1,
-    background: theme.scale.gray[8],
+    background: theme.scale.gray[9],
     width: "100%",
     borderRadius: theme.module[3],
     overflow: "visible",

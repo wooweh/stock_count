@@ -27,6 +27,7 @@ import {
 } from "./countSliceUtils"
 import { DashboardBody } from "./dashboard"
 import { FinalizationBody } from "./finalization"
+import { ManageCount } from "./manageCount"
 import { PreparationBody } from "./preparation"
 import { ReviewBody } from "./review"
 import { SetupBody } from "./setup"
@@ -51,6 +52,7 @@ export function Steps() {
   const isJustOrganiser = useAppSelector(selectIsUserJustOrganiser)
   const isFinalizing = useAppSelector(selectIsOrganiserFinalizing)
 
+  const isManagingCount = useCountUI((state) => state.isManagingCount)
   const countType = useCountUI((state) => state.tempCountType) as CountTypes
   const isCounterRequirementMet = useCountUI(
     (state) => state.isCounterRequirementMet,
@@ -170,7 +172,11 @@ export function Steps() {
       padding={theme.module[4]}
       boxSizing={"border-box"}
     >
-      <CountStep {...countSteps[countStep]} />
+      {isManagingCount ? (
+        <ManageCount />
+      ) : (
+        <CountStep {...countSteps[countStep]} />
+      )}
     </Stack>
   )
 }
@@ -306,9 +312,8 @@ function OptionsTray() {
   }
 
   function handleManage() {
-    // TODO: implement
-    // setCountUI("isManagingCount", true)
-    // handleCancel()
+    setCountUI("isManagingCount", true)
+    handleCancel()
   }
 
   useEffect(() => {

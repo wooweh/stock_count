@@ -1,6 +1,6 @@
 import { ClickAwayListener, Stack, Typography } from "@mui/material"
 import _ from "lodash"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { Button } from "../../components/button"
@@ -12,11 +12,9 @@ import Modal, { ModalActionProps } from "../../components/modal"
 import { selectOrgCountChecksList } from "../org/orgSliceSelectors"
 import {
   CountUIState,
-  addCountUIPrepComment,
-  addCountUISatisfiedCheckUuid,
-  editCountUIPrepComment,
-  removeCountUIPrepComment,
-  removeCountUISatisfiedCheckUuid,
+  addCountUIArrayItem,
+  editCountUIArrayItem,
+  removeCountUIArrayItem,
   setCountUI,
   useCountUI,
 } from "./count"
@@ -64,6 +62,15 @@ function Outer({
 */
 function PreparationItems() {
   const comments = useCountUI((state) => state.prepComments)
+
+  const props = {
+    comments,
+    handleAccept: (index: number, value: string) =>
+      editCountUIArrayItem("prepComments", index, value),
+    handleDelete: (value: string) =>
+      removeCountUIArrayItem("prepComments", value),
+  }
+
   const prepItems: PreparationItemProps[] = [
     {
       label: "Checklist:",
@@ -71,14 +78,8 @@ function PreparationItems() {
     },
     {
       label: "Comments:",
-      onClick: () => addCountUIPrepComment(""),
-      item: (
-        <CommentsList
-          comments={comments}
-          handleAccept={editCountUIPrepComment}
-          handleDelete={removeCountUIPrepComment}
-        />
-      ),
+      onClick: () => addCountUIArrayItem("prepComments", ""),
+      item: <CommentsList {...props} />,
     },
   ]
 
@@ -188,8 +189,8 @@ function CheckListItem({ check }: { check: { id: string; check: string } }) {
 
   function handleClick() {
     isSatisfied
-      ? removeCountUISatisfiedCheckUuid(check.id)
-      : addCountUISatisfiedCheckUuid(check.id)
+      ? removeCountUIArrayItem("satisfiedCheckUuids", check.id)
+      : addCountUIArrayItem("satisfiedCheckUuids", check.id)
   }
 
   const listItemStyles = {
@@ -216,28 +217,26 @@ function CheckListItem({ check }: { check: { id: string; check: string } }) {
 
 
 */
-export function CommentsList({
-  comments,
-  handleAccept,
-  handleDelete,
-}: {
+type CommentsListProps = {
   comments: string[]
-  handleAccept: any
-  handleDelete: any
-}) {
+  handleAccept: (index: number, value: string) => void
+  handleDelete: (value: string) => void
+}
+export function CommentsList(props: CommentsListProps) {
   const theme = useTheme()
+  console.log(props.comments)
 
   return (
     <List maxHeight={"100%"} gapScale={1}>
-      {!!comments.length ? (
-        comments.map((comment: string, index: number) => {
+      {!!props.comments.length ? (
+        props.comments.map((comment: string, index: number) => {
           return (
             <CommentListItem
               comment={comment}
               index={index}
-              handleAccept={handleAccept}
-              handleDelete={handleDelete}
-              key={`${comment} ${index}`}
+              handleAccept={props.handleAccept}
+              handleDelete={props.handleDelete}
+              key={`${index} + ${comment}`}
             />
           )
         })
@@ -258,14 +257,18 @@ export function CommentsList({
 type CommentListProps = {
   comment: string
   index: number
-  handleAccept: any
-  handleDelete: any
+  handleAccept: (index: number, value: string) => void
+  handleDelete: (value: string) => void
 }
 function CommentListItem(props: CommentListProps) {
   const theme = useTheme()
 
-  const [value, setValue] = useState(props.comment)
+  const [value, setValue] = useState(props.comment ?? "")
   const [isEditing, setIsEditing] = useState(false)
+
+  useEffect(() => {
+    if (!isEditing && !props.comment) setIsEditing(true)
+  }, [props.comment, isEditing])
 
   function handleEdit() {
     setIsEditing(true)
@@ -273,23 +276,38 @@ function CommentListItem(props: CommentListProps) {
 
   function handleAccept() {
     props.handleAccept(props.index, value)
+    console.log(value)
+    console.log("fired")
     setIsEditing(false)
   }
 
   function handleDelete() {
-    props.handleDelete(props.index)
+    console.log(props.comment)
+    props.handleDelete(props.comment)
     setIsEditing(false)
   }
 
-  const isDisabled = !isEditing && !!props.comment
+  function handleClickAway() {
+    if (isEditing) {
+      if (!props.comment && !value) {
+        handleDelete()
+      } else if (!!props.comment && !value) {
+        setValue(props.comment)
+      } else {
+        handleAccept()
+      }
+      setIsEditing(false)
+    }
+  }
+
   const inputStyles = {
-    background: theme.scale.gray[isDisabled ? 8 : 7],
-    color: theme.scale.gray[isDisabled ? 8 : 4],
+    background: theme.scale.gray[isEditing ? 7 : 8],
+    color: theme.scale.gray[isEditing ? 4 : 8],
     padding: theme.module[2],
   }
 
   return (
-    <ClickAwayListener onClickAway={!!value ? handleAccept : handleDelete}>
+    <ClickAwayListener onClickAway={handleClickAway}>
       <Stack
         direction={"row"}
         width={"100%"}
@@ -299,7 +317,7 @@ function CommentListItem(props: CommentListProps) {
         gap={theme.module[2]}
       >
         <Input
-          disabled={isDisabled}
+          disabled={!isEditing}
           value={value}
           onChange={(e: any) => setValue(_.capitalize(e.target.value))}
           placeholder={"New comment..."}
@@ -309,8 +327,8 @@ function CommentListItem(props: CommentListProps) {
         />
         <Button
           variation={"pill"}
-          onClick={isDisabled ? handleEdit : handleAccept}
-          iconName={isDisabled ? "edit" : "done"}
+          onClick={!isEditing ? handleEdit : handleAccept}
+          iconName={!isEditing ? "edit" : "done"}
         />
         <Button variation={"pill"} onClick={handleDelete} iconName={"delete"} />
       </Stack>
