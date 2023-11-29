@@ -231,7 +231,7 @@ export function DataPill(props: DataPillProps) {
       bgcolor={props.color ? theme.scale[props.color][8] : theme.scale.gray[9]}
       boxSizing={"border-box"}
       sx={{
-        outline: `1px solid ${
+        outline: `2px solid ${
           props.color ? theme.scale[props.color][7] : theme.scale.gray[7]
         }`,
       }}

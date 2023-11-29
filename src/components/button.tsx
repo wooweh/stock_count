@@ -129,15 +129,15 @@ function ProfileButton(props: ButtonVariationProps) {
 
   const styles = {
     opacity: props.disabled ? 0.5 : 1,
-    background: props.bgColor ?? theme.scale.gray[8],
+    background: props.bgColor ?? theme.scale.gray[9],
     height: theme.module[7],
     padding: `${theme.module[4]} ${theme.module[5]}`,
     color: props.color ?? theme.scale.gray[3],
     borderRadius: theme.module[3],
     boxShadow: theme.shadow.neo[props.boxShadowScale ?? 3],
     width: "100%",
-    outlineOffset: "-1px",
-    outline: `1px solid ${
+    outlineOffset: "-2px",
+    outline: `2px solid ${
       props.outlineColor ?? theme.scale.gray[7]
     } !important`,
     transform: `scale(${props.isPressed ? 0.975 : 1})`,
@@ -188,10 +188,10 @@ function ModalButton(props: ButtonVariationProps) {
     width: "100%",
     padding: theme.module[3],
     color: props.color ?? theme.scale.gray[4],
-    outline: `1px solid ${
+    outline: `2px solid ${
       props.outlineColor ?? theme.scale.gray[7]
     } !important`,
-    outlineOffset: "-1px",
+    outlineOffset: "-2px",
     background: props.bgColor ?? theme.scale.gray[8],
     borderRadius: theme.module[3],
     boxShadow: theme.shadow.neo[props.boxShadowScale ?? 3],
@@ -246,7 +246,7 @@ function HomeButton(props: ButtonVariationProps) {
       disableTouchRipple
       sx={styles}
     >
-      <Window height={"min-content"}>
+      <Window height={"min-content"} gap={0}>
         <Window
           height={"min-content"}
           bgcolor={props.bgColor ?? theme.scale.gray[9]}
@@ -293,11 +293,11 @@ function PillButton(props: ButtonVariationProps) {
     padding: props.label
       ? `${theme.module[2]} ${theme.module[3]}`
       : theme.module[2],
-    outlineOffset: "-1px",
+    outlineOffset: "-2px",
     outline: props.outlineColor
-      ? `1px solid ${props.outlineColor} !important`
+      ? `2px solid ${props.outlineColor} !important`
       : 0,
-    transform: `scale(${props.isPressed ? 0.9 : 1})`,
+    transform: `scale(${props.isPressed ? 0.95 : 1})`,
     transition: "transform 250ms",
     boxShadow:
       props.boxShadowScale !== undefined
@@ -360,23 +360,27 @@ export function NavigationButton(props: NavigationButtonProps) {
     padding: theme.module[3],
     boxSizing: "border-box",
     color: theme.scale.gray[4],
-    background: theme.scale.gray[7],
+    background: theme.scale.gray[8],
     borderRadius: theme.module[3],
-    outlineOffset: "-1px",
-    outline: `1px solid ${theme.scale.gray[6]} !important`,
+    outlineOffset: "-2px",
+    outline: `2px solid ${theme.scale.gray[6]} !important`,
     transform: `scale(${props.isPressed ? 0.99 : 1})`,
     ...props.sx,
   }
   const iconName = props.navigateTo === "next" ? "arrowRight" : "arrowLeft"
   const elements = [
-    <Icon fontSize="large" variation={iconName} key={iconName} />,
+    <Icon fontSize="medium" variation={iconName} key={iconName} />,
     <Stack
       width={"100%"}
       justifyContent={"center"}
       flexShrink={1}
       key={props.label}
     >
-      <Typography variant="h6" color={theme.scale.gray[4]}>
+      <Typography
+        variant="body1"
+        fontWeight={"bold"}
+        color={theme.scale.gray[5]}
+      >
         {props.label}
       </Typography>
     </Stack>,
@@ -438,12 +442,12 @@ export function ToggleButtonGroup(props: ToggleButtonGroupProps) {
             disableTouchRipple
             disableRipple
             key={option.label}
-            sx={{
-              background: theme.scale.gray[8],
-              transition: "background 250ms",
-            }}
           >
-            <Icon variation={option.iconName} fontSize="large" />
+            <Icon
+              variation={option.iconName}
+              fontSize="large"
+              color="inheret"
+            />
           </MuiToggleButton>
         ))}
       </MuiToggleButtonGroup>

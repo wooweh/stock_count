@@ -157,7 +157,7 @@ function ButtonTray() {
   ]
 
   return (
-    <Stack height={"100%"} justifyContent={"space-between"}>
+    <Stack height={"100%"} width={"100%"} justifyContent={"space-between"}>
       <Stack
         width={"100%"}
         gap={theme.module[5]}

@@ -367,6 +367,9 @@ function CountItemInfoDisplay({
 */
 function AddStockItemButton() {
   const theme = useTheme()
+  const isAddingStockItem = useCountUI(
+    (state: CountUIState) => state.isAddingStockItem,
+  )
 
   function handleClick() {
     setCountUI("isAddingStockItem", true)
@@ -374,14 +377,14 @@ function AddStockItemButton() {
 
   return (
     <Button
+      disabled={isAddingStockItem}
       variation={"profile"}
       label={"Add Item"}
       iconName={"add"}
-      iconColor={theme.scale.blue[6]}
+      iconColor={theme.scale.blue[7]}
       color={theme.scale.blue[7]}
-      outlineColor={theme.scale.blue[8]}
+      outlineColor={theme.scale.blue[7]}
       boxShadowScale={5}
-      bgColor={theme.scale.blue[9]}
       onClick={handleClick}
       justifyCenter
     />
@@ -488,7 +491,6 @@ function RecordStockItemCountBody({ handleClose }: { handleClose: Function }) {
             outlineColor={theme.scale.red[7]}
             iconName={"delete"}
             label={"Remove Item"}
-            bgColor={theme.scale.red[9]}
             onClick={handleDelete}
             boxShadowScale={4}
             justifyCenter

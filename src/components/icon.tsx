@@ -40,6 +40,7 @@ import SearchIcon from "@mui/icons-material/SearchRounded"
 import UseableIcon from "@mui/icons-material/SellRounded"
 import SettingsIcon from "@mui/icons-material/Settings"
 import OrgIcon from "@mui/icons-material/StoreRounded"
+import TransferIcon from "@mui/icons-material/SwapHorizRounded"
 import TimelineIcon from "@mui/icons-material/TimelineRounded"
 import UploadIcon from "@mui/icons-material/UploadRounded"
 import ListIcon from "@mui/icons-material/ViewListRounded"
@@ -113,6 +114,7 @@ export type IconNames =
   | "clipboard"
   | "scrollToTop"
   | "comments"
+  | "transfer"
 
 type IconProps = {
   variation: IconNames
@@ -165,6 +167,17 @@ export default function Icon(props: IconProps) {
     ),
     home: (
       <HomeIcon
+        fontSize={fontSize}
+        fontWeight={props.fontWeight}
+        sx={{
+          ...styles,
+          ...props.sx,
+          color: props.color ? props.color : theme.scale.gray[4],
+        }}
+      />
+    ),
+    transfer: (
+      <TransferIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
         sx={{

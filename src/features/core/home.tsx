@@ -1,6 +1,5 @@
 import { Divider, Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
-import Grid from "@mui/material/Unstable_Grid2/Grid2"
 import { getAuth, onAuthStateChanged } from "firebase/auth"
 import _ from "lodash"
 import { useEffect, useState } from "react"
@@ -405,26 +404,28 @@ function HomeButtons() {
           animationDuration={150}
         />
       </Stack>
-      <Stack width={"100%"} height={"75%"} justifyContent={"start"}>
-        <Grid container spacing={4}>
-          {buttons.map((button: HomeButton, index: number) => {
-            return (
-              <Grid width={"100%"} key={index}>
-                <Button
-                  variation={"home"}
-                  label={button.label}
-                  bgColor={button.bgColor}
-                  color={button.color}
-                  iconName={button.icon}
-                  iconColor={button.iconColor}
-                  outlineColor={button.outlineColor}
-                  onClick={() => navigate(button.path)}
-                  animationDuration={150}
-                />
-              </Grid>
-            )
-          })}
-        </Grid>
+      <Stack
+        width={"100%"}
+        height={"75%"}
+        justifyItems={"flex-start"}
+        gap={theme.module[5]}
+      >
+        {buttons.map((button: HomeButton) => {
+          return (
+            <Button
+              key={button.label}
+              variation={"home"}
+              label={button.label}
+              bgColor={button.bgColor}
+              color={button.color}
+              iconName={button.icon}
+              iconColor={button.iconColor}
+              outlineColor={button.outlineColor}
+              onClick={() => navigate(button.path)}
+              animationDuration={150}
+            />
+          )
+        })}
       </Stack>
     </Stack>
   )

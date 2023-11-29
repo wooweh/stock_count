@@ -136,7 +136,6 @@ function ChooseTeamButton(props: ChooseTeamButtonProps) {
       label={`Add ${props.isSolo ? "Counter" : "Counters"}`}
       iconName={"addMembers"}
       onClick={() => setCountUI("isAddingMembers", true)}
-      bgColor={theme.scale.gray[7]}
       outlineColor={theme.scale.gray[6]}
       justifyCenter
     />
@@ -189,14 +188,14 @@ export function CountTypeToggleButtons(props: CountTypeToggleButtonsProps) {
 
 
 */
-function WarningBox() {
+export function WarningBox() {
   const theme = useTheme()
 
   const countType = useCountUI((state: CountUIState) => state.tempCountType)
   const isCounterRequirementMet = useCountUI(
     (state: any) => state.isCounterRequirementMet,
   )
-
+  console.log(countType)
   return (
     !isCounterRequirementMet &&
     countType && (

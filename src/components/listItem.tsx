@@ -79,7 +79,11 @@ function ListItemOuterWrapper(props: {
       minHeight={theme.module[6]}
       width={"100%"}
       padding={theme.module[4]}
-      sx={{ outline: `1px solid ${theme.scale.gray[7]}`, ...props.sx }}
+      sx={{
+        outline: `2px solid ${theme.scale.gray[7]}`,
+        outlineOffset: "-2px",
+        ...props.sx,
+      }}
     >
       {props.children}
     </Stack>

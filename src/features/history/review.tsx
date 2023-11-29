@@ -187,8 +187,6 @@ function Body() {
 
 */
 function Details(props: Required<HistoryItemMetadataProps>) {
-  const theme = useTheme()
-
   return (
     <Stack width={"100%"} height={"100%"} justifyContent={"space-evenly"}>
       <DetailsList {...props} />
@@ -398,7 +396,7 @@ function Results(props: Required<HistoryItemResultsProps>) {
           label={"Download CSV"}
           iconName={"download"}
           outlineColor={theme.scale.gray[6]}
-          bgColor={theme.scale.gray[8]}
+          bgColor={theme.scale.gray[9]}
           onClick={() => downloadCSVTemplate(rows)}
           sx={{
             borderRadius: theme.module[2],

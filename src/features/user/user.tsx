@@ -124,7 +124,7 @@ function ProfileFields() {
   ]
 
   return (
-    <Stack gap={theme.module[5]}>
+    <Stack gap={theme.module[5]} width={"100%"}>
       {fields.map((field: ProfileFieldProps, index: number) => (
         <ProfileField
           label={field.label}

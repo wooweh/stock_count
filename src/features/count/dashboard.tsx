@@ -208,10 +208,10 @@ function Notification(props: NotificationProps) {
       borderRadius={theme.module[4]}
       padding={theme.module[3]}
       boxSizing={"border-box"}
-      bgcolor={theme.scale.blue[8]}
+      bgcolor={theme.scale.blue[9]}
       sx={{
-        outline: `1px solid ${theme.scale.blue[7]}`,
-        outlineOffset: "-1px",
+        outline: `2px solid ${theme.scale.blue[7]}`,
+        outlineOffset: "-2px",
       }}
     >
       <Stack
@@ -241,7 +241,9 @@ function Notification(props: NotificationProps) {
           label={action.label}
           iconName={action.iconName}
           justifyCenter
-          bgColor={theme.scale.gray[7]}
+          bgColor={theme.scale.gray[9]}
+          color={theme.scale.green[6]}
+          outlineColor={theme.scale.green[7]}
           onClick={action.handleClick}
           key={action.label}
         />
@@ -289,10 +291,9 @@ function ButtonTray() {
           variation={"profile"}
           label={"New Count"}
           iconName={"add"}
-          iconColor={theme.scale.blue[5]}
-          color={theme.scale.blue[5]}
-          bgColor={theme.scale.blue[9]}
-          outlineColor={theme.scale.blue[8]}
+          iconColor={theme.scale.blue[6]}
+          color={theme.scale.blue[6]}
+          outlineColor={theme.scale.blue[7]}
           justifyCenter
           onClick={handleNewCount}
         />
@@ -441,13 +442,14 @@ function CheckListItem({ countCheck }: { countCheck: CountCheckProps }) {
         width={"100%"}
         gap={isEditing ? theme.module[3] : 0}
         padding={theme.module[2]}
+        paddingRight={0}
         boxSizing={"border-box"}
       >
         <Stack
           direction={"row"}
           width={"100%"}
           alignItems={"stretch"}
-          gap={theme.module[2]}
+          gap={theme.module[3]}
           position={"relative"}
         >
           <CheckListItemInput {...checkListItemInputProps} />
@@ -499,9 +501,9 @@ function CheckListItemInput(props: CheckListItemInputProps) {
   const inputStyles = {
     background: theme.scale.gray[props.isDisabled ? 7 : 8],
     color: theme.scale.gray[props.isDisabled ? 8 : 4],
-    outline: `1px solid ${theme.scale.blue[7]}`,
+    outline: `2px solid ${theme.scale.blue[7]}`,
     padding: theme.module[2],
-    borderLeft: `${theme.module[3]} solid ${theme.scale.blue[8]}`,
+    borderLeft: `${theme.module[2]} solid ${theme.scale.blue[7]}`,
   }
 
   function EndAdornment() {

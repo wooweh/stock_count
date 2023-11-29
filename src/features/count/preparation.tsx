@@ -109,6 +109,7 @@ export function PreparationItem(props: PreparationItemProps) {
     <Stack gap={theme.module[3]} height={"47.5%"}>
       <Stack
         paddingLeft={theme.module[1]}
+        paddingRight={theme.module[1]}
         direction={"row"}
         gap={theme.module[3]}
         justifyContent={"space-between"}
@@ -147,6 +148,7 @@ export function PreparationItem(props: PreparationItemProps) {
         paddingRight={theme.module[1]}
         sx={{
           outline: `1px solid ${theme.scale.gray[7]}`,
+          outlineOffset: "-1px",
         }}
       >
         {props.item}

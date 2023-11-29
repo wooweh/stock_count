@@ -17,8 +17,7 @@ export function Loader({ narration }: { narration: string }) {
     justifyContent: "center",
     alignItems: "center",
     borderRadius: theme.module[3],
-    outline: `1px solid ${theme.scale.gray[7]}`,
-    boxShadow: `0 0 10px 0px ${theme.scale.blue[7]}`,
+    outline: `2px solid ${theme.scale.blue[7]}`,
   }
   const firstChar = narration.charAt(0).toUpperCase()
   const modifiedNarration = firstChar + narration.slice(1)

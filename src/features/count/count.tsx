@@ -20,6 +20,7 @@ export type CountUIState = {
   isEditingCheckList: boolean
   isCounterRequirementMet: boolean
   isAddingMembers: boolean
+  isAddingTempMembers: boolean
   isAddingPrepComment: boolean
   isStartingCount: boolean
   isAddingStockItem: boolean
@@ -39,9 +40,9 @@ export type CountUIState = {
   prepComments: string[]
   finalComments: string[]
   tempCountType: CountTypes
-  tempAddedMembers: string[]
-  tempRemovedMembers: string[]
-  tempResultsTransfers: [string, string][]
+  tempAddedMemberUuids: string[]
+  tempRemovedMemberUuids: string[]
+  tempResultsTransfers: { [key: string]: string }
 }
 type ConstructStringUnionFromKeyOfValueMatch<T, U> = {
   [K in keyof T]: T[K] extends U ? K : never
@@ -51,12 +52,15 @@ type ConstructStringUnionFromKeyMatch<T, U extends string[]> = {
 }[keyof T]
 
 type CountUIKeys = keyof CountUIState
-export type CountUIKeysWithStringArrays =
-  ConstructStringUnionFromKeyOfValueMatch<CountUIState, string[]>
-export type CountUIKeysWithSubArrays = ConstructStringUnionFromKeyOfValueMatch<
+export type CountUIKeysWithItemArrays = ConstructStringUnionFromKeyOfValueMatch<
   CountUIState,
-  [string, string][]
+  string[]
 >
+export type CountUIKeysWithStringKeyValuePairs =
+  ConstructStringUnionFromKeyOfValueMatch<
+    CountUIState,
+    { [key: string]: string }
+  >
 export type ArrayWithEditableItemsUIState = ConstructStringUnionFromKeyMatch<
   CountUIState,
   ["finalComments", "prepComments"]
@@ -68,6 +72,7 @@ const initialState: CountUIState = {
   isEditingCheckList: false,
   isCounterRequirementMet: false,
   isAddingMembers: false,
+  isAddingTempMembers: false,
   isAddingPrepComment: false,
   isStartingCount: false,
   isAddingStockItem: false,
@@ -87,9 +92,9 @@ const initialState: CountUIState = {
   satisfiedCheckUuids: [],
   prepComments: [],
   finalComments: [],
-  tempAddedMembers: [],
-  tempRemovedMembers: [],
-  tempResultsTransfers: [],
+  tempAddedMemberUuids: [],
+  tempRemovedMemberUuids: [],
+  tempResultsTransfers: {},
 }
 export const useCountUI = create<CountUIState>()(
   persist(
@@ -104,35 +109,35 @@ export function setCountUI(path: CountUIKeys, value: any) {
   useCountUI.setState({ [path]: value })
 }
 export function addCountUIArrayItem(
-  key: CountUIKeysWithStringArrays,
+  key: CountUIKeysWithItemArrays,
   value: string,
 ) {
   useCountUI.setState((state) => ({
     [key]: _.uniq([...state[key], value]),
   }))
 }
-export function addCountUIArraySubArray(
-  key: CountUIKeysWithSubArrays,
-  value: [string, string],
+export function addCountUIKeyValuePair(
+  key: CountUIKeysWithStringKeyValuePairs,
+  value: { [key: string]: string },
 ) {
   useCountUI.setState((state) => ({
-    [key]: _.uniq([...state[key], value]),
+    [key]: { ...state[key], ...value },
   }))
 }
 export function removeCountUIArrayItem(
-  key: CountUIKeysWithStringArrays,
+  key: CountUIKeysWithItemArrays,
   value: string,
 ) {
   useCountUI.setState((state) => ({
     [key]: _.without(state[key], value),
   }))
 }
-export function removeCountUIArraySubArray(
-  key: CountUIKeysWithSubArrays,
-  value: [string, string],
+export function removeCountUIKeyValuePair(
+  key: CountUIKeysWithStringKeyValuePairs,
+  value: string,
 ) {
   useCountUI.setState((state) => ({
-    [key]: _.without(state[key], value),
+    [key]: _.omit(state[key], value),
   }))
 }
 export function editCountUIArrayItem(

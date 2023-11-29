@@ -1,5 +1,4 @@
-import ClickAwayListener from "@mui/base/ClickAwayListener"
-import { Stack, Typography } from "@mui/material"
+import { ClickAwayListener, Stack, Typography } from "@mui/material"
 import { useState } from "react"
 import { ReactSearchAutocomplete } from "react-search-autocomplete"
 import useTheme from "../common/useTheme"

@@ -234,9 +234,9 @@ function Header({ label }: { label: string }) {
       boxSizing={"border-box"}
       bgcolor={theme.scale.gray[9]}
       borderRadius={theme.module[5]}
-      boxShadow={theme.shadow.neo[3]}
       sx={{
-        outline: `1px solid ${theme.scale.gray[7]}`,
+        outline: `2px solid ${theme.scale.gray[7]}`,
+        outlineOffset: "-2px",
       }}
     >
       {isOptionsOpen ? <OptionsTray /> : <StepLabel label={label} />}
@@ -447,8 +447,8 @@ function ButtonTray(props: CountStepProps) {
             label={props.submitButton.label}
             onClick={props.submitButton.onClick}
             disabled={props.submitButton.disabled}
-            bgColor={theme.scale.gray[7]}
-            outlineColor={theme.scale.gray[6]}
+            color={theme.scale.blue[6]}
+            outlineColor={theme.scale.blue[7]}
             justifyCenter
           />
         )}

@@ -29,8 +29,10 @@ export default function GlobalStyles() {
           border-radius: ${theme.module[2]};
           border: none;
           box-shadow: ${theme.shadow.neo[4]};
-          background-color: ${theme.scale.blue[8]};
-          outline: 1px solid ${theme.scale.blue[7]};
+          background-color: ${theme.scale.gray[9]} !important;
+          color: ${theme.scale.gray[3]} !important;
+          font-weight: bold;
+          outline: 2px solid ${theme.scale.blue[7]};
           outline-offset: -1px;
           cursor: pointer;
           color: ${theme.scale.gray[2]};
@@ -43,9 +45,8 @@ export default function GlobalStyles() {
           opacity: 0.65 !important;
         }
         .MuiToggleButtonGroup-grouped {
-          box-shadow: ${theme.shadow.neo[4]};
-          outline: 1px solid ${theme.scale.gray[6]} !important;
-          outline-offset: -1px;
+          outline: 2px solid ${theme.scale.gray[7]} !important;
+          outline-offset: -2px;
           &:first-of-type {
             border-radius: ${theme.module[3]} 0 0 ${theme.module[3]} !important;
           }
@@ -55,9 +56,13 @@ export default function GlobalStyles() {
         }
         .MuiToggleButton-root {
           border: none !important;
+          color: ${theme.scale.gray[6]} !important;
         }
         .MuiToggleButton-root.Mui-selected {
-          background: ${theme.scale.blue[8]} !important;
+          color: ${theme.scale.blue[7]} !important;
+          background: ${theme.scale.gray[9]} !important;
+          outline: 2px solid ${theme.scale.blue[7]} !important;
+          outline-offset: -2px;
         }
         .MuiSwitch-root {
           overflow: visible !important;

@@ -1,11 +1,13 @@
 import { createSelector } from "@reduxjs/toolkit"
 import _ from "lodash"
 import { selectOrgMembers } from "../org/orgSliceSelectors"
+import { getMemberShortName } from "../org/orgUtils"
 import { StockItemProps, StockProps } from "../stock/stockSlice"
 import { selectStock } from "../stock/stockSliceSelectors"
 import { selectUserUuidString } from "../user/userSliceSelectors"
 import {
   CountItemProps,
+  CountMemberProps,
   CountMemberResultsProps,
   CountResultsProps,
   CountSteps,
@@ -71,6 +73,33 @@ export const selectCountMembers = createSelector(
 export const selectCountResults = createSelector(
   [selectCount],
   (count) => count.results,
+)
+/*
+
+
+
+
+*/
+export type CountMembersWithResultsProps = {
+  [key: string]: {
+    name: string
+    uuid: string
+    count: number
+  }
+}
+export const selectCountMembersCountValueList = createSelector(
+  [selectCountMembers, selectCountResults],
+  (members, results) => {
+    const membersWithCountValues: CountMembersWithResultsProps = {}
+    _.forIn(members, (value: CountMemberProps, key) => {
+      const name = getMemberShortName(value)
+      const countValue = results?.[key] ? Object.keys(results[key]).length : 0
+      _.set(membersWithCountValues, `${key}.name`, name)
+      _.set(membersWithCountValues, `${key}.uuid`, value.uuid)
+      _.set(membersWithCountValues, `${key}.count`, countValue)
+    })
+    return _.values(membersWithCountValues)
+  },
 )
 /*
 

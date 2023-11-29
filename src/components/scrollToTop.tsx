@@ -31,7 +31,7 @@ export function ScrollToTop(props: ScrollToTopProps) {
         justifyContent: "center",
         alignItems: "center",
         zIndex: 1000,
-        outline: `1px solid ${theme.scale.gray[6]} !important`,
+        outline: `2px solid ${theme.scale.gray[6]} !important`,
         transform: "scale(1)",
       }}
       iconName={"scrollToTop"}
