@@ -14,7 +14,7 @@ export function ProfileWrapper({
 }) {
   const theme = useTheme()
   return (
-    <Window padding={theme.module[3]}>
+    <Window padding={theme.module[2]}>
       <Window
         padding={theme.module[5]}
         justifyContent={"space-between"}

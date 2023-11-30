@@ -4,7 +4,7 @@ import Fade from "@mui/material/Fade"
 import MuiModal from "@mui/material/Modal"
 import Typography from "@mui/material/Typography"
 import { useEffect, useState } from "react"
-import useTheme from "../common/useTheme"
+import useTheme, { ThemeColors } from "../common/useTheme"
 import { Button } from "./button"
 import { IconNames } from "./icon"
 /*
@@ -23,6 +23,7 @@ type ModalProps = {
   open: boolean
   heading: string
   body: React.ReactElement
+  outlineColor?: ThemeColors
   actions?: ModalActionProps[]
   onClose?: Function
 }
@@ -41,6 +42,10 @@ export default function Modal(props: ModalProps) {
 
   const styles = {
     transform: "translate(-50%, -50%)",
+    outline: `2px solid ${
+      theme.scale[props.outlineColor ?? "gray"][props.outlineColor ? 7 : 6]
+    } !important`,
+    outlineOffset: "-2px",
   }
 
   return (

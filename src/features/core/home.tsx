@@ -9,6 +9,7 @@ import useTheme from "../../common/useTheme"
 import { Button } from "../../components/button"
 import { Input } from "../../components/control"
 import Icon, { IconNames } from "../../components/icon"
+import { Window } from "../../components/surface"
 import { auth } from "../../remote"
 import { selectIsOrgSetup, selectOrgName } from "../org/orgSliceSelectors"
 import { createOrg, joinOrg } from "../org/orgSliceUtils"
@@ -28,6 +29,7 @@ import { routePaths } from "./pages"
 
 */
 export function Home() {
+  const theme = useTheme()
   const isProfileComplete = useAppSelector(selectIsProfileComplete)
   const isOrgSetup = useAppSelector(selectIsOrgSetup)
 
@@ -35,22 +37,27 @@ export function Home() {
 
   useEffect(() => {
     let initial = 0
-    setInterval(() => {
+    const interval = setInterval(() => {
       initial = 5000
       onAuthStateChanged(getAuth(), (user) => {
         if (!!user) setIsEmailVerified(user.emailVerified)
       })
     }, initial)
+    return () => clearInterval(interval)
   }, [])
 
-  return !isEmailVerified ? (
-    <VerifyEmailPrompt />
-  ) : !isProfileComplete ? (
-    <CompleteProfilePrompt />
-  ) : !isOrgSetup ? (
-    <SetupOrgPrompt />
-  ) : (
-    <HomeButtons />
+  return (
+    <Window bgcolor={theme.scale.gray[9]}>
+      {!isEmailVerified ? (
+        <VerifyEmailPrompt />
+      ) : !isProfileComplete ? (
+        <CompleteProfilePrompt />
+      ) : !isOrgSetup ? (
+        <SetupOrgPrompt />
+      ) : (
+        <HomeButtons />
+      )}
+    </Window>
   )
 }
 /*
@@ -68,10 +75,6 @@ export function VerifyEmailPrompt() {
       sendEmailVerification(user, codeSettings).then(() =>
         generateCustomNotification("success", "Email sent"),
       )
-  }
-
-  function handleRefresh() {
-    window.location.reload()
   }
 
   return (

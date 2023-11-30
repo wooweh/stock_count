@@ -30,8 +30,9 @@ type ButtonVariationProps = {
   label?: string
   iconName?: IconNames
   onClick: any
-  isPressed: boolean
   disabled?: boolean
+  disableTouchRipple?: boolean
+  disableRipple?: boolean
   justifyCenter?: boolean
   bgColor?: string
   color?: string
@@ -42,76 +43,28 @@ type ButtonVariationProps = {
   sx?: any
 }
 export function Button(props: ButtonProps) {
-  const [isPressed, setIsPressed] = useState(false)
-  const [isThrottled, setIsThrottled] = useState(false)
   const duration = props.animationDuration ? props.animationDuration : 150
+  const throttleDuration = duration + 250
 
-  if (isThrottled) _.delay(() => setIsThrottled(false), duration)
-
-  function handleClick(e: any) {
-    e.nativeEvent.stopImmediatePropagation()
-    if (!isThrottled) {
-      setIsThrottled(true)
-      setIsPressed(true)
-      _.delay(() => setIsPressed(false), duration / 2)
+  const handleClick = _.throttle(
+    (e: any) => {
+      e.nativeEvent.stopImmediatePropagation()
       _.delay(() => props.onClick(e), duration + 50)
-    }
-  }
-
-  const commonStyles = {
-    transition: `transform ${duration / 2}ms, box-shadow ${duration / 2}ms`,
-  }
+    },
+    throttleDuration,
+    { trailing: false },
+  )
 
   const variations = {
-    profile: (
-      <ProfileButton
-        isPressed={isPressed}
-        {...props}
-        onClick={handleClick}
-        sx={{ ...commonStyles, ...props.sx }}
-      />
-    ),
-    modal: (
-      <ModalButton
-        isPressed={isPressed}
-        {...props}
-        onClick={handleClick}
-        sx={{ ...commonStyles, ...props.sx }}
-      />
-    ),
-    home: (
-      <HomeButton
-        isPressed={isPressed}
-        {...props}
-        onClick={handleClick}
-        sx={{ ...commonStyles, ...props.sx }}
-      />
-    ),
-    pill: (
-      <PillButton
-        isPressed={isPressed}
-        {...props}
-        onClick={handleClick}
-        sx={{ ...commonStyles, ...props.sx }}
-      />
-    ),
+    profile: <ProfileButton {...props} onClick={handleClick} />,
+    modal: <ModalButton {...props} onClick={handleClick} />,
+    home: <HomeButton {...props} onClick={handleClick} />,
+    pill: <PillButton {...props} onClick={handleClick} />,
     navNext: (
-      <NavigationButton
-        navigateTo={"next"}
-        isPressed={isPressed}
-        {...props}
-        onClick={handleClick}
-        sx={{ ...commonStyles, ...props.sx }}
-      />
+      <NavigationButton navigateTo={"next"} {...props} onClick={handleClick} />
     ),
     navPrev: (
-      <NavigationButton
-        navigateTo={"prev"}
-        isPressed={isPressed}
-        {...props}
-        onClick={handleClick}
-        sx={{ ...commonStyles, ...props.sx }}
-      />
+      <NavigationButton navigateTo={"prev"} {...props} onClick={handleClick} />
     ),
   }
 
@@ -140,7 +93,6 @@ function ProfileButton(props: ButtonVariationProps) {
     outline: `2px solid ${
       props.outlineColor ?? theme.scale.gray[7]
     } !important`,
-    transform: `scale(${props.isPressed ? 0.975 : 1})`,
     ...props.sx,
   }
 
@@ -148,8 +100,8 @@ function ProfileButton(props: ButtonVariationProps) {
     <ButtonBase
       onClick={props.onClick}
       disabled={props.disabled ?? false}
-      disableRipple
-      disableTouchRipple
+      disableTouchRipple={props.disableTouchRipple ?? false}
+      disableRipple={props.disableRipple ?? false}
       sx={styles}
     >
       <Window
@@ -195,7 +147,6 @@ function ModalButton(props: ButtonVariationProps) {
     background: props.bgColor ?? theme.scale.gray[8],
     borderRadius: theme.module[3],
     boxShadow: theme.shadow.neo[props.boxShadowScale ?? 3],
-    transform: `scale(${props.isPressed ? 0.975 : 1})`,
     ...props.sx,
   }
 
@@ -203,8 +154,8 @@ function ModalButton(props: ButtonVariationProps) {
     <ButtonBase
       onClick={props.onClick}
       disabled={props.disabled ?? false}
-      disableRipple
-      disableTouchRipple
+      disableTouchRipple={props.disableTouchRipple ?? false}
+      disableRipple={props.disableRipple ?? false}
       sx={styles}
     >
       <Stack direction={"row"} gap={theme.module[3]}>
@@ -230,7 +181,6 @@ function HomeButton(props: ButtonVariationProps) {
     borderRadius: theme.module[3],
     overflow: "visible",
     justifyContent: "flex-start",
-    transform: `scale(${props.isPressed ? 0.99 : 1})`,
     outline: `2px solid ${
       props.outlineColor ?? theme.scale.gray[6]
     } !important`,
@@ -242,8 +192,8 @@ function HomeButton(props: ButtonVariationProps) {
     <ButtonBase
       onClick={props.onClick}
       disabled={props.disabled ?? false}
-      disableRipple
-      disableTouchRipple
+      disableTouchRipple={props.disableTouchRipple ?? false}
+      disableRipple={props.disableRipple ?? false}
       sx={styles}
     >
       <Window height={"min-content"} gap={0}>
@@ -297,7 +247,6 @@ function PillButton(props: ButtonVariationProps) {
     outline: props.outlineColor
       ? `2px solid ${props.outlineColor} !important`
       : 0,
-    transform: `scale(${props.isPressed ? 0.95 : 1})`,
     transition: "transform 250ms",
     boxShadow:
       props.boxShadowScale !== undefined
@@ -310,8 +259,8 @@ function PillButton(props: ButtonVariationProps) {
     <ButtonBase
       onClick={props.onClick}
       disabled={props.disabled ?? false}
-      disableRipple
-      disableTouchRipple
+      disableTouchRipple={props.disableTouchRipple ?? false}
+      disableRipple={props.disableRipple ?? false}
       sx={styles}
     >
       <Stack direction={"row"} gap={theme.module[2]} alignContent={"center"}>
@@ -360,11 +309,10 @@ export function NavigationButton(props: NavigationButtonProps) {
     padding: theme.module[3],
     boxSizing: "border-box",
     color: theme.scale.gray[4],
-    background: theme.scale.gray[8],
+    background: theme.scale.gray[9],
     borderRadius: theme.module[3],
     outlineOffset: "-2px",
     outline: `2px solid ${theme.scale.gray[6]} !important`,
-    transform: `scale(${props.isPressed ? 0.99 : 1})`,
     ...props.sx,
   }
   const iconName = props.navigateTo === "next" ? "arrowRight" : "arrowLeft"
@@ -392,8 +340,8 @@ export function NavigationButton(props: NavigationButtonProps) {
     <ButtonBase
       onClick={props.onClick}
       disabled={props.disabled ?? false}
-      disableRipple
-      disableTouchRipple
+      disableTouchRipple={props.disableTouchRipple ?? false}
+      disableRipple={props.disableRipple ?? false}
       sx={styles}
     >
       {buttonElements}

@@ -176,7 +176,7 @@ export function Select(props: SelectProps) {
   }
 
   const selectStyles = {
-    height: theme.module[6],
+    height: theme.module[5],
     width: props.width ? props.width : "100%",
     borderRadius: isOpen
       ? `${theme.module[3]} ${theme.module[3]} 0 0`

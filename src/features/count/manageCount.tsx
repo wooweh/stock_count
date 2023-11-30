@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { useAppSelector } from "../../app/hooks"
 import useTheme, { ThemeColors } from "../../common/useTheme"
 import { Button } from "../../components/button"
+import { Select } from "../../components/control"
 import Icon, { IconNames } from "../../components/icon"
 import { List } from "../../components/list"
 import { ListItem } from "../../components/listItem"
@@ -27,6 +28,7 @@ import {
   selectAvailableCountersList,
   selectCountMembersCountValueList,
   selectCountersList,
+  selectCountersUuidList,
 } from "./countSliceSelectors"
 import { CountTypeToggleButtons, WarningBox } from "./setup"
 /*
@@ -58,7 +60,11 @@ function Outer({
 }) {
   const theme = useTheme()
   return (
-    <Stack height={"100%"} gap={theme.module[5]}>
+    <Stack
+      gap={theme.module[5]}
+      bgcolor={theme.scale.gray[8]}
+      position={"relative"}
+    >
       {children}
     </Stack>
   )
@@ -72,32 +78,34 @@ function Outer({
 function Header() {
   const theme = useTheme()
   return (
-    <Stack
-      width={"100%"}
-      justifyContent={"center"}
-      alignItems={"center"}
-      position={"relative"}
-      direction={"row"}
-    >
-      <Stack direction={"row"} gap={theme.module[3]} alignItems={"center"}>
-        <Icon variation={"settings"} />
-        <Typography variant="h6">Manage Count</Typography>
-      </Stack>
+    <Stack>
       <Stack
         width={"100%"}
-        position={"absolute"}
-        right={0}
-        alignItems={"flex-end"}
+        justifyContent={"center"}
+        alignItems={"center"}
+        position={"relative"}
+        direction={"row"}
       >
-        <Button
-          variation={"pill"}
-          iconName={"cancel"}
-          bgColor={theme.scale.gray[9]}
-          onClick={() => setCountUI("isManagingCount", false)}
-          iconSize={"small"}
-          outlineColor={theme.scale.red[7]}
-          sx={{ padding: theme.module[3], boxShadow: theme.shadow.neo[3] }}
-        />
+        <Stack direction={"row"} gap={theme.module[3]} alignItems={"center"}>
+          <Icon variation={"settings"} />
+          <Typography variant="h6">Manage Count</Typography>
+        </Stack>
+        <Stack
+          width={"100%"}
+          position={"absolute"}
+          right={0}
+          alignItems={"flex-end"}
+        >
+          <Button
+            variation={"pill"}
+            iconName={"cancel"}
+            bgColor={theme.scale.gray[9]}
+            onClick={() => setCountUI("isManagingCount", false)}
+            iconSize={"small"}
+            outlineColor={theme.scale.red[7]}
+            sx={{ padding: theme.module[3], boxShadow: theme.shadow.neo[3] }}
+          />
+        </Stack>
       </Stack>
     </Stack>
   )
@@ -114,7 +122,6 @@ function Body() {
     <Stack width={"100%"} gap={theme.module[5]}>
       <CountType />
       <CountTeam />
-      <Transfers />
       <WarningBox />
     </Stack>
   )
@@ -150,6 +157,7 @@ function CountTeam() {
       <CountTeamDescription />
       <CountTeamControls />
       <AddMembersButton />
+      <Transfers />
     </Stack>
   )
 }
@@ -217,13 +225,12 @@ function ControlsHeader() {
     <CountTeamSlot
       bgColor={theme.scale.gray[9]}
       borderRadius={theme.module[2]}
-      left={<Icon variation={leftIconName} fontSize="large" />}
+      left={<Icon variation={leftIconName} />}
       right={
         <CountTeamRightSlot>
           {rightIcons.map((icon) => (
             <Icon
               variation={icon.name}
-              fontSize="large"
               key={icon.name}
               color={theme.scale[icon.color][6]}
             />
@@ -251,21 +258,28 @@ function ControlsBody() {
   )
 
   return (
-    <Slot direction={"column"} gap={theme.module[0]}>
-      {countMembers.map((member, index) => (
+    <Slot
+      maxHeight={theme.module[9]}
+      overflow={"scroll"}
+      bgcolor={theme.scale.gray[9]}
+      borderRadius={theme.module[2]}
+      direction={"column"}
+      gap={theme.module[0]}
+    >
+      {countMembers.map((member) => (
         <TeamMemberControls
-          key={index}
+          key={member.name}
           uuid={member.uuid}
           name={member.name}
           count={member.count}
         />
       ))}
       {!!tempAddedMemberUuids.length &&
-        tempAddedMemberUuids.map((memberUuid, index) => (
+        tempAddedMemberUuids.map((memberUuid) => (
           <TempAddedMemberControls
             name={getMemberShortName(orgMembers?.[memberUuid])}
             uuid={orgMembers?.[memberUuid].uuid}
-            key={index}
+            key={getMemberShortName(orgMembers?.[memberUuid])}
           />
         ))}
     </Slot>
@@ -367,14 +381,35 @@ function TempAddedMemberControls({
   }
 
   return (
-    <CountTeamSlot
-      bgColor={theme.scale.gray[9]}
-      borderRadius={theme.module[2]}
-      left={<Typography fontWeight={"bold"}>{name}</Typography>}
-      right={
-        <Button variation={"pill"} iconName="delete" onClick={handleDelete} />
-      }
-    />
+    <>
+      <CountTeamSlot
+        bgColor={theme.scale.gray[9]}
+        borderRadius={theme.module[2]}
+        left={<Typography fontWeight={"bold"}>{name}</Typography>}
+        right={
+          <CountTeamRightSlot>
+            <Typography
+              variant="body2"
+              color={theme.scale.blue[6]}
+              fontWeight={"bold"}
+            >
+              Added
+            </Typography>
+            <Button
+              variation={"pill"}
+              iconName="delete"
+              onClick={handleDelete}
+            />
+          </CountTeamRightSlot>
+        }
+      />
+      <Divider
+        sx={{
+          width: "100%",
+          borderColor: theme.scale.gray[7],
+        }}
+      />
+    </>
   )
 }
 /*
@@ -584,7 +619,7 @@ function MembersList({
     (state: any) => state.tempAddedMemberUuids,
   )
 
-  const availableTempMembers = _.remove(
+  const availableMembersToAdd = _.remove(
     [...availableMembers],
     (member: MemberProps) => !tempAddedMemberUuids.includes(member.uuid),
   )
@@ -592,7 +627,7 @@ function MembersList({
 
   return (
     <List>
-      {availableTempMembers.map((member: MemberProps) => {
+      {availableMembersToAdd.map((member: MemberProps) => {
         const name = getMemberName(member)
         const isSelected = selectedMemberUuids.includes(member.uuid)
         const memberUuid = member.uuid
@@ -627,7 +662,147 @@ function MembersList({
 
 */
 function Transfers() {
-  return <></>
+  const theme = useTheme()
+
+  return (
+    <Stack width={"100%"} gap={theme.module[3]}>
+      <TransfersHeader />
+      <TransfersBody />
+    </Stack>
+  )
+}
+/*
+
+
+
+
+*/
+function TransfersHeader() {
+  const theme = useTheme()
+
+  return (
+    <Slot
+      bgcolor={theme.scale.gray[9]}
+      borderRadius={theme.module[2]}
+      padding={`${theme.module[2]} ${theme.module[3]}`}
+      gap={theme.module[3]}
+      sx={{ outline: `2px solid ${theme.scale.gray[7]}` }}
+    >
+      <Icon variation={"transfer"} />
+      <Typography fontWeight={"bold"}>Transfers</Typography>
+    </Slot>
+  )
+}
+/*
+
+
+
+
+*/
+function TransfersBody() {
+  const theme = useTheme()
+  const members = useAppSelector(selectOrgMembers)
+  const availableMembers = useAppSelector(selectAvailableCountersList)
+  const currentCountersUuidList = useAppSelector(selectCountersUuidList)
+
+  const countType: CountTypes = useCountUI(
+    (state: CountUIState) => state.tempCountType,
+  )
+  const tempRemovedMemberUuids = useCountUI(
+    (state: CountUIState) => state.tempRemovedMemberUuids,
+  )
+  const tempAddedMemberUuids = useCountUI(
+    (state: CountUIState) => state.tempAddedMemberUuids,
+  )
+
+  const transferMembersUuids = useCountUI(
+    (state: CountUIState) => state.tempResultsTransfers,
+  )
+  const availableMembersToTransferTo = _.remove(
+    _.values(members),
+    (member: MemberProps) =>
+      (currentCountersUuidList.includes(member.uuid) ||
+        tempAddedMemberUuids.includes(member.uuid)) &&
+      !tempRemovedMemberUuids.includes(member.uuid),
+  )
+
+  const transferUuidsList = getTransferUuidsList()
+
+  function getTransferUuidsList() {
+    const list: string[][] = []
+    _.forIn(transferMembersUuids, (value, key) => list.push([key, value]))
+    return list
+  }
+
+  return (
+    <Stack width={"100%"} gap={theme.module[0]}>
+      {!!members &&
+        transferUuidsList.map((uuidPair, index) => {
+          const shortName = getMemberShortName(members[uuidPair[0]])
+          return (
+            <TransferControl
+              key={index}
+              memberShortName={shortName}
+              memberUuid={uuidPair[0]}
+              availableMembers={availableMembersToTransferTo}
+              onSelectMember={alert}
+            />
+          )
+        })}
+    </Stack>
+  )
+}
+/*
+
+
+
+
+*/
+type TransferControlProps = {
+  memberShortName: string
+  memberUuid: string
+  availableMembers: MemberProps[]
+  onSelectMember: (memberUuid: string) => void
+}
+function TransferControl(props: TransferControlProps) {
+  const theme = useTheme()
+
+  return (
+    <CountTeamSlot
+      bgColor={theme.scale.gray[9]}
+      borderRadius={theme.module[2]}
+      left={
+        <Stack width={"35%"}>
+          <Typography
+            width={"100%"}
+            fontWeight={"bold"}
+            whiteSpace={"nowrap"}
+            overflow={"hidden"}
+            textOverflow={"ellipsis"}
+          >
+            {props.memberShortName}
+          </Typography>
+        </Stack>
+      }
+      right={
+        <Stack
+          width={"65%"}
+          flexShrink={1}
+          direction={"row"}
+          gap={theme.module[4]}
+          alignItems={"center"}
+          padding={`${theme.module[2]} 0`}
+        >
+          <Icon variation={"transfer"} />
+          <Select
+            placeholder="Select recipient"
+            options={["hi", "bye"]}
+            onChange={() => null}
+          />
+        </Stack>
+      }
+    />
+  )
 }
 /*
 
