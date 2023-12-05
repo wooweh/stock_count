@@ -322,7 +322,7 @@ function ReviewResultsTable() {
       borderRadius={theme.module[2]}
       height={"60%"}
       overflow={"hidden"}
-      sx={{ outline: `2px solid ${theme.scale.blue[9]}` }}
+      sx={{ outline: `2px solid ${theme.scale.gray[7]}` }}
     >
       <VirtualizedTable
         rows={rows}

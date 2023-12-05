@@ -228,16 +228,17 @@ export function DataPill(props: DataPillProps) {
       justifyContent={"center"}
       padding={`${theme.module[2]} ${theme.module[3]}`}
       borderRadius={theme.module[2]}
-      bgcolor={props.color ? theme.scale[props.color][8] : theme.scale.gray[9]}
+      bgcolor={theme.scale.gray[9]}
       boxSizing={"border-box"}
       sx={{
         outline: `2px solid ${
           props.color ? theme.scale[props.color][7] : theme.scale.gray[7]
         }`,
+        outlineOffset: "-2px",
       }}
     >
       <Typography
-        color={props.color ? theme.scale[props.color][3] : theme.scale.gray[4]}
+        color={props.color ? theme.scale[props.color][5] : theme.scale.gray[4]}
         noWrap
         variant="body2"
         fontWeight={"bold"}

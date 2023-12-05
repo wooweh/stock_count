@@ -157,6 +157,7 @@ function Search(props: SearchProps) {
           <Stack
             width={"100%"}
             padding={theme.module[0]}
+            paddingRight={theme.module[1]}
             boxSizing={"border-box"}
             position={"absolute"}
             zIndex={10}
@@ -171,7 +172,7 @@ function Search(props: SearchProps) {
               placeholder={props.placeholder ?? ""}
               autoFocus
               styling={{
-                border: `1px solid ${props.borderColor ?? theme.scale.gray[6]}`,
+                border: `2px solid ${props.borderColor ?? theme.scale.gray[6]}`,
                 backgroundColor: theme.scale.gray[7],
                 color: theme.scale.gray[4],
                 iconColor: theme.scale.gray[5],

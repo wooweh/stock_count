@@ -17,6 +17,7 @@ export type CountUIState = {
   isSettingUp: boolean
   isManagingCheckList: boolean
   isManagingCount: boolean
+  isUpdatingCount: boolean
   isEditingCheckList: boolean
   isCounterRequirementMet: boolean
   isAddingMembers: boolean
@@ -69,6 +70,7 @@ const initialState: CountUIState = {
   isSettingUp: false,
   isManagingCheckList: false,
   isManagingCount: false,
+  isUpdatingCount: false,
   isEditingCheckList: false,
   isCounterRequirementMet: false,
   isAddingMembers: false,
@@ -116,28 +118,12 @@ export function addCountUIArrayItem(
     [key]: _.uniq([...state[key], value]),
   }))
 }
-export function addCountUIKeyValuePair(
-  key: CountUIKeysWithStringKeyValuePairs,
-  value: { [key: string]: string },
-) {
-  useCountUI.setState((state) => ({
-    [key]: { ...state[key], ...value },
-  }))
-}
 export function removeCountUIArrayItem(
   key: CountUIKeysWithItemArrays,
   value: string,
 ) {
   useCountUI.setState((state) => ({
     [key]: _.without(state[key], value),
-  }))
-}
-export function removeCountUIKeyValuePair(
-  key: CountUIKeysWithStringKeyValuePairs,
-  value: string,
-) {
-  useCountUI.setState((state) => ({
-    [key]: _.omit(state[key], value),
   }))
 }
 export function editCountUIArrayItem(
@@ -157,6 +143,32 @@ export function editCountUIArrayItem(
     } else {
       return { [key]: [...first, value, ...last] }
     }
+  })
+}
+export function addCountUIKeyValuePair(
+  key: CountUIKeysWithStringKeyValuePairs,
+  value: { [key: string]: string },
+) {
+  useCountUI.setState((state) => ({
+    [key]: { ...state[key], ...value },
+  }))
+}
+export function removeCountUIKeyValuePair(
+  key: CountUIKeysWithStringKeyValuePairs,
+  value: string,
+) {
+  useCountUI.setState((state) => ({
+    [key]: _.omit(state[key], value),
+  }))
+}
+export function removeCountUIKeyValuePairValue(
+  key: CountUIKeysWithStringKeyValuePairs,
+  value: string,
+) {
+  useCountUI.setState((state) => {
+    const transferPair = _.pickBy(state[key], (v) => v === value)
+    const fromUuid = _.keys(transferPair)[0]
+    return { [key]: { ...state[key], [fromUuid]: "" } }
   })
 }
 

@@ -195,12 +195,12 @@ export function WarningBox() {
   const isCounterRequirementMet = useCountUI(
     (state: any) => state.isCounterRequirementMet,
   )
-  console.log(countType)
+  
   return (
     !isCounterRequirementMet &&
     countType && (
       <Stack
-        height={"100%"}
+        // height={"100%"}
         width={"100%"}
         direction={"row"}
         gap={theme.module[3]}

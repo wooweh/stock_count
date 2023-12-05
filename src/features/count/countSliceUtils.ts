@@ -444,3 +444,22 @@ export function completeReview() {
 
 
 */
+export function updateCount(
+  countType: CountTypes,
+  addedMembers: string[],
+  removedMembers: string[],
+  transferredMembers: { [key: string]: string },
+) {
+  // get count object
+  // create new object
+  // update count type in metadata sub object
+  // add members to members sub object and metatdata sub object
+  // transfer member restuls
+  // remove memebrs in members sub object and metatdata sub object
+}
+/*
+
+
+
+
+*/

@@ -66,7 +66,6 @@ export function Steps() {
     isCountCompleted && isOrganiser && !isReviewMetadataSubmitted
 
   useEffect(() => {
-    console.log(shouldUpdateReviewMetadata)
     if (shouldUpdateReviewMetadata) updateReviewMetadata()
   }, [shouldUpdateReviewMetadata])
 
@@ -169,7 +168,7 @@ export function Steps() {
       width={"100%"}
       height={"100%"}
       bgcolor={theme.scale.gray[8]}
-      padding={theme.module[4]}
+      padding={theme.module[3]}
       boxSizing={"border-box"}
     >
       {isManagingCount ? (

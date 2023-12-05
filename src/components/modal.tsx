@@ -90,16 +90,16 @@ export default function Modal(props: ModalProps) {
           </Stack>
           <Stack
             alignItems={"center"}
-            padding={theme.module[4]}
+            padding={theme.module[2]}
             boxSizing={"border-box"}
           >
             {props.body}
           </Stack>
           <Stack
             direction={"row"}
-            padding={theme.module[4]}
+            padding={theme.module[1]}
             paddingTop={0}
-            gap={theme.module[4]}
+            gap={theme.module[1]}
             boxSizing={"border-box"}
             width={"100%"}
             overflow={"visible"}
@@ -110,7 +110,7 @@ export default function Modal(props: ModalProps) {
                   variation={"modal"}
                   disabled={action.isDisabled}
                   iconName={action.iconName}
-                  outlineColor={theme.scale.gray[6]}
+                  outlineColor={theme.scale.gray[7]}
                   onClick={action.handleClick}
                   key={index}
                 />

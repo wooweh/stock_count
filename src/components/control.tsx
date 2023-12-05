@@ -4,7 +4,6 @@ import MenuItem from "@mui/material/MenuItem"
 import MuiSelect, { SelectChangeEvent } from "@mui/material/Select"
 import MuiSlider from "@mui/material/Slider"
 import MuiSwitch from "@mui/material/Switch"
-import _ from "lodash"
 import React, { useState } from "react"
 import useTheme from "../common/useTheme"
 import { Button } from "./button"
@@ -159,12 +158,17 @@ export function Input(props: InputProps) {
 
 */
 type SelectProps = {
-  options: string[]
-  onChange?: Function
+  options: SelectOptionProps[]
+  onChange?: (value: any) => void
   value?: string
   displayEmpty?: boolean
   placeholder?: string
   width?: string
+  sx?: any
+}
+export type SelectOptionProps = {
+  value: any
+  label: string
 }
 export function Select(props: SelectProps) {
   const theme = useTheme()
@@ -190,6 +194,7 @@ export function Select(props: SelectProps) {
     border: `1px solid ${theme.scale.gray[6]}`,
     "& .MuiOutlinedInput-notchedOutline ": {
       border: "none",
+      textOverflow: "ellipsis",
       borderColor: isOpen
         ? `${theme.scale.gray[6]} !important`
         : `${theme.scale.gray[6]} !important`,
@@ -197,6 +202,7 @@ export function Select(props: SelectProps) {
     "& .MuiSelect-icon": {
       color: theme.scale.gray[5],
     },
+    ...props.sx,
   }
 
   const paperStyles = {
@@ -210,7 +216,7 @@ export function Select(props: SelectProps) {
 
   return (
     <MuiSelect
-      value={props.value ? _.capitalize(props.value) : ""}
+      value={props.value ? props.value : ""}
       onChange={(e: SelectChangeEvent) => {
         props.onChange?.(e.target.value as string)
       }}
@@ -229,10 +235,10 @@ export function Select(props: SelectProps) {
       sx={selectStyles}
       MenuProps={{ PaperProps: { sx: paperStyles } }}
     >
-      {props.options.map((option: any, index: any) => {
+      {props.options.map((option: SelectOptionProps, index: any) => {
         return (
-          <MenuItem value={option} sx={{ ...menuItemStyles }} key={index}>
-            {_.capitalize(option)}
+          <MenuItem value={option.value} sx={{ ...menuItemStyles }} key={index}>
+            {option.label}
           </MenuItem>
         )
       })}

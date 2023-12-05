@@ -89,7 +89,6 @@ function CountBanner() {
   const speed = networkState.downlink ?? 0
   const slow = speed < 1
   const medium = speed >= 1 && speed < 10
-  console.log(speed)
   const color = slow
     ? theme.scale.red[6]
     : medium

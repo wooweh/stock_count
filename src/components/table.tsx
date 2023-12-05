@@ -51,7 +51,7 @@ export default function VirtualizedTable(props: VirtualizedTableProps) {
 
   const headerRowStyles = {
     width: "100%",
-    outline: `1px solid ${theme.scale.gray[8]}`,
+    outline: `1px solid ${theme.scale.gray[7]}`,
   }
   const headerCellStyles = {
     outline: `1px solid ${theme.scale.gray[7]}`,
@@ -59,7 +59,7 @@ export default function VirtualizedTable(props: VirtualizedTableProps) {
     width: "min-content",
     padding: theme.module[2],
     color: theme.scale.gray[4],
-    background: theme.scale.gray[8],
+    background: theme.scale.gray[9],
     border: 0,
   }
   function fixedHeaderContent() {

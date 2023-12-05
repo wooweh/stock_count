@@ -211,8 +211,8 @@ function ButtonTray() {
 
   function handleAccept() {
     if (isProfileComplete) {
+      setUserUI("isEditing", false)
       updateUserName(name, surname)
-
       if (isChangingEmail) setUserUI("isChangingEmail", true)
     } else {
       generateNotification("incompleteProfileDetails")

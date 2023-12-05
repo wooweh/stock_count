@@ -173,7 +173,7 @@ function AddStockItemSearchBar() {
           justifyContent={"center"}
           position={"absolute"}
           right={2}
-          top={8}
+          top={9}
           zIndex={20}
         >
           <Button
@@ -181,6 +181,7 @@ function AddStockItemSearchBar() {
             bgColor={theme.scale.gray[9]}
             iconSize={"small"}
             iconName={"cancel"}
+            outlineColor={theme.scale.red[8]}
             onClick={() => setCountUI("isAddingStockItem", false)}
             sx={{ padding: theme.module[3] }}
           />
@@ -480,7 +481,13 @@ function RecordStockItemCountBody({ handleClose }: { handleClose: Function }) {
   }
 
   return (
-    <Stack width={"100%"} gap={theme.module[4]} justifyContent={"flex-start"}>
+    <Stack
+      width={"100%"}
+      gap={theme.module[4]}
+      justifyContent={"flex-start"}
+      paddingBottom={theme.module[3]}
+      boxSizing={"border-box"}
+    >
       {!!stockItem && (
         <>
           <StockDetails stockItem={stockItem} />
