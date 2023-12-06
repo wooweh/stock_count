@@ -1,9 +1,10 @@
-import { InputAdornment } from "@mui/material"
+import { InputAdornment, Typography } from "@mui/material"
 import MuiInput from "@mui/material/InputBase"
 import MenuItem from "@mui/material/MenuItem"
 import MuiSelect, { SelectChangeEvent } from "@mui/material/Select"
 import MuiSlider from "@mui/material/Slider"
 import MuiSwitch from "@mui/material/Switch"
+import _ from "lodash"
 import React, { useState } from "react"
 import useTheme from "../common/useTheme"
 import { Button } from "./button"
@@ -164,6 +165,7 @@ type SelectProps = {
   displayEmpty?: boolean
   placeholder?: string
   width?: string
+  emptyOptionsValue?: string
   sx?: any
 }
 export type SelectOptionProps = {
@@ -235,13 +237,25 @@ export function Select(props: SelectProps) {
       sx={selectStyles}
       MenuProps={{ PaperProps: { sx: paperStyles } }}
     >
-      {props.options.map((option: SelectOptionProps, index: any) => {
-        return (
-          <MenuItem value={option.value} sx={{ ...menuItemStyles }} key={index}>
-            {option.label}
-          </MenuItem>
-        )
-      })}
+      {props.options.length ? (
+        props.options.map((option: SelectOptionProps, index: any) => {
+          return (
+            <MenuItem
+              value={option.value}
+              sx={{ ...menuItemStyles }}
+              key={index}
+            >
+              {option.label}
+            </MenuItem>
+          )
+        })
+      ) : (
+        <MenuItem sx={{ ...menuItemStyles }}>
+          <Typography color={theme.scale.gray[5]}>
+            {_.capitalize(props.emptyOptionsValue ?? "no options")}
+          </Typography>
+        </MenuItem>
+      )}
     </MuiSelect>
   )
 }

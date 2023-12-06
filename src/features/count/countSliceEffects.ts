@@ -8,6 +8,7 @@ import {
   setCountMember,
   setCountMembers,
   setCountMetaData,
+  setCountResults,
   setCountResultsItem,
   setCountStep,
 } from "./countSlice"
@@ -20,6 +21,7 @@ import {
   setCountMembersOnDB,
   setCountMetaDataOnDB,
   setCountResultsItemOnDB,
+  setCountResultsOnDB,
 } from "./countSliceRemote"
 import { updateUserCountMember } from "./countSliceUtils"
 /*
@@ -68,6 +70,19 @@ countListenerMiddleware.startListening({
   effect: async (action) => {
     const memberUuid = action.payload.uuid
     deleteCountMemberOnDB(memberUuid)
+  },
+})
+/*
+
+
+
+
+*/
+countListenerMiddleware.startListening({
+  actionCreator: setCountResults,
+  effect: async (action) => {
+    const results = action.payload
+    setCountResultsOnDB(results)
   },
 })
 /*

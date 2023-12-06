@@ -20,6 +20,7 @@ import {
 import { CountUIState, setCountUI, useCountUI } from "./count"
 import { CountItemProps, CountTypes } from "./countSlice"
 import {
+  selectCount,
   selectCountType,
   selectModifiedUserCountResults,
   selectModifiedUserCountResultsList,
@@ -201,6 +202,10 @@ function CountSheet() {
   const countList = useAppSelector(selectModifiedUserCountResultsList)
   const scrollIndex = useCountUI((state: CountUIState) => state.scrollIndex)
   const virtuoso: any = useRef(null)
+
+  const count = useAppSelector(selectCount)
+
+  console.log(count)
 
   useEffect(() => {
     virtuoso.current &&
@@ -401,13 +406,13 @@ function RecordStockItemCount() {
   const memberUuid = useAppSelector(selectUserUuid) as string
 
   const useableCount = useCountUI(
-    (state: any) => state.currentStockItemUseableCount,
+    (state: CountUIState) => state.currentStockItemUseableCount,
   )
   const damagedCount = useCountUI(
-    (state: any) => state.currentStockItemDamagedCount,
+    (state: CountUIState) => state.currentStockItemDamagedCount,
   )
   const obsoleteCount = useCountUI(
-    (state: any) => state.currentStockItemObsoleteCount,
+    (state: CountUIState) => state.currentStockItemObsoleteCount,
   )
   const id = useCountUI(
     (state: CountUIState) => state.currentStockItemId,

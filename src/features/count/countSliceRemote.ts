@@ -9,6 +9,7 @@ import {
   CountMemberProps,
   CountMembersProps,
   CountMetadataProps,
+  CountResultsProps,
   DeleteCountItemProps,
   SetCountResultsItemProps,
 } from "./countSlice"
@@ -46,6 +47,23 @@ export async function deleteCountMemberOnDB(memberUuid: string) {
     ).catch((error) => {
       console.log(error)
     })
+  }
+}
+/*
+
+
+
+
+
+*/
+export async function setCountResultsOnDB(payload: CountResultsProps) {
+  const orgUuid = store.getState().org.org.uuid
+  if (orgUuid) {
+    set(ref(dbReal, getDBPath.count(orgUuid).results), payload).catch(
+      (error) => {
+        console.log(error)
+      },
+    )
   }
 }
 /*

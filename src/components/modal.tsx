@@ -90,7 +90,7 @@ export default function Modal(props: ModalProps) {
           </Stack>
           <Stack
             alignItems={"center"}
-            padding={theme.module[2]}
+            padding={`${theme.module[3]} ${theme.module[3]}`}
             boxSizing={"border-box"}
           >
             {props.body}

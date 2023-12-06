@@ -26,8 +26,12 @@ export function getInviteKeyValidation(key: string) {
 */
 type NameMemberProps = MemberProps | CountMemberProps | HistoryItemMemberProps
 export function getMemberShortName(member: NameMemberProps) {
-  const shortName = `${member.firstName[0]}. ${member.lastName}`
-  return shortName
+  if (!!member) {
+    const shortName = `${member.firstName[0]}. ${member.lastName}`
+    return shortName
+  } else {
+    return ""
+  }
 }
 /*
 

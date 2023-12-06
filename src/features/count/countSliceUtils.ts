@@ -34,6 +34,7 @@ import {
   setCountMemberResults,
   setCountMembers,
   setCountMetaData,
+  setCountResults,
   setCountResultsItem,
   setCountStep,
 } from "./countSlice"
@@ -59,6 +60,15 @@ export function updateCountComments(
   const prevComments = store.getState().count.count.comments
   const comments = prevComments ? { ...prevComments, ...payload } : payload
   store.dispatch(setCountComments({ comments, updateDB }))
+}
+/*
+
+
+
+
+*/
+export function updateCountResults(payload: CountResultsProps) {
+  store.dispatch(setCountResults(payload))
 }
 /*
 
@@ -444,18 +454,104 @@ export function completeReview() {
 
 
 */
-export function updateCount(
+export function updateManagedCount(
   countType: CountTypes,
   addedMembers: string[],
   removedMembers: string[],
   transferredMembers: { [key: string]: string },
 ) {
-  // get count object
-  // create new object
-  // update count type in metadata sub object
-  // add members to members sub object and metatdata sub object
-  // transfer member restuls
-  // remove memebrs in members sub object and metatdata sub object
+  const count = store.getState().count.count
+  const members = count.members!
+  const results = count.results!
+  const orgMembers = store.getState().org.org.members!
+
+  const updatedMembers = prepareManagedCountMembers(
+    members,
+    orgMembers,
+    addedMembers,
+    removedMembers,
+  )
+  updateCountMembers(updatedMembers, true)
+
+  const counters = _.keys(
+    _.omitBy(updatedMembers, (member) => !member.isCounter),
+  )
+  const type = countType
+  updateCountMetadata({ type, counters }, true)
+
+  const updatedResults = prepareManagedCountResults(
+    results,
+    addedMembers,
+    removedMembers,
+    transferredMembers,
+  )
+  updateCountResults(updatedResults)
+}
+/*
+
+
+
+
+*/
+export function prepareManagedCountMembers(
+  members: CountMembersProps,
+  orgMembers: MembersProps,
+  addedMembers: string[],
+  removedMembers: string[],
+) {
+  const updatedMembers: CountMembersProps = { ...members }
+  _.forEach(addedMembers, (memberUuid) => {
+    const orgMember = orgMembers![memberUuid]
+    const member = _.omit(orgMember, "role")
+    const countMember: CountMemberProps = {
+      ...member,
+      isOrganiser: false,
+      isCounter: true,
+      isJoined: false,
+      isCounting: false,
+      step: "dashboard",
+    }
+    _.set(updatedMembers, memberUuid, countMember)
+  })
+  _.forEach(removedMembers, (memberUuid) => {
+    const isOrganiser = members[memberUuid].isOrganiser
+    if (isOrganiser) {
+      const member = members[memberUuid]
+      const countMember: CountMemberProps = {
+        ...member,
+        isCounter: false,
+        step: "review",
+      }
+      _.set(updatedMembers, memberUuid, countMember)
+    } else {
+      _.unset(updatedMembers, memberUuid)
+    }
+  })
+  return updatedMembers
+}
+/*
+
+
+
+
+*/
+export function prepareManagedCountResults(
+  results: CountResultsProps,
+  addedMembers: string[] = [],
+  removedMembers: string[] = [],
+  transferredMembers: { [key: string]: string } = {},
+) {
+  const updatedResults: CountResultsProps = { ...results }
+  _.forEach(addedMembers, (memberUuid) => {
+    _.set(updatedResults, memberUuid, {})
+  })
+  _.forEach(removedMembers, (memberUuid) => {
+    _.unset(updatedResults, memberUuid)
+  })
+  _.forEach(transferredMembers, (newMemberUuid, oldMemberUuid) => {
+    _.set(updatedResults, newMemberUuid, _.get(results, oldMemberUuid))
+  })
+  return updatedResults
 }
 /*
 

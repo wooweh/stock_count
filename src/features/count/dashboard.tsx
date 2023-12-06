@@ -19,7 +19,7 @@ import Icon from "../../components/icon"
 import Modal, { ModalActionProps } from "../../components/modal"
 import { selectOrgCountChecksList } from "../org/orgSliceSelectors"
 import { selectIsUserAdmin } from "../user/userSliceSelectors"
-import { resetCountUI, setCountUI, useCountUI } from "./count"
+import { CountUIState, resetCountUI, setCountUI, useCountUI } from "./count"
 import {
   selectIsCountInProgress,
   selectIsCountInvitePending,
@@ -309,10 +309,10 @@ function ButtonTray() {
 */
 function PrepCheckList() {
   const isManagingCheckList = useCountUI(
-    (state: any) => state.isManagingCheckList,
+    (state: CountUIState) => state.isManagingCheckList,
   )
   const isEditingCheckList = useCountUI(
-    (state: any) => state.isEditingCheckList,
+    (state: CountUIState) => state.isEditingCheckList,
   )
 
   function handleClose() {
@@ -481,7 +481,7 @@ function CheckListItemInput(props: CheckListItemInputProps) {
   const theme = useTheme()
 
   const isEditingCheckList = useCountUI(
-    (state: any) => state.isEditingCheckList,
+    (state: CountUIState) => state.isEditingCheckList,
   )
 
   function handleEdit() {

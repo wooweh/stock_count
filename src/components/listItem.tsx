@@ -7,6 +7,7 @@ import { MouseEvent, useContext, useEffect, useState } from "react"
 import { useLongPress } from "use-long-press"
 import useTheme from "../common/useTheme"
 import { Button } from "./button"
+import { Divider } from "./divider"
 import Icon, { IconNames } from "./icon"
 import { ListGroupContext } from "./list"
 /* 
@@ -430,7 +431,11 @@ function ItemOptions(props: ItemOptionsProps) {
         height={"100%"}
         bgcolor={theme.scale.gray[9]}
         position={"absolute"}
-        borderRadius={theme.module[3]}
+        borderRadius={theme.module[2]}
+        sx={{
+          outline: `2px solid ${theme.scale.gray[6]}`,
+          outlineOffset: "-2px",
+        }}
       >
         <Stack
           width={"100%"}
@@ -439,9 +444,8 @@ function ItemOptions(props: ItemOptionsProps) {
           boxSizing={"border-box"}
           position={"relative"}
           borderRadius={theme.module[3]}
-          justifyContent={"space-between"}
+          justifyContent={"space-evenly"}
           alignItems={"center"}
-          padding={`0 ${theme.module[5]}`}
         >
           {props.options.map((option: ListItemOptionProps, index: number) => {
             const isDelete = option.iconName === "delete"
@@ -458,12 +462,15 @@ function ItemOptions(props: ItemOptionsProps) {
             }
 
             return (
-              <Button
-                variation={"pill"}
-                onClick={onClick}
-                iconName={option.iconName}
-                key={index}
-              />
+              <>
+                <Button
+                  variation={"pill"}
+                  onClick={onClick}
+                  iconName={option.iconName}
+                  key={index}
+                />
+                {index !== props.options.length && <Divider vertical />}
+              </>
             )
           })}
           <Button

@@ -378,8 +378,8 @@ function HomeButtons() {
   return (
     <Stack
       height={"100%"}
-      width={theme.module[10]}
-      paddingTop={theme.module[2]}
+      width={"100%"}
+      padding={theme.module[4]}
       paddingBottom={theme.module[5]}
       boxSizing={"border-box"}
     >
@@ -388,7 +388,6 @@ function HomeButtons() {
         width={"100%"}
         height={"18.75%"}
         minHeight={theme.module[8]}
-        gap={theme.module[4]}
         justifyContent={"center"}
         alignItems={"center"}
         boxSizing={"border-box"}
@@ -411,7 +410,7 @@ function HomeButtons() {
         width={"100%"}
         height={"75%"}
         justifyItems={"flex-start"}
-        gap={theme.module[5]}
+        gap={theme.module[4]}
       >
         {buttons.map((button: HomeButton) => {
           return (

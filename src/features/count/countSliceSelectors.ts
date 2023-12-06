@@ -52,7 +52,7 @@ export const selectCountMetadata = createSelector(
 */
 export const selectCountType = createSelector(
   [selectCount],
-  (count) => count.metadata?.type,
+  (count) => count.metadata?.type ?? "solo",
 )
 /*
 
@@ -306,6 +306,16 @@ function getStockIdsFromResults(
 const selectUserCountResults = createSelector(
   [selectCountResults, selectUserUuidString],
   (results, userUuid) => results?.[userUuid],
+)
+/*
+                            
+                            
+                            
+                            
+*/
+export const selectIsUserCountResultsEmpty = createSelector(
+  [selectUserCountResults],
+  (results) => !results || _.isEmpty(results),
 )
 /*
                             

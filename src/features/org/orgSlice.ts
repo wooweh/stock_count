@@ -15,14 +15,14 @@ export type OrgProps = {
   invites?: InvitesProps
   countChecks?: CountChecksProps
 }
+export type MembersProps = {
+  [key: string]: MemberProps
+}
 export type MemberProps = {
   firstName: string
   lastName: string
   role: UserOrgRoles
   uuid: string
-}
-export type MembersProps = {
-  [key: string]: MemberProps
 }
 export type MemberStatuses = "notJoined" | "joining" | "isJoined"
 export type InvitesProps = { [key: string]: string }

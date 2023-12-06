@@ -20,6 +20,7 @@ import {
   selectCountMembers,
   selectCountResults,
   selectCountType,
+  selectCountersUuidList,
   selectIsOrganiserFinalizing,
   selectIsStockCountCompleted,
   selectIsUserOrganiser,
@@ -65,7 +66,6 @@ function Outer({ children }: { children: React.ReactElement }) {
       padding={theme.module[0]}
       alignItems={"space-between"}
       boxSizing={"border-box"}
-      overflow={"hidden"}
     >
       {children}
     </Stack>
@@ -132,8 +132,8 @@ function CounterReviewBody() {
 */
 function CounterSummary() {
   const theme = useTheme()
-  const results = useAppSelector(selectCountResults) as CountResultsProps
-  const counterUuids = _.keys(results)
+  const results = useAppSelector(selectCountResults)!
+  const counterUuids = useAppSelector(selectCountersUuidList)
 
   return (
     <Stack
@@ -142,7 +142,7 @@ function CounterSummary() {
       borderRadius={theme.module[2]}
       boxShadow={theme.shadow.neo[1]}
       sx={{
-        outline: `1px solid ${theme.scale.gray[7]}`,
+        outline: `2px solid ${theme.scale.gray[7]}`,
       }}
     >
       <Stack
@@ -222,7 +222,9 @@ function CounterSummaryItem({
           fontSize={"small"}
           color={theme.scale.blue[6]}
         />
-        <Typography variant={"body2"}>{name}</Typography>
+        <Typography textOverflow={"ellipsis"} noWrap variant={"body2"}>
+          {name}
+        </Typography>
       </Stack>
       <Stack
         direction={"row"}
@@ -342,7 +344,7 @@ function ReviewCompletionConirmation() {
   const theme = useTheme()
 
   const isStartingFinalization = useCountUI(
-    (state: any) => state.isStartingFinalization,
+    (state: CountUIState) => state.isStartingFinalization,
   )
 
   function handleAccept() {

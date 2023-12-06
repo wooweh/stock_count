@@ -14,6 +14,7 @@ import { generateCustomNotification } from "../core/coreUtils"
 import { MemberProps, MembersProps } from "../org/orgSlice"
 import { selectOrgMembers } from "../org/orgSliceSelectors"
 import { getMemberName, getMemberShortName } from "../org/orgUtils"
+import { selectUserUuidString } from "../user/userSliceSelectors"
 import {
   CountUIState,
   addCountUIArrayItem,
@@ -21,6 +22,7 @@ import {
   removeCountUIArrayItem,
   removeCountUIKeyValuePair,
   removeCountUIKeyValuePairValue,
+  resetCountUI,
   setCountUI,
   useCountUI,
 } from "./count"
@@ -30,7 +32,9 @@ import {
   selectCountMembersCountValueList,
   selectCountersList,
   selectCountersUuidList,
+  selectIsUserOrganiser,
 } from "./countSliceSelectors"
+import { updateCountStep, updateManagedCount } from "./countSliceUtils"
 import { DataPill } from "./finalization"
 import { CountTypeToggleButtons, WarningBox } from "./setup"
 /*
@@ -81,6 +85,7 @@ function Outer({
 */
 function Header() {
   const theme = useTheme()
+
   return (
     <Stack>
       <Stack
@@ -104,7 +109,7 @@ function Header() {
             variation={"pill"}
             iconName={"cancel"}
             bgColor={theme.scale.gray[9]}
-            onClick={() => setCountUI("isManagingCount", false)}
+            onClick={resetCountUI}
             iconSize={"small"}
             outlineColor={theme.scale.red[7]}
             sx={{ padding: theme.module[3], boxShadow: theme.shadow.neo[3] }}
@@ -320,9 +325,6 @@ function TeamMemberControls(props: TeamMemberControlsProps) {
     [props.uuid, tempResultsTransfers],
   )
 
-  console.log(isRemoved)
-  console.log(isTransferred)
-
   function handleToggleDelete() {
     if (isRemoved) {
       removeCountUIArrayItem("tempRemovedMemberUuids", props.uuid)
@@ -524,16 +526,16 @@ function AddTempMembers() {
     (state: CountUIState) => state.isAddingTempMembers,
   )
   const selectedMemberUuids = useCountUI(
-    (state: any) => state.selectedMemberUuids,
+    (state: CountUIState) => state.selectedMemberUuids,
   )
   const tempAddedMemberUuids = useCountUI(
-    (state: any) => state.tempAddedMemberUuids,
+    (state: CountUIState) => state.tempAddedMemberUuids,
   )
   const tempRemovedMemberUuids = useCountUI(
-    (state: any) => state.tempRemovedMemberUuids,
+    (state: CountUIState) => state.tempRemovedMemberUuids,
   )
   const tempResultsTransfers = useCountUI(
-    (state: any) => state.tempResultsTransfers,
+    (state: CountUIState) => state.tempResultsTransfers,
   )
 
   const availableTempMembers = _.remove(
@@ -545,6 +547,9 @@ function AddTempMembers() {
     selectedMemberUuids.length +
     tempAddedMemberUuids.length -
     tempRemovedMemberUuids.length
+
+  console.log(totalPotentialMembers)
+  console.log(countMembers.length)
 
   //TODO: Refactor into Count utils function to reuse in Manage feature
   const counterRequirements = {
@@ -635,10 +640,10 @@ function MembersList({
     (state: CountUIState) => state.tempCountType,
   )
   const selectedMemberUuids = useCountUI(
-    (state: any) => state.selectedMemberUuids,
+    (state: CountUIState) => state.selectedMemberUuids,
   )
   const tempAddedMemberUuids = useCountUI(
-    (state: any) => state.tempAddedMemberUuids,
+    (state: CountUIState) => state.tempAddedMemberUuids,
   )
 
   const availableMembersToAdd = _.remove(
@@ -648,7 +653,7 @@ function MembersList({
   const isTeamCount = countType === "team"
 
   return (
-    <List>
+    <List gapScale={0}>
       {availableMembersToAdd.map((member: MemberProps) => {
         const name = getMemberName(member)
         const isSelected = selectedMemberUuids.includes(member.uuid)
@@ -745,6 +750,7 @@ function TransfersBody() {
     _.forIn(transferMembersUuids, (value, key) => list.push([key, value]))
     return list
   }
+  console.log(transferUuidsList)
 
   return (
     <Slot
@@ -759,7 +765,7 @@ function TransfersBody() {
         transferUuidsList.map((uuidPair, index) => {
           return (
             <TransferControl
-              key={index}
+              key={uuidPair[0]}
               fromMemberUuid={uuidPair[0]}
               toMemberUuid={uuidPair[1]}
               availableMemberUuids={availableMemberUuidsToTransferTo}
@@ -836,6 +842,7 @@ function TransferControl(props: TransferControlProps) {
             placeholder="Select recipient"
             options={options}
             onChange={handleMemberSelect}
+            emptyOptionsValue={"add members"}
             sx={{ width: "10rem" }}
           />
         </Stack>
@@ -885,26 +892,55 @@ function UpdateCountButton() {
 */
 function UpdateCountConfirmation() {
   const theme = useTheme()
+
+  const userUuid = useAppSelector(selectUserUuidString)
+  const isUserOrganiser = useAppSelector(selectIsUserOrganiser)
+
+  const countType = useCountUI((state: CountUIState) => state.tempCountType)
+  const addedMembers = useCountUI(
+    (state: CountUIState) => state.tempAddedMemberUuids,
+  )
+  const removedMembers = useCountUI(
+    (state: CountUIState) => state.tempRemovedMemberUuids,
+  )
+  const transferredMembers = useCountUI(
+    (state: CountUIState) => state.tempResultsTransfers,
+  )
   const isUpdatingCount = useCountUI(
     (state: CountUIState) => state.isUpdatingCount,
   )
+  console.log(countType, addedMembers, removedMembers, transferredMembers)
+
+  const isRemovingOrganiser =
+    isUserOrganiser && removedMembers.includes(userUuid)
+
+  function handleAccept() {
+    updateManagedCount(
+      countType,
+      addedMembers,
+      removedMembers,
+      transferredMembers,
+    )
+    resetCountUI()
+    isRemovingOrganiser && updateCountStep("review")
+  }
+
+  function handleCancel() {
+    setCountUI("isUpdatingCount", false)
+  }
+
+  const actions: ModalActionProps[] = [
+    { iconName: "cancel", handleClick: handleCancel },
+    { iconName: "done", handleClick: handleAccept },
+  ]
+
   return (
     <Modal
       open={isUpdatingCount}
       heading="Update Count"
       body={<UpdateCountConfirmationBody />}
-      actions={[
-        {
-          iconName: "cancel",
-          handleClick: () => setCountUI("isUpdatingCount", false),
-        },
-        {
-          iconName: "done",
-          //TODO: Update count function
-          handleClick: () => null,
-        },
-      ]}
-      onClose={() => setCountUI("isUpdatingCount", false)}
+      actions={actions}
+      onClose={handleCancel}
     />
   )
 }
@@ -914,6 +950,7 @@ function UpdateCountConfirmation() {
 
 
 */
+
 function UpdateCountConfirmationBody() {
   const theme = useTheme()
 
@@ -928,8 +965,6 @@ function UpdateCountConfirmationBody() {
   )
 
   const summaryProps = { addedUuids, removedUuids, transferUuids }
-
-  console.log(summaryProps)
 
   return (
     <Stack width={"100%"} gap={theme.module[3]}>
@@ -962,25 +997,6 @@ type SummaryProps = {
 function ChangeSummary(props: SummaryProps) {
   const theme = useTheme()
   const members = useAppSelector(selectOrgMembers) as MembersProps
-
-  function Title({
-    children,
-    color,
-    icon,
-  }: {
-    children: string
-    color: ThemeColors
-    icon: IconNames
-  }) {
-    return (
-      <Slot gap={theme.module[3]}>
-        <Icon variation={icon} color={theme.scale[color][6]} />
-        <Typography color={theme.scale[color][5]} fontWeight={"bold"}>
-          {_.capitalize(children)}
-        </Typography>
-      </Slot>
-    )
-  }
 
   return (
     <Stack
@@ -1040,3 +1056,23 @@ function ChangeSummary(props: SummaryProps) {
 
 
 */
+function Title({
+  children,
+  color,
+  icon,
+}: {
+  children: string
+  color: ThemeColors
+  icon: IconNames
+}) {
+  const theme = useTheme()
+
+  return (
+    <Slot gap={theme.module[3]}>
+      <Icon variation={icon} color={theme.scale[color][6]} />
+      <Typography color={theme.scale[color][5]} fontWeight={"bold"}>
+        {_.capitalize(children)}
+      </Typography>
+    </Slot>
+  )
+}

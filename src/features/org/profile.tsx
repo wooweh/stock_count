@@ -210,7 +210,7 @@ function MembersList() {
       heading={"Members"}
       body={
         members?.length ? (
-          <List>
+          <List gapScale={0}>
             {members.map((member: any, index: number) => {
               return <MemberListItem member={member} key={index} />
             })}
@@ -280,7 +280,7 @@ function InvitesList() {
       heading={"Invites"}
       body={
         invites.length ? (
-          <List>
+          <List gapScale={0}>
             {invites.map((invite: InviteProps, index: number) => {
               return <InviteListItem invite={invite} key={index} />
             })}

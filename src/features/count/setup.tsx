@@ -21,6 +21,7 @@ import {
 import { CountMemberProps, CountTypes } from "./countSlice"
 import {
   selectAvailableCountersList,
+  selectCountType,
   selectCountersList,
   selectCountersUuidList,
 } from "./countSliceSelectors"
@@ -75,7 +76,7 @@ function SetupOptions() {
 
   const countType = useCountUI((state: CountUIState) => state.tempCountType)
   const selectedMemberUuids = useCountUI(
-    (state: any) => state.selectedMemberUuids,
+    (state: CountUIState) => state.selectedMemberUuids,
   )
 
   const COUNT_TYPE_DESCRIPTIONS: any = {
@@ -151,7 +152,12 @@ type CountTypeToggleButtonsProps = {
   onTypeSelect?: () => void
 }
 export function CountTypeToggleButtons(props: CountTypeToggleButtonsProps) {
-  const countType = useCountUI((state: CountUIState) => state.tempCountType)
+  const countType = useAppSelector(selectCountType)
+  const tempCountType = useCountUI((state: CountUIState) => state.tempCountType)
+
+  useEffect(() => {
+    setCountUI("tempCountType", countType)
+  }, [countType])
 
   function handleCountTypeSelect(value: any) {
     setCountUI("tempCountType", value)
@@ -161,7 +167,7 @@ export function CountTypeToggleButtons(props: CountTypeToggleButtonsProps) {
 
   return (
     <ToggleButtonGroup
-      initialAlignment={_.capitalize(countType ?? "solo")}
+      initialAlignment={_.capitalize(tempCountType)}
       options={[
         {
           label: "Solo",
@@ -193,14 +199,13 @@ export function WarningBox() {
 
   const countType = useCountUI((state: CountUIState) => state.tempCountType)
   const isCounterRequirementMet = useCountUI(
-    (state: any) => state.isCounterRequirementMet,
+    (state: CountUIState) => state.isCounterRequirementMet,
   )
-  
+
   return (
     !isCounterRequirementMet &&
     countType && (
       <Stack
-        // height={"100%"}
         width={"100%"}
         direction={"row"}
         gap={theme.module[3]}
@@ -230,7 +235,7 @@ function AddMembers() {
     (state: CountUIState) => state.isAddingMembers,
   )
   const selectedMemberUuids = useCountUI(
-    (state: any) => state.selectedMemberUuids,
+    (state: CountUIState) => state.selectedMemberUuids,
   )
 
   //TODO: Refactor into Count utils function to reuse in Manage feature
@@ -319,13 +324,13 @@ function MembersList({
     (state: CountUIState) => state.tempCountType,
   )
   const selectedMemberUuids = useCountUI(
-    (state: any) => state.selectedMemberUuids,
+    (state: CountUIState) => state.selectedMemberUuids,
   )
 
   const isTeamCount = countType === "team"
 
   return (
-    <List>
+    <List gapScale={0}>
       {availableMembers.map((member: MemberProps) => {
         const name = getMemberName(member)
         const isSelected = selectedMemberUuids.includes(member.uuid)

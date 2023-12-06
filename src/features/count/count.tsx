@@ -52,7 +52,7 @@ type ConstructStringUnionFromKeyMatch<T, U extends string[]> = {
   [K in keyof T]: K extends U[number] ? K : never
 }[keyof T]
 
-type CountUIKeys = keyof CountUIState
+export type CountUIKeys = keyof CountUIState
 export type CountUIKeysWithItemArrays = ConstructStringUnionFromKeyOfValueMatch<
   CountUIState,
   string[]
@@ -66,6 +66,7 @@ export type ArrayWithEditableItemsUIState = ConstructStringUnionFromKeyMatch<
   CountUIState,
   ["finalComments", "prepComments"]
 >
+
 const initialState: CountUIState = {
   isSettingUp: false,
   isManagingCheckList: false,
@@ -99,12 +100,10 @@ const initialState: CountUIState = {
   tempResultsTransfers: {},
 }
 export const useCountUI = create<CountUIState>()(
-  persist(
-    (set) => ({
-      ...initialState,
-    }),
-    { name: "count-storage", storage: createJSONStorage(() => sessionStorage) },
-  ),
+  persist((set) => ({ ...initialState }), {
+    name: "count-storage",
+    storage: createJSONStorage(() => sessionStorage),
+  }),
 )
 
 export function setCountUI(path: CountUIKeys, value: any) {
@@ -168,7 +167,7 @@ export function removeCountUIKeyValuePairValue(
   useCountUI.setState((state) => {
     const transferPair = _.pickBy(state[key], (v) => v === value)
     const fromUuid = _.keys(transferPair)[0]
-    return { [key]: { ...state[key], [fromUuid]: "" } }
+    return !!fromUuid ? { [key]: { ...state[key], [fromUuid]: "" } } : state
   })
 }
 

@@ -14,16 +14,13 @@ export function ProfileWrapper({
 }) {
   const theme = useTheme()
   return (
-    <Window padding={theme.module[2]}>
-      <Window
-        padding={theme.module[5]}
-        justifyContent={"space-between"}
-        bgcolor={theme.scale.gray[9]}
-        borderRadius={theme.module[4]}
-        gap={theme.module[5]}
-      >
-        {children}
-      </Window>
+    <Window
+      padding={theme.module[4]}
+      justifyContent={"space-between"}
+      borderRadius={theme.module[4]}
+      gap={theme.module[5]}
+    >
+      {children}
     </Window>
   )
 }

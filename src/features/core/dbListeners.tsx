@@ -16,6 +16,7 @@ import {
   selectCountMembers,
   selectCountMetadata,
   selectCountersUuidList,
+  selectIsUserCountResultsEmpty,
   selectIsUserOrganiser,
 } from "../count/countSliceSelectors"
 import {
@@ -174,6 +175,9 @@ export function CountDBListener() {
   const localCountMetadata = useAppSelector(selectCountMetadata)
   const isOrganiser = useAppSelector(selectIsUserOrganiser)
   const counterUuids = useAppSelector(selectCountersUuidList)
+  const isUserCountResultsEmpty = useAppSelector(selectIsUserCountResultsEmpty)
+
+  console.log("isUserCountResultsEmpty", isUserCountResultsEmpty)
 
   const pathName = location.pathname
   const isCountPath = pathName === routePaths.count.path
@@ -234,13 +238,16 @@ export function CountDBListener() {
   useEffect(() => {
     if (isSafeToSync) {
       _.forEach(counterUuids, (uuid) => {
-        if (userUuid !== uuid) {
+        if (userUuid !== uuid || isUserCountResultsEmpty) {
           const dbCounterResultsRef = ref(
             dbReal,
             getDBPath.count(orgUuid).memberResults(uuid).results,
           )
           onValue(dbCounterResultsRef, (snapshot) => {
             const dbCounterResults: CountMemberResultsProps = snapshot.val()
+            console.log(dbCounterResults)
+            console.log(uuid)
+            console.log(!!dbCounterResults)
             if (!!dbCounterResults) {
               updateCountMemberResults(uuid, dbCounterResults)
             } else {

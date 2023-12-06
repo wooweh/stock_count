@@ -257,7 +257,7 @@ export function DataPill(props: DataPillProps) {
 function FinalizeCountConfirmation() {
   const theme = useTheme()
   const isSubmittingFinalization = useCountUI(
-    (state: any) => state.isSubmittingFinalization,
+    (state: CountUIState) => state.isSubmittingFinalization,
   )
 
   function handleAccept() {

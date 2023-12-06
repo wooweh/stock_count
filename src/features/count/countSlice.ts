@@ -156,12 +156,10 @@ export const countSlice = createSlice({
       state,
       action: PayloadAction<SetCountMemberResultsProps>,
     ) => {
-      const member = state.count.results
+      const count = state.count
       const uuid = action.payload.memberUuid
       const results = action.payload.results
-      if (member) {
-        member[uuid] = results
-      }
+      if (count) _.set(count, `results.${uuid}`, results)
     },
     setCount: (state, action: PayloadAction<CountProps>) => {
       state.count = action.payload

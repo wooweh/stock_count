@@ -30,6 +30,8 @@ import {
   createCountChecksPayload,
   prepareCountMembersPayload,
   prepareFinalResults,
+  prepareManagedCountMembers,
+  prepareManagedCountResults,
 } from "./countSliceUtils"
 /*
 
@@ -345,6 +347,94 @@ describe("Count SliceUtils", () => {
       mockFinalResults.mockCounterUuid2.mockStockId2,
     )
     expectTypeOf(finalResults).toEqualTypeOf<CountMemberResultsProps>()
+  })
+
+  it("should handle prepareManagedCountMembers", () => {
+    const mockManagedCountMembers: CountMembersProps = {
+      mockUuid1: {
+        uuid: "mockUuid1",
+        firstName: "mockName",
+        lastName: "mockSurname",
+        isCounter: false,
+        isCounting: false,
+        isJoined: false,
+        isOrganiser: false,
+        step: "dashboard",
+      },
+    }
+    const mockOrgMembers: MembersProps = {
+      mockUuid1: {
+        uuid: "mockUuid1",
+        firstName: "mockName",
+        lastName: "mockSurname",
+        role: "admin",
+      },
+      mockUuid2: {
+        uuid: "mockUuid2",
+        firstName: "mockName",
+        lastName: "mockSurname",
+        role: "admin",
+      },
+      mockUuid3: {
+        uuid: "mockUuid3",
+        firstName: "mockName",
+        lastName: "mockSurname",
+        role: "admin",
+      },
+    }
+    const addedMembers = ["mockUuid2", "mockUuid3"]
+    const removedMembers = ["mockUuid1"]
+    const managedCountMembers = prepareManagedCountMembers(
+      mockManagedCountMembers,
+      mockOrgMembers,
+      addedMembers,
+      removedMembers,
+    )
+    expectTypeOf(managedCountMembers).toEqualTypeOf<CountMembersProps>()
+    expect(managedCountMembers.mockUuid1).toEqual(undefined)
+    expect(managedCountMembers.mockUuid2.uuid).toEqual(
+      mockOrgMembers.mockUuid2.uuid,
+    )
+  })
+
+  it("should handle prepareManagedCountResults", () => {
+    const mockManagedCountResults: CountResultsProps = {
+      mockUuid1: {
+        mockStockId1: {
+          id: "mockStockId1",
+          useableCount: 2,
+          damagedCount: 3,
+          obsoleteCount: 4,
+        },
+      },
+      mockUuid2: {
+        mockStockId2: {
+          id: "mockStockId2",
+          useableCount: 2,
+          damagedCount: 3,
+          obsoleteCount: 4,
+        },
+      },
+    }
+
+    const addedMembers = ["mockUuid3"]
+    const removedMembers = ["mockUuid1"]
+    const transferredMembers = { mockUuid1: "mockUuid3" }
+
+    const managedCountResults = prepareManagedCountResults(
+      mockManagedCountResults,
+      addedMembers,
+      removedMembers,
+      transferredMembers,
+    )
+    expectTypeOf(managedCountResults).toEqualTypeOf<CountResultsProps>()
+    expect(managedCountResults.mockUuid1).toEqual(undefined)
+    expect(managedCountResults.mockUuid2).toEqual(
+      mockManagedCountResults.mockUuid2,
+    )
+    expect(managedCountResults.mockUuid3).toEqual(
+      mockManagedCountResults.mockUuid1,
+    )
   })
 })
 /*
