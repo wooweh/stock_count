@@ -423,7 +423,12 @@ function ButtonTray(props: CountStepProps) {
 
   return (
     showButtons && (
-      <Stack width={"100%"} direction={"row"} gap={theme.module[4]}>
+      <Stack
+        width={"100%"}
+        direction={"row"}
+        gap={theme.module[4]}
+        justifyContent={"center"}
+      >
         {props.prevButton && (
           <Button
             variation={"navPrev"}

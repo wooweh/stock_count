@@ -391,7 +391,7 @@ function HomeButtons() {
         justifyContent={"center"}
         alignItems={"center"}
         boxSizing={"border-box"}
-      >
+        >
         <Button
           variation="profile"
           label={orgName}
@@ -408,6 +408,7 @@ function HomeButtons() {
       </Stack>
       <Stack
         width={"100%"}
+        alignItems={"center"}
         height={"75%"}
         justifyItems={"flex-start"}
         gap={theme.module[4]}

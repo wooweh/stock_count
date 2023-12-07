@@ -7,6 +7,7 @@ import { useEffect, useState } from "react"
 import useTheme, { ThemeColors } from "../common/useTheme"
 import { Button } from "./button"
 import { IconNames } from "./icon"
+import { ErrorBoundary } from "./errorBoundary"
 /*
 
 
@@ -93,7 +94,7 @@ export default function Modal(props: ModalProps) {
             padding={`${theme.module[3]} ${theme.module[3]}`}
             boxSizing={"border-box"}
           >
-            {props.body}
+            <ErrorBoundary>{props.body}</ErrorBoundary>
           </Stack>
           <Stack
             direction={"row"}

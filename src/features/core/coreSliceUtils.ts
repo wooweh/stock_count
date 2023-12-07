@@ -56,7 +56,7 @@ export function toggleDarkmode() {
 
 */
 export function toggleMobile(width: number) {
-  const mobileWidth = 1000
+  const mobileWidth = 750
   const isMobile = store.getState().core.isMobile
   const toggleMobile =
     (width && width < mobileWidth && !isMobile) ||

@@ -277,6 +277,7 @@ function ButtonTray() {
         overflow={"visible"}
         padding={theme.module[0]}
         boxSizing={"border-box"}
+        alignItems={"center"}
       >
         <Button
           variation={"profile"}

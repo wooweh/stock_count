@@ -43,6 +43,7 @@ type ButtonVariationProps = {
   sx?: any
 }
 export function Button(props: ButtonProps) {
+  const theme = useTheme()
   const duration = props.animationDuration ? props.animationDuration : 150
   const throttleDuration = duration + 250
 
@@ -55,11 +56,20 @@ export function Button(props: ButtonProps) {
     { trailing: false },
   )
 
+  const buttonProps = {
+    ...props,
+    sx: {
+      ...props.sx,
+      maxWidth: "450px",
+    },
+    onClick: handleClick,
+  }
+
   const variations = {
-    profile: <ProfileButton {...props} onClick={handleClick} />,
-    modal: <ModalButton {...props} onClick={handleClick} />,
-    home: <HomeButton {...props} onClick={handleClick} />,
-    pill: <PillButton {...props} onClick={handleClick} />,
+    profile: <ProfileButton {...buttonProps} onClick={handleClick} />,
+    modal: <ModalButton {...buttonProps} onClick={handleClick} />,
+    home: <HomeButton {...buttonProps} onClick={handleClick} />,
+    pill: <PillButton {...buttonProps} onClick={handleClick} />,
     navNext: (
       <NavigationButton navigateTo={"next"} {...props} onClick={handleClick} />
     ),

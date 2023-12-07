@@ -18,6 +18,7 @@ export function ProfileWrapper({
       padding={theme.module[4]}
       justifyContent={"space-between"}
       borderRadius={theme.module[4]}
+      maxWidth={"700px"}
       gap={theme.module[5]}
     >
       {children}

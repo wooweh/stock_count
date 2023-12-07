@@ -37,10 +37,13 @@ import {
 
 */
 export function SetupBody() {
+  const theme = useTheme()
   return (
     <Outer>
-      <SetupOptions />
-      <AddMembers />
+      <Stack width={"100%"} gap={theme.module[5]}>
+        <SetupOptions />
+        <AddMembers />
+      </Stack>
       <WarningBox />
     </Outer>
   )
@@ -58,7 +61,11 @@ function Outer({
 }) {
   const theme = useTheme()
   return (
-    <Stack height={"100%"} gap={theme.module[5]}>
+    <Stack
+      height={"100%"}
+      justifyContent={"space-between"}
+      alignItems={"center"}
+    >
       {children}
     </Stack>
   )
@@ -371,6 +378,7 @@ function CountersList() {
 
   return (
     <Stack
+      width={"100%"}
       boxShadow={theme.shadow.neo[1]}
       padding={theme.module[2]}
       boxSizing={"border-box"}
@@ -442,10 +450,20 @@ function SetupOption(props: SetupOptionProps) {
           {props.label}
         </Typography>
       </Stack>
-      <Stack>{props.control}</Stack>
+      <Stack width={"100%"} alignItems={"center"}>
+        {props.control}
+      </Stack>
       {!!props.description && (
-        <Stack paddingLeft={theme.module[1]}>
-          <Typography color={theme.scale.gray[5]} fontWeight={"bold"}>
+        <Stack
+          width={"100%"}
+          alignItems={"center"}
+          paddingLeft={theme.module[1]}
+        >
+          <Typography
+            // textAlign={"center"}
+            color={theme.scale.gray[5]}
+            fontWeight={"bold"}
+          >
             {props.description}
           </Typography>
         </Stack>

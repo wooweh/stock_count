@@ -157,11 +157,17 @@ function ButtonTray() {
   ]
 
   return (
-    <Stack height={"100%"} width={"100%"} justifyContent={"space-between"}>
+    <Stack
+      height={"100%"}
+      width={"100%"}
+      justifyContent={"space-between"}
+      alignItems={"center"}
+    >
       <Stack
         width={"100%"}
         gap={theme.module[5]}
         paddingTop={theme.module[3]}
+        alignItems={"center"}
         boxSizing={"border-box"}
       >
         {isAdmin &&
@@ -263,7 +269,7 @@ function MemberListItem({ member }: { member: MemberProps }) {
 
 */
 function InvitesList() {
-  const invites = useAppSelector(selectOrgInvitesList) as InviteProps[]
+  const invites = useAppSelector(selectOrgInvitesList)
   const isViewingInvites = useOrgUI((state: any) => state.isViewingInvites)
 
   function handleClose() {
@@ -281,7 +287,7 @@ function InvitesList() {
       body={
         invites.length ? (
           <List gapScale={0}>
-            {invites.map((invite: InviteProps, index: number) => {
+            {invites.map((invite: any, index: number) => {
               return <InviteListItem invite={invite} key={index} />
             })}
           </List>

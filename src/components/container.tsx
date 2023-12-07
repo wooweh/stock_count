@@ -17,12 +17,12 @@ export default function Container(props: ContainerProps) {
 
   return (
     <Stack
-      id={"pages_container"}
       ref={props.resizeRef}
       width={"100vw"}
       height={"100vh"}
       minHeight={"710px"}
       minWidth={"350px"}
+      maxWidth={"820px"}
       paddingTop={theme.module[6]}
       bgcolor={theme.scale.gray[9]}
       bottom={0}
