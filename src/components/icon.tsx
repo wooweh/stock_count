@@ -35,6 +35,7 @@ import OptionsIcon from "@mui/icons-material/MoreVert"
 import NotificationIcon from "@mui/icons-material/NotificationsActive"
 import ProfileIcon from "@mui/icons-material/PersonRounded"
 import SubmitIcon from "@mui/icons-material/Publish"
+import RetryIcon from "@mui/icons-material/ReplayRounded"
 import ObsoleteIcon from "@mui/icons-material/ScheduleRounded"
 import SearchIcon from "@mui/icons-material/SearchRounded"
 import UseableIcon from "@mui/icons-material/SellRounded"
@@ -82,6 +83,7 @@ export type IconNames =
   | "leave"
   | "invite"
   | "options"
+  | "retry"
   | "copy"
   | "key"
   | "admin"
@@ -167,6 +169,17 @@ export default function Icon(props: IconProps) {
     ),
     home: (
       <HomeIcon
+        fontSize={fontSize}
+        fontWeight={props.fontWeight}
+        sx={{
+          ...styles,
+          ...props.sx,
+          color: props.color ? props.color : theme.scale.gray[4],
+        }}
+      />
+    ),
+    retry: (
+      <RetryIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
         sx={{

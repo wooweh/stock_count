@@ -67,13 +67,12 @@ export function Org() {
   const [isEmailVerified, setIsEmailVerified] = useState(true)
 
   useEffect(() => {
-    let initial = 0
-    setInterval(() => {
-      initial = 5000
+    const interval = setInterval(() => {
       onAuthStateChanged(getAuth(), (user) => {
-        if (!!user) setIsEmailVerified(user.emailVerified)
+        if (!!user) setIsEmailVerified(!!user.emailVerified)
       })
-    }, initial)
+    }, 1000)
+    return () => clearInterval(interval)
   }, [])
 
   return !isProfileComplete ? (

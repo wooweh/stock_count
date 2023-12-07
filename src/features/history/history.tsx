@@ -2,6 +2,7 @@ import { Stack } from "@mui/material"
 import { create } from "zustand"
 import { createJSONStorage, persist } from "zustand/middleware"
 import useTheme from "../../common/useTheme"
+import { ErrorBoundary } from "../../components/errorBoundary"
 import { HistoryList } from "./historyList"
 import { Review } from "./review"
 /*
@@ -45,19 +46,26 @@ export function resetHistoryUI() {
 
 */
 export function History() {
+  return (
+    <ErrorBoundary>
+      <Outer>
+        <HistoryBody />
+      </Outer>
+    </ErrorBoundary>
+  )
+}
+/*
+
+
+
+
+
+*/
+function HistoryBody() {
   const isReviewing = !!useHistoryUI(
     (state: HistoryUIState) => state.reviewItemUuid,
   )
-
-  function HistoryBody() {
-    return isReviewing ? <Review /> : <HistoryList />
-  }
-
-  return (
-    <Outer>
-      <HistoryBody />
-    </Outer>
-  )
+  return isReviewing ? <Review /> : <HistoryList />
 }
 /*
 

@@ -24,6 +24,7 @@ import {
 } from "./userSliceSelectors"
 import { removeUser, updateUserName } from "./userSliceUtils"
 import { checkNewPassword, getPasswordValidation } from "./userUtils"
+import { ErrorBoundary } from "../../components/errorBoundary"
 /*
 
 
@@ -73,13 +74,15 @@ export function resetUserUI() {
 */
 export function UserProfile() {
   return (
-    <ProfileWrapper>
-      <ProfileFields />
-      <ButtonTray />
-      <ChangePassword />
-      <ChangeEmail />
-      <DeleteProfileConfirmation />
-    </ProfileWrapper>
+    <ErrorBoundary>
+      <ProfileWrapper>
+        <ProfileFields />
+        <ButtonTray />
+        <ChangePassword />
+        <ChangeEmail />
+        <DeleteProfileConfirmation />
+      </ProfileWrapper>
+    </ErrorBoundary>
   )
 }
 /*

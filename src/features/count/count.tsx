@@ -3,6 +3,7 @@ import _ from "lodash"
 import { create } from "zustand"
 import { createJSONStorage, persist } from "zustand/middleware"
 import useTheme from "../../common/useTheme"
+import { ErrorBoundary } from "../../components/errorBoundary"
 import Modal, { ModalActionProps } from "../../components/modal"
 import { CountTypes } from "./countSlice"
 import { leaveCount, removeCount } from "./countSliceUtils"
@@ -182,11 +183,11 @@ export function resetCountUI() {
 */
 export function Count() {
   return (
-    <>
+    <ErrorBoundary>
       <Steps />
       <LeaveCountConfirmation />
       <DeleteCountConfirmation />
-    </>
+    </ErrorBoundary>
   )
 }
 /*

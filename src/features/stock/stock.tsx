@@ -7,6 +7,7 @@ import { EditItem } from "./editItem"
 import { StockList } from "./stockList"
 import { StockItemProps } from "./stockSlice"
 import { UploadItems } from "./uploadItems"
+import { ErrorBoundary } from "../../components/errorBoundary"
 /*
 
 
@@ -50,12 +51,14 @@ export function resetStockUI() {
 */
 export function Stock() {
   return (
-    <Outer>
-      <StockList />
-      <AddItem />
-      <UploadItems />
-      <EditItem />
-    </Outer>
+    <ErrorBoundary>
+      <Outer>
+        <StockList />
+        <AddItem />
+        <UploadItems />
+        <EditItem />
+      </Outer>
+    </ErrorBoundary>
   )
 }
 /*

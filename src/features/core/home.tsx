@@ -22,6 +22,7 @@ import {
 import { updateUserName } from "../user/userSliceUtils"
 import { generateCustomNotification } from "./coreUtils"
 import { routePaths } from "./pages"
+import { ErrorBoundary } from "../../components/errorBoundary"
 /*
 
 
@@ -36,28 +37,28 @@ export function Home() {
   const [isEmailVerified, setIsEmailVerified] = useState(true)
 
   useEffect(() => {
-    let initial = 0
     const interval = setInterval(() => {
-      initial = 5000
       onAuthStateChanged(getAuth(), (user) => {
-        if (!!user) setIsEmailVerified(user.emailVerified)
+        if (!!user) setIsEmailVerified(!!user.emailVerified)
       })
-    }, initial)
+    }, 1000)
     return () => clearInterval(interval)
   }, [])
 
   return (
-    <Window bgcolor={theme.scale.gray[9]}>
-      {!isEmailVerified ? (
-        <VerifyEmailPrompt />
-      ) : !isProfileComplete ? (
-        <CompleteProfilePrompt />
-      ) : !isOrgSetup ? (
-        <SetupOrgPrompt />
-      ) : (
-        <HomeButtons />
-      )}
-    </Window>
+    <ErrorBoundary>
+      <Window bgcolor={theme.scale.gray[9]}>
+        {!isEmailVerified ? (
+          <VerifyEmailPrompt />
+        ) : !isProfileComplete ? (
+          <CompleteProfilePrompt />
+        ) : !isOrgSetup ? (
+          <SetupOrgPrompt />
+        ) : (
+          <HomeButtons />
+        )}
+      </Window>
+    </ErrorBoundary>
   )
 }
 /*
@@ -391,7 +392,7 @@ function HomeButtons() {
         justifyContent={"center"}
         alignItems={"center"}
         boxSizing={"border-box"}
-        >
+      >
         <Button
           variation="profile"
           label={orgName}

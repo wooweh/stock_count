@@ -12,6 +12,7 @@ import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { Button } from "../../components/button"
 import { Input } from "../../components/control"
+import { ErrorBoundary } from "../../components/errorBoundary"
 import Icon from "../../components/icon"
 import { Loader } from "../../components/loader"
 import { selectIsSystemBooted } from "../core/coreSliceSelectors"
@@ -108,11 +109,11 @@ export function Authentication({
   isRegistering?: boolean
 }) {
   return (
-    <>
+    <ErrorBoundary>
       <AuthenticationInput isRegistering={isRegistering} />
       <SigningInLoader />
       <VerifyEmailPrompt />
-    </>
+    </ErrorBoundary>
   )
 }
 /*
