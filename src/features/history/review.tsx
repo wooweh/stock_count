@@ -1,5 +1,6 @@
 import { Stack, Typography } from "@mui/material"
 import _ from "lodash"
+import { useLocation } from "react-router-dom"
 import { useAppSelector } from "../../app/hooks"
 import useTheme, { ThemeColors } from "../../common/useTheme"
 import {
@@ -14,6 +15,7 @@ import {
 } from "../../components/button"
 import { PieChart, PieChartDataProps } from "../../components/chart"
 import { downloadCSVTemplate } from "../../components/csvParser"
+import { ErrorBoundary } from "../../components/errorBoundary"
 import VirtualizedTable from "../../components/table"
 import {
   prepareSoloResultsTableColumns,
@@ -48,12 +50,22 @@ import { selectHistory } from "./historySliceSelectors"
 
 */
 export function Review() {
+  const location = useLocation()
+  const historyUIState = useHistoryUI((state) => state)
+  const path = location.pathname
+
   return (
-    <Outer>
-      <Header />
-      <Body />
-      <ButtonTray />
-    </Outer>
+    <ErrorBoundary
+      componentName={"Review"}
+      featurePath={path}
+      state={{ featureUI: { ...historyUIState } }}
+    >
+      <Outer>
+        <Header />
+        <Body />
+        <ButtonTray />
+      </Outer>
+    </ErrorBoundary>
   )
 }
 /*

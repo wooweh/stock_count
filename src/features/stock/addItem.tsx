@@ -7,6 +7,8 @@ import Modal, { ModalActionProps } from "../../components/modal"
 import { generateCustomNotification } from "../core/coreUtils"
 import { setStockUI, useStockUI } from "./stock"
 import { updateStockItem } from "./stockSliceUtils"
+import { useLocation } from "react-router-dom"
+import { ErrorBoundary } from "../../components/errorBoundary"
 /*
 
 
@@ -14,7 +16,7 @@ import { updateStockItem } from "./stockSliceUtils"
 
 */
 export function AddItem() {
-  const isAdding = useStockUI((state: any) => state.isAdding)
+  const isAdding = useStockUI((state) => state.isAdding)
 
   const [name, setName] = useState("")
   const [unit, setUnit] = useState("")
@@ -96,20 +98,31 @@ export function StockItemInputFields(props: {
   inputs: StockItemInputFieldProps[]
 }) {
   const theme = useTheme()
+  const location = useLocation()
+
+  const stockUIState = useStockUI((state) => state)
+
+  const path = location.pathname
 
   return (
-    <Stack
-      width={"100%"}
-      alignItems={"center"}
-      padding={theme.module[3]}
-      paddingRight={theme.module[2]}
-      gap={theme.module[3]}
-      boxSizing={"border-box"}
+    <ErrorBoundary
+      componentName={"StockItemInputFields"}
+      featurePath={path}
+      state={{ component: { ...props }, featureUI: { ...stockUIState } }}
     >
-      {props.inputs.map((input: StockItemInputFieldProps) => (
-        <StockItemInputField key={input.label} {...input} />
-      ))}
-    </Stack>
+      <Stack
+        width={"100%"}
+        alignItems={"center"}
+        padding={theme.module[3]}
+        paddingRight={theme.module[2]}
+        gap={theme.module[3]}
+        boxSizing={"border-box"}
+      >
+        {props.inputs.map((input: StockItemInputFieldProps) => (
+          <StockItemInputField key={input.label} {...input} />
+        ))}
+      </Stack>
+    </ErrorBoundary>
   )
 }
 /*

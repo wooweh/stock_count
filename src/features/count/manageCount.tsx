@@ -1,10 +1,12 @@
 import { Divider, Stack, Typography } from "@mui/material"
 import _ from "lodash"
 import { useEffect, useMemo } from "react"
+import { useLocation } from "react-router-dom"
 import { useAppSelector } from "../../app/hooks"
 import useTheme, { ThemeColors } from "../../common/useTheme"
 import { Button } from "../../components/button"
 import { Select, SelectOptionProps } from "../../components/control"
+import { ErrorBoundary } from "../../components/errorBoundary"
 import Icon, { IconNames } from "../../components/icon"
 import { List } from "../../components/list"
 import { ListItem } from "../../components/listItem"
@@ -16,7 +18,6 @@ import { selectOrgMembers } from "../org/orgSliceSelectors"
 import { getMemberName, getMemberShortName } from "../org/orgUtils"
 import { selectUserUuidString } from "../user/userSliceSelectors"
 import {
-  CountUIState,
   addCountUIArrayItem,
   addCountUIKeyValuePair,
   removeCountUIArrayItem,
@@ -44,14 +45,24 @@ import { CountTypeToggleButtons, WarningBox } from "./setup"
 
 */
 export function ManageCount() {
+  const location = useLocation()
+  const countUIState = useCountUI((state) => state)
+  const path = location.pathname
+
   return (
-    <Outer>
-      <Header />
-      <Body />
-      <UpdateCountButton />
-      <UpdateCountConfirmation />
-      <AddTempMembers />
-    </Outer>
+    <ErrorBoundary
+      componentName="ManageCount"
+      featurePath={path}
+      state={{ featureUI: { ...countUIState } }}
+    >
+      <Outer>
+        <Header />
+        <Body />
+        <UpdateCountButton />
+        <UpdateCountConfirmation />
+        <AddTempMembers />
+      </Outer>
+    </ErrorBoundary>
   )
 }
 /*
@@ -223,7 +234,7 @@ function CountTeamControls() {
 
 function ControlsHeader() {
   const theme = useTheme()
-  const countType = useCountUI((state: CountUIState) => state.tempCountType)
+  const countType = useCountUI((state) => state.tempCountType)
 
   const leftIconName: IconNames =
     countType === "solo" ? "profile" : countType === "dual" ? "dual" : "group"
@@ -265,9 +276,7 @@ function ControlsBody() {
   const theme = useTheme()
   const countMembers = useAppSelector(selectCountMembersCountValueList)
   const orgMembers = useAppSelector(selectOrgMembers) as MembersProps
-  const tempAddedMemberUuids = useCountUI(
-    (state: CountUIState) => state.tempAddedMemberUuids,
-  )
+  const tempAddedMemberUuids = useCountUI((state) => state.tempAddedMemberUuids)
 
   return (
     <Slot
@@ -310,11 +319,9 @@ function TeamMemberControls(props: TeamMemberControlsProps) {
   const theme = useTheme()
 
   const tempRemovedMemberUuids = useCountUI(
-    (state: CountUIState) => state.tempRemovedMemberUuids,
+    (state) => state.tempRemovedMemberUuids,
   )
-  const tempResultsTransfers = useCountUI(
-    (state: CountUIState) => state.tempResultsTransfers,
-  )
+  const tempResultsTransfers = useCountUI((state) => state.tempResultsTransfers)
 
   const isRemoved = useMemo(
     () => tempRemovedMemberUuids.includes(props.uuid),
@@ -521,22 +528,14 @@ function AddTempMembers() {
   const availableMembers = useAppSelector(selectAvailableCountersList)
   const countMembers = useAppSelector(selectCountersList)
 
-  const countType = useCountUI((state: CountUIState) => state.tempCountType)
-  const isAddingTempMembers = useCountUI(
-    (state: CountUIState) => state.isAddingTempMembers,
-  )
-  const selectedMemberUuids = useCountUI(
-    (state: CountUIState) => state.selectedMemberUuids,
-  )
-  const tempAddedMemberUuids = useCountUI(
-    (state: CountUIState) => state.tempAddedMemberUuids,
-  )
+  const countType = useCountUI((state) => state.tempCountType)
+  const isAddingTempMembers = useCountUI((state) => state.isAddingTempMembers)
+  const selectedMemberUuids = useCountUI((state) => state.selectedMemberUuids)
+  const tempAddedMemberUuids = useCountUI((state) => state.tempAddedMemberUuids)
   const tempRemovedMemberUuids = useCountUI(
-    (state: CountUIState) => state.tempRemovedMemberUuids,
+    (state) => state.tempRemovedMemberUuids,
   )
-  const tempResultsTransfers = useCountUI(
-    (state: CountUIState) => state.tempResultsTransfers,
-  )
+  const tempResultsTransfers = useCountUI((state) => state.tempResultsTransfers)
 
   const availableTempMembers = _.remove(
     [...availableMembers],
@@ -591,6 +590,12 @@ function AddTempMembers() {
     }
   }
 
+  const addTempMembersBodyProps = {
+    isRequirementMet,
+    warningMessage,
+    isAvailableTempMembers: !!availableTempMembers.length,
+  }
+
   const modalActions: ModalActionProps[] = [
     {
       iconName: "cancel",
@@ -606,19 +611,43 @@ function AddTempMembers() {
     <Modal
       open={isAddingTempMembers}
       heading={"Add Counters"}
-      body={
-        !availableTempMembers.length ? (
-          <Typography>No additional members available.</Typography>
-        ) : (
-          <MembersList
-            isRequirementMet={isRequirementMet}
-            warningMessage={warningMessage}
-          />
-        )
-      }
+      body={<AddTempMembersBody {...addTempMembersBodyProps} />}
       actions={modalActions}
       onClose={handleClose}
     />
+  )
+}
+/*
+
+
+
+
+*/
+type AddTempMembersBodyProps = {
+  isRequirementMet: boolean
+  warningMessage: string
+  isAvailableTempMembers: boolean
+}
+function AddTempMembersBody(props: AddTempMembersBodyProps) {
+  const location = useLocation()
+  const countUIState = useCountUI((state) => state)
+  const path = location.pathname
+
+  return (
+    <ErrorBoundary
+      componentName="AddTempMembersBody"
+      featurePath={path}
+      state={{ featureUI: { ...countUIState }, component: { ...props } }}
+    >
+      {props.isAvailableTempMembers ? (
+        <MembersList
+          isRequirementMet={props.isRequirementMet}
+          warningMessage={props.warningMessage}
+        />
+      ) : (
+        <Typography>No additional members available.</Typography>
+      )}
+    </ErrorBoundary>
   )
 }
 /*
@@ -636,15 +665,9 @@ function MembersList({
 }) {
   const availableMembers = useAppSelector(selectAvailableCountersList)
 
-  const countType: CountTypes = useCountUI(
-    (state: CountUIState) => state.tempCountType,
-  )
-  const selectedMemberUuids = useCountUI(
-    (state: CountUIState) => state.selectedMemberUuids,
-  )
-  const tempAddedMemberUuids = useCountUI(
-    (state: CountUIState) => state.tempAddedMemberUuids,
-  )
+  const countType: CountTypes = useCountUI((state) => state.tempCountType)
+  const selectedMemberUuids = useCountUI((state) => state.selectedMemberUuids)
+  const tempAddedMemberUuids = useCountUI((state) => state.tempAddedMemberUuids)
 
   const availableMembersToAdd = _.remove(
     [...availableMembers],
@@ -730,14 +753,10 @@ function TransfersBody() {
   const currentCountersUuids = useAppSelector(selectCountersUuidList)
 
   const tempRemovedMemberUuids = useCountUI(
-    (state: CountUIState) => state.tempRemovedMemberUuids,
+    (state) => state.tempRemovedMemberUuids,
   )
-  const tempAddedMemberUuids = useCountUI(
-    (state: CountUIState) => state.tempAddedMemberUuids,
-  )
-  const transferMembersUuids = useCountUI(
-    (state: CountUIState) => state.tempResultsTransfers,
-  )
+  const tempAddedMemberUuids = useCountUI((state) => state.tempAddedMemberUuids)
+  const transferMembersUuids = useCountUI((state) => state.tempResultsTransfers)
   const availableMemberUuidsToTransferTo = _.remove(
     _.uniq([...currentCountersUuids, ...tempAddedMemberUuids]),
     (memberUuid) => !tempRemovedMemberUuids.includes(memberUuid),
@@ -860,7 +879,7 @@ function UpdateCountButton() {
   const theme = useTheme()
 
   const isCounterRequirement = useCountUI(
-    (state: CountUIState) => state.isCounterRequirementMet,
+    (state) => state.isCounterRequirementMet,
   )
 
   return (
@@ -896,19 +915,11 @@ function UpdateCountConfirmation() {
   const userUuid = useAppSelector(selectUserUuidString)
   const isUserOrganiser = useAppSelector(selectIsUserOrganiser)
 
-  const countType = useCountUI((state: CountUIState) => state.tempCountType)
-  const addedMembers = useCountUI(
-    (state: CountUIState) => state.tempAddedMemberUuids,
-  )
-  const removedMembers = useCountUI(
-    (state: CountUIState) => state.tempRemovedMemberUuids,
-  )
-  const transferredMembers = useCountUI(
-    (state: CountUIState) => state.tempResultsTransfers,
-  )
-  const isUpdatingCount = useCountUI(
-    (state: CountUIState) => state.isUpdatingCount,
-  )
+  const countType = useCountUI((state) => state.tempCountType)
+  const addedMembers = useCountUI((state) => state.tempAddedMemberUuids)
+  const removedMembers = useCountUI((state) => state.tempRemovedMemberUuids)
+  const transferredMembers = useCountUI((state) => state.tempResultsTransfers)
+  const isUpdatingCount = useCountUI((state) => state.isUpdatingCount)
   console.log(countType, addedMembers, removedMembers, transferredMembers)
 
   const isRemovingOrganiser =
@@ -953,34 +964,37 @@ function UpdateCountConfirmation() {
 
 function UpdateCountConfirmationBody() {
   const theme = useTheme()
+  const location = useLocation()
 
-  const addedUuids = useCountUI(
-    (state: CountUIState) => state.tempAddedMemberUuids,
-  )
-  const removedUuids = useCountUI(
-    (state: CountUIState) => state.tempRemovedMemberUuids,
-  )
-  const transferUuids = useCountUI(
-    (state: CountUIState) => state.tempResultsTransfers,
-  )
+  const countUIState = useCountUI((state) => state)
+  const addedUuids = useCountUI((state) => state.tempAddedMemberUuids)
+  const removedUuids = useCountUI((state) => state.tempRemovedMemberUuids)
+  const transferUuids = useCountUI((state) => state.tempResultsTransfers)
 
   const summaryProps = { addedUuids, removedUuids, transferUuids }
+  const path = location.pathname
 
   return (
-    <Stack width={"100%"} gap={theme.module[3]}>
-      <Typography textAlign={"center"}>
-        You are about to update the count. Confirm your changes before
-        proceeding.
-      </Typography>
-      <Typography
-        fontWeight={"bold"}
-        color={theme.scale.blue[6]}
-        textAlign={"center"}
-      >
-        Change Summary:
-      </Typography>
-      <ChangeSummary {...summaryProps} />
-    </Stack>
+    <ErrorBoundary
+      componentName="UpdateCountConfirmationBody"
+      featurePath={path}
+      state={{ featureUI: { ...countUIState }, component: { ...summaryProps } }}
+    >
+      <Stack width={"100%"} gap={theme.module[3]}>
+        <Typography textAlign={"center"}>
+          You are about to update the count. Confirm your changes before
+          proceeding.
+        </Typography>
+        <Typography
+          fontWeight={"bold"}
+          color={theme.scale.blue[6]}
+          textAlign={"center"}
+        >
+          Change Summary:
+        </Typography>
+        <ChangeSummary {...summaryProps} />
+      </Stack>
+    </ErrorBoundary>
   )
 }
 /*

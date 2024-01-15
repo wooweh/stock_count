@@ -5,9 +5,16 @@ import TableCell from "@mui/material/TableCell"
 import TableHead from "@mui/material/TableHead"
 import TableRow from "@mui/material/TableRow"
 import * as React from "react"
+import { useLocation } from "react-router-dom"
 import { TableComponents, TableVirtuoso } from "react-virtuoso"
 import useTheme from "../common/useTheme"
+import { ErrorBoundary } from "./errorBoundary"
+/*
 
+
+
+
+*/
 export type ColumnData = {
   label: string
   dataKey: string
@@ -26,6 +33,9 @@ type VirtualizedTableProps = {
 }
 export default function VirtualizedTable(props: VirtualizedTableProps) {
   const theme = useTheme()
+  const location = useLocation()
+
+  const path = location.pathname
 
   const VirtuosoTableComponents: TableComponents<RowData> = {
     Table: (props) => (
@@ -43,7 +53,11 @@ export default function VirtualizedTable(props: VirtualizedTableProps) {
     TableBody: React.forwardRef<HTMLTableSectionElement>((props, ref) => (
       <TableBody
         {...props}
-        sx={{ paddingTop: theme.module[0], overflow: "hidden", background: theme.scale.gray[9] }}
+        sx={{
+          paddingTop: theme.module[0],
+          overflow: "hidden",
+          background: theme.scale.gray[9],
+        }}
         ref={ref}
       />
     )),
@@ -132,12 +146,18 @@ export default function VirtualizedTable(props: VirtualizedTableProps) {
         overflow: "hidden",
       }}
     >
-      <TableVirtuoso
-        data={props.rows}
-        components={VirtuosoTableComponents}
-        fixedHeaderContent={() => fixedHeaderContent()}
-        itemContent={(_index, row) => rowContent(_index, row)}
-      />
+      <ErrorBoundary
+        componentName={"Table"}
+        featurePath={path}
+        state={{ component: { ...props } }}
+      >
+        <TableVirtuoso
+          data={props.rows}
+          components={VirtuosoTableComponents}
+          fixedHeaderContent={() => fixedHeaderContent()}
+          itemContent={(_index, row) => rowContent(_index, row)}
+        />
+      </ErrorBoundary>
     </Paper>
   )
 }

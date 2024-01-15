@@ -2,12 +2,14 @@ import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 import _ from "lodash"
 import { useEffect, useState } from "react"
+import { useLocation } from "react-router-dom"
 import { create } from "zustand"
 import { createJSONStorage, persist } from "zustand/middleware"
 import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { Button } from "../../components/button"
 import { Input } from "../../components/control"
+import { ErrorBoundary } from "../../components/errorBoundary"
 import { Loader } from "../../components/loader"
 import Modal, { ModalActionProps } from "../../components/modal"
 import { ProfileWrapper } from "../../components/surface"
@@ -24,7 +26,6 @@ import {
 } from "./userSliceSelectors"
 import { removeUser, updateUserName } from "./userSliceUtils"
 import { checkNewPassword, getPasswordValidation } from "./userUtils"
-import { ErrorBoundary } from "../../components/errorBoundary"
 /*
 
 
@@ -73,8 +74,16 @@ export function resetUserUI() {
 
 */
 export function UserProfile() {
+  const location = useLocation()
+  const userUIState = useUserUI((state) => state)
+  const path = location.pathname
+
   return (
-    <ErrorBoundary>
+    <ErrorBoundary
+      componentName={"UserProfile"}
+      featurePath={path}
+      state={{ featureUI: { ...userUIState } }}
+    >
       <ProfileWrapper>
         <ProfileFields />
         <ButtonTray />
@@ -97,10 +106,10 @@ function ProfileFields() {
   const name = useAppSelector(selectUserName)
   const email = useAppSelector(selectUserEmail)
 
-  const isEditing = useUserUI((state: any) => state.isEditing)
-  const editableName = useUserUI((state: any) => state.name)
-  const editableSurname = useUserUI((state: any) => state.surname)
-  const editableEmail = useUserUI((state: any) => state.email)
+  const isEditing = useUserUI((state) => state.isEditing)
+  const editableName = useUserUI((state) => state.name)
+  const editableSurname = useUserUI((state) => state.surname)
+  const editableEmail = useUserUI((state) => state.email)
 
   useEffect(() => {
     if (name?.first) setUserUI("name", name.first)
@@ -111,17 +120,17 @@ function ProfileFields() {
   const fields: ProfileFieldProps[] = [
     {
       label: "Name",
-      value: isEditing ? editableName : name?.first,
+      value: isEditing ? editableName : name?.first!,
       handleChange: (event: any) => setUserUI("name", event.target.value),
     },
     {
       label: "Surname",
-      value: isEditing ? editableSurname : name?.last,
+      value: isEditing ? editableSurname : name?.last!,
       handleChange: (event: any) => setUserUI("surname", event.target.value),
     },
     {
       label: "Email",
-      value: isEditing ? editableEmail : email,
+      value: isEditing ? editableEmail : email!,
       handleChange: (event: any) => setUserUI("email", event.target.value),
     },
   ]
@@ -153,7 +162,7 @@ type ProfileFieldProps = {
 function ProfileField(props: ProfileFieldProps) {
   const theme = useTheme()
 
-  const isEditing = useUserUI((state: any) => state.isEditing)
+  const isEditing = useUserUI((state) => state.isEditing)
   const placeholder =
     props.value === "" && !isEditing
       ? `Fill in your ${props.label.toLowerCase()}`
@@ -200,10 +209,10 @@ function ButtonTray() {
 
   const oldEmail = useAppSelector(selectUserEmail)
 
-  const isEditing = useUserUI((state: any) => state.isEditing)
-  const name = useUserUI((state: any) => state.name)
-  const surname = useUserUI((state: any) => state.surname)
-  const newEmail = useUserUI((state: any) => state.email)
+  const isEditing = useUserUI((state) => state.isEditing)
+  const name = useUserUI((state) => state.name)
+  const surname = useUserUI((state) => state.surname)
+  const newEmail = useUserUI((state) => state.email)
 
   const isChangingEmail = !!newEmail && newEmail !== oldEmail
   const isProfileComplete = !!name && !!surname && !!oldEmail
@@ -270,7 +279,7 @@ function ButtonTray() {
 */
 function DeleteProfileConfirmation() {
   const theme = useTheme()
-  const isDeleting = useUserUI((state: any) => state.isDeleting)
+  const isDeleting = useUserUI((state) => state.isDeleting)
   const [password, setPassword] = useState("")
 
   function handleAccept() {
@@ -323,8 +332,8 @@ function ChangeEmail() {
   const isEmailChangeSuccess = useAppSelector(selectIsEmailChangeSuccess)
   const oldEmail = useAppSelector(selectUserEmail)
 
-  const newEmail = useUserUI((state: any) => state.email)
-  const isChangingEmail = useUserUI((state: any) => state.isChangingEmail)
+  const newEmail = useUserUI((state) => state.email)
+  const isChangingEmail = useUserUI((state) => state.isChangingEmail)
   const [password, setPassword] = useState("")
 
   const isCredentialsComplete = !!newEmail && !!oldEmail && !!password
@@ -386,7 +395,7 @@ function ChangePassword() {
   const isPasswordChangeSuccess = useAppSelector(selectIsPasswordChangeSuccess)
   const isPasswordChangePending = useAppSelector(selectIsPasswordChangePending)
 
-  const isChangingPassword = useUserUI((state: any) => state.isChangingPassword)
+  const isChangingPassword = useUserUI((state) => state.isChangingPassword)
 
   const [password, setPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")

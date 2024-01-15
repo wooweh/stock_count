@@ -1,5 +1,6 @@
 import { Stack, Typography } from "@mui/material"
 import _ from "lodash"
+import { useLocation } from "react-router-dom"
 import { useAppSelector } from "../../app/hooks"
 import useTheme, { ThemeColors } from "../../common/useTheme"
 import {
@@ -7,10 +8,12 @@ import {
   formatDuration,
   formatLongDate,
 } from "../../common/utils"
+import { ErrorBoundary } from "../../components/errorBoundary"
 import Icon, { IconNames } from "../../components/icon"
 import Modal, { ModalActionProps } from "../../components/modal"
 import { getMemberShortName } from "../org/orgUtils"
 import {
+  CountUIState,
   addCountUIArrayItem,
   editCountUIArrayItem,
   removeCountUIArrayItem,
@@ -38,11 +41,21 @@ import {
 
 */
 export function FinalizationBody() {
+  const location = useLocation()
+  const countUIState = useCountUI((state) => state)
+  const path = location.pathname
+
   return (
-    <Outer>
-      <FinalizationItems />
-      <FinalizeCountConfirmation />
-    </Outer>
+    <ErrorBoundary
+      componentName="FinalizationBody"
+      featurePath={path}
+      state={{ featureUI: { ...countUIState } }}
+    >
+      <Outer>
+        <FinalizationItems />
+        <FinalizeCountConfirmation />
+      </Outer>
+    </ErrorBoundary>
   )
 }
 /*
@@ -257,7 +270,7 @@ export function DataPill(props: DataPillProps) {
 function FinalizeCountConfirmation() {
   const theme = useTheme()
   const isSubmittingFinalization = useCountUI(
-    (state: CountUIState) => state.isSubmittingFinalization,
+    (state) => state.isSubmittingFinalization,
   )
 
   function handleAccept() {

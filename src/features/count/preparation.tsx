@@ -1,17 +1,18 @@
 import { ClickAwayListener, Stack, Typography } from "@mui/material"
 import _ from "lodash"
 import { useEffect, useState } from "react"
+import { useLocation } from "react-router-dom"
 import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { Button } from "../../components/button"
 import { Input } from "../../components/control"
+import { ErrorBoundary } from "../../components/errorBoundary"
 import Icon from "../../components/icon"
 import { List } from "../../components/list"
 import { ListItem } from "../../components/listItem"
 import Modal, { ModalActionProps } from "../../components/modal"
 import { selectOrgCountChecksList } from "../org/orgSliceSelectors"
 import {
-  CountUIState,
   addCountUIArrayItem,
   editCountUIArrayItem,
   removeCountUIArrayItem,
@@ -28,11 +29,21 @@ import { startCount } from "./countSliceUtils"
 
 */
 export function PreparationBody() {
+  const location = useLocation()
+  const countUIState = useCountUI((state) => state)
+  const path = location.pathname
+
   return (
-    <Outer>
-      <PreparationItems />
-      <StartCountConfirmation />
-    </Outer>
+    <ErrorBoundary
+      componentName="PreparationBody"
+      featurePath={path}
+      state={{ featureUI: { ...countUIState } }}
+    >
+      <Outer>
+        <PreparationItems />
+        <StartCountConfirmation />
+      </Outer>
+    </ErrorBoundary>
   )
 }
 /*
@@ -348,13 +359,9 @@ function StartCountConfirmation() {
 
   const isOnlyOrganiser = useAppSelector(selectIsUserJustOrganiser)
 
-  const comments = useCountUI((state: CountUIState) => state.prepComments)
-  const checkUuids = useCountUI(
-    (state: CountUIState) => state.satisfiedCheckUuids,
-  )
-  const isStartingCount = useCountUI(
-    (state: CountUIState) => state.isStartingCount,
-  )
+  const comments = useCountUI((state) => state.prepComments)
+  const checkUuids = useCountUI((state) => state.satisfiedCheckUuids)
+  const isStartingCount = useCountUI((state) => state.isStartingCount)
 
   const step: CountSteps = isOnlyOrganiser ? "review" : "stockCount"
 
@@ -380,11 +387,9 @@ function StartCountConfirmation() {
 
   const START_MESSAGE =
     "You are about to start the count. Please read the following:"
-
   const DISCLAIMER = `Once the count has been started you will not be able 
   to go back to Setup or Preparation. You can change count type and manage 
   counters in the 'Manage' count option.`
-
   const PROCEED_MESSAGE = "Are you sure you want to proceed?"
 
   return (

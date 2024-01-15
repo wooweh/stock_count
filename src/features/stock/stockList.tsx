@@ -5,7 +5,7 @@ import { Button } from "../../components/button"
 import { ListItemOptionProps } from "../../components/listItem"
 import { ManagedList } from "../../components/managedList"
 import { SearchItemProps } from "../../components/searchBar"
-import { setStockUI } from "./stock"
+import { setStockUI, useStockUI } from "./stock"
 import { selectStockList } from "./stockSliceSelectors"
 import {
   removeStock,
@@ -13,6 +13,8 @@ import {
   removeStockItems,
 } from "./stockSliceUtils"
 import { prepareStockSearchList } from "./stockUtils"
+import { ErrorBoundary } from "../../components/errorBoundary"
+import { useLocation } from "react-router-dom"
 /*
 
 
@@ -20,11 +22,21 @@ import { prepareStockSearchList } from "./stockUtils"
 
 */
 export function StockList() {
+  const location = useLocation()
+  const stockUIState = useStockUI((state) => state)
+  const path = location.pathname
+
   return (
-    <Outer>
-      <StockManagementList />
-      <ButtonTray />
-    </Outer>
+    <ErrorBoundary
+      componentName={"StockList"}
+      featurePath={path}
+      state={{ featureUI: { ...stockUIState } }}
+    >
+      <Outer>
+        <StockManagementList />
+        <ButtonTray />
+      </Outer>
+    </ErrorBoundary>
   )
 }
 /*

@@ -1,8 +1,10 @@
 import { getAuth, onAuthStateChanged } from "firebase/auth"
 import { useEffect, useState } from "react"
+import { useLocation } from "react-router-dom"
 import { create } from "zustand"
 import { createJSONStorage, persist } from "zustand/middleware"
 import { useAppSelector } from "../../app/hooks"
+import { ErrorBoundary } from "../../components/errorBoundary"
 import { Loader } from "../../components/loader"
 import { CompleteProfilePrompt, VerifyEmailPrompt } from "../core/home"
 import { selectIsProfileComplete } from "../user/userSliceSelectors"
@@ -60,11 +62,17 @@ export function resetOrgUI() {
 
 */
 export function Org() {
+  const location = useLocation()
+
   const isProfileComplete = useAppSelector(selectIsProfileComplete)
   const isOrgSetup = useAppSelector(selectIsOrgSetup)
   const isJoiningOrg = useAppSelector(selectIsJoining)
 
+  const orgUIState = useOrgUI((state) => state)
+
   const [isEmailVerified, setIsEmailVerified] = useState(true)
+
+  const path = location.pathname
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -75,16 +83,24 @@ export function Org() {
     return () => clearInterval(interval)
   }, [])
 
-  return !isProfileComplete ? (
-    <CompleteProfilePrompt />
-  ) : !isEmailVerified ? (
-    <VerifyEmailPrompt />
-  ) : isJoiningOrg ? (
-    <Loader narration={"joining org"} />
-  ) : isOrgSetup ? (
-    <OrgProfile />
-  ) : (
-    <OrgSetup />
+  return (
+    <ErrorBoundary
+      componentName={"Org"}
+      featurePath={path}
+      state={{ featureUI: { ...orgUIState } }}
+    >
+      {!isProfileComplete ? (
+        <CompleteProfilePrompt />
+      ) : !isEmailVerified ? (
+        <VerifyEmailPrompt />
+      ) : isJoiningOrg ? (
+        <Loader narration={"joining org"} />
+      ) : isOrgSetup ? (
+        <OrgProfile />
+      ) : (
+        <OrgSetup />
+      )}
+    </ErrorBoundary>
   )
 }
 /*

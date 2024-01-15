@@ -3,11 +3,12 @@ import Stack from "@mui/material/Stack"
 import { getAuth, onAuthStateChanged } from "firebase/auth"
 import _ from "lodash"
 import { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { Button } from "../../components/button"
 import { Input } from "../../components/control"
+import { ErrorBoundary } from "../../components/errorBoundary"
 import Icon, { IconNames } from "../../components/icon"
 import { Window } from "../../components/surface"
 import { auth } from "../../remote"
@@ -22,7 +23,6 @@ import {
 import { updateUserName } from "../user/userSliceUtils"
 import { generateCustomNotification } from "./coreUtils"
 import { routePaths } from "./pages"
-import { ErrorBoundary } from "../../components/errorBoundary"
 /*
 
 
@@ -31,10 +31,14 @@ import { ErrorBoundary } from "../../components/errorBoundary"
 */
 export function Home() {
   const theme = useTheme()
+  const location = useLocation()
+
   const isProfileComplete = useAppSelector(selectIsProfileComplete)
   const isOrgSetup = useAppSelector(selectIsOrgSetup)
 
   const [isEmailVerified, setIsEmailVerified] = useState(true)
+
+  const path = location.pathname
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -46,7 +50,7 @@ export function Home() {
   }, [])
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary componentName={"Home"} featurePath={path}>
       <Window bgcolor={theme.scale.gray[9]}>
         {!isEmailVerified ? (
           <VerifyEmailPrompt />

@@ -1,5 +1,6 @@
 import { Stack, Typography } from "@mui/material"
 import _ from "lodash"
+import { useLocation } from "react-router-dom"
 import { create } from "zustand"
 import { createJSONStorage, persist } from "zustand/middleware"
 import useTheme from "../../common/useTheme"
@@ -182,12 +183,22 @@ export function resetCountUI() {
 
 */
 export function Count() {
+  const location = useLocation()
+  const countUIState = useCountUI((state) => state)
+  const path = location.pathname
+
   return (
-    <ErrorBoundary>
-      <Steps />
-      <LeaveCountConfirmation />
-      <DeleteCountConfirmation />
-    </ErrorBoundary>
+    <>
+      <ErrorBoundary
+        componentName={"Count"}
+        featurePath={path}
+        state={{ featureUI: { ...countUIState } }}
+      >
+        <Steps />
+        <LeaveCountConfirmation />
+        <DeleteCountConfirmation />
+      </ErrorBoundary>
+    </>
   )
 }
 /*

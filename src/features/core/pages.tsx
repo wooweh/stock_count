@@ -17,6 +17,7 @@ import { UserProfile, resetUserUI } from "../user/user"
 import { toggleMobile } from "./coreSliceUtils"
 import { getRoutePaths } from "./coreUtils"
 import { Home } from "./home"
+import { ErrorBoundary } from "../../components/errorBoundary"
 /*
 
 
@@ -129,17 +130,19 @@ export function Pages() {
 
   return (
     <Container resizeRef={ref}>
-      <Routes>
-        {routes.map((route: any, index: number) => {
-          return (
-            <Route
-              path={route.path}
-              element={<AuthWrapper route={route} />}
-              key={index}
-            />
-          )
-        })}
-      </Routes>
+      <ErrorBoundary componentName={"Pages"} featurePath={path}>
+        <Routes>
+          {routes.map((route: any, index: number) => {
+            return (
+              <Route
+                path={route.path}
+                element={<AuthWrapper route={route} />}
+                key={index}
+              />
+            )
+          })}
+        </Routes>
+      </ErrorBoundary>
     </Container>
   )
 }

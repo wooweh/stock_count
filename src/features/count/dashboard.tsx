@@ -10,16 +10,18 @@ import {
 } from "@mui/material"
 import _ from "lodash"
 import { useState } from "react"
+import { useLocation } from "react-router-dom"
 import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { trimEmptyLines } from "../../common/utils"
 import { Button } from "../../components/button"
 import { Input } from "../../components/control"
+import { ErrorBoundary } from "../../components/errorBoundary"
 import Icon from "../../components/icon"
 import Modal, { ModalActionProps } from "../../components/modal"
 import { selectOrgCountChecksList } from "../org/orgSliceSelectors"
 import { selectIsUserAdmin } from "../user/userSliceSelectors"
-import { CountUIState, resetCountUI, setCountUI, useCountUI } from "./count"
+import { resetCountUI, setCountUI, useCountUI } from "./count"
 import {
   selectIsCountInProgress,
   selectIsCountInvitePending,
@@ -41,12 +43,22 @@ import {
 
 */
 export function DashboardBody() {
+  const location = useLocation()
+  const countUIState = useCountUI((state) => state)
+  const path = location.pathname
+
   return (
-    <Outer>
-      <Body />
-      <ButtonTray />
-      <PrepCheckList />
-    </Outer>
+    <ErrorBoundary
+      componentName="DashboardBody"
+      featurePath={path}
+      state={{ featureUI: { ...countUIState } }}
+    >
+      <Outer>
+        <Body />
+        <ButtonTray />
+        <PrepCheckList />
+      </Outer>
+    </ErrorBoundary>
   )
 }
 /*
@@ -309,12 +321,8 @@ function ButtonTray() {
 
 */
 function PrepCheckList() {
-  const isManagingCheckList = useCountUI(
-    (state: CountUIState) => state.isManagingCheckList,
-  )
-  const isEditingCheckList = useCountUI(
-    (state: CountUIState) => state.isEditingCheckList,
-  )
+  const isManagingCheckList = useCountUI((state) => state.isManagingCheckList)
+  const isEditingCheckList = useCountUI((state) => state.isEditingCheckList)
 
   function handleClose() {
     setCountUI("isManagingCheckList", false)
@@ -357,20 +365,29 @@ function PrepCheckList() {
 */
 function CheckList() {
   const theme = useTheme()
+  const location = useLocation()
   const checkList = useAppSelector(selectOrgCountChecksList)
+  const countUIState = useCountUI((state) => state)
+  const path = location.pathname
 
   return (
-    <Stack width={"100%"} gap={theme.module[1]}>
-      {!!checkList.length ? (
-        checkList.map((check: any) => (
-          <CheckListItem countCheck={check} key={check.id} />
-        ))
-      ) : (
-        <Typography textAlign={"center"} color={theme.scale.gray[5]}>
-          No checks added
-        </Typography>
-      )}
-    </Stack>
+    <ErrorBoundary
+      componentName="CheckList"
+      featurePath={path}
+      state={{ featureUI: { ...countUIState } }}
+    >
+      <Stack width={"100%"} gap={theme.module[1]}>
+        {!!checkList.length ? (
+          checkList.map((check: any) => (
+            <CheckListItem countCheck={check} key={check.id} />
+          ))
+        ) : (
+          <Typography textAlign={"center"} color={theme.scale.gray[5]}>
+            No checks added
+          </Typography>
+        )}
+      </Stack>
+    </ErrorBoundary>
   )
 }
 /*
@@ -481,9 +498,7 @@ type CheckListItemInputProps = {
 function CheckListItemInput(props: CheckListItemInputProps) {
   const theme = useTheme()
 
-  const isEditingCheckList = useCountUI(
-    (state: CountUIState) => state.isEditingCheckList,
-  )
+  const isEditingCheckList = useCountUI((state) => state.isEditingCheckList)
 
   function handleEdit() {
     if (!isEditingCheckList) {

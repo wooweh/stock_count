@@ -1,11 +1,13 @@
 import { ClickAwayListener, Stack, Typography } from "@mui/material"
 import _ from "lodash"
 import { useEffect, useState } from "react"
+import { useLocation } from "react-router-dom"
 import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { getTimeStamp } from "../../common/utils"
 import Animation from "../../components/animation"
 import { Button } from "../../components/button"
+import { ErrorBoundary } from "../../components/errorBoundary"
 import { IconNames } from "../../components/icon"
 import { resetCountUI, setCountUI, useCountUI } from "./count"
 import { CountSteps, CountTypes } from "./countSlice"
@@ -44,6 +46,7 @@ type CountStepsPropsCreator<CountStepsProperties extends string> = {
 type CountStepsProps = CountStepsPropsCreator<CountSteps>
 export function Steps() {
   const theme = useTheme()
+  const location = useLocation()
 
   const countStep = useAppSelector(selectCountStep)
   const counterUuids = useAppSelector(selectCountersUuidList)
@@ -52,6 +55,7 @@ export function Steps() {
   const isJustOrganiser = useAppSelector(selectIsUserJustOrganiser)
   const isFinalizing = useAppSelector(selectIsOrganiserFinalizing)
 
+  const countUIState = useCountUI((state) => state)
   const isManagingCount = useCountUI((state) => state.isManagingCount)
   const countType = useCountUI((state) => state.tempCountType) as CountTypes
   const isCounterRequirementMet = useCountUI(
@@ -163,20 +167,28 @@ export function Steps() {
       disabled: !isCountCompleted,
     })
 
+  const path = location.pathname
+
   return (
-    <Stack
-      width={"100%"}
-      height={"100%"}
-      bgcolor={theme.scale.gray[8]}
-      padding={theme.module[3]}
-      boxSizing={"border-box"}
+    <ErrorBoundary
+      componentName={"Steps"}
+      featurePath={path}
+      state={{ featureUI: { ...countUIState } }}
     >
-      {isManagingCount ? (
-        <ManageCount />
-      ) : (
-        <CountStep {...countSteps[countStep]} />
-      )}
-    </Stack>
+      <Stack
+        width={"100%"}
+        height={"100%"}
+        bgcolor={theme.scale.gray[8]}
+        padding={theme.module[3]}
+        boxSizing={"border-box"}
+      >
+        {isManagingCount ? (
+          <ManageCount />
+        ) : (
+          <CountStep {...countSteps[countStep]} />
+        )}
+      </Stack>
+    </ErrorBoundary>
   )
 }
 /*

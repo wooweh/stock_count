@@ -1,9 +1,11 @@
 import { Stack, Typography } from "@mui/material"
 import _ from "lodash"
 import { useEffect } from "react"
+import { useLocation } from "react-router-dom"
 import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { Button, ToggleButtonGroup } from "../../components/button"
+import { ErrorBoundary } from "../../components/errorBoundary"
 import Icon from "../../components/icon"
 import { List } from "../../components/list"
 import { ListItem } from "../../components/listItem"
@@ -12,11 +14,10 @@ import { generateCustomNotification } from "../core/coreUtils"
 import { MemberProps } from "../org/orgSlice"
 import { getMemberName, getMemberShortName } from "../org/orgUtils"
 import {
-  CountUIState,
   addCountUIArrayItem,
   removeCountUIArrayItem,
   setCountUI,
-  useCountUI,
+  useCountUI
 } from "./count"
 import { CountMemberProps, CountTypes } from "./countSlice"
 import {
@@ -38,14 +39,24 @@ import {
 */
 export function SetupBody() {
   const theme = useTheme()
+  const location = useLocation()
+  const countUIState = useCountUI((state) => state)
+  const path = location.pathname
+
   return (
-    <Outer>
-      <Stack width={"100%"} gap={theme.module[5]}>
-        <SetupOptions />
-        <AddMembers />
-      </Stack>
-      <WarningBox />
-    </Outer>
+    <ErrorBoundary
+      componentName="SetupBody"
+      featurePath={path}
+      state={{ featureUI: { ...countUIState } }}
+    >
+      <Outer>
+        <Stack width={"100%"} gap={theme.module[5]}>
+          <SetupOptions />
+          <AddMembers />
+        </Stack>
+        <WarningBox />
+      </Outer>
+    </ErrorBoundary>
   )
 }
 /*
@@ -77,14 +88,10 @@ function Outer({
 
 */
 function SetupOptions() {
-  const theme = useTheme()
-
   const counterUuids = useAppSelector(selectCountersUuidList)
 
-  const countType = useCountUI((state: CountUIState) => state.tempCountType)
-  const selectedMemberUuids = useCountUI(
-    (state: CountUIState) => state.selectedMemberUuids,
-  )
+  const countType = useCountUI((state) => state.tempCountType)
+  const selectedMemberUuids = useCountUI((state) => state.selectedMemberUuids)
 
   const COUNT_TYPE_DESCRIPTIONS: any = {
     solo: "Solo: A single counter will count the entire stock holding.",
@@ -160,7 +167,7 @@ type CountTypeToggleButtonsProps = {
 }
 export function CountTypeToggleButtons(props: CountTypeToggleButtonsProps) {
   const countType = useAppSelector(selectCountType)
-  const tempCountType = useCountUI((state: CountUIState) => state.tempCountType)
+  const tempCountType = useCountUI((state) => state.tempCountType)
 
   useEffect(() => {
     setCountUI("tempCountType", countType)
@@ -204,9 +211,9 @@ export function CountTypeToggleButtons(props: CountTypeToggleButtonsProps) {
 export function WarningBox() {
   const theme = useTheme()
 
-  const countType = useCountUI((state: CountUIState) => state.tempCountType)
+  const countType = useCountUI((state) => state.tempCountType)
   const isCounterRequirementMet = useCountUI(
-    (state: CountUIState) => state.isCounterRequirementMet,
+    (state) => state.isCounterRequirementMet,
   )
 
   return (
@@ -237,13 +244,9 @@ export function WarningBox() {
 function AddMembers() {
   const availableMembers = useAppSelector(selectAvailableCountersList)
 
-  const countType = useCountUI((state: CountUIState) => state.tempCountType)
-  const isAddingMembers = useCountUI(
-    (state: CountUIState) => state.isAddingMembers,
-  )
-  const selectedMemberUuids = useCountUI(
-    (state: CountUIState) => state.selectedMemberUuids,
-  )
+  const countType = useCountUI((state) => state.tempCountType)
+  const isAddingMembers = useCountUI((state) => state.isAddingMembers)
+  const selectedMemberUuids = useCountUI((state) => state.selectedMemberUuids)
 
   //TODO: Refactor into Count utils function to reuse in Manage feature
   const counterRequirements = {
@@ -282,6 +285,12 @@ function AddMembers() {
     }
   }
 
+  const addMembersBodyProps = {
+    isRequirementMet,
+    warningMessage,
+    isAvailableTempMembers: !!availableMembers.length,
+  }
+
   const modalActions: ModalActionProps[] = [
     {
       iconName: "cancel",
@@ -297,19 +306,43 @@ function AddMembers() {
     <Modal
       open={isAddingMembers}
       heading={"Add Counters"}
-      body={
-        !availableMembers.length ? (
-          <Typography>No additional members available.</Typography>
-        ) : (
-          <MembersList
-            isRequirementMet={isRequirementMet}
-            warningMessage={warningMessage}
-          />
-        )
-      }
+      body={<AddMembersBody {...addMembersBodyProps} />}
       actions={modalActions}
       onClose={handleClose}
     />
+  )
+}
+/*
+
+
+
+
+*/
+type AddMembersBodyProps = {
+  isRequirementMet: boolean
+  warningMessage: string
+  isAvailableTempMembers: boolean
+}
+function AddMembersBody(props: AddMembersBodyProps) {
+  const location = useLocation()
+  const countUIState = useCountUI((state) => state)
+  const path = location.pathname
+
+  return (
+    <ErrorBoundary
+      componentName="AddTempMembersBody"
+      featurePath={path}
+      state={{ featureUI: { ...countUIState }, component: { ...props } }}
+    >
+      {props.isAvailableTempMembers ? (
+        <MembersList
+          isRequirementMet={props.isRequirementMet}
+          warningMessage={props.warningMessage}
+        />
+      ) : (
+        <Typography>No additional members available.</Typography>
+      )}
+    </ErrorBoundary>
   )
 }
 /*
@@ -327,12 +360,8 @@ function MembersList({
 }) {
   const availableMembers = useAppSelector(selectAvailableCountersList)
 
-  const countType: CountTypes = useCountUI(
-    (state: CountUIState) => state.tempCountType,
-  )
-  const selectedMemberUuids = useCountUI(
-    (state: CountUIState) => state.selectedMemberUuids,
-  )
+  const countType: CountTypes = useCountUI((state) => state.tempCountType)
+  const selectedMemberUuids = useCountUI((state) => state.selectedMemberUuids)
 
   const isTeamCount = countType === "team"
 
@@ -459,11 +488,7 @@ function SetupOption(props: SetupOptionProps) {
           alignItems={"center"}
           paddingLeft={theme.module[1]}
         >
-          <Typography
-            // textAlign={"center"}
-            color={theme.scale.gray[5]}
-            fontWeight={"bold"}
-          >
+          <Typography color={theme.scale.gray[5]} fontWeight={"bold"}>
             {props.description}
           </Typography>
         </Stack>

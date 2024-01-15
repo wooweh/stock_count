@@ -1,11 +1,12 @@
-import { Box, Divider, PopoverOrigin, Stack } from "@mui/material"
+import { Divider, PopoverOrigin, Stack } from "@mui/material"
 import ButtonBase from "@mui/material/ButtonBase"
 import MuiMenu from "@mui/material/Menu"
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { Switch } from "../../components/control"
+import { ErrorBoundary } from "../../components/errorBoundary"
 import Icon, { IconNames } from "../../components/icon"
 import { ListItem } from "../../components/listItem"
 import { signOut } from "../user/userAuth"
@@ -26,10 +27,13 @@ type MenuItemProps = {
 export function Menu() {
   const theme = useTheme()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const isDarkmode = useAppSelector(selectIsDarkmode)
 
   const [anchorEl, setAnchorEl] = useState(null)
+
+  const path = location.pathname
 
   function handleOpenMenu(e: any) {
     setAnchorEl(e.currentTarget)
@@ -103,18 +107,20 @@ export function Menu() {
           justifyContent={"flex-start"}
           boxSizing={"border-box"}
         >
-          {menuItems.map((item: MenuItemProps, index: number) => (
-            <MenuListitem
-              item={item}
-              control={
-                !index ? (
-                  <Switch value={isDarkmode} onChange={item.onChange} />
-                ) : undefined
-              }
-              divider={index !== menuItems.length - 1}
-              key={index}
-            />
-          ))}
+          <ErrorBoundary componentName={"Menu"} featurePath={path}>
+            {menuItems.map((item: MenuItemProps, index: number) => (
+              <MenuListitem
+                item={item}
+                control={
+                  !index ? (
+                    <Switch value={isDarkmode} onChange={item.onChange} />
+                  ) : undefined
+                }
+                divider={index !== menuItems.length - 1}
+                key={index}
+              />
+            ))}
+          </ErrorBoundary>
         </Stack>
       </MuiMenu>
     </>

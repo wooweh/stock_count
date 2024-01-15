@@ -10,6 +10,7 @@ import { selectIsUserCounting } from "../count/countSliceSelectors"
 import { selectIsSystemBooted } from "./coreSliceSelectors"
 import { Menu } from "./menu"
 import { routePaths, routes } from "./pages"
+import { ErrorBoundary } from "../../components/errorBoundary"
 /*
 
 
@@ -18,29 +19,34 @@ import { routePaths, routes } from "./pages"
 */
 export function Bar() {
   const theme = useTheme()
+  const location = useLocation()
 
   const isSystemBooted = useAppSelector(selectIsSystemBooted)
   const isUserCounting = useAppSelector(selectIsUserCounting)
 
+  const path = location.pathname
+
   return (
     isSystemBooted && (
-      <Stack
-        direction={"row"}
-        position={"fixed"}
-        top={0}
-        width={"100%"}
-        height={theme.module[6]}
-        bgcolor={theme.scale.gray[9]}
-        justifyContent={isUserCounting ? "center" : "space-between"}
-        alignItems={"center"}
-        paddingLeft={theme.module[3]}
-        paddingRight={theme.module[3]}
-        boxShadow={theme.shadow.neo[4]}
-        boxSizing={"border-box"}
-        zIndex={1000}
-      >
-        {isUserCounting ? <CountBanner /> : <NavigationBar />}
-      </Stack>
+      <ErrorBoundary componentName={"Bar"} featurePath={path}>
+        <Stack
+          direction={"row"}
+          position={"fixed"}
+          top={0}
+          width={"100%"}
+          height={theme.module[6]}
+          bgcolor={theme.scale.gray[9]}
+          justifyContent={isUserCounting ? "center" : "space-between"}
+          alignItems={"center"}
+          paddingLeft={theme.module[3]}
+          paddingRight={theme.module[3]}
+          boxShadow={theme.shadow.neo[4]}
+          boxSizing={"border-box"}
+          zIndex={1000}
+        >
+          {isUserCounting ? <CountBanner /> : <NavigationBar />}
+        </Stack>
+      </ErrorBoundary>
     )
   )
 }

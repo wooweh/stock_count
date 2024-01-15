@@ -1,12 +1,14 @@
 import { ClickAwayListener, Stack, Typography } from "@mui/material"
 import _ from "lodash"
 import { useEffect, useRef, useState } from "react"
+import { useLocation } from "react-router-dom"
 import { Virtuoso } from "react-virtuoso"
 import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { formatCommaSeparatedNumber } from "../../common/utils"
 import { Button } from "../../components/button"
 import { Input } from "../../components/control"
+import { ErrorBoundary } from "../../components/errorBoundary"
 import Icon, { IconNames } from "../../components/icon"
 import { ListItem } from "../../components/listItem"
 import Modal, { ModalActionProps } from "../../components/modal"
@@ -17,7 +19,7 @@ import {
   selectUserUuid,
   selectUserUuidString,
 } from "../user/userSliceSelectors"
-import { CountUIState, setCountUI, useCountUI } from "./count"
+import { setCountUI, useCountUI } from "./count"
 import { CountItemProps, CountTypes } from "./countSlice"
 import {
   selectCount,
@@ -39,12 +41,22 @@ import {
 
 */
 export function StockCountBody() {
+  const location = useLocation()
+  const countUIState = useCountUI((state) => state)
+  const path = location.pathname
+
   return (
-    <Outer>
-      <Body />
-      <AddStockItemButton />
-      <RecordStockItemCount />
-    </Outer>
+    <ErrorBoundary
+      componentName="StockCountBody"
+      featurePath={path}
+      state={{ featureUI: { ...countUIState } }}
+    >
+      <Outer>
+        <Body />
+        <AddStockItemButton />
+        <RecordStockItemCount />
+      </Outer>
+    </ErrorBoundary>
   )
 }
 /*
@@ -89,9 +101,7 @@ function Body() {
 
 */
 function SearchControls() {
-  const isAddingStockItem = useCountUI(
-    (state: CountUIState) => state.isAddingStockItem,
-  )
+  const isAddingStockItem = useCountUI((state) => state.isAddingStockItem)
 
   return isAddingStockItem ? <AddStockItemSearchBar /> : <CountSearchBar />
 }
@@ -200,7 +210,7 @@ function AddStockItemSearchBar() {
 function CountSheet() {
   const theme = useTheme()
   const countList = useAppSelector(selectModifiedUserCountResultsList)
-  const scrollIndex = useCountUI((state: CountUIState) => state.scrollIndex)
+  const scrollIndex = useCountUI((state) => state.scrollIndex)
   const virtuoso: any = useRef(null)
 
   const count = useAppSelector(selectCount)
@@ -373,9 +383,7 @@ function CountItemInfoDisplay({
 */
 function AddStockItemButton() {
   const theme = useTheme()
-  const isAddingStockItem = useCountUI(
-    (state: CountUIState) => state.isAddingStockItem,
-  )
+  const isAddingStockItem = useCountUI((state) => state.isAddingStockItem)
 
   function handleClick() {
     setCountUI("isAddingStockItem", true)
@@ -405,18 +413,12 @@ function AddStockItemButton() {
 function RecordStockItemCount() {
   const memberUuid = useAppSelector(selectUserUuid) as string
 
-  const useableCount = useCountUI(
-    (state: CountUIState) => state.currentStockItemUseableCount,
-  )
-  const damagedCount = useCountUI(
-    (state: CountUIState) => state.currentStockItemDamagedCount,
-  )
+  const useableCount = useCountUI((state) => state.currentStockItemUseableCount)
+  const damagedCount = useCountUI((state) => state.currentStockItemDamagedCount)
   const obsoleteCount = useCountUI(
-    (state: CountUIState) => state.currentStockItemObsoleteCount,
+    (state) => state.currentStockItemObsoleteCount,
   )
-  const id = useCountUI(
-    (state: CountUIState) => state.currentStockItemId,
-  ) as string
+  const id = useCountUI((state) => state.currentStockItemId) as string
 
   const [isOpen, setIsOpen] = useState(false)
 
@@ -470,15 +472,16 @@ function RecordStockItemCount() {
 */
 function RecordStockItemCountBody({ handleClose }: { handleClose: Function }) {
   const theme = useTheme()
+  const location = useLocation()
 
   const userUuid = useAppSelector(selectUserUuidString)
   const stock = useAppSelector(selectModifiedUserCountResults)
 
-  const id = useCountUI(
-    (state: CountUIState) => state.currentStockItemId,
-  ) as string
+  const countUIState = useCountUI((state) => state)
+  const id = useCountUI((state) => state.currentStockItemId) as string
 
   const stockItem = stock[id as string]
+  const path = location.pathname
 
   function handleDelete() {
     handleClose()
@@ -486,30 +489,36 @@ function RecordStockItemCountBody({ handleClose }: { handleClose: Function }) {
   }
 
   return (
-    <Stack
-      width={"100%"}
-      gap={theme.module[4]}
-      justifyContent={"flex-start"}
-      paddingBottom={theme.module[3]}
-      boxSizing={"border-box"}
+    <ErrorBoundary
+      componentName="RecordStockItemCountBody"
+      featurePath={path}
+      state={{ featureUI: { ...countUIState } }}
     >
-      {!!stockItem && (
-        <>
-          <StockDetails stockItem={stockItem} />
-          <CountData />
-          <Button
-            variation={"profile"}
-            color={theme.scale.red[6]}
-            outlineColor={theme.scale.red[7]}
-            iconName={"delete"}
-            label={"Remove Item"}
-            onClick={handleDelete}
-            boxShadowScale={4}
-            justifyCenter
-          />
-        </>
-      )}
-    </Stack>
+      <Stack
+        width={"100%"}
+        gap={theme.module[4]}
+        justifyContent={"flex-start"}
+        paddingBottom={theme.module[3]}
+        boxSizing={"border-box"}
+      >
+        {!!stockItem && (
+          <>
+            <StockDetails stockItem={stockItem} />
+            <CountData />
+            <Button
+              variation={"profile"}
+              color={theme.scale.red[6]}
+              outlineColor={theme.scale.red[7]}
+              iconName={"delete"}
+              label={"Remove Item"}
+              onClick={handleDelete}
+              boxShadowScale={4}
+              justifyCenter
+            />
+          </>
+        )}
+      </Stack>
+    </ErrorBoundary>
   )
 }
 /*
@@ -567,17 +576,11 @@ function CountData() {
 
   const stock = useAppSelector(selectModifiedUserCountResults)
 
-  const id = useCountUI(
-    (state: CountUIState) => state.currentStockItemId,
-  ) as string
-  const useableCount = useCountUI(
-    (state: CountUIState) => state.currentStockItemUseableCount,
-  )
-  const damagedCount = useCountUI(
-    (state: CountUIState) => state.currentStockItemDamagedCount,
-  )
+  const id = useCountUI((state) => state.currentStockItemId) as string
+  const useableCount = useCountUI((state) => state.currentStockItemUseableCount)
+  const damagedCount = useCountUI((state) => state.currentStockItemDamagedCount)
   const obsoleteCount = useCountUI(
-    (state: CountUIState) => state.currentStockItemObsoleteCount,
+    (state) => state.currentStockItemObsoleteCount,
   )
 
   const stockItem = stock[id as string]

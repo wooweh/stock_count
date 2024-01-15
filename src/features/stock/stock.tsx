@@ -1,13 +1,14 @@
 import { Stack } from "@mui/material"
+import { useLocation } from "react-router-dom"
 import { create } from "zustand"
 import { createJSONStorage, persist } from "zustand/middleware"
 import useTheme from "../../common/useTheme"
+import { ErrorBoundary } from "../../components/errorBoundary"
 import { AddItem } from "./addItem"
 import { EditItem } from "./editItem"
 import { StockList } from "./stockList"
 import { StockItemProps } from "./stockSlice"
 import { UploadItems } from "./uploadItems"
-import { ErrorBoundary } from "../../components/errorBoundary"
 /*
 
 
@@ -50,8 +51,16 @@ export function resetStockUI() {
 
 */
 export function Stock() {
+  const location = useLocation()
+  const stockUIState = useStockUI((state) => state)
+  const path = location.pathname
+
   return (
-    <ErrorBoundary>
+    <ErrorBoundary
+      componentName={"Stock"}
+      featurePath={path}
+      state={{ featureUI: { ...stockUIState } }}
+    >
       <Outer>
         <StockList />
         <AddItem />

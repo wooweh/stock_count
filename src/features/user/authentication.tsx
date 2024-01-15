@@ -5,7 +5,7 @@ import AccordionSummary from "@mui/material/AccordionSummary"
 import Stack from "@mui/material/Stack"
 import _ from "lodash"
 import { useEffect } from "react"
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import { create } from "zustand"
 import { createJSONStorage, persist } from "zustand/middleware"
 import { useAppSelector } from "../../app/hooks"
@@ -108,8 +108,16 @@ export function Authentication({
 }: {
   isRegistering?: boolean
 }) {
+  const location = useLocation()
+  const authUIState = useAuthUI((state) => state)
+  const path = location.pathname
+
   return (
-    <ErrorBoundary>
+    <ErrorBoundary
+      componentName={"Authentication"}
+      featurePath={path}
+      state={{ featureUI: { ...authUIState } }}
+    >
       <AuthenticationInput isRegistering={isRegistering} />
       <SigningInLoader />
       <VerifyEmailPrompt />

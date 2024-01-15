@@ -1,7 +1,9 @@
 import { Stack, Typography } from "@mui/material"
 import _ from "lodash"
+import { useLocation } from "react-router-dom"
 import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
+import { ErrorBoundary } from "../../components/errorBoundary"
 import Icon from "../../components/icon"
 import Modal, { ModalActionProps } from "../../components/modal"
 import VirtualizedTable from "../../components/table"
@@ -44,10 +46,20 @@ import {
 
 */
 export function ReviewBody() {
+  const location = useLocation()
+  const countUIState = useCountUI((state) => state)
+  const path = location.pathname
+
   return (
-    <Outer>
-      <Body />
-    </Outer>
+    <ErrorBoundary
+      componentName="ReviewBody"
+      featurePath={path}
+      state={{ featureUI: { ...countUIState } }}
+    >
+      <Outer>
+        <Body />
+      </Outer>
+    </ErrorBoundary>
   )
 }
 /*
@@ -344,7 +356,7 @@ function ReviewCompletionConirmation() {
   const theme = useTheme()
 
   const isStartingFinalization = useCountUI(
-    (state: CountUIState) => state.isStartingFinalization,
+    (state) => state.isStartingFinalization,
   )
 
   function handleAccept() {
@@ -367,19 +379,18 @@ function ReviewCompletionConirmation() {
     },
   ]
 
+  const DISCLAIMER =
+    "You are about to enter count finalization. You will not be able to go back to the review stage or change count results."
+  const PROCEED_MESSAGE = "Are you sure you want to proceed?"
+
   return (
     <Modal
       open={isStartingFinalization}
       heading={"Finalization"}
       body={
         <Stack gap={theme.module[4]}>
-          <Typography textAlign={"center"}>
-            You are about to enter count finalization. You will not be able to
-            go back to the review stage or change count results.
-          </Typography>
-          <Typography textAlign={"center"}>
-            Are you sure you want to proceed?
-          </Typography>
+          <Typography textAlign={"center"}>{DISCLAIMER}</Typography>
+          <Typography textAlign={"center"}>{PROCEED_MESSAGE}</Typography>
         </Stack>
       }
       actions={actions}

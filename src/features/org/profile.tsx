@@ -3,12 +3,14 @@ import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 import _ from "lodash"
 import { useEffect, useState } from "react"
+import { useLocation } from "react-router-dom"
 import { v4 as uuidv4 } from "uuid"
 import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { copyToClipboard } from "../../common/utils"
 import { Button } from "../../components/button"
 import { Input } from "../../components/control"
+import { ErrorBoundary } from "../../components/errorBoundary"
 import Icon, { IconNames } from "../../components/icon"
 import { List } from "../../components/list"
 import {
@@ -43,14 +45,24 @@ import { getMemberName } from "./orgUtils"
 
 */
 export function OrgProfile() {
+  const location = useLocation()
+  const orgUIState = useOrgUI((state) => state)
+  const path = location.pathname
+
   return (
     <ProfileWrapper>
-      <OrgNameHeader />
-      <ButtonTray />
-      <MembersList />
-      <InvitesList />
-      <NewInvite />
-      <RemoveOrgConfirmation />
+      <ErrorBoundary
+        componentName={"OrgProfile"}
+        featurePath={path}
+        state={{ featureUI: { ...orgUIState } }}
+      >
+        <OrgNameHeader />
+        <ButtonTray />
+        <MembersList />
+        <InvitesList />
+        <NewInvite />
+        <RemoveOrgConfirmation />
+      </ErrorBoundary>
     </ProfileWrapper>
   )
 }
@@ -66,7 +78,7 @@ function OrgNameHeader() {
   const orgName = useAppSelector(selectOrgName) as string
   const isAdmin = useAppSelector(selectIsUserAdmin)
 
-  const isEditing = useOrgUI((state: any) => state.isEditing)
+  const isEditing = useOrgUI((state) => state.isEditing)
 
   const [newOrgName, setNewOrgName] = useState("")
 
@@ -199,8 +211,7 @@ function ButtonTray() {
 
 */
 function MembersList() {
-  const members = useAppSelector(selectOtherOrgMembersList)
-  const isViewingMembers = useOrgUI((state: any) => state.isViewingMembers)
+  const isViewingMembers = useOrgUI((state) => state.isViewingMembers)
 
   function handleClose() {
     setOrgUI("isViewingMembers", false)
@@ -214,20 +225,40 @@ function MembersList() {
     <Modal
       open={isViewingMembers}
       heading={"Members"}
-      body={
-        members?.length ? (
-          <List gapScale={0}>
-            {members.map((member: any, index: number) => {
-              return <MemberListItem member={member} key={index} />
-            })}
-          </List>
-        ) : (
-          <Typography>No members have been added</Typography>
-        )
-      }
+      body={<MembersListBody />}
       actions={actions}
       onClose={handleClose}
     />
+  )
+}
+/*
+
+
+
+
+*/
+function MembersListBody() {
+  const location = useLocation()
+  const members = useAppSelector(selectOtherOrgMembersList)
+  const orgFeatureUI = useOrgUI((state) => state)
+  const path = location.pathname
+
+  return (
+    <ErrorBoundary
+      componentName={"MembersList"}
+      featurePath={path}
+      state={{ component: { members }, featureUI: { ...orgFeatureUI } }}
+    >
+      {members?.length ? (
+        <List gapScale={0}>
+          {members.map((member: any, index: number) => {
+            return <MemberListItem member={member} key={index} />
+          })}
+        </List>
+      ) : (
+        <Typography>No members have been added</Typography>
+      )}
+    </ErrorBoundary>
   )
 }
 /*
@@ -270,7 +301,7 @@ function MemberListItem({ member }: { member: MemberProps }) {
 */
 function InvitesList() {
   const invites = useAppSelector(selectOrgInvitesList)
-  const isViewingInvites = useOrgUI((state: any) => state.isViewingInvites)
+  const isViewingInvites = useOrgUI((state) => state.isViewingInvites)
 
   function handleClose() {
     setOrgUI("isViewingInvites", false)
@@ -284,20 +315,40 @@ function InvitesList() {
     <Modal
       open={isViewingInvites}
       heading={"Invites"}
-      body={
-        invites.length ? (
-          <List gapScale={0}>
-            {invites.map((invite: any, index: number) => {
-              return <InviteListItem invite={invite} key={index} />
-            })}
-          </List>
-        ) : (
-          <Typography>No pending invites</Typography>
-        )
-      }
+      body={<InvitesListBody />}
       actions={actions}
       onClose={handleClose}
     />
+  )
+}
+/*
+
+
+
+
+*/
+function InvitesListBody() {
+  const location = useLocation()
+  const invites = useAppSelector(selectOrgInvitesList)
+  const orgFeatureUI = useOrgUI((state) => state)
+  const path = location.pathname
+
+  return (
+    <ErrorBoundary
+      componentName={"MembersList"}
+      featurePath={path}
+      state={{ component: { invites }, featureUI: { ...orgFeatureUI } }}
+    >
+      {invites.length ? (
+        <List gapScale={0}>
+          {invites.map((invite: any, index: number) => {
+            return <InviteListItem invite={invite} key={index} />
+          })}
+        </List>
+      ) : (
+        <Typography>No pending invites</Typography>
+      )}
+    </ErrorBoundary>
   )
 }
 /*
@@ -337,7 +388,7 @@ function InviteListItem({ invite }: { invite: InviteProps }) {
 
 */
 function NewInvite() {
-  const isInviting = useOrgUI((state: any) => state.isInviting)
+  const isInviting = useOrgUI((state) => state.isInviting)
 
   const [tempName, setTempName] = useState("")
   const [inviteKey, setInviteKey] = useState("")
@@ -405,6 +456,11 @@ type NewInviteBodyProps = {
 }
 function NewInviteBody(props: NewInviteBodyProps) {
   const theme = useTheme()
+  const location = useLocation()
+
+  const orgUIState = useOrgUI((state) => state)
+
+  const path = location.pathname
 
   function handleChange(event: any) {
     props.setTempName(_.capitalize(event.target.value))
@@ -416,46 +472,52 @@ function NewInviteBody(props: NewInviteBodyProps) {
   }
 
   return (
-    <Stack width={"100%"} gap={theme.module[4]}>
-      <Stack
-        width={"100%"}
-        direction={"row"}
-        alignItems={"center"}
-        paddingLeft={theme.module[2]}
-        gap={theme.module[3]}
-        boxSizing={"border-box"}
-      >
-        <Typography>Name:</Typography>
-        <Input
-          placeholder={"(optional)"}
-          onChange={handleChange}
-          value={props.tempName}
-          sx={{
-            background: theme.scale.gray[8],
-          }}
+    <ErrorBoundary
+      componentName={"NewInviteBody"}
+      featurePath={path}
+      state={{ component: { ...props }, featureUI: { ...orgUIState } }}
+    >
+      <Stack width={"100%"} gap={theme.module[4]}>
+        <Stack
+          width={"100%"}
+          direction={"row"}
+          alignItems={"center"}
+          paddingLeft={theme.module[2]}
+          gap={theme.module[3]}
+          boxSizing={"border-box"}
+        >
+          <Typography>Name:</Typography>
+          <Input
+            placeholder={"(optional)"}
+            onChange={handleChange}
+            value={props.tempName}
+            sx={{
+              background: theme.scale.gray[8],
+            }}
+          />
+        </Stack>
+        <ListItem
+          label={props.inviteKey}
+          primarySlot={
+            <Icon
+              variation={"key"}
+              fontSize={"small"}
+              color={theme.scale.gray[5]}
+            />
+          }
+          secondarySlot={
+            <Button
+              variation={"pill"}
+              onClick={handleCopy}
+              iconName={props.isCopied ? "done" : "copy"}
+            />
+          }
+          onChange={handleCopy}
+          noWrap
+          tappable
         />
       </Stack>
-      <ListItem
-        label={props.inviteKey}
-        primarySlot={
-          <Icon
-            variation={"key"}
-            fontSize={"small"}
-            color={theme.scale.gray[5]}
-          />
-        }
-        secondarySlot={
-          <Button
-            variation={"pill"}
-            onClick={handleCopy}
-            iconName={props.isCopied ? "done" : "copy"}
-          />
-        }
-        onChange={handleCopy}
-        noWrap
-        tappable
-      />
-    </Stack>
+    </ErrorBoundary>
   )
 }
 /*
@@ -466,7 +528,7 @@ function NewInviteBody(props: NewInviteBodyProps) {
 */
 function RemoveOrgConfirmation() {
   const isAdmin = useAppSelector(selectIsUserAdmin)
-  const isRemoving = useOrgUI((state: any) => state.isRemoving)
+  const isRemoving = useOrgUI((state) => state.isRemoving)
 
   function handleAccept() {
     isAdmin ? removeOrg() : leaveOrg()

@@ -10,7 +10,7 @@ import { updateStockItem } from "./stockSliceUtils"
 
 */
 export function EditItem() {
-  const isEditing = useStockUI((state: any) => state.isEditing)
+  const isEditing = useStockUI((state) => state.isEditing)
 
   const [name, setName] = useState("")
   const [unit, setUnit] = useState("")

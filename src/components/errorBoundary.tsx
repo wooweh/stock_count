@@ -54,19 +54,19 @@ export function ErrorFallback({
 */
 type ErrorBoundaryProps = {
   children: React.ReactElement | React.ReactElement[]
-  componentName: string
-  featurePath: string
-  componentState: {}
-  featureState: {}
+  componentName?: string
+  featurePath?: string
+  state?: {
+    component?: {}
+    featureUI?: {}
+  }
 }
 export function ErrorBoundary(props: ErrorBoundaryProps) {
   function handleError(error: Error, info: React.ErrorInfo) {
     console.log("error", error)
     console.log("info", info)
     console.log("componentName", props.componentName)
-    console.log("featurePath", props.featurePath)
-    console.log("componentState", props.componentState)
-    console.log("featureState", props.featureState)
+    console.log("state", props.state)
   }
 
   return (

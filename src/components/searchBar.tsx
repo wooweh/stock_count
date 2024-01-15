@@ -4,6 +4,8 @@ import { ReactSearchAutocomplete } from "react-search-autocomplete"
 import useTheme from "../common/useTheme"
 import Animation from "../components/animation"
 import { Button } from "../components/button"
+import { ErrorBoundary } from "./errorBoundary"
+import { useLocation } from "react-router-dom"
 /*
 
 
@@ -21,7 +23,11 @@ type SearchBarProps = {
 }
 export function SearchBar(props: SearchBarProps) {
   const theme = useTheme()
+  const location = useLocation()
+
   const [isSearching, setIsSearching] = useState(props.isOpen ?? false)
+
+  const path = location.pathname
 
   function handleIconClick() {
     setIsSearching(!isSearching)
@@ -44,35 +50,37 @@ export function SearchBar(props: SearchBarProps) {
   }
 
   return (
-    <ClickAwayListener onClickAway={handleClickAway}>
-      <Stack
-        width={"100%"}
-        height={`calc(${theme.module[6]} * 1.25)`}
-        justifyContent={"center"}
-      >
+    <ErrorBoundary componentName={"SearchBar"} featurePath={path}>
+      <ClickAwayListener onClickAway={handleClickAway}>
         <Stack
           width={"100%"}
-          position={"relative"}
-          alignItems={"flex-end"}
+          height={`calc(${theme.module[6]} * 1.25)`}
           justifyContent={"center"}
-          zIndex={10}
         >
-          <Heading heading={props.heading} />
           <Stack
             width={"100%"}
-            height={`calc(${theme.module[6]} * 1.125)`}
-            direction={"row"}
-            boxSizing={"border-box"}
-            position={"absolute"}
-            justifyContent={"flex-end"}
+            position={"relative"}
+            alignItems={"flex-end"}
+            justifyContent={"center"}
             zIndex={10}
           >
-            <Search {...searchProps} />
-            <ToggleButton {...searchProps} />
+            <Heading heading={props.heading} />
+            <Stack
+              width={"100%"}
+              height={`calc(${theme.module[6]} * 1.125)`}
+              direction={"row"}
+              boxSizing={"border-box"}
+              position={"absolute"}
+              justifyContent={"flex-end"}
+              zIndex={10}
+            >
+              <Search {...searchProps} />
+              <ToggleButton {...searchProps} />
+            </Stack>
           </Stack>
         </Stack>
-      </Stack>
-    </ClickAwayListener>
+      </ClickAwayListener>
+    </ErrorBoundary>
   )
 }
 /*

@@ -1,4 +1,5 @@
 import { Stack } from "@mui/material"
+import { useLocation } from "react-router-dom"
 import { create } from "zustand"
 import { createJSONStorage, persist } from "zustand/middleware"
 import useTheme from "../../common/useTheme"
@@ -46,8 +47,16 @@ export function resetHistoryUI() {
 
 */
 export function History() {
+  const location = useLocation()
+  const historyUIState = useHistoryUI((state) => state)
+  const path = location.pathname
+
   return (
-    <ErrorBoundary>
+    <ErrorBoundary
+      componentName={"History"}
+      featurePath={path}
+      state={{ featureUI: { ...historyUIState } }}
+    >
       <Outer>
         <HistoryBody />
       </Outer>

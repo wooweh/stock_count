@@ -1,10 +1,12 @@
 import { Stack, Typography } from "@mui/material"
+import { useLocation } from "react-router-dom"
 import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
+import { ErrorBoundary } from "../../components/errorBoundary"
 import { ListItemOptionProps } from "../../components/listItem"
 import { ManagedList } from "../../components/managedList"
 import { SearchItemProps } from "../../components/searchBar"
-import { setHistoryUI } from "./history"
+import { setHistoryUI, useHistoryUI } from "./history"
 import { selectHistoryList } from "./historySliceSelectors"
 import {
   removeHistory,
@@ -19,10 +21,20 @@ import { prepareHistorySearchList } from "./historyUtils"
 
 */
 export function HistoryList() {
+  const location = useLocation()
+  const historyUIState = useHistoryUI((state) => state)
+  const path = location.pathname
+
   return (
-    <Outer>
-      <HistoryManagementList />
-    </Outer>
+    <ErrorBoundary
+      componentName={"HistoryList"}
+      featurePath={path}
+      state={{ featureUI: { ...historyUIState } }}
+    >
+      <Outer>
+        <HistoryManagementList />
+      </Outer>
+    </ErrorBoundary>
   )
 }
 /*

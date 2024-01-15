@@ -16,6 +16,8 @@ import {
 } from "../components/searchBar"
 import { IconNames } from "./icon"
 import Modal, { ModalActionProps } from "./modal"
+import { useLocation } from "react-router-dom"
+import { ErrorBoundary } from "./errorBoundary"
 /*
 
 
@@ -100,6 +102,8 @@ export type ManagedListProps = {
   emptyListPlaceholder: React.FunctionComponent
 }
 export function ManagedList(props: ManagedListProps) {
+  const location = useLocation()
+
   const [isDeletingSelection, setIsDeletingSelection] = useState(false)
   const [isDeletingAll, setIsDeletingAll] = useState(false)
   const [isSelecting, setIsSelecting] = useState(false)
@@ -108,6 +112,7 @@ export function ManagedList(props: ManagedListProps) {
     selectedItems: [],
   })
 
+  const path = location.pathname
   const selectedItems = state.selectedItems
   const headerProps: HeaderProps = {
     ...props,
@@ -148,11 +153,17 @@ export function ManagedList(props: ManagedListProps) {
   }
 
   return (
-    <Outer>
-      <Header {...headerProps} />
-      <Body {...bodyProps} />
-      <DeleteConfirmation {...deleteConfirmationProps} />
-    </Outer>
+    <ErrorBoundary
+      componentName="ManagedList"
+      featurePath={path}
+      state={{ component: { ...props } }}
+    >
+      <Outer>
+        <Header {...headerProps} />
+        <Body {...bodyProps} />
+        <DeleteConfirmation {...deleteConfirmationProps} />
+      </Outer>
+    </ErrorBoundary>
   )
 }
 /*
