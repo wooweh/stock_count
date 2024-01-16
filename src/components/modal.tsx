@@ -7,6 +7,7 @@ import { useEffect, useState } from "react"
 import useTheme, { ThemeColors } from "../common/useTheme"
 import { Button } from "./button"
 import { IconNames } from "./icon"
+import { Slot } from "./surface"
 /*
 
 
@@ -95,13 +96,10 @@ export default function Modal(props: ModalProps) {
           >
             {props.body}
           </Stack>
-          <Stack
-            direction={"row"}
+          <Slot
             padding={theme.module[1]}
             paddingTop={0}
             gap={theme.module[1]}
-            boxSizing={"border-box"}
-            width={"100%"}
             overflow={"visible"}
           >
             {props.actions &&
@@ -115,7 +113,7 @@ export default function Modal(props: ModalProps) {
                   key={index}
                 />
               ))}
-          </Stack>
+          </Slot>
         </Stack>
       </Fade>
     </MuiModal>

@@ -39,6 +39,7 @@ import {
   prepareTeamResultsTableColumns,
   prepareTeamResultsTableRows,
 } from "./countUtils"
+import { Slot, Window } from "../../components/surface"
 /*
 
 
@@ -72,15 +73,9 @@ function Outer({ children }: { children: React.ReactElement }) {
   const theme = useTheme()
 
   return (
-    <Stack
-      width={"100%"}
-      height={"100%"}
-      padding={theme.module[0]}
-      alignItems={"space-between"}
-      boxSizing={"border-box"}
-    >
+    <Window padding={theme.module[0]} alignItems={"space-between"}>
       {children}
-    </Stack>
+    </Window>
   )
 }
 /*
@@ -124,16 +119,11 @@ function CounterReviewBody() {
   const isFinalizing = useAppSelector(selectIsOrganiserFinalizing)
 
   return (
-    <Stack
-      width={"100%"}
-      height={"100%"}
-      alignItems={"center"}
-      justifyContent={"center"}
-    >
+    <Window justifyContent={"center"}>
       <Typography variant="h6">
         Organiser is {isFinalizing ? "finalizing" : "reviewing"} results
       </Typography>
-    </Stack>
+    </Window>
   )
 }
 /*
@@ -278,21 +268,14 @@ function ProceedMessage() {
   const isStockCountCompleted = useAppSelector(selectIsStockCountCompleted)
 
   return (
-    <Stack
-      direction={"row"}
-      gap={theme.module[3]}
-      justifyContent={"center"}
-      alignItems={"center"}
-      paddingBottom={theme.module[3]}
-      boxSizing={"border-box"}
-    >
+    <Slot gap={theme.module[3]} paddingBottom={theme.module[3]}>
       <Icon variation={isStockCountCompleted ? "done" : "warning"} />
       <Typography variant={"body2"}>
         {isStockCountCompleted
           ? "Proceed to Finalization"
           : "Count still in progress"}
       </Typography>
-    </Stack>
+    </Slot>
   )
 }
 /*

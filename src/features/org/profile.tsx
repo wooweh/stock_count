@@ -19,7 +19,7 @@ import {
   ListItemWithOptions,
 } from "../../components/listItem"
 import Modal, { ModalActionProps } from "../../components/modal"
-import { ProfileWrapper } from "../../components/surface"
+import { ProfileWrapper, Slot, Window } from "../../components/surface"
 import { selectIsUserAdmin } from "../user/userSliceSelectors"
 import { setOrgUI, useOrgUI } from "./org"
 import { InviteProps, MemberProps } from "./orgSlice"
@@ -98,7 +98,7 @@ function OrgNameHeader() {
   return (
     <Stack width={"100%"} gap={theme.module[3]}>
       <ClickAwayListener onClickAway={() => setOrgUI("isEditing", false)}>
-        <Stack direction={"row"} alignItems={"center"} gap={theme.module[5]}>
+        <Slot gap={theme.module[5]}>
           <Input
             disabled={!isEditing}
             value={newOrgName}
@@ -117,7 +117,7 @@ function OrgNameHeader() {
               iconName={isEditing ? "done" : "edit"}
             />
           )}
-        </Stack>
+        </Slot>
       </ClickAwayListener>
       <Stack
         direction={"row"}
@@ -169,12 +169,7 @@ function ButtonTray() {
   ]
 
   return (
-    <Stack
-      height={"100%"}
-      width={"100%"}
-      justifyContent={"space-between"}
-      alignItems={"center"}
-    >
+    <Window justifyContent={"space-between"}>
       <Stack
         width={"100%"}
         gap={theme.module[5]}
@@ -201,7 +196,7 @@ function ButtonTray() {
         iconName={isAdmin ? "delete" : "leave"}
         justifyCenter
       />
-    </Stack>
+    </Window>
   )
 }
 /*
@@ -478,14 +473,7 @@ function NewInviteBody(props: NewInviteBodyProps) {
       state={{ component: { ...props }, featureUI: { ...orgUIState } }}
     >
       <Stack width={"100%"} gap={theme.module[4]}>
-        <Stack
-          width={"100%"}
-          direction={"row"}
-          alignItems={"center"}
-          paddingLeft={theme.module[2]}
-          gap={theme.module[3]}
-          boxSizing={"border-box"}
-        >
+        <Slot paddingLeft={theme.module[2]} gap={theme.module[3]}>
           <Typography>Name:</Typography>
           <Input
             placeholder={"(optional)"}
@@ -495,7 +483,7 @@ function NewInviteBody(props: NewInviteBodyProps) {
               background: theme.scale.gray[8],
             }}
           />
-        </Stack>
+        </Slot>
         <ListItem
           label={props.inviteKey}
           primarySlot={

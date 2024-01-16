@@ -34,6 +34,7 @@ import {
   PreparationItem as FinalizationItem,
   PreparationItemProps,
 } from "./preparation"
+import { Slot, Window } from "../../components/surface"
 /*
 
 
@@ -70,11 +71,7 @@ function Outer({
   children: React.ReactElement | React.ReactElement[]
 }) {
   const theme = useTheme()
-  return (
-    <Stack gap={theme.module[4]} height={"100%"}>
-      {children}
-    </Stack>
-  )
+  return <Window gap={theme.module[4]}>{children}</Window>
 }
 /*
 
@@ -168,7 +165,7 @@ function CountSummary() {
   ]
 
   return (
-    <Stack width={"100%"} height={"100%"}>
+    <Window width={"100%"} height={"100%"}>
       {dataItems.map((item: DataLineItemProps) => (
         <DataLineItem
           label={item.label}
@@ -177,7 +174,7 @@ function CountSummary() {
           key={item.label}
         />
       ))}
-    </Stack>
+    </Window>
   )
 }
 /*
@@ -195,31 +192,25 @@ export function DataLineItem(props: DataLineItemProps) {
   const theme = useTheme()
 
   return (
-    <Stack
-      width={"100%"}
-      direction={"row"}
+    <Slot
       gap={theme.module[4]}
-      alignItems={"center"}
       padding={`${theme.module[0]} 0 ${theme.module[0]} ${theme.module[3]}`}
-      boxSizing={"border-box"}
     >
       <Icon variation={props.iconName} />
       <Typography width={"50%"} flexShrink={1}>
         {props.label}
         {":"}
       </Typography>
-      <Stack
-        direction={"row"}
+      <Slot
         gap={theme.module[3]}
+        justifyContent={"flex-start"}
         overflow={"scroll"}
-        width={"100%"}
         padding={theme.module[0]}
-        boxSizing={"border-box"}
         sx={{ overflowX: "scroll", overflowY: "visible" }}
       >
         {props.data}
-      </Stack>
-    </Stack>
+      </Slot>
+    </Slot>
   )
 }
 /*

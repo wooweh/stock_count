@@ -34,6 +34,7 @@ import {
   removeCountResultsItem,
   updateCountResultItem,
 } from "./countSliceUtils"
+import { Slot, Window } from "../../components/surface"
 /*
 
 
@@ -72,11 +73,7 @@ function Outer({
 }) {
   const theme = useTheme()
 
-  return (
-    <Stack gap={theme.module[3]} height={"100%"}>
-      {children}
-    </Stack>
-  )
+  return <Window gap={theme.module[3]}>{children}</Window>
 }
 /*
 
@@ -88,10 +85,10 @@ function Body() {
   const theme = useTheme()
 
   return (
-    <Stack height={"100%"} gap={theme.module[2]}>
+    <Window gap={theme.module[2]}>
       <SearchControls />
       <CountSheet />
-    </Stack>
+    </Window>
   )
 }
 /*
@@ -126,14 +123,14 @@ function CountSearchBar() {
   const list = prepareStockSearchList(countList)
 
   return (
-    <Stack width={"100%"}>
+    <Slot>
       <SearchBar
         heading={"Count Sheet"}
         list={list}
         onSelect={handleSelect}
         placeholder={"Search count sheet"}
       />
-    </Stack>
+    </Slot>
   )
 }
 /*
@@ -213,10 +210,6 @@ function CountSheet() {
   const scrollIndex = useCountUI((state) => state.scrollIndex)
   const virtuoso: any = useRef(null)
 
-  const count = useAppSelector(selectCount)
-
-  console.log(count)
-
   useEffect(() => {
     virtuoso.current &&
       virtuoso.current.scrollToIndex({
@@ -227,14 +220,10 @@ function CountSheet() {
   }, [virtuoso, scrollIndex])
 
   return (
-    <Stack
-      width={"100%"}
-      height={"100%"}
+    <Window
       gap={theme.module[3]}
       justifyContent={"center"}
-      alignItems={"center"}
       borderRadius={theme.module[3]}
-      boxSizing={"border-box"}
       padding={theme.module[1]}
       overflow={"hidden"}
       boxShadow={theme.shadow.neo[1]}
@@ -258,7 +247,7 @@ function CountSheet() {
           }}
         />
       )}
-    </Stack>
+    </Window>
   )
 }
 /*
@@ -358,19 +347,16 @@ function CountItemInfoDisplay({
         </Typography>
       </Stack>
       {isZeroCount && (
-        <Stack
-          direction={"row"}
-          width={"100%"}
+        <Slot
           justifyContent={"flex-end"}
           paddingRight={theme.module[4]}
-          boxSizing={"border-box"}
           gap={theme.module[2]}
         >
           <Icon variation={"warning"} fontSize={"small"} />
           <Typography variant={"caption"} color={theme.scale.red[5]}>
             No count
           </Typography>
-        </Stack>
+        </Slot>
       )}
     </Stack>
   )
@@ -715,12 +701,7 @@ function StockItemCountInput(props: StockItemCountInputProps) {
       : `calc(${theme.module[7]} * 1.25)`
 
   return (
-    <Stack
-      width={"100%"}
-      direction={"row"}
-      alignItems={"center"}
-      justifyContent={"space-between"}
-    >
+    <Slot justifyContent={"space-between"}>
       <Stack
         direction={"row"}
         gap={theme.module[4]}
@@ -736,7 +717,7 @@ function StockItemCountInput(props: StockItemCountInputProps) {
       <Stack width={inputWidth}>
         <Input {...inputProps} />
       </Stack>
-    </Stack>
+    </Slot>
   )
 }
 /*

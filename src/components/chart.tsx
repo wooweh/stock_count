@@ -1,4 +1,3 @@
-import { Stack } from "@mui/material"
 import {
   Cell,
   Legend,
@@ -8,6 +7,7 @@ import {
 } from "recharts"
 import useTheme from "../common/useTheme"
 import { formatDuration } from "../common/utils"
+import { Window } from "./surface"
 /*
 
 
@@ -53,7 +53,7 @@ export function PieChart({ data }: { data: PieChartDataProps[] }) {
   }
 
   return (
-    <Stack height={"100%"} width={"100%"}>
+    <Window>
       <ResponsiveContainer width="100%" height="100%">
         <RePieChart width={300} height={300}>
           <Pie
@@ -79,6 +79,6 @@ export function PieChart({ data }: { data: PieChartDataProps[] }) {
           <Legend />
         </RePieChart>
       </ResponsiveContainer>
-    </Stack>
+    </Window>
   )
 }

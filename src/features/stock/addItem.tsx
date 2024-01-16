@@ -9,6 +9,7 @@ import { setStockUI, useStockUI } from "./stock"
 import { updateStockItem } from "./stockSliceUtils"
 import { useLocation } from "react-router-dom"
 import { ErrorBoundary } from "../../components/errorBoundary"
+import { Slot } from "../../components/surface"
 /*
 
 
@@ -135,13 +136,7 @@ function StockItemInputField(props: StockItemInputFieldProps) {
   const theme = useTheme()
 
   return (
-    <Stack
-      width={"100%"}
-      direction={"row"}
-      alignItems={"center"}
-      gap={theme.module[1]}
-      key={props.label}
-    >
+    <Slot gap={theme.module[1]} key={props.label}>
       <Typography
         width={theme.module[7]}
         fontWeight={"bold"}
@@ -157,7 +152,7 @@ function StockItemInputField(props: StockItemInputFieldProps) {
           background: theme.scale.gray[8],
         }}
       />
-    </Stack>
+    </Slot>
   )
 }
 /*

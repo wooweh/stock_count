@@ -9,6 +9,7 @@ import { EditItem } from "./editItem"
 import { StockList } from "./stockList"
 import { StockItemProps } from "./stockSlice"
 import { UploadItems } from "./uploadItems"
+import { Window } from "../../components/surface"
 /*
 
 
@@ -80,15 +81,9 @@ function Outer({ children }: { children: any }) {
   const theme = useTheme()
 
   return (
-    <Stack
-      width={"100%"}
-      height={"100%"}
-      padding={theme.module[3]}
-      bgcolor={theme.scale.gray[8]}
-      boxSizing={"border-box"}
-    >
+    <Window padding={theme.module[3]} bgcolor={theme.scale.gray[8]}>
       {children}
-    </Stack>
+    </Window>
   )
 }
 /*

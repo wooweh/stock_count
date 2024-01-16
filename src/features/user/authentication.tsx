@@ -24,6 +24,7 @@ import {
   PasswordValidationReturnProps,
   getPasswordValidation,
 } from "./userUtils"
+import { Slot, Window } from "../../components/surface"
 /*
 
 
@@ -182,12 +183,7 @@ function Outer({ children }: { children: any }) {
 function Logo() {
   const theme = useTheme()
   return (
-    <Stack
-      width={"100%"}
-      direction={"row"}
-      alignItems={"center"}
-      gap={theme.module[2]}
-    >
+    <Slot gap={theme.module[2]} justifyContent={"flex-start"}>
       <Icon variation="stock" color={theme.scale.gray[5]} />
       <Typography
         variant="h5"
@@ -196,7 +192,7 @@ function Logo() {
       >
         StockCount
       </Typography>
-    </Stack>
+    </Slot>
   )
 }
 /*
@@ -272,12 +268,7 @@ function ButtonTray({ isRegistering }: { isRegistering: boolean }) {
   const path = routePaths[isRegistering ? "signIn" : "register"].path
 
   return (
-    <Stack
-      width={"100%"}
-      direction={"row"}
-      justifyContent={"space-between"}
-      boxSizing={"border-box"}
-    >
+    <Slot justifyContent={"space-between"}>
       <Button
         variation={"pill"}
         label={actionLabel}
@@ -294,7 +285,7 @@ function ButtonTray({ isRegistering }: { isRegistering: boolean }) {
         color={theme.scale.blue[6]}
         animationDuration={0}
       />
-    </Stack>
+    </Slot>
   )
 }
 /*
@@ -416,12 +407,7 @@ function CheckLineItem({ check }: { check: PasswordCheckProps }) {
   const theme = useTheme()
 
   return (
-    <Stack
-      width={"100%"}
-      direction={"row"}
-      gap={theme.module[4]}
-      justifyItems={"center"}
-    >
+    <Slot gap={theme.module[4]} justifyContent={"flex-start"}>
       <Box
         width={theme.module[4]}
         height={theme.module[4]}
@@ -432,7 +418,7 @@ function CheckLineItem({ check }: { check: PasswordCheckProps }) {
       <Typography color={theme.scale.gray[4]} variant="body2">
         {check.description}
       </Typography>
-    </Stack>
+    </Slot>
   )
 }
 /*
@@ -467,18 +453,18 @@ export function VerifyEmailPrompt() {
 
   return (
     isVerifying && (
-      <Stack
-        width={"100%"}
-        height={"100%"}
+      <Window
         gap={theme.module[4]}
         justifyContent={"center"}
-        alignContent={"center"}
         position={"absolute"}
         zIndex={100}
         padding={theme.module[6]}
-        boxSizing={"border-box"}
       >
-        <Typography fontWeight={"bold"} color={theme.scale.gray[5]}>
+        <Typography
+          fontWeight={"bold"}
+          color={theme.scale.gray[5]}
+          textAlign={"center"}
+        >
           An email has been sent to you. Click the link to verify your account.
         </Typography>
         <Button
@@ -487,7 +473,7 @@ export function VerifyEmailPrompt() {
           onClick={signInUser}
           color={theme.scale.blue[6]}
         />
-      </Stack>
+      </Window>
     )
   )
 }

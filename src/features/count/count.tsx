@@ -1,4 +1,4 @@
-import { Stack, Typography } from "@mui/material"
+import { Typography } from "@mui/material"
 import _ from "lodash"
 import { useLocation } from "react-router-dom"
 import { create } from "zustand"
@@ -6,6 +6,7 @@ import { createJSONStorage, persist } from "zustand/middleware"
 import useTheme from "../../common/useTheme"
 import { ErrorBoundary } from "../../components/errorBoundary"
 import Modal, { ModalActionProps } from "../../components/modal"
+import { Window } from "../../components/surface"
 import { CountTypes } from "./countSlice"
 import { leaveCount, removeCount } from "./countSliceUtils"
 import { Steps } from "./steps"
@@ -250,13 +251,13 @@ function LeaveCountConfirmationBody() {
   const theme = useTheme()
 
   return (
-    <Stack width={"100%"} gap={theme.module[3]} alignItems={"center"}>
+    <Window gap={theme.module[3]}>
       <Typography textAlign={"center"}>
         You are leaving the count. You can re-join using the Dashboard. No data
         will be lost.
       </Typography>
       <Typography>Are you sure you want to leave?</Typography>
-    </Stack>
+    </Window>
   )
 }
 /*
@@ -309,12 +310,12 @@ function DeleteCountConfirmationBody() {
   const theme = useTheme()
 
   return (
-    <Stack width={"100%"} gap={theme.module[3]} alignItems={"center"}>
+    <Window gap={theme.module[3]}>
       <Typography textAlign={"center"}>
         You are about to delete the count. All count data will be lost.
       </Typography>
       <Typography>Are you sure you want to continue?</Typography>
-    </Stack>
+    </Window>
   )
 }
 /*

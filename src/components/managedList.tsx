@@ -1,6 +1,7 @@
 import { Stack, Typography } from "@mui/material"
 import _ from "lodash"
 import { useEffect, useReducer, useRef, useState } from "react"
+import { useLocation } from "react-router-dom"
 import { Virtuoso } from "react-virtuoso"
 import useTheme from "../common/useTheme"
 import { Button } from "../components/button"
@@ -14,10 +15,10 @@ import {
   SearchItemProps,
   SearchListProps,
 } from "../components/searchBar"
+import { ErrorBoundary } from "./errorBoundary"
 import { IconNames } from "./icon"
 import Modal, { ModalActionProps } from "./modal"
-import { useLocation } from "react-router-dom"
-import { ErrorBoundary } from "./errorBoundary"
+import { Window } from "./surface"
 /*
 
 
@@ -180,15 +181,9 @@ function Outer({
   const theme = useTheme()
 
   return (
-    <Stack
-      width={"100%"}
-      height={"100%"}
-      gap={theme.module[2]}
-      padding={`0 ${theme.module[2]}`}
-      boxSizing={"border-box"}
-    >
+    <Window gap={theme.module[2]} padding={`0 ${theme.module[2]}`}>
       {children}
-    </Stack>
+    </Window>
   )
 }
 /*
@@ -270,13 +265,9 @@ function SelectionBar(props: SelectionBarProps) {
   }
 
   return (
-    <Stack
-      height={"100%"}
-      width={"100%"}
+    <Window
       direction={"row"}
       padding={`0 ${theme.module[3]}`}
-      boxSizing={"border-box"}
-      alignItems={"center"}
       justifyContent={"space-between"}
     >
       <Stack
@@ -301,7 +292,7 @@ function SelectionBar(props: SelectionBarProps) {
       <Stack width={theme.module[7]} alignItems={"flex-end"}>
         <Button variation={"pill"} iconName={"delete"} onClick={handleDelete} />
       </Stack>
-    </Stack>
+    </Window>
   )
 }
 /*
@@ -348,11 +339,8 @@ function Body(props: BodyProps) {
   return !props.list.length ? (
     <props.emptyListPlaceholder />
   ) : (
-    <Stack
-      width={"100%"}
-      height={"100%"}
+    <Window
       padding={theme.module[1]}
-      boxSizing={"border-box"}
       borderRadius={theme.module[3]}
       boxShadow={theme.shadow.neo[2]}
       position={"relative"}
@@ -360,12 +348,8 @@ function Body(props: BodyProps) {
         outline: `1px solid ${theme.scale.gray[7]}`,
       }}
     >
-      <Stack
-        width={"100%"}
-        height={"100%"}
+      <Window
         gap={theme.module[3]}
-        justifyContent={"center"}
-        alignItems={"center"}
         borderRadius={theme.module[3]}
         overflow={"hidden"}
       >
@@ -408,9 +392,9 @@ function Body(props: BodyProps) {
             )
           }}
         />
-      </Stack>
+      </Window>
       {showScrollToTop && <ScrollToTop onClick={handleScrollToTopClick} />}
-    </Stack>
+    </Window>
   )
 }
 /*

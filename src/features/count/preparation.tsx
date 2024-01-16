@@ -22,6 +22,7 @@ import {
 import { CountSteps } from "./countSlice"
 import { selectIsUserJustOrganiser } from "./countSliceSelectors"
 import { startCount } from "./countSliceUtils"
+import { Window } from "../../components/surface"
 /*
 
 
@@ -59,11 +60,7 @@ function Outer({
 }) {
   const theme = useTheme()
 
-  return (
-    <Stack gap={theme.module[4]} height={"100%"}>
-      {children}
-    </Stack>
-  )
+  return <Window gap={theme.module[4]}>{children}</Window>
 }
 /*
 
@@ -117,7 +114,7 @@ export function PreparationItem(props: PreparationItemProps) {
   const theme = useTheme()
 
   return (
-    <Stack gap={theme.module[3]} height={"47.5%"}>
+    <Stack gap={theme.module[3]} height={"47.5%"} width={"100%"}>
       <Stack
         paddingLeft={theme.module[1]}
         paddingRight={theme.module[1]}

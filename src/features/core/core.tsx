@@ -5,6 +5,7 @@ import { Bar } from "./bar"
 import { DBListeners } from "./dbListeners"
 import { Notifications } from "./notifications"
 import { Pages } from "./pages"
+import { Window } from "../../components/surface"
 /*
 
 
@@ -17,12 +18,12 @@ export default function Core() {
 
   return (
     <ErrorBoundary componentName={"Core"} featurePath={path}>
-      <Stack width={"100vw"} height={"100vh"} alignItems={"center"}>
+      <Window>
         <Bar />
         <DBListeners />
         <Notifications />
         <Pages />
-      </Stack>
+      </Window>
     </ErrorBoundary>
   )
 }

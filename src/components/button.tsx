@@ -1,4 +1,4 @@
-import { Stack, Typography } from "@mui/material"
+import { Typography } from "@mui/material"
 import ButtonBase from "@mui/material/ButtonBase"
 import MuiToggleButton from "@mui/material/ToggleButton"
 import MuiToggleButtonGroup from "@mui/material/ToggleButtonGroup"
@@ -168,10 +168,10 @@ function ModalButton(props: ButtonVariationProps) {
       disableRipple={props.disableRipple ?? false}
       sx={styles}
     >
-      <Stack direction={"row"} gap={theme.module[3]}>
+      <Slot direction={"row"} gap={theme.module[3]}>
         {!!props.iconName && <Icon variation={props.iconName} />}
         {!!props.label && <Typography>{props.label}</Typography>}
-      </Stack>
+      </Slot>
     </ButtonBase>
   )
 }
@@ -273,7 +273,7 @@ function PillButton(props: ButtonVariationProps) {
       disableRipple={props.disableRipple ?? false}
       sx={styles}
     >
-      <Stack direction={"row"} gap={theme.module[2]} alignContent={"center"}>
+      <Slot gap={theme.module[2]}>
         {!!props.iconName && (
           <Icon
             variation={props.iconName}
@@ -295,7 +295,7 @@ function PillButton(props: ButtonVariationProps) {
             {props.label}
           </Typography>
         )}
-      </Stack>
+      </Slot>
     </ButtonBase>
   )
 }
@@ -328,12 +328,7 @@ export function NavigationButton(props: NavigationButtonProps) {
   const iconName = props.navigateTo === "next" ? "arrowRight" : "arrowLeft"
   const elements = [
     <Icon fontSize="medium" variation={iconName} key={iconName} />,
-    <Stack
-      width={"100%"}
-      justifyContent={"center"}
-      flexShrink={1}
-      key={props.label}
-    >
+    <Slot flexShrink={1} key={props.label}>
       <Typography
         variant="body1"
         fontWeight={"bold"}
@@ -341,7 +336,7 @@ export function NavigationButton(props: NavigationButtonProps) {
       >
         {props.label}
       </Typography>
-    </Stack>,
+    </Slot>,
   ]
   const buttonElements =
     props.navigateTo === "next" ? elements.reverse() : elements

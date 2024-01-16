@@ -6,6 +6,7 @@ import useTheme from "../../common/useTheme"
 import { ErrorBoundary } from "../../components/errorBoundary"
 import { HistoryList } from "./historyList"
 import { Review } from "./review"
+import { Window } from "../../components/surface"
 /*
 
 
@@ -70,6 +71,25 @@ export function History() {
 
 
 */
+function Outer({ children }: { children: any }) {
+  const theme = useTheme()
+
+  return (
+    <Window
+      padding={theme.module[3]}
+      bgcolor={theme.scale.gray[8]}
+      paddingBottom={theme.module[2]}
+    >
+      {children}
+    </Window>
+  )
+}
+/*
+
+
+
+
+*/
 function HistoryBody() {
   const isReviewing = !!useHistoryUI(
     (state: HistoryUIState) => state.reviewItemUuid,
@@ -78,28 +98,6 @@ function HistoryBody() {
 }
 /*
 
-
-
-
-
-*/
-function Outer({ children }: { children: any }) {
-  const theme = useTheme()
-
-  return (
-    <Stack
-      width={"100%"}
-      height={"100%"}
-      padding={theme.module[3]}
-      bgcolor={theme.scale.gray[8]}
-      paddingBottom={theme.module[2]}
-      boxSizing={"border-box"}
-    >
-      {children}
-    </Stack>
-  )
-}
-/*
 
 
 

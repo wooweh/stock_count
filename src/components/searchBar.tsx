@@ -1,11 +1,12 @@
 import { ClickAwayListener, Stack, Typography } from "@mui/material"
 import { useState } from "react"
+import { useLocation } from "react-router-dom"
 import { ReactSearchAutocomplete } from "react-search-autocomplete"
 import useTheme from "../common/useTheme"
 import Animation from "../components/animation"
 import { Button } from "../components/button"
 import { ErrorBoundary } from "./errorBoundary"
-import { useLocation } from "react-router-dom"
+import { Slot } from "./surface"
 /*
 
 
@@ -65,18 +66,15 @@ export function SearchBar(props: SearchBarProps) {
             zIndex={10}
           >
             <Heading heading={props.heading} />
-            <Stack
-              width={"100%"}
+            <Slot
               height={`calc(${theme.module[6]} * 1.125)`}
-              direction={"row"}
-              boxSizing={"border-box"}
               position={"absolute"}
               justifyContent={"flex-end"}
               zIndex={10}
             >
               <Search {...searchProps} />
               <ToggleButton {...searchProps} />
-            </Stack>
+            </Slot>
           </Stack>
         </Stack>
       </ClickAwayListener>
@@ -94,14 +92,7 @@ function Heading({ heading }: { heading: string | undefined }) {
   const theme = useTheme()
   return (
     !!heading && (
-      <Stack
-        direction={"row"}
-        width={"100%"}
-        alignItems={"center"}
-        justifyContent={"flex-start"}
-        padding={`0 ${theme.module[2]}`}
-        boxSizing={"border-box"}
-      >
+      <Slot justifyContent={"flex-start"} padding={`0 ${theme.module[2]}`}>
         <Typography
           variant="h6"
           fontWeight={"bold"}
@@ -109,7 +100,7 @@ function Heading({ heading }: { heading: string | undefined }) {
         >
           {heading}
         </Typography>
-      </Stack>
+      </Slot>
     )
   )
 }
@@ -146,12 +137,7 @@ function Search(props: SearchProps) {
   const searchKeys = ["name", "description"]
 
   return (
-    <Stack
-      width={"100%"}
-      direction={"row"}
-      boxSizing={"border-box"}
-      justifyContent={"flex-end"}
-    >
+    <Slot justifyContent={"flex-end"}>
       <Animation
         from={{ width: "0%", opacity: 0 }}
         to={{ width: "100%", opacity: 1 }}
@@ -191,7 +177,7 @@ function Search(props: SearchProps) {
           </Stack>
         )}
       </Animation>
-    </Stack>
+    </Slot>
   )
 }
 /*
@@ -211,7 +197,7 @@ function ToggleButton(props: SearchProps) {
         direction={"row"}
         justifyContent={"flex-end"}
         position={"absolute"}
-        top={5}
+        top={6}
         right={2}
         zIndex={10}
       >

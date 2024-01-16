@@ -13,6 +13,7 @@ import { signOut } from "../user/userAuth"
 import { selectIsDarkmode } from "./coreSliceSelectors"
 import { toggleDarkmode } from "./coreSliceUtils"
 import { routePaths } from "./pages"
+import { Window } from "../../components/surface"
 /*
 
 
@@ -100,13 +101,7 @@ export function Menu() {
           },
         }}
       >
-        <Stack
-          width={"100%"}
-          height={"100%"}
-          padding={theme.module[2]}
-          justifyContent={"flex-start"}
-          boxSizing={"border-box"}
-        >
+        <Window padding={theme.module[2]} justifyContent={"flex-start"}>
           <ErrorBoundary componentName={"Menu"} featurePath={path}>
             {menuItems.map((item: MenuItemProps, index: number) => (
               <MenuListitem
@@ -121,7 +116,7 @@ export function Menu() {
               />
             ))}
           </ErrorBoundary>
-        </Stack>
+        </Window>
       </MuiMenu>
     </>
   )

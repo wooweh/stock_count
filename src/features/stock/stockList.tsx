@@ -15,6 +15,7 @@ import {
 import { prepareStockSearchList } from "./stockUtils"
 import { ErrorBoundary } from "../../components/errorBoundary"
 import { useLocation } from "react-router-dom"
+import { Slot, Window } from "../../components/surface"
 /*
 
 
@@ -53,14 +54,9 @@ function Outer({
   const theme = useTheme()
 
   return (
-    <Stack
-      width={"100%"}
-      height={"100%"}
-      gap={theme.module[4]}
-      bgcolor={theme.scale.gray[8]}
-    >
+    <Window gap={theme.module[4]} bgcolor={theme.scale.gray[8]}>
       {children}
-    </Stack>
+    </Window>
   )
 }
 /*
@@ -109,12 +105,7 @@ function EmptyListPlaceholder() {
   const theme = useTheme()
 
   return (
-    <Stack
-      width={"100%"}
-      height={"100%"}
-      justifyContent={"center"}
-      alignItems={"center"}
-    >
+    <Window justifyContent={"center"}>
       <Typography variant="h6" color={theme.scale.gray[5]}>
         Click + to add a stock item
       </Typography>
@@ -125,7 +116,7 @@ function EmptyListPlaceholder() {
       >
         or upload a CSV stock list
       </Typography>
-    </Stack>
+    </Window>
   )
 }
 /*
@@ -146,13 +137,7 @@ function ButtonTray() {
   }
 
   return (
-    <Stack
-      width={"100%"}
-      direction={"row"}
-      gap={theme.module[4]}
-      padding={theme.module[2]}
-      boxSizing={"border-box"}
-    >
+    <Slot gap={theme.module[4]} padding={theme.module[2]}>
       <Button
         variation={"profile"}
         iconName={"add"}
@@ -169,7 +154,7 @@ function ButtonTray() {
         outlineColor={theme.scale.gray[6]}
         justifyCenter
       />
-    </Stack>
+    </Slot>
   )
 }
 /*

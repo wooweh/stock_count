@@ -12,7 +12,7 @@ import { Input } from "../../components/control"
 import { ErrorBoundary } from "../../components/errorBoundary"
 import { Loader } from "../../components/loader"
 import Modal, { ModalActionProps } from "../../components/modal"
-import { ProfileWrapper } from "../../components/surface"
+import { ProfileWrapper, Slot } from "../../components/surface"
 import { generateNotification } from "../core/coreUtils"
 import { PasswordValidationCheck } from "./authentication"
 import { changeEmail, changePassword } from "./userAuth"
@@ -176,13 +176,7 @@ function ProfileField(props: ProfileFieldProps) {
       >
         {props.label}:
       </Typography>
-      <Stack
-        width={"100%"}
-        direction={"row"}
-        alignItems={"center"}
-        justifyContent={"space-between"}
-        gap={theme.module[3]}
-      >
+      <Slot justifyContent={"space-between"} gap={theme.module[3]}>
         <Input
           value={props.value}
           placeholder={placeholder}
@@ -194,7 +188,7 @@ function ProfileField(props: ProfileFieldProps) {
             background: isEditing ? theme.scale.gray[8] : theme.scale.gray[9],
           }}
         />
-      </Stack>
+      </Slot>
     </Stack>
   )
 }

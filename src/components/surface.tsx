@@ -32,13 +32,10 @@ export function ProfileWrapper({
 
 */
 export function Window(props: StackProps) {
-  const theme = useTheme()
-
   const stackProps: StackProps = {
     width: "100%",
     height: "100%",
     boxSizing: "border-box",
-    gap: theme.module[3],
     alignItems: "center",
     ...props,
   }
@@ -52,14 +49,12 @@ export function Window(props: StackProps) {
 
 */
 export function Slot(props: StackProps) {
-  const theme = useTheme()
-
   const stackProps: StackProps = {
     width: "100%",
     boxSizing: "border-box",
-    gap: theme.module[3],
     direction: "row",
     alignItems: "center",
+    justifyContent: "center",
     ...props,
   }
 

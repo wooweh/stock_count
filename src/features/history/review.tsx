@@ -43,6 +43,7 @@ import {
   HistoryItemResultsProps,
 } from "./historySlice"
 import { selectHistory } from "./historySliceSelectors"
+import { Slot, Window } from "../../components/surface"
 /*
 
 
@@ -80,18 +81,12 @@ function Outer({
   children: React.ReactElement | React.ReactElement[]
 }) {
   const theme = useTheme()
+  const padding = `0 ${theme.module[2]} ${theme.module[2]} ${theme.module[2]}`
 
   return (
-    <Stack
-      width={"100%"}
-      height={"100%"}
-      padding={`0 ${theme.module[2]} ${theme.module[2]} ${theme.module[2]}`}
-      gap={theme.module[2]}
-      boxSizing={"border-box"}
-      flexShrink={10}
-    >
+    <Window padding={padding} gap={theme.module[2]} flexShrink={10}>
       {children}
-    </Stack>
+    </Window>
   )
 }
 /*
@@ -104,15 +99,11 @@ function Header() {
   const theme = useTheme()
 
   return (
-    <Stack
-      width={"100%"}
+    <Slot
       height={theme.module[6]}
-      direction={"row"}
       flexShrink={0}
       justifyContent={"space-between"}
-      alignItems={"center"}
       paddingLeft={theme.module[2]}
-      boxSizing={"border-box"}
     >
       <Typography variant="h6" fontWeight={"bold"} color={theme.scale.gray[5]}>
         Count Review
@@ -126,7 +117,7 @@ function Header() {
         outlineColor={theme.scale.red[7]}
         sx={{ padding: theme.module[3], boxShadow: theme.shadow.neo[3] }}
       />
-    </Stack>
+    </Slot>
   )
 }
 /*
@@ -154,11 +145,8 @@ function Body() {
   }
 
   return (
-    <Stack
-      width={"100%"}
-      height={"100%"}
+    <Window
       gap={theme.module[2]}
-      boxSizing={"border-box"}
       borderRadius={theme.module[3]}
       bgcolor={theme.scale.gray[9]}
       flexShrink={10}
@@ -168,9 +156,8 @@ function Body() {
         outlineOffset: "-1px",
       }}
     >
-      <Stack
+      <Slot
         padding={theme.module[2]}
-        boxSizing={"border-box"}
         borderRadius={`${theme.module[2]} ${theme.module[2]} 0 0`}
         bgcolor={theme.scale.gray[8]}
         sx={{
@@ -185,11 +172,9 @@ function Body() {
         >
           {_.capitalize(sectionName)}
         </Typography>
-      </Stack>
-      <Stack width={"100%"} height={"100%"} flexShrink={1}>
-        {sections[sectionName]}
-      </Stack>
-    </Stack>
+      </Slot>
+      <Window flexShrink={1}>{sections[sectionName]}</Window>
+    </Window>
   )
 }
 /*
@@ -200,10 +185,10 @@ function Body() {
 */
 function Details(props: Required<HistoryItemMetadataProps>) {
   return (
-    <Stack width={"100%"} height={"100%"} justifyContent={"space-evenly"}>
+    <Window justifyContent={"space-evenly"}>
       <DetailsList {...props} />
       <DurationChart {...props} />
-    </Stack>
+    </Window>
   )
 }
 /*
@@ -308,14 +293,9 @@ function DurationChart(props: Required<HistoryItemMetadataProps>) {
   ]
 
   return (
-    <Stack
-      width={"100%"}
-      height={"55%"}
-      paddingBottom={theme.module[2]}
-      boxSizing={"border-box"}
-    >
+    <Window height={"55%"} paddingBottom={theme.module[2]}>
       <PieChart data={data} />
-    </Stack>
+    </Window>
   )
 }
 /*
@@ -328,13 +308,7 @@ function Comments(props: HistoryItemCommentsProps) {
   const theme = useTheme()
 
   return (
-    <Stack
-      width={"100%"}
-      height={"100%"}
-      padding={theme.module[2]}
-      boxSizing={"border-box"}
-      gap={theme.module[4]}
-    >
+    <Window padding={theme.module[2]} gap={theme.module[4]}>
       <CommentBlock
         label="Preparation"
         color={theme.scale.blue[6]}
@@ -345,7 +319,7 @@ function Comments(props: HistoryItemCommentsProps) {
         color={theme.scale.orange[6]}
         comments={props.finalization}
       />
-    </Stack>
+    </Window>
   )
 }
 /*
@@ -398,11 +372,11 @@ function Results(props: Required<HistoryItemResultsProps>) {
   const columns = prepareSoloResultsTableColumns()
 
   return (
-    <Stack width={"100%"} height={"100%"} justifyContent={"space-between"}>
-      <Stack width={"100%"}>
+    <Window justifyContent={"space-between"}>
+      <Slot>
         <VirtualizedTable rows={rows} columns={columns} />
-      </Stack>
-      <Stack width={"100%"} padding={theme.module[1]} boxSizing={"border-box"}>
+      </Slot>
+      <Slot padding={theme.module[1]}>
         <Button
           variation={"modal"}
           label={"Download CSV"}
@@ -416,8 +390,8 @@ function Results(props: Required<HistoryItemResultsProps>) {
             padding: theme.module[4],
           }}
         />
-      </Stack>
-    </Stack>
+      </Slot>
+    </Window>
   )
 }
 /*
@@ -454,12 +428,12 @@ function ButtonTray() {
   const initialAlignment = options[0].label
 
   return (
-    <Stack width={"100%"} paddingTop={theme.module[1]} boxSizing={"border-box"}>
+    <Slot paddingTop={theme.module[1]}>
       <ToggleButtonGroup
         options={options}
         initialAlignment={initialAlignment}
       />
-    </Stack>
+    </Slot>
   )
 }
 /*

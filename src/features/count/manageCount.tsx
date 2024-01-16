@@ -11,7 +11,7 @@ import Icon, { IconNames } from "../../components/icon"
 import { List } from "../../components/list"
 import { ListItem } from "../../components/listItem"
 import Modal, { ModalActionProps } from "../../components/modal"
-import { Slot } from "../../components/surface"
+import { Slot, Window } from "../../components/surface"
 import { generateCustomNotification } from "../core/coreUtils"
 import { MemberProps, MembersProps } from "../org/orgSlice"
 import { selectOrgMembers } from "../org/orgSliceSelectors"
@@ -99,13 +99,7 @@ function Header() {
 
   return (
     <Stack>
-      <Stack
-        width={"100%"}
-        justifyContent={"center"}
-        alignItems={"center"}
-        position={"relative"}
-        direction={"row"}
-      >
+      <Slot position={"relative"}>
         <Stack direction={"row"} gap={theme.module[3]} alignItems={"center"}>
           <Icon variation={"settings"} />
           <Typography variant="h6">Manage Count</Typography>
@@ -126,7 +120,7 @@ function Header() {
             sx={{ padding: theme.module[3], boxShadow: theme.shadow.neo[3] }}
           />
         </Stack>
-      </Stack>
+      </Slot>
     </Stack>
   )
 }
@@ -247,9 +241,9 @@ function ControlsHeader() {
   return (
     <CountTeamSlot
       left={
-        <Slot width={"min-content"}>
+        <Slot width={"min-content"} gap={theme.module[2]}>
           <Icon variation={leftIconName} />
-          <Typography fontWeight={"bold"}>Counters</Typography>
+          <Typography fontWeight={"medium"}>Counters</Typography>
         </Slot>
       }
       right={
@@ -733,11 +727,12 @@ function TransfersHeader() {
   return (
     <Slot
       borderRadius={theme.module[2]}
+      justifyContent={"flex-start"}
       padding={`${theme.module[2]} ${theme.module[3]}`}
-      gap={theme.module[3]}
+      gap={theme.module[2]}
     >
       <Icon variation={"transfer"} />
-      <Typography fontWeight={"bold"}>Transfers</Typography>
+      <Typography fontWeight={"medium"}>Transfers</Typography>
     </Slot>
   )
 }
@@ -883,12 +878,7 @@ function UpdateCountButton() {
   )
 
   return (
-    <Stack
-      justifyContent={"flex-end"}
-      height={"100%"}
-      width={"100%"}
-      flexShrink={1}
-    >
+    <Window justifyContent={"flex-end"} flexShrink={1}>
       <WarningBox />
       <Button
         variation={"profile"}
@@ -900,7 +890,7 @@ function UpdateCountButton() {
         disabled={!isCounterRequirement}
         justifyCenter
       />
-    </Stack>
+    </Window>
   )
 }
 /*

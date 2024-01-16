@@ -160,14 +160,12 @@ function ReviewTable({
   const theme = useTheme()
 
   return (
-    <Stack width={"100%"} boxSizing={"border-box"} justifyContent={"center"}>
       <Stack width={"100%"} gap={theme.module[3]} justifyContent={"flex-start"}>
         <Typography fontWeight={"bold"} color={theme.scale.gray[5]}>
           Item count: {rows.length}
         </Typography>
         <VirtualizedTable rows={rows} columns={columns} />
       </Stack>
-    </Stack>
   )
 }
 /*

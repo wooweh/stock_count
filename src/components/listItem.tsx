@@ -10,6 +10,7 @@ import { Button } from "./button"
 import { Divider } from "./divider"
 import Icon, { IconNames } from "./icon"
 import { ListGroupContext } from "./list"
+import { Slot, Window } from "./surface"
 /* 
 
 
@@ -120,16 +121,14 @@ function TertiarySlot(props: { children: any }) {
 function InnerWrapper(props: { children: any }) {
   const theme = useTheme()
   return (
-    <Stack
+    <Slot
       bgcolor={"none"}
-      direction={"row"}
-      boxSizing={"border-box"}
       justifyContent={"space-between"}
       gap={theme.module[4]}
-      sx={{ width: "100%", zIndex: 0 }}
+      zIndex={0}
     >
       {props.children}
-    </Stack>
+    </Slot>
   )
 }
 /*
@@ -172,17 +171,7 @@ function Container(props: ContainerProps) {
 
 */
 function PrimarySlot(props: { children: PrimarySlotProps | undefined }) {
-  return (
-    !!props.children && (
-      <Stack
-        boxSizing={"border-box"}
-        bgcolor={"none"}
-        justifyContent={"center"}
-      >
-        {props.children}
-      </Stack>
-    )
-  )
+  return !!props.children && <Slot width={"min-content"}>{props.children}</Slot>
 }
 /*
 
@@ -426,9 +415,7 @@ function ItemOptions(props: ItemOptionsProps) {
 
   return (
     props.show && (
-      <Stack
-        width={"100%"}
-        height={"100%"}
+      <Window
         bgcolor={theme.scale.gray[9]}
         position={"absolute"}
         borderRadius={theme.module[2]}
@@ -437,15 +424,11 @@ function ItemOptions(props: ItemOptionsProps) {
           outlineOffset: "-2px",
         }}
       >
-        <Stack
-          width={"100%"}
-          height={"100%"}
+        <Window
           direction={"row"}
-          boxSizing={"border-box"}
           position={"relative"}
           borderRadius={theme.module[3]}
           justifyContent={"space-evenly"}
-          alignItems={"center"}
         >
           {props.options.map((option: ListItemOptionProps, index: number) => {
             const isDelete = option.iconName === "delete"
@@ -486,8 +469,8 @@ function ItemOptions(props: ItemOptionsProps) {
               onDelete={handleDelete.onDelete}
             />
           )}
-        </Stack>
-      </Stack>
+        </Window>
+      </Window>
     )
   )
 }
@@ -519,26 +502,22 @@ function ItemOptionDeleteConfirmation(
   }
 
   return (
-    <Stack
-      width={"100%"}
-      height={"100%"}
+    <Window
       position={"absolute"}
       left={0}
       direction={"row"}
       borderRadius={theme.module[2]}
       zIndex={100}
       justifyContent={"space-between"}
-      alignItems={"center"}
       padding={`0 ${theme.module[5]}`}
       bgcolor={theme.scale.gray[8]}
-      boxSizing={"border-box"}
     >
       <Button variation="pill" iconName={"cancel"} onClick={handleCancel} />
       <Typography variant="body2" color={theme.scale.gray[5]}>
         Confirm Deletion
       </Typography>
       <Button variation="pill" iconName={"done"} onClick={handleAccept} />
-    </Stack>
+    </Window>
   )
 }
 /*

@@ -19,6 +19,7 @@ import { Input } from "../../components/control"
 import { ErrorBoundary } from "../../components/errorBoundary"
 import Icon from "../../components/icon"
 import Modal, { ModalActionProps } from "../../components/modal"
+import { Slot, Window } from "../../components/surface"
 import { selectOrgCountChecksList } from "../org/orgSliceSelectors"
 import { selectIsUserAdmin } from "../user/userSliceSelectors"
 import { resetCountUI, setCountUI, useCountUI } from "./count"
@@ -72,11 +73,7 @@ function Outer({
 }: {
   children: React.ReactElement | React.ReactElement[]
 }) {
-  return (
-    <Stack width={"100%"} height={"100%"} justifyContent={"space-between"}>
-      {children}
-    </Stack>
-  )
+  return <Window justifyContent={"space-between"}>{children}</Window>
 }
 /*
 
@@ -92,13 +89,10 @@ function Body() {
   const isCountInProgress = useAppSelector(selectIsCountInProgress)
 
   return (
-    <Stack
-      width={"100%"}
-      height={"100%"}
+    <Window
       justifyContent={"center"}
       gap={theme.module[6]}
       paddingBottom={isCountInProgress ? theme.module[8] : 0}
-      boxSizing={"border-box"}
     >
       {isInvitePending ? (
         <Invite />
@@ -107,7 +101,7 @@ function Body() {
       ) : (
         <CountPrompt />
       )}
-    </Stack>
+    </Window>
   )
 }
 /*
@@ -226,14 +220,7 @@ function Notification(props: NotificationProps) {
         outlineOffset: "-2px",
       }}
     >
-      <Stack
-        width={"100%"}
-        direction={"row"}
-        gap={theme.module[4]}
-        alignItems={"center"}
-        padding={theme.module[3]}
-        boxSizing={"border-box"}
-      >
+      <Slot gap={theme.module[4]} padding={theme.module[3]}>
         <Icon
           variation="notification"
           fontSize="large"
@@ -246,7 +233,7 @@ function Notification(props: NotificationProps) {
         >
           {props.message}
         </Typography>
-      </Stack>
+      </Slot>
       {props.actions.map((action) => (
         <Button
           variation="profile"
@@ -284,12 +271,11 @@ function ButtonTray() {
   return (
     isAdmin &&
     !isCountInProgress && (
-      <Stack
+      <Window
         gap={theme.module[4]}
+        height={"min-content"}
         overflow={"visible"}
         padding={theme.module[0]}
-        boxSizing={"border-box"}
-        alignItems={"center"}
       >
         <Button
           variation={"profile"}
@@ -310,7 +296,7 @@ function ButtonTray() {
           justifyCenter
           onClick={handleNewCount}
         />
-      </Stack>
+      </Window>
     )
   )
 }
@@ -456,16 +442,13 @@ function CheckListItem({ countCheck }: { countCheck: CountCheckProps }) {
   return (
     <ClickAwayListener onClickAway={handleClickAway}>
       <Stack
-        direction={"column"}
         width={"100%"}
         gap={isEditing ? theme.module[3] : 0}
         padding={theme.module[2]}
         paddingRight={0}
         boxSizing={"border-box"}
       >
-        <Stack
-          direction={"row"}
-          width={"100%"}
+        <Slot
           alignItems={"stretch"}
           gap={theme.module[3]}
           position={"relative"}
@@ -476,7 +459,7 @@ function CheckListItem({ countCheck }: { countCheck: CountCheckProps }) {
             onClick={handleDelete}
             iconName={"delete"}
           />
-        </Stack>
+        </Slot>
         <ActionButtonDropdown actions={dropdownActions} isActive={isEditing} />
       </Stack>
     </ClickAwayListener>
@@ -591,12 +574,7 @@ function ActionButtonDropdown(props: ActionButtonDropdownProps) {
     >
       <AccordionSummary />
       <AccordionDetails>
-        <Stack
-          width={"100%"}
-          direction={"row"}
-          boxSizing={"border-box"}
-          justifyContent={"space-evenly"}
-        >
+        <Slot justifyContent={"space-evenly"}>
           {props.actions.map((action, index) => {
             return (
               <Button
@@ -610,7 +588,7 @@ function ActionButtonDropdown(props: ActionButtonDropdownProps) {
               />
             )
           })}
-        </Stack>
+        </Slot>
       </AccordionDetails>
     </Accordion>
   )

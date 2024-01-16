@@ -1,6 +1,6 @@
-import Stack from "@mui/material/Stack"
 import { createContext } from "react"
 import useTheme from "../common/useTheme"
+import { Slot, Window } from "./surface"
 /*
 
 
@@ -15,11 +15,8 @@ export type ListProps = {
 export function List(props: ListProps) {
   const theme = useTheme()
   return (
-    <Stack
-      width={"100%"}
-      height={"100%"}
+    <Window
       maxHeight={props.maxHeight ?? "100%"}
-      boxSizing={"border-box"}
       justifyContent={"flex-start"}
       gap={theme.module[props.gapScale ?? 3]}
       sx={{
@@ -27,7 +24,7 @@ export function List(props: ListProps) {
       }}
     >
       {props.children}
-    </Stack>
+    </Window>
   )
 }
 /*
@@ -60,17 +57,7 @@ export function ListGroup(props: ListGroupProps) {
 */
 function ListGroupOuterWrapper(props: ListGroupProps) {
   const theme = useTheme()
-  return (
-    <Stack
-      gap={theme.module[2]}
-      boxSizing={"border-box"}
-      sx={{
-        width: "100%",
-      }}
-    >
-      {props.children}
-    </Stack>
-  )
+  return <Slot gap={theme.module[2]}>{props.children}</Slot>
 }
 /* 
 
@@ -83,15 +70,14 @@ function ListGroupChildren(props: ListGroupProps) {
   const theme = useTheme()
   return (
     <ListGroupContext.Provider value={true}>
-      <Stack
+      <Slot
         gap={theme.module[0]}
         alignItems={"flex-start"}
         overflow={"hidden"}
         borderRadius={theme.module[3]}
-        sx={{ width: "100%" }}
       >
         {props.children}
-      </Stack>
+      </Slot>
     </ListGroupContext.Provider>
   )
 }

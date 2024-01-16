@@ -1,4 +1,4 @@
-import { Stack, Typography } from "@mui/material"
+import { Typography } from "@mui/material"
 import { useLocation } from "react-router-dom"
 import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
@@ -6,6 +6,7 @@ import { ErrorBoundary } from "../../components/errorBoundary"
 import { ListItemOptionProps } from "../../components/listItem"
 import { ManagedList } from "../../components/managedList"
 import { SearchItemProps } from "../../components/searchBar"
+import { Window } from "../../components/surface"
 import { setHistoryUI, useHistoryUI } from "./history"
 import { selectHistoryList } from "./historySliceSelectors"
 import {
@@ -50,16 +51,7 @@ function Outer({
 }) {
   const theme = useTheme()
 
-  return (
-    <Stack
-      width={"100%"}
-      height={"100%"}
-      paddingBottom={theme.module[3]}
-      boxSizing={"border-box"}
-    >
-      {children}
-    </Stack>
-  )
+  return <Window paddingBottom={theme.module[3]}>{children}</Window>
 }
 /*
 
@@ -107,12 +99,7 @@ function EmptyListPlaceholder() {
   const theme = useTheme()
 
   return (
-    <Stack
-      width={"100%"}
-      height={"100%"}
-      justifyContent={"center"}
-      alignItems={"center"}
-    >
+    <Window justifyContent={"center"}>
       <Typography variant="h6" color={theme.scale.gray[5]}>
         Click + to add a stock item
       </Typography>
@@ -123,7 +110,7 @@ function EmptyListPlaceholder() {
       >
         or upload a CSV stock list
       </Typography>
-    </Stack>
+    </Window>
   )
 }
 /*

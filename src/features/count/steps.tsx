@@ -9,6 +9,7 @@ import Animation from "../../components/animation"
 import { Button } from "../../components/button"
 import { ErrorBoundary } from "../../components/errorBoundary"
 import { IconNames } from "../../components/icon"
+import { Slot, Window } from "../../components/surface"
 import { resetCountUI, setCountUI, useCountUI } from "./count"
 import { CountSteps, CountTypes } from "./countSlice"
 import {
@@ -175,19 +176,13 @@ export function Steps() {
       featurePath={path}
       state={{ featureUI: { ...countUIState } }}
     >
-      <Stack
-        width={"100%"}
-        height={"100%"}
-        bgcolor={theme.scale.gray[8]}
-        padding={theme.module[3]}
-        boxSizing={"border-box"}
-      >
+      <Window bgcolor={theme.scale.gray[8]} padding={theme.module[3]}>
         {isManagingCount ? (
           <ManageCount />
         ) : (
           <CountStep {...countSteps[countStep]} />
         )}
-      </Stack>
+      </Window>
     </ErrorBoundary>
   )
 }
@@ -213,17 +208,11 @@ function CountStep(props: CountStepProps) {
   const theme = useTheme()
 
   return (
-    <Stack
-      width={"100%"}
-      height={"100%"}
-      gap={theme.module[3]}
-      alignItems={"center"}
-      boxSizing={"border-box"}
-    >
+    <Window gap={theme.module[3]}>
       <Header {...props} />
       <Body {...props} />
       <ButtonTray {...props} />
-    </Stack>
+    </Window>
   )
 }
 /*
@@ -304,6 +293,7 @@ function OptionsTray() {
 
   const isOptionsOpen = useCountUI((state) => state.isCountOptionsOpen)
   const isOrganiser = useAppSelector(selectIsUserOrganiser)
+  const step = useAppSelector(selectCountStep)
 
   const [isOpen, setIsOpen] = useState(false)
 
@@ -346,18 +336,23 @@ function OptionsTray() {
   ]
 
   if (isOrganiser) {
-    options.unshift(
-      {
-        label: "Manage",
-        iconName: "settings",
-        onClick: handleManage,
-      },
-      {
-        label: "Delete",
-        iconName: "delete",
-        onClick: handleDelete,
-      },
-    )
+    options.unshift({
+      label: "Delete",
+      iconName: "delete",
+      onClick: handleDelete,
+    })
+  }
+
+  const isFinalizing = step === "finalization"
+  console.log(isFinalizing)
+  console.log(step)
+
+  if (isOrganiser && !isFinalizing) {
+    options.unshift({
+      label: "Manage",
+      iconName: "settings",
+      onClick: handleManage,
+    })
   }
 
   return (
@@ -372,33 +367,25 @@ function OptionsTray() {
       >
         <Animation
           from={{ opacity: 0, width: "8.5rem" }}
-          to={{ opacity: 1, width: isOrganiser ? "20rem" : "8.5rem" }}
+          to={{
+            opacity: 1,
+            width: isOrganiser ? (isFinalizing ? "14rem" : "20rem") : "8.5rem",
+          }}
           duration={150}
           start={isOpen}
         >
-          <Stack
-            direction={"row"}
-            gap={theme.module[2]}
-            alignItems={"center"}
-            justifyContent={"center"}
-            boxSizing={"border-box"}
-          >
+          <Slot gap={theme.module[2]}>
             {options.map((option) => (
-              <Stack
-                direction={"row"}
-                gap={theme.module[1]}
-                alignItems={"center"}
-                key={option.iconName}
-              >
+              <Slot width={"min-content"} key={option.iconName}>
                 <Button
                   variation={"pill"}
                   iconName={option.iconName}
                   label={option.label}
                   onClick={option.onClick}
                 />
-              </Stack>
+              </Slot>
             ))}
-          </Stack>
+          </Slot>
         </Animation>
       </Stack>
     </ClickAwayListener>
@@ -412,15 +399,7 @@ function OptionsTray() {
 */
 function Body({ body }: { body: any }) {
   return (
-    <Stack
-      width={"100%"}
-      height={"100%"}
-      boxSizing={"border-box"}
-      overflow={"hidden"}
-      sx={{ overflowX: "visible", overflowY: "hidden" }}
-    >
-      {body}
-    </Stack>
+    <Window sx={{ overflowX: "visible", overflowY: "hidden" }}>{body}</Window>
   )
 }
 /*
@@ -435,12 +414,7 @@ function ButtonTray(props: CountStepProps) {
 
   return (
     showButtons && (
-      <Stack
-        width={"100%"}
-        direction={"row"}
-        gap={theme.module[4]}
-        justifyContent={"center"}
-      >
+      <Slot gap={theme.module[4]}>
         {props.prevButton && (
           <Button
             variation={"navPrev"}
@@ -468,7 +442,7 @@ function ButtonTray(props: CountStepProps) {
             justifyCenter
           />
         )}
-      </Stack>
+      </Slot>
     )
   )
 }

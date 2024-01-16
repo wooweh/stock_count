@@ -177,8 +177,6 @@ export function CountDBListener() {
   const counterUuids = useAppSelector(selectCountersUuidList)
   const isUserCountResultsEmpty = useAppSelector(selectIsUserCountResultsEmpty)
 
-  console.log("isUserCountResultsEmpty", isUserCountResultsEmpty)
-
   const pathName = location.pathname
   const isCountPath = pathName === routePaths.count.path
   const isSafeToSync = !!userUuid && !!orgUuid && isSystemActive && isCountPath
@@ -245,9 +243,6 @@ export function CountDBListener() {
           )
           onValue(dbCounterResultsRef, (snapshot) => {
             const dbCounterResults: CountMemberResultsProps = snapshot.val()
-            console.log(dbCounterResults)
-            console.log(uuid)
-            console.log(!!dbCounterResults)
             if (!!dbCounterResults) {
               updateCountMemberResults(uuid, dbCounterResults)
             } else {

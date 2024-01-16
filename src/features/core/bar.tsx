@@ -5,12 +5,13 @@ import { useNetworkState } from "react-use"
 import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { Button } from "../../components/button"
+import { ErrorBoundary } from "../../components/errorBoundary"
 import Icon from "../../components/icon"
+import { Slot } from "../../components/surface"
 import { selectIsUserCounting } from "../count/countSliceSelectors"
 import { selectIsSystemBooted } from "./coreSliceSelectors"
 import { Menu } from "./menu"
 import { routePaths, routes } from "./pages"
-import { ErrorBoundary } from "../../components/errorBoundary"
 /*
 
 
@@ -29,23 +30,19 @@ export function Bar() {
   return (
     isSystemBooted && (
       <ErrorBoundary componentName={"Bar"} featurePath={path}>
-        <Stack
-          direction={"row"}
+        <Slot
           position={"fixed"}
           top={0}
-          width={"100%"}
           height={theme.module[6]}
           bgcolor={theme.scale.gray[9]}
           justifyContent={isUserCounting ? "center" : "space-between"}
-          alignItems={"center"}
           paddingLeft={theme.module[3]}
           paddingRight={theme.module[3]}
           boxShadow={theme.shadow.neo[4]}
-          boxSizing={"border-box"}
           zIndex={1000}
         >
           {isUserCounting ? <CountBanner /> : <NavigationBar />}
-        </Stack>
+        </Slot>
       </ErrorBoundary>
     )
   )
@@ -69,15 +66,11 @@ function NavigationBar() {
 
   return (
     <>
-      <Stack>
-        <Button variation={"pill"} onClick={handleClick} iconName={"home"} />
-      </Stack>
+      <Button variation={"pill"} onClick={handleClick} iconName={"home"} />
       <Typography fontWeight={"bold"} color={theme.scale.gray[4]}>
         {locationName}
       </Typography>
-      <Stack>
-        <Menu />
-      </Stack>
+      <Menu />
     </>
   )
 }
@@ -111,13 +104,9 @@ function CountBanner() {
   const iconName = isWifi ? "wifi" : "cellular"
 
   return (
-    <Stack
-      width={"100%"}
-      direction={"row"}
+    <Slot
       justifyContent={"space-between"}
       padding={`0 ${theme.module[3]}`}
-      alignItems={"center"}
-      boxSizing={"border-box"}
       position={"relative"}
     >
       <Stack
@@ -131,13 +120,7 @@ function CountBanner() {
           Counting...
         </Typography>
       </Stack>
-      <Stack
-        width={"100%"}
-        direction={"row"}
-        gap={theme.module[3]}
-        alignItems={"center"}
-        justifyContent={"flex-end"}
-      >
+      <Slot gap={theme.module[3]} justifyContent={"flex-end"}>
         <Icon variation={iconName} color={color} fontSize="small" />
         <Typography
           fontWeight={"medium"}
@@ -147,8 +130,8 @@ function CountBanner() {
         >
           {status}
         </Typography>
-      </Stack>
-    </Stack>
+      </Slot>
+    </Slot>
   )
 }
 /*

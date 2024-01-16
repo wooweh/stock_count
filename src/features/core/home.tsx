@@ -1,4 +1,4 @@
-import { Divider, Typography } from "@mui/material"
+import { Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
 import { getAuth, onAuthStateChanged } from "firebase/auth"
 import _ from "lodash"
@@ -10,11 +10,10 @@ import { Button } from "../../components/button"
 import { Input } from "../../components/control"
 import { ErrorBoundary } from "../../components/errorBoundary"
 import Icon, { IconNames } from "../../components/icon"
-import { Window } from "../../components/surface"
+import { Slot, Window } from "../../components/surface"
 import { auth } from "../../remote"
 import { selectIsOrgSetup, selectOrgName } from "../org/orgSliceSelectors"
-import { createOrg, joinOrg } from "../org/orgSliceUtils"
-import { getInviteKeyValidation } from "../org/orgUtils"
+import { SetupOrgPrompt } from "../org/setup"
 import { codeSettings, sendEmailVerification } from "../user/userAuth"
 import {
   selectIsProfileComplete,
@@ -83,14 +82,10 @@ export function VerifyEmailPrompt() {
   }
 
   return (
-    <Stack
-      width={"100%"}
-      height={"100%"}
-      justifyContent={"center"}
-      alignItems={"center"}
+    <Window
       gap={theme.module[6]}
       padding={theme.module[5]}
-      boxSizing={"border-box"}
+      justifyContent={"center"}
     >
       <Typography textAlign={"center"} color={theme.scale.gray[4]}>
         Verify your email using the link sent to you.
@@ -102,7 +97,7 @@ export function VerifyEmailPrompt() {
         outlineColor={theme.scale.gray[6]}
         sx={{ width: theme.module[10] }}
       />
-    </Stack>
+    </Window>
   )
 }
 /*
@@ -117,32 +112,20 @@ export function CompleteProfilePrompt() {
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
 
-  const isProfileDetailsComplete = !!firstName && !!lastName
-  const INCOMPLETE_DETAILS_MESSAGE = "Please complete your name and surname."
-
   function handleClick() {
-    isProfileDetailsComplete
-      ? updateUserName(firstName, lastName)
-      : generateCustomNotification("error", INCOMPLETE_DETAILS_MESSAGE)
+    updateUserName(firstName, lastName)
   }
 
+  const isProfileDetailsComplete = !!firstName && !!lastName
+
   return (
-    <Stack
-      height={"100%"}
-      alignItems={"center"}
+    <Window
       justifyContent={"space-between"}
       maxWidth={theme.module[11]}
-      width={"100%"}
       padding={theme.module[5]}
       paddingTop={theme.module[6]}
-      boxSizing={"border-box"}
     >
-      <Stack
-        width={"100%"}
-        height={"100%"}
-        gap={theme.module[6]}
-        alignItems={"center"}
-      >
+      <Window gap={theme.module[6]}>
         <Icon
           variation="profile"
           fontSize="large"
@@ -161,8 +144,9 @@ export function CompleteProfilePrompt() {
           value={_.capitalize(lastName)}
           onChange={setLastName}
         />
-      </Stack>
+      </Window>
       <Button
+        disabled={!isProfileDetailsComplete}
         variation={"profile"}
         label={"Complete"}
         iconName={"done"}
@@ -171,7 +155,7 @@ export function CompleteProfilePrompt() {
         onClick={handleClick}
         justifyCenter
       />
-    </Stack>
+    </Window>
   )
 }
 /*
@@ -185,7 +169,7 @@ type PromptInputProps = {
   value: string
   onChange: Function
 }
-function PromptInput(props: PromptInputProps) {
+export function PromptInput(props: PromptInputProps) {
   const [placeholder, setPlacehoder] = useState(props.placeholder ?? "")
 
   const inputProps = {
@@ -209,124 +193,6 @@ function PromptInput(props: PromptInputProps) {
       sx={styles}
       onChange={(event: any) => props.onChange(event.target.value)}
     />
-  )
-}
-/*
-
-
-
-
-*/
-function SetupOrgPrompt() {
-  const theme = useTheme()
-
-  const [orgName, setOrgName] = useState("")
-  const [inviteKey, setInviteKey] = useState("")
-
-  const SUCCESS_MESSAGE = "You can view your org in the menu."
-
-  function handleCreateOrg() {
-    createOrg(orgName)
-    generateCustomNotification("success", SUCCESS_MESSAGE)
-  }
-  async function handleJoinOrg() {
-    const status = await joinOrg(inviteKey)
-    if (status.isJoined) generateCustomNotification("success", SUCCESS_MESSAGE)
-  }
-
-  const isInviteKeyValid = getInviteKeyValidation(inviteKey)
-
-  return (
-    <Stack
-      height={"100%"}
-      width={"100%"}
-      gap={theme.module[6]}
-      alignItems={"center"}
-      maxWidth={theme.module[11]}
-      padding={theme.module[5]}
-      paddingTop={theme.module[6]}
-      boxSizing={"border-box"}
-    >
-      <Icon variation="org" fontSize="large" color={theme.scale.green[7]} />
-      <Stack
-        height={"100%"}
-        width={"100%"}
-        gap={theme.module[5]}
-        alignItems={"center"}
-      >
-        <Typography color={theme.scale.green[7]} variant="h5">
-          Setup Org
-        </Typography>
-        <OrgSetupPromptAction
-          placeholder={"Org Name"}
-          value={orgName}
-          onInputChange={setOrgName}
-          actionIconName={"done"}
-          actionLabel="Create"
-          onActionClick={handleCreateOrg}
-          disabled={!orgName}
-          key={"create"}
-        />
-        <Divider
-          sx={{
-            width: "100%",
-            borderColor: theme.scale.gray[7],
-            paddingTop: theme.module[3],
-          }}
-        />
-        <Typography color={theme.scale.green[7]} variant="h5">
-          Join Org
-        </Typography>
-        <OrgSetupPromptAction
-          placeholder={"Org invite key"}
-          value={inviteKey}
-          onInputChange={setInviteKey}
-          actionIconName={"done"}
-          actionLabel="Join"
-          onActionClick={handleJoinOrg}
-          disabled={!isInviteKeyValid}
-          key={"join"}
-        />
-      </Stack>
-    </Stack>
-  )
-}
-/*
-
-
-
-
-*/
-type OrgSetupPromptActionProps = {
-  value: string
-  placeholder: string
-  actionIconName: IconNames
-  actionLabel: string
-  onActionClick: Function
-  onInputChange: Function
-  disabled: boolean
-}
-function OrgSetupPromptAction(props: OrgSetupPromptActionProps) {
-  const theme = useTheme()
-  return (
-    <Stack gap={theme.module[5]} width={"100%"}>
-      <PromptInput
-        placeholder={props.placeholder}
-        value={props.value}
-        onChange={props.onInputChange}
-      />
-      <Button
-        variation={"profile"}
-        label={props.actionLabel}
-        iconName={props.actionIconName}
-        color={theme.scale.gray[5]}
-        iconColor={!props.disabled ? theme.scale.green[6] : theme.scale.gray[5]}
-        outlineColor={theme.scale.gray[6]}
-        justifyCenter
-        disabled={!!props.disabled}
-        onClick={props.onActionClick}
-      />
-    </Stack>
   )
 }
 /*
@@ -381,22 +247,8 @@ function HomeButtons() {
   const buttons = isAdmin ? adminButtons : memberButtons
 
   return (
-    <Stack
-      height={"100%"}
-      width={"100%"}
-      padding={theme.module[4]}
-      paddingBottom={theme.module[5]}
-      boxSizing={"border-box"}
-    >
-      <Stack
-        direction={"row"}
-        width={"100%"}
-        height={"18.75%"}
-        minHeight={theme.module[8]}
-        justifyContent={"center"}
-        alignItems={"center"}
-        boxSizing={"border-box"}
-      >
+    <Window padding={theme.module[4]} paddingBottom={theme.module[5]}>
+      <Slot height={"18.75%"} minHeight={theme.module[8]}>
         <Button
           variation="profile"
           label={orgName}
@@ -410,7 +262,7 @@ function HomeButtons() {
           justifyCenter
           animationDuration={150}
         />
-      </Stack>
+      </Slot>
       <Stack
         width={"100%"}
         alignItems={"center"}
@@ -435,7 +287,7 @@ function HomeButtons() {
           )
         })}
       </Stack>
-    </Stack>
+    </Window>
   )
 }
 /*

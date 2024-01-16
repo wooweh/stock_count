@@ -10,6 +10,7 @@ import Icon from "../../components/icon"
 import { List } from "../../components/list"
 import { ListItem } from "../../components/listItem"
 import Modal, { ModalActionProps } from "../../components/modal"
+import { Slot } from "../../components/surface"
 import { generateCustomNotification } from "../core/coreUtils"
 import { MemberProps } from "../org/orgSlice"
 import { getMemberName, getMemberShortName } from "../org/orgUtils"
@@ -17,7 +18,7 @@ import {
   addCountUIArrayItem,
   removeCountUIArrayItem,
   setCountUI,
-  useCountUI
+  useCountUI,
 } from "./count"
 import { CountMemberProps, CountTypes } from "./countSlice"
 import {
@@ -219,19 +220,16 @@ export function WarningBox() {
   return (
     !isCounterRequirementMet &&
     countType && (
-      <Stack
-        width={"100%"}
-        direction={"row"}
+      <Slot
         gap={theme.module[3]}
         paddingBottom={theme.module[4]}
-        justifyContent={"center"}
         alignItems={"flex-end"}
       >
         <Icon variation={"warning"} />
         <Typography variant={"body2"}>
           Required number of counters not chosen.
         </Typography>
-      </Stack>
+      </Slot>
     )
   )
 }
@@ -444,11 +442,11 @@ function CountersList() {
             )
           })
         ) : (
-          <Stack width={"100%"} padding={theme.module[3]} alignItems={"center"}>
+          <Slot padding={theme.module[3]}>
             <Typography color={theme.scale.gray[5]}>
               No counters chosen
             </Typography>
-          </Stack>
+          </Slot>
         )}
       </List>
     </Stack>
@@ -469,7 +467,7 @@ function SetupOption(props: SetupOptionProps) {
   const theme = useTheme()
 
   return (
-    <Stack gap={theme.module[3]} boxSizing={"border-box"}>
+    <Stack gap={theme.module[3]}>
       <Stack paddingLeft={theme.module[1]}>
         <Typography
           fontSize={"large"}
@@ -479,19 +477,18 @@ function SetupOption(props: SetupOptionProps) {
           {props.label}
         </Typography>
       </Stack>
-      <Stack width={"100%"} alignItems={"center"}>
-        {props.control}
-      </Stack>
+      <Slot>{props.control}</Slot>
       {!!props.description && (
-        <Stack
-          width={"100%"}
-          alignItems={"center"}
-          paddingLeft={theme.module[1]}
-        >
-          <Typography color={theme.scale.gray[5]} fontWeight={"bold"}>
+        <Slot paddingLeft={theme.module[1]}>
+          <Typography
+            color={theme.scale.gray[5]}
+            fontWeight={"bold"}
+            width={"100%"}
+            textAlign={"left"}
+          >
             {props.description}
           </Typography>
-        </Stack>
+        </Slot>
       )}
     </Stack>
   )
