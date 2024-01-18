@@ -10,6 +10,7 @@ import useTheme, { ThemeColors } from "../common/useTheme"
 type DividerProps = {
   vertical?: boolean
   color?: ThemeColors
+  variant?: "inset" | "middle" | "fullWidth"
   sx?: any
 }
 export function Divider(props: DividerProps) {
@@ -21,7 +22,7 @@ export function Divider(props: DividerProps) {
   return (
     <MuiDivider
       orientation={props.vertical ? "vertical" : "horizontal"}
-      variant="middle"
+      variant={props.variant ?? "middle"}
       flexItem
       sx={styles}
     />

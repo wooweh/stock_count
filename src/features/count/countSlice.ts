@@ -64,6 +64,7 @@ export type CountMemberProps = {
   isCounter: boolean
   isJoined: boolean
   isCounting: boolean
+  isDeclined?: boolean
   step: CountSteps
 }
 export type SetCountMemberProps = UpdateDB & { member: CountMemberProps }

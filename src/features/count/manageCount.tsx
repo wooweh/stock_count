@@ -1,4 +1,4 @@
-import { Divider, Stack, Typography } from "@mui/material"
+import { Stack, Typography } from "@mui/material"
 import _ from "lodash"
 import { useEffect, useMemo } from "react"
 import { useLocation } from "react-router-dom"
@@ -45,6 +45,7 @@ import { CountTypeToggleButtons, WarningBox } from "./setup"
 
 */
 export function ManageCount() {
+  const theme = useTheme()
   const location = useLocation()
   const countUIState = useCountUI((state) => state)
   const path = location.pathname
@@ -56,8 +57,10 @@ export function ManageCount() {
       state={{ featureUI: { ...countUIState } }}
     >
       <Outer>
-        <Header />
-        <Body />
+        <Stack height={"80%"} gap={theme.module[3]}>
+          <Header />
+          <Body />
+        </Stack>
         <UpdateCountButton />
         <UpdateCountConfirmation />
         <AddTempMembers />
@@ -82,7 +85,7 @@ function Outer({
       gap={theme.module[4]}
       height={"100%"}
       bgcolor={theme.scale.gray[8]}
-      position={"relative"}
+      justifyContent={"space-between"}
     >
       {children}
     </Stack>
@@ -133,10 +136,10 @@ function Header() {
 function Body() {
   const theme = useTheme()
   return (
-    <Stack width={"100%"} gap={theme.module[5]}>
+    <Window height={"70%"} gap={theme.module[5]}>
       <CountType />
       <CountTeam />
-    </Stack>
+    </Window>
   )
 }
 /*
@@ -165,16 +168,24 @@ function CountTeam() {
   const theme = useTheme()
 
   return (
-    <Stack width={"100%"} gap={theme.module[3]}>
+    <Stack width={"100%"} height={"100%"} gap={theme.module[3]}>
       <Slot justifyContent={"space-between"}>
         <Typography variant="h6">Count Team</Typography>
         <AddMembersButton />
       </Slot>
       <CountTeamDescription />
-      <Stack maxHeight={"20rem"} overflow={"scroll"} gap={theme.module[3]}>
-        <CountTeamControls />
-        <Transfers />
-      </Stack>
+      <Window
+        overflow={"auto"}
+        gap={theme.module[4]}
+        borderRadius={theme.module[3]}
+        padding={theme.module[1]}
+        sx={{ outline: `1px solid ${theme.scale.gray[6]}` }}
+      >
+        <Stack width={"100%"} gap={theme.module[3]}>
+          <CountTeamControls />
+          <Transfers />
+        </Stack>
+      </Window>
     </Stack>
   )
 }
@@ -213,7 +224,7 @@ function CountTeamControls() {
   const theme = useTheme()
 
   return (
-    <Slot direction={"column"} gap={theme.module[2]}>
+    <Slot height={"100%"} direction={"column"} gap={theme.module[2]}>
       <ControlsHeader />
       <ControlsBody />
     </Slot>
@@ -277,7 +288,7 @@ function ControlsBody() {
       bgcolor={theme.scale.gray[9]}
       borderRadius={theme.module[2]}
       direction={"column"}
-      gap={theme.module[0]}
+      height={"100%"}
     >
       {countMembers.map((member) => (
         <TeamMemberControls
@@ -349,36 +360,28 @@ function TeamMemberControls(props: TeamMemberControlsProps) {
   }
 
   return (
-    <>
-      <CountTeamSlot
-        left={<Typography fontWeight={"bold"}>{props.name}</Typography>}
-        right={
-          <CountTeamRightSlot>
-            <Typography color={theme.scale.green[6]} fontWeight={"bold"}>
-              {props.count}
-            </Typography>
-            <Button
-              variation={"pill"}
-              iconName={isRemoved ? "checked" : "unchecked"}
-              iconColor={theme.scale.red[6]}
-              onClick={handleToggleDelete}
-            />
-            <Button
-              variation={"pill"}
-              iconName={isTransferred ? "checked" : "unchecked"}
-              iconColor={theme.scale.yellow[6]}
-              onClick={handleToggleTransfer}
-            />
-          </CountTeamRightSlot>
-        }
-      />
-      <Divider
-        sx={{
-          width: "100%",
-          borderColor: theme.scale.gray[7],
-        }}
-      />
-    </>
+    <CountTeamSlot
+      left={<Typography fontWeight={"bold"}>{props.name}</Typography>}
+      right={
+        <CountTeamRightSlot>
+          <Typography color={theme.scale.green[6]} fontWeight={"bold"}>
+            {props.count}
+          </Typography>
+          <Button
+            variation={"pill"}
+            iconName={isRemoved ? "checked" : "unchecked"}
+            iconColor={theme.scale.red[6]}
+            onClick={handleToggleDelete}
+          />
+          <Button
+            variation={"pill"}
+            iconName={isTransferred ? "checked" : "unchecked"}
+            iconColor={theme.scale.yellow[6]}
+            onClick={handleToggleTransfer}
+          />
+        </CountTeamRightSlot>
+      }
+    />
   )
 }
 /*
@@ -402,35 +405,23 @@ function TempAddedMemberControls({
   }
 
   return (
-    <>
-      <CountTeamSlot
-        bgColor={theme.scale.gray[9]}
-        borderRadius={theme.module[2]}
-        left={<Typography fontWeight={"bold"}>{name}</Typography>}
-        right={
-          <CountTeamRightSlot>
-            <Typography
-              variant="body2"
-              color={theme.scale.blue[6]}
-              fontWeight={"bold"}
-            >
-              Added
-            </Typography>
-            <Button
-              variation={"pill"}
-              iconName="delete"
-              onClick={handleDelete}
-            />
-          </CountTeamRightSlot>
-        }
-      />
-      <Divider
-        sx={{
-          width: "100%",
-          borderColor: theme.scale.gray[7],
-        }}
-      />
-    </>
+    <CountTeamSlot
+      bgColor={theme.scale.gray[9]}
+      borderRadius={theme.module[2]}
+      left={<Typography fontWeight={"bold"}>{name}</Typography>}
+      right={
+        <CountTeamRightSlot>
+          <Typography
+            variant="body2"
+            color={theme.scale.blue[6]}
+            fontWeight={"bold"}
+          >
+            Added
+          </Typography>
+          <Button variation={"pill"} iconName="delete" onClick={handleDelete} />
+        </CountTeamRightSlot>
+      }
+    />
   )
 }
 /*
@@ -448,13 +439,18 @@ type CountTeamControlSlotProps = {
 }
 function CountTeamSlot(props: CountTeamControlSlotProps) {
   const theme = useTheme()
+  const styles = {
+    outline: `1px solid ${theme.scale.gray[8]}`,
+    outlineOffset: "-1px",
+    ...props.sx,
+  }
   return (
     <Slot
       justifyContent={"space-between"}
       bgcolor={props.bgColor ?? "none"}
       borderRadius={props.borderRadius}
       padding={`${theme.module[2]} ${theme.module[3]}`}
-      sx={props.sx}
+      sx={styles}
     >
       {props.left}
       {props.right}
@@ -542,7 +538,9 @@ function AddTempMembers() {
     tempRemovedMemberUuids.length
 
   console.log(totalPotentialMembers)
-  console.log(countMembers.length)
+  console.log(tempRemovedMemberUuids.length)
+  console.log(selectedMemberUuids.length)
+  console.log(selectedMemberUuids)
 
   //TODO: Refactor into Count utils function to reuse in Manage feature
   const counterRequirements = {
@@ -764,9 +762,8 @@ function TransfersBody() {
     _.forIn(transferMembersUuids, (value, key) => list.push([key, value]))
     return list
   }
-  console.log(transferUuidsList)
 
-  return (
+  return !!transferUuidsList.length ? (
     <Slot
       maxHeight={theme.module[9]}
       overflow={"scroll"}
@@ -786,6 +783,12 @@ function TransfersBody() {
             />
           )
         })}
+    </Slot>
+  ) : (
+    <Slot paddingTop={theme.module[3]}>
+      <Typography textAlign={"center"} color={theme.scale.gray[5]}>
+        No transfers added
+      </Typography>
     </Slot>
   )
 }
@@ -876,9 +879,21 @@ function UpdateCountButton() {
   const isCounterRequirement = useCountUI(
     (state) => state.isCounterRequirementMet,
   )
+  const tempAddedMemberUuids = useCountUI((state) => state.tempAddedMemberUuids)
+  const tempRemovedMemberUuids = useCountUI(
+    (state) => state.tempRemovedMemberUuids,
+  )
+  const tempResultsTransfers = useCountUI((state) => state.tempResultsTransfers)
+  const isAllTransfersAllocated = !_.values(tempResultsTransfers).includes("")
+  const isDataSafe =
+    !!tempAddedMemberUuids.length &&
+    !!tempRemovedMemberUuids.length &&
+    !!_.keys(tempResultsTransfers).length &&
+    isAllTransfersAllocated
+  const isDisabled = !isCounterRequirement || !isDataSafe
 
   return (
-    <Window justifyContent={"flex-end"} flexShrink={1}>
+    <Window flexShrink={0} height={"min-content"}>
       <WarningBox />
       <Button
         variation={"profile"}
@@ -887,7 +902,7 @@ function UpdateCountButton() {
         label="Update Count"
         color={theme.scale.green[6]}
         outlineColor={theme.scale.green[7]}
-        disabled={!isCounterRequirement}
+        disabled={isDisabled}
         justifyCenter
       />
     </Window>
@@ -910,7 +925,6 @@ function UpdateCountConfirmation() {
   const removedMembers = useCountUI((state) => state.tempRemovedMemberUuids)
   const transferredMembers = useCountUI((state) => state.tempResultsTransfers)
   const isUpdatingCount = useCountUI((state) => state.isUpdatingCount)
-  console.log(countType, addedMembers, removedMembers, transferredMembers)
 
   const isRemovingOrganiser =
     isUserOrganiser && removedMembers.includes(userUuid)
@@ -1015,7 +1029,11 @@ function ChangeSummary(props: SummaryProps) {
         <Title icon={"addMembers"} color={"green"}>
           Added:
         </Title>
-        <Slot overflow={"scroll"} gap={theme.module[3]}>
+        <Slot
+          justifyContent={"flex-start"}
+          overflow={"scroll"}
+          gap={theme.module[3]}
+        >
           {_.map(props.addedUuids, (uuid) => (
             <DataPill key={uuid} label={getMemberShortName(members[uuid])} />
           ))}
@@ -1025,7 +1043,11 @@ function ChangeSummary(props: SummaryProps) {
         <Title icon={"delete"} color={"red"}>
           Removed:
         </Title>
-        <Slot overflow={"scroll"} gap={theme.module[3]}>
+        <Slot
+          justifyContent={"flex-start"}
+          overflow={"scroll"}
+          gap={theme.module[3]}
+        >
           {_.map(props.removedUuids, (uuid) => (
             <DataPill key={uuid} label={getMemberShortName(members[uuid])} />
           ))}
@@ -1036,7 +1058,7 @@ function ChangeSummary(props: SummaryProps) {
           Transferred:
         </Title>
         {_.toPairs(props.transferUuids).map(([key, value]) => (
-          <Slot gap={theme.module[3]} key={key}>
+          <Slot justifyContent={"flex-start"} gap={theme.module[3]} key={key}>
             <DataPill key={key} label={getMemberShortName(members[key])} />
             <Typography fontWeight={"bold"}>to</Typography>
             <DataPill
@@ -1072,7 +1094,7 @@ function Title({
   const theme = useTheme()
 
   return (
-    <Slot gap={theme.module[3]}>
+    <Slot gap={theme.module[3]} justifyContent={"flex-start"}>
       <Icon variation={icon} color={theme.scale[color][6]} />
       <Typography color={theme.scale[color][5]} fontWeight={"bold"}>
         {_.capitalize(children)}

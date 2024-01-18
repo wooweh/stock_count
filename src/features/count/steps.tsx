@@ -314,6 +314,7 @@ function OptionsTray() {
 
   function handleManage() {
     setCountUI("isManagingCount", true)
+    setCountUI("selectedMemberUuids", [])
     handleCancel()
   }
 

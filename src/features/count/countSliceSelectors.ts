@@ -80,33 +80,6 @@ export const selectCountResults = createSelector(
 
 
 */
-export type CountMembersWithResultsProps = {
-  [key: string]: {
-    name: string
-    uuid: string
-    count: number
-  }
-}
-export const selectCountMembersCountValueList = createSelector(
-  [selectCountMembers, selectCountResults],
-  (members, results) => {
-    const membersWithCountValues: CountMembersWithResultsProps = {}
-    _.forIn(members, (value: CountMemberProps, key) => {
-      const name = getMemberShortName(value)
-      const countValue = results?.[key] ? Object.keys(results[key]).length : 0
-      _.set(membersWithCountValues, `${key}.name`, name)
-      _.set(membersWithCountValues, `${key}.uuid`, value.uuid)
-      _.set(membersWithCountValues, `${key}.count`, countValue)
-    })
-    return _.values(membersWithCountValues)
-  },
-)
-/*
-
-
-
-
-*/
 export const selectIsStockCountCompleted = createSelector(
   [selectCountMembers],
   (members) => _.every(members, (value) => value.step === "review"),
@@ -211,6 +184,33 @@ export const selectCounters = createSelector([selectCountMembers], (members) =>
   _.omitBy(members, (value) => !value.isCounter),
 )
 /*
+
+
+
+
+*/
+export type CountMembersWithResultsProps = {
+  [key: string]: {
+    name: string
+    uuid: string
+    count: number
+  }
+}
+export const selectCountMembersCountValueList = createSelector(
+  [selectCounters, selectCountResults],
+  (members, results) => {
+    const membersWithCountValues: CountMembersWithResultsProps = {}
+    _.forIn(members, (value: CountMemberProps, key) => {
+      const name = getMemberShortName(value)
+      const countValue = results?.[key] ? Object.keys(results[key]).length : 0
+      _.set(membersWithCountValues, `${key}.name`, name)
+      _.set(membersWithCountValues, `${key}.uuid`, value.uuid)
+      _.set(membersWithCountValues, `${key}.count`, countValue)
+    })
+    return _.values(membersWithCountValues)
+  },
+)
+/*
                 
                 
                 
@@ -259,7 +259,7 @@ export const selectAvailableCountersList = createSelector(
 */
 export const selectIsCountInvitePending = createSelector(
   [selectUserCountMember],
-  (user) => !!user && !user.isJoined,
+  (user) => !!user && !user.isJoined && !user.isDeclined,
 )
 /*
                             

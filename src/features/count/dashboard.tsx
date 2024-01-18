@@ -111,15 +111,15 @@ function Body() {
 
 */
 function Invite() {
+  const theme = useTheme()
+
   function handleAccept() {
     updateUserCountMember({ isCounting: true, isJoined: true })
     updateCountStep("stockCount", true)
   }
 
   function handleDecline() {
-    // TODO: Count put on pause for all members until organiser updates count settings in manage count.
-    // TODO: Add isDeclined property to userCountMember
-    // updateUserCountMember({ isDeclined: true })
+    updateUserCountMember({ isDeclined: true })
   }
 
   const MESSAGE = "You are invited to count"
@@ -128,11 +128,13 @@ function Invite() {
       label: "Accept",
       handleClick: handleAccept,
       iconName: "done",
+      color: theme.scale.green[5],
     },
     {
       label: "Decline",
       handleClick: handleDecline,
-      iconName: "cancel",
+      iconName: "decline",
+      color: theme.scale.red[5],
     },
   ]
 
@@ -145,6 +147,7 @@ function Invite() {
 
 */
 function Rejoin() {
+  const theme = useTheme()
   const step = useAppSelector(selectUserCountMemberStep)
 
   function handleRejoin() {
@@ -158,6 +161,7 @@ function Rejoin() {
       label: "Rejoin",
       handleClick: handleRejoin,
       iconName: "joinGroup",
+      color: theme.scale.green[6],
     },
   ]
 
@@ -200,7 +204,10 @@ function CountPrompt() {
 
 
 */
-type NotificationActionProps = ModalActionProps & { label: string }
+type NotificationActionProps = ModalActionProps & {
+  label: string
+  color: string
+}
 type NotificationProps = {
   message: string
   actions: NotificationActionProps[]
@@ -215,6 +222,7 @@ function Notification(props: NotificationProps) {
       padding={theme.module[3]}
       boxSizing={"border-box"}
       bgcolor={theme.scale.blue[9]}
+      width={"100%"}
       sx={{
         outline: `2px solid ${theme.scale.blue[7]}`,
         outlineOffset: "-2px",
@@ -241,8 +249,8 @@ function Notification(props: NotificationProps) {
           iconName={action.iconName}
           justifyCenter
           bgColor={theme.scale.gray[9]}
-          color={theme.scale.green[6]}
-          outlineColor={theme.scale.green[7]}
+          color={action.color}
+          outlineColor={action.color}
           onClick={action.handleClick}
           key={action.label}
         />

@@ -3,7 +3,7 @@ import ButtonBase from "@mui/material/ButtonBase"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 import _ from "lodash"
-import { MouseEvent, useContext, useEffect, useState } from "react"
+import React, { MouseEvent, useContext, useEffect, useState } from "react"
 import { useLongPress } from "use-long-press"
 import useTheme from "../common/useTheme"
 import { Button } from "./button"
@@ -413,6 +413,18 @@ function ItemOptions(props: ItemOptionsProps) {
     if (!props.show) setShowDeleteConfirmation(false)
   }, [props.show])
 
+  function handleClick(option: ListItemOptionProps) {
+    if (option.onClick) {
+      if (option.iconName === "delete") {
+        setShowDeleteConfirmation(true)
+        setHandleDelete({ onDelete: option.onClick })
+      } else {
+        option.onClick()
+        props.setShow(false)
+      }
+    }
+  }
+
   return (
     props.show && (
       <Window
@@ -424,55 +436,57 @@ function ItemOptions(props: ItemOptionsProps) {
           outlineOffset: "-2px",
         }}
       >
-        <Window
-          direction={"row"}
+        <Slot
+          height={"100%"}
           position={"relative"}
           borderRadius={theme.module[3]}
           justifyContent={"space-evenly"}
         >
-          {props.options.map((option: ListItemOptionProps, index: number) => {
-            const isDelete = option.iconName === "delete"
-            function onClick() {
-              if (option.onClick) {
-                if (isDelete) {
-                  setShowDeleteConfirmation(true)
-                  setHandleDelete({ onDelete: option.onClick })
-                } else {
-                  option.onClick()
-                  props.setShow(false)
-                }
-              }
-            }
-
-            return (
-              <>
-                <Button
-                  variation={"pill"}
-                  onClick={onClick}
-                  iconName={option.iconName}
-                  key={index}
-                />
-                {index !== props.options.length && <Divider vertical />}
-              </>
-            )
-          })}
+          <OptionButtons options={props.options} onClick={handleClick} />
           <Button
             variation={"pill"}
             onClick={() => props.setShow(false)}
             iconName={"cancel"}
-            key={props.options.length}
+            key={"button_last"}
           />
           {showDeleteConfirmation && (
             <ItemOptionDeleteConfirmation
               setShowOptions={props.setShow}
               setShow={setShowDeleteConfirmation}
               onDelete={handleDelete.onDelete}
+              key={"delete_confirmation"}
             />
           )}
-        </Window>
+        </Slot>
       </Window>
     )
   )
+}
+/*
+
+
+
+
+
+*/
+type OptionButtonsProps = {
+  options: ListItemOptionProps[]
+  onClick: (option: ListItemOptionProps) => void
+}
+function OptionButtons(props: OptionButtonsProps) {
+  const theme = useTheme()
+  return props.options.map((option: ListItemOptionProps, index: number) => {
+    return (
+      <React.Fragment key={`option_${index}`}>
+        <Button
+          variation={"pill"}
+          onClick={() => props.onClick(option)}
+          iconName={option.iconName}
+        />
+        {index !== props.options.length && <Divider vertical />}
+      </React.Fragment>
+    )
+  })
 }
 /*
 
@@ -493,12 +507,12 @@ function ItemOptionDeleteConfirmation(
 
   function handleAccept() {
     !!props.onDelete && props.onDelete()
-    props.setShow(false)
-    props.setShowOptions(false)
+    handleCancel()
   }
 
   function handleCancel() {
     props.setShow(false)
+    props.setShowOptions(false)
   }
 
   return (

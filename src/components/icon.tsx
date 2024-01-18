@@ -36,6 +36,7 @@ import NotificationIcon from "@mui/icons-material/NotificationsActive"
 import ProfileIcon from "@mui/icons-material/PersonRounded"
 import SubmitIcon from "@mui/icons-material/Publish"
 import RetryIcon from "@mui/icons-material/ReplayRounded"
+import DeclineIcon from "@mui/icons-material/BlockRounded"
 import ObsoleteIcon from "@mui/icons-material/ScheduleRounded"
 import SearchIcon from "@mui/icons-material/SearchRounded"
 import UseableIcon from "@mui/icons-material/SellRounded"
@@ -105,6 +106,7 @@ export type IconNames =
   | "warning"
   | "checklist"
   | "useable"
+  | "decline"
   | "obsolete"
   | "damaged"
   | "step"
@@ -186,6 +188,17 @@ export default function Icon(props: IconProps) {
           ...styles,
           ...props.sx,
           color: props.color ? props.color : theme.scale.gray[4],
+        }}
+      />
+    ),
+    decline: (
+      <DeclineIcon
+        fontSize={fontSize}
+        fontWeight={props.fontWeight}
+        sx={{
+          ...styles,
+          ...props.sx,
+          color: props.color ? props.color : theme.scale.red[5],
         }}
       />
     ),

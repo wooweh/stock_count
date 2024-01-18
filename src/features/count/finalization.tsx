@@ -35,6 +35,8 @@ import {
   PreparationItemProps,
 } from "./preparation"
 import { Slot, Window } from "../../components/surface"
+import React from "react"
+import { Divider } from "../../components/divider"
 /*
 
 
@@ -104,8 +106,11 @@ function FinalizationItems() {
   ]
   return (
     <>
-      {finalItems.map((item: FinalizationItemsProps) => (
-        <FinalizationItem {...item} key={item.label} />
+      {finalItems.map((item: FinalizationItemsProps, index: number) => (
+        <React.Fragment key={item.label}>
+          <FinalizationItem {...item} key={item.label} />
+          {index !== finalItems.length - 1 && <Divider variant={"fullWidth"} />}
+        </React.Fragment>
       ))}
     </>
   )

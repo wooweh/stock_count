@@ -151,8 +151,10 @@ function ChooseTeamButton(props: ChooseTeamButtonProps) {
       variation={"profile"}
       label={`Add ${props.isSolo ? "Counter" : "Counters"}`}
       iconName={"addMembers"}
+      color={theme.scale.blue[6]}
+      iconColor={theme.scale.blue[6]}
       onClick={() => setCountUI("isAddingMembers", true)}
-      outlineColor={theme.scale.gray[6]}
+      outlineColor={theme.scale.blue[6]}
       justifyCenter
     />
   )

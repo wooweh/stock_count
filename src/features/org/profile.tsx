@@ -98,7 +98,12 @@ function OrgNameHeader() {
   return (
     <Stack width={"100%"} gap={theme.module[3]}>
       <ClickAwayListener onClickAway={() => setOrgUI("isEditing", false)}>
-        <Slot gap={theme.module[5]}>
+        <Stack
+          width={"100%"}
+          alignItems={"center"}
+          direction={"row"}
+          gap={theme.module[5]}
+        >
           <Input
             disabled={!isEditing}
             value={newOrgName}
@@ -117,7 +122,7 @@ function OrgNameHeader() {
               iconName={isEditing ? "done" : "edit"}
             />
           )}
-        </Slot>
+        </Stack>
       </ClickAwayListener>
       <Stack
         direction={"row"}

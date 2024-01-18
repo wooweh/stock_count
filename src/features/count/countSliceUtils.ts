@@ -501,15 +501,16 @@ export function prepareManagedCountMembers(
 ) {
   const updatedMembers: CountMembersProps = { ...members }
   _.forEach(addedMembers, (memberUuid) => {
+    const isOrganiser = !!members[memberUuid]?.isOrganiser
     const orgMember = orgMembers![memberUuid]
     const member = _.omit(orgMember, "role")
     const countMember: CountMemberProps = {
       ...member,
-      isOrganiser: false,
+      isOrganiser: isOrganiser,
       isCounter: true,
-      isJoined: false,
-      isCounting: false,
-      step: "dashboard",
+      isJoined: isOrganiser,
+      isCounting: isOrganiser,
+      step: isOrganiser ? "review" : "dashboard",
     }
     _.set(updatedMembers, memberUuid, countMember)
   })

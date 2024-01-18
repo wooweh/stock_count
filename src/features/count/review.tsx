@@ -192,18 +192,22 @@ function CounterSummaryItem({
   const name = getMemberShortName(members[uuid])
   const step = members[uuid].step
   const isCounting = members[uuid].isCounting
+  const isDeclined = members[uuid].isDeclined
 
   const actionColors = {
-    Reviewing: theme.scale.green[6],
-    Counting: theme.scale.orange[6],
-    Away: theme.scale.red[6],
+    reviewing: theme.scale.green[6],
+    counting: theme.scale.orange[6],
+    away: theme.scale.gray[5],
+    declined: theme.scale.red[5],
   }
   const action =
     step === "review" && isCounting
-      ? "Reviewing"
+      ? "reviewing"
       : step === "stockCount" && isCounting
-      ? "Counting"
-      : "Away"
+      ? "counting"
+      : isDeclined
+      ? "declined"
+      : "away"
   const actionColor = actionColors[action]
 
   return (
@@ -250,7 +254,7 @@ function CounterSummaryItem({
         >
           <Icon variation={"step"} fontSize={"small"} color={actionColor} />
           <Typography variant={"body2"} fontWeight={"bold"} color={actionColor}>
-            {action}
+            {_.capitalize(action)}
           </Typography>
         </Stack>
       </Stack>

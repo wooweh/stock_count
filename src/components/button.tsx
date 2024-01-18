@@ -44,7 +44,7 @@ type ButtonVariationProps = {
 }
 export function Button(props: ButtonProps) {
   const theme = useTheme()
-  const duration = props.animationDuration ? props.animationDuration : 150
+  const duration = props.animationDuration ? props.animationDuration : 0
   const throttleDuration = duration + 250
 
   const handleClick = _.throttle(

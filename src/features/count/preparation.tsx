@@ -1,16 +1,18 @@
 import { ClickAwayListener, Stack, Typography } from "@mui/material"
 import _ from "lodash"
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useLocation } from "react-router-dom"
 import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { Button } from "../../components/button"
 import { Input } from "../../components/control"
+import { Divider } from "../../components/divider"
 import { ErrorBoundary } from "../../components/errorBoundary"
 import Icon from "../../components/icon"
 import { List } from "../../components/list"
 import { ListItem } from "../../components/listItem"
 import Modal, { ModalActionProps } from "../../components/modal"
+import { Window } from "../../components/surface"
 import { selectOrgCountChecksList } from "../org/orgSliceSelectors"
 import {
   addCountUIArrayItem,
@@ -22,7 +24,6 @@ import {
 import { CountSteps } from "./countSlice"
 import { selectIsUserJustOrganiser } from "./countSliceSelectors"
 import { startCount } from "./countSliceUtils"
-import { Window } from "../../components/surface"
 /*
 
 
@@ -93,8 +94,11 @@ function PreparationItems() {
 
   return (
     <>
-      {prepItems.map((item: PreparationItemProps) => (
-        <PreparationItem {...item} key={item.label} />
+      {prepItems.map((item: PreparationItemProps, index: number) => (
+        <React.Fragment key={item.label}>
+          <PreparationItem {...item} key={item.label} />
+          {index !== prepItems.length - 1 && <Divider variant={"fullWidth"} />}
+        </React.Fragment>
       ))}
     </>
   )
@@ -114,7 +118,7 @@ export function PreparationItem(props: PreparationItemProps) {
   const theme = useTheme()
 
   return (
-    <Stack gap={theme.module[3]} height={"47.5%"} width={"100%"}>
+    <Stack gap={theme.module[3]} height={"45%"} width={"100%"}>
       <Stack
         paddingLeft={theme.module[1]}
         paddingRight={theme.module[1]}
@@ -234,7 +238,6 @@ type CommentsListProps = {
 }
 export function CommentsList(props: CommentsListProps) {
   const theme = useTheme()
-  console.log(props.comments)
 
   return (
     <List maxHeight={"100%"} gapScale={1}>
@@ -286,13 +289,10 @@ function CommentListItem(props: CommentListProps) {
 
   function handleAccept() {
     props.handleAccept(props.index, value)
-    console.log(value)
-    console.log("fired")
     setIsEditing(false)
   }
 
   function handleDelete() {
-    console.log(props.comment)
     props.handleDelete(props.comment)
     setIsEditing(false)
   }
