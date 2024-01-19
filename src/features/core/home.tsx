@@ -28,7 +28,7 @@ import { routePaths } from "./pages"
 
 
 */
-export function Home() {
+export default function Home() {
   const theme = useTheme()
   const location = useLocation()
 
@@ -223,7 +223,7 @@ function HomeButtons() {
       icon: "list",
       iconColor: theme.scale.blue[7],
       outlineColor: theme.scale.blue[8],
-      bgColor: theme.scale.blue[9],
+      bgColor: theme.scale.gray[9],
       path: routePaths.count.path,
     },
     {
@@ -231,7 +231,7 @@ function HomeButtons() {
       icon: "stock",
       iconColor: theme.scale.green[7],
       outlineColor: theme.scale.green[8],
-      bgColor: theme.scale.green[9],
+      bgColor: theme.scale.gray[9],
       path: routePaths.stock.path,
     },
     {
@@ -239,7 +239,7 @@ function HomeButtons() {
       icon: "history",
       iconColor: theme.scale.yellow[7],
       outlineColor: theme.scale.yellow[8],
-      bgColor: theme.scale.yellow[9],
+      bgColor: theme.scale.gray[9],
       path: routePaths.history.path,
     },
   ]
@@ -253,14 +253,13 @@ function HomeButtons() {
           variation="profile"
           label={orgName}
           iconName="org"
-          bgColor={theme.scale.gray[9]}
+          bgColor={theme.scale.gray[7]}
           iconColor={theme.scale.gray[5]}
-          color={theme.scale.gray[5]}
+          color={theme.scale.gray[4]}
           outlineColor={theme.scale.gray[6]}
           iconSize="large"
           onClick={() => navigate(routePaths.org.path)}
           justifyCenter
-          animationDuration={150}
         />
       </Slot>
       <Stack
@@ -282,7 +281,6 @@ function HomeButtons() {
               iconColor={button.iconColor}
               outlineColor={button.outlineColor}
               onClick={() => navigate(button.path)}
-              animationDuration={150}
             />
           )
         })}

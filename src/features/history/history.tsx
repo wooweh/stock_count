@@ -47,7 +47,7 @@ export function resetHistoryUI() {
 
 
 */
-export function History() {
+export default function History() {
   const location = useLocation()
   const historyUIState = useHistoryUI((state) => state)
   const path = location.pathname

@@ -97,7 +97,6 @@ function ProfileButton(props: ButtonVariationProps) {
     padding: `${theme.module[4]} ${theme.module[5]}`,
     color: props.color ?? theme.scale.gray[3],
     borderRadius: theme.module[3],
-    boxShadow: theme.shadow.neo[props.boxShadowScale ?? 3],
     width: "100%",
     outlineOffset: "-2px",
     outline: `2px solid ${
@@ -224,9 +223,10 @@ function HomeButton(props: ButtonVariationProps) {
         </Window>
         <Window
           padding={theme.module[3]}
-          bgcolor={theme.scale.gray[9]}
+          bgcolor={theme.scale.gray[8]}
           height={"min-content"}
-          borderRadius={theme.module[3]}
+          borderRadius={`0 0 ${theme.module[3]} ${theme.module[3]}`}
+          borderTop={`2px solid ${theme.scale.gray[7]}`}
         >
           <Typography color={props.color ?? theme.scale.gray[5]} variant="h5">
             {props.label}

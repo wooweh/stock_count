@@ -73,7 +73,7 @@ export function resetUserUI() {
 
 
 */
-export function UserProfile() {
+export default function UserProfile() {
   const location = useLocation()
   const userUIState = useUserUI((state) => state)
   const path = location.pathname

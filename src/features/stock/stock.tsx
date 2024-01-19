@@ -51,7 +51,7 @@ export function resetStockUI() {
 
 
 */
-export function Stock() {
+export default function Stock() {
   const location = useLocation()
   const stockUIState = useStockUI((state) => state)
   const path = location.pathname

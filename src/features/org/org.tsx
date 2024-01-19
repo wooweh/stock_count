@@ -61,7 +61,7 @@ export function resetOrgUI() {
 
 
 */
-export function Org() {
+export default function Org() {
   const location = useLocation()
 
   const isProfileComplete = useAppSelector(selectIsProfileComplete)

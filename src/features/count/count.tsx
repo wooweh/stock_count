@@ -183,7 +183,7 @@ export function resetCountUI() {
 
 
 */
-export function Count() {
+export default function Count() {
   const location = useLocation()
   const countUIState = useCountUI((state) => state)
   const path = location.pathname

@@ -18,7 +18,7 @@ export function Loader({ narration }: { narration: string }) {
     justifyContent: "center",
     alignItems: "center",
     borderRadius: theme.module[3],
-    outline: `2px solid ${theme.scale.blue[7]}`,
+    outline: `2px solid ${theme.scale.gray[7]}`,
   }
   const firstChar = narration.charAt(0).toUpperCase()
   const modifiedNarration = firstChar + narration.slice(1)
@@ -42,12 +42,12 @@ export function Loader({ narration }: { narration: string }) {
         <Icon
           variation="stock"
           fontSize="large"
-          color={theme.scale.blue[8]}
+          color={theme.scale.gray[7]}
           sx={{ transform: "scale(1.5)" }}
         />
       </SquareLoader>
-      <Typography color={theme.scale.blue[8]} variant="h6">
-        {modifiedNarration} ...
+      <Typography color={theme.scale.gray[6]} variant="h6">
+        {modifiedNarration}
       </Typography>
     </Window>
   )

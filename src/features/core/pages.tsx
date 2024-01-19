@@ -1,23 +1,33 @@
-import { ReactElement, useEffect } from "react"
+import { ReactElement, Suspense, lazy, useEffect } from "react"
 import { useResizeDetector } from "react-resize-detector"
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom"
 import { useAppSelector } from "../../app/hooks"
 import Container from "../../components/container"
-import { Count, resetCountUI } from "../count/count"
+import { ErrorBoundary } from "../../components/errorBoundary"
+import { Loader } from "../../components/loader"
+import { resetCountUI } from "../count/count"
 import { selectIsUserCounting } from "../count/countSliceSelectors"
-import { History, resetHistoryUI } from "../history/history"
-import { Org, resetOrgUI } from "../org/org"
-import { Stock, resetStockUI } from "../stock/stock"
-import {
-  AuthWrapper,
-  Authentication,
-  resetAuthUI,
-} from "../user/authentication"
-import { UserProfile, resetUserUI } from "../user/user"
+import { resetHistoryUI } from "../history/history"
+import { resetOrgUI } from "../org/org"
+import { resetStockUI } from "../stock/stock"
+import { AuthWrapper, resetAuthUI } from "../user/authentication"
+import { resetUserUI } from "../user/user"
 import { toggleMobile } from "./coreSliceUtils"
 import { getRoutePaths } from "./coreUtils"
-import { Home } from "./home"
-import { ErrorBoundary } from "../../components/errorBoundary"
+// import { Authentication } from "../user/authentication"
+// import { Home } from "./home"
+// import { Stock } from "../stock/stock"
+// import { Count } from "../count/count"
+// import { History } from "../history/history"
+// import { Org } from "../org/org"
+// import { UserProfile } from "../user/user"
+const Authentication = lazy(() => import("../user/authentication"))
+const Home = lazy(() => import("./home"))
+const Stock = lazy(() => import("../stock/stock"))
+const Count = lazy(() => import("../count/count"))
+const History = lazy(() => import("../history/history"))
+const Org = lazy(() => import("../org/org"))
+const UserProfile = lazy(() => import("../user/user"))
 /*
 
 
