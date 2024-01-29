@@ -24,6 +24,7 @@ import {
 import { CountSteps } from "./countSlice"
 import { selectIsUserJustOrganiser } from "./countSliceSelectors"
 import { startCount } from "./countSliceUtils"
+import { Fade } from "../../components/fade"
 /*
 
 
@@ -41,10 +42,12 @@ export function PreparationBody() {
       featurePath={path}
       state={{ featureUI: { ...countUIState } }}
     >
-      <Outer>
-        <PreparationItems />
-        <StartCountConfirmation />
-      </Outer>
+      <Fade>
+        <Outer>
+          <PreparationItems />
+          <StartCountConfirmation />
+        </Outer>
+      </Fade>
     </ErrorBoundary>
   )
 }

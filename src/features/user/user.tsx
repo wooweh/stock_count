@@ -1,3 +1,4 @@
+import { ClickAwayListener } from "@mui/material"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 import _ from "lodash"
@@ -26,6 +27,8 @@ import {
 } from "./userSliceSelectors"
 import { removeUser, updateUserName } from "./userSliceUtils"
 import { checkNewPassword, getPasswordValidation } from "./userUtils"
+import { selectIsMobile } from "../core/coreSliceSelectors"
+import { Fade } from "../../components/fade"
 /*
 
 
@@ -73,7 +76,7 @@ export function resetUserUI() {
 
 
 */
-export default function UserProfile() {
+export function UserProfile() {
   const location = useLocation()
   const userUIState = useUserUI((state) => state)
   const path = location.pathname
@@ -84,13 +87,15 @@ export default function UserProfile() {
       featurePath={path}
       state={{ featureUI: { ...userUIState } }}
     >
-      <ProfileWrapper>
-        <ProfileFields />
-        <ButtonTray />
-        <ChangePassword />
-        <ChangeEmail />
-        <DeleteProfileConfirmation />
-      </ProfileWrapper>
+      <Fade>
+        <ProfileWrapper>
+          <ProfileFields />
+          <ButtonTray />
+          <ChangePassword />
+          <ChangeEmail />
+          <DeleteProfileConfirmation />
+        </ProfileWrapper>
+      </Fade>
     </ErrorBoundary>
   )
 }
@@ -103,6 +108,7 @@ export default function UserProfile() {
 function ProfileFields() {
   const theme = useTheme()
 
+  const isMobile = useAppSelector(selectIsMobile)
   const name = useAppSelector(selectUserName)
   const email = useAppSelector(selectUserEmail)
 
@@ -116,6 +122,11 @@ function ProfileFields() {
     if (name?.last) setUserUI("surname", name.last)
     if (email && !editableEmail) setUserUI("email", email)
   }, [isEditing, name, email])
+
+  function handleClick(e: any) {
+    e.stopImmediatePropagation()
+    setUserUI("isEditing", false)
+  }
 
   const fields: ProfileFieldProps[] = [
     {
@@ -136,16 +147,28 @@ function ProfileFields() {
   ]
 
   return (
-    <Stack gap={theme.module[5]} width={"100%"}>
-      {fields.map((field: ProfileFieldProps, index: number) => (
-        <ProfileField
-          label={field.label}
-          value={field.value ?? ""}
-          handleChange={field.handleChange}
-          key={field.label}
-        />
-      ))}
-    </Stack>
+    <ClickAwayListener onClickAway={handleClick}>
+      <Stack
+        gap={theme.module[5]}
+        padding={theme.module[isMobile ? 2 : 4]}
+        boxSizing={"border-box"}
+        borderRadius={theme.module[4]}
+        width={"100%"}
+        sx={{
+          outline: `1px solid ${theme.scale.gray[7]}`,
+          outlineOffset: "-1px",
+        }}
+      >
+        {fields.map((field: ProfileFieldProps, index: number) => (
+          <ProfileField
+            label={field.label}
+            value={field.value ?? ""}
+            handleChange={field.handleChange}
+            key={field.label}
+          />
+        ))}
+      </Stack>
+    </ClickAwayListener>
   )
 }
 /*

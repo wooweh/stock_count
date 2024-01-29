@@ -11,6 +11,7 @@ import { selectIsProfileComplete } from "../user/userSliceSelectors"
 import { selectIsJoining, selectIsOrgSetup } from "./orgSliceSelectors"
 import { OrgProfile } from "./profile"
 import { OrgSetup } from "./setup"
+import { Fade } from "../../components/fade"
 /*
 
 
@@ -61,7 +62,7 @@ export function resetOrgUI() {
 
 
 */
-export default function Org() {
+export function Org() {
   const location = useLocation()
 
   const isProfileComplete = useAppSelector(selectIsProfileComplete)
@@ -89,17 +90,19 @@ export default function Org() {
       featurePath={path}
       state={{ featureUI: { ...orgUIState } }}
     >
-      {!isProfileComplete ? (
-        <CompleteProfilePrompt />
-      ) : !isEmailVerified ? (
-        <VerifyEmailPrompt />
-      ) : isJoiningOrg ? (
-        <Loader narration={"joining org"} />
-      ) : isOrgSetup ? (
-        <OrgProfile />
-      ) : (
-        <OrgSetup />
-      )}
+      <Fade>
+        {!isProfileComplete ? (
+          <CompleteProfilePrompt />
+        ) : !isEmailVerified ? (
+          <VerifyEmailPrompt />
+        ) : isJoiningOrg ? (
+          <Loader narration={"joining org"} />
+        ) : isOrgSetup ? (
+          <OrgProfile />
+        ) : (
+          <OrgSetup />
+        )}
+      </Fade>
     </ErrorBoundary>
   )
 }

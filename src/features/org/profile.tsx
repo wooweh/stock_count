@@ -38,6 +38,7 @@ import {
   updateOrgName,
 } from "./orgSliceUtils"
 import { getMemberName } from "./orgUtils"
+import { selectIsMobile } from "../core/coreSliceSelectors"
 /*
 
 
@@ -75,6 +76,7 @@ export function OrgProfile() {
 function OrgNameHeader() {
   const theme = useTheme()
 
+  const isMobile = useAppSelector(selectIsMobile)
   const orgName = useAppSelector(selectOrgName) as string
   const isAdmin = useAppSelector(selectIsUserAdmin)
 
@@ -96,7 +98,14 @@ function OrgNameHeader() {
   }
 
   return (
-    <Stack width={"100%"} gap={theme.module[3]}>
+    <Stack
+      borderRadius={theme.module[4]}
+      width={"100%"}
+      gap={theme.module[3]}
+      padding={theme.module[3]}
+      boxSizing={"border-box"}
+      sx={{ outline: `1px solid ${theme.scale.gray[7]}` }}
+    >
       <ClickAwayListener onClickAway={() => setOrgUI("isEditing", false)}>
         <Stack
           width={"100%"}

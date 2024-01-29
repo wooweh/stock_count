@@ -18,7 +18,7 @@ export default function Core() {
 
   return (
     <ErrorBoundary componentName={"Core"} featurePath={path}>
-      <Window>
+      <Window justifyContent={"center"} bgcolor={"blue"}>
         <Bar />
         <DBListeners />
         <Notifications />

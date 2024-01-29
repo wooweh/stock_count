@@ -17,7 +17,7 @@ import Icon from "../../components/icon"
 import { Loader } from "../../components/loader"
 import { Slot, Window } from "../../components/surface"
 import { selectIsSystemBooted } from "../core/coreSliceSelectors"
-import Home from "../core/home"
+import { Home } from "../core/home"
 import { Route, routePaths } from "../core/pages"
 import { register, resetPassword, signIn } from "./userAuth"
 import { selectIsSignedIn } from "./userSliceSelectors"
@@ -104,7 +104,7 @@ export function AuthWrapper({ route }: { route: Route }) {
 
 
 */
-export default function Authentication({
+export function Authentication({
   isRegistering = false,
 }: {
   isRegistering?: boolean
@@ -119,9 +119,16 @@ export default function Authentication({
       featurePath={path}
       state={{ featureUI: { ...authUIState } }}
     >
-      <AuthenticationInput isRegistering={isRegistering} />
-      <SigningInLoader />
-      <VerifyEmailPrompt />
+      <Stack
+        width={"100%"}
+        height={"100%"}
+        justifyContent={"center"}
+        alignItems={"center"}
+      >
+        <AuthenticationInput isRegistering={isRegistering} />
+        <SigningInLoader />
+        <VerifyEmailPrompt />
+      </Stack>
     </ErrorBoundary>
   )
 }
@@ -283,7 +290,6 @@ function ButtonTray({ isRegistering }: { isRegistering: boolean }) {
         label={navigationLabel}
         onClick={() => navigate(path)}
         color={theme.scale.blue[6]}
-        animationDuration={0}
       />
     </Slot>
   )
@@ -316,7 +322,9 @@ function ForgotPassword({ isRegistering }: { isRegistering: boolean }) {
     >
       <Button
         variation={"pill"}
-        label={"Forgot password"}
+        label={`Forgot password ${
+          isDisabled ? "(Enter your email address)" : ""
+        }`}
         onClick={handleClick}
         disabled={isDisabled}
         color={theme.scale.orange[6]}

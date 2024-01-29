@@ -1,12 +1,12 @@
-import { Stack } from "@mui/material"
 import { useLocation } from "react-router-dom"
 import { create } from "zustand"
 import { createJSONStorage, persist } from "zustand/middleware"
 import useTheme from "../../common/useTheme"
 import { ErrorBoundary } from "../../components/errorBoundary"
+import { Fade } from "../../components/fade"
+import { Window } from "../../components/surface"
 import { HistoryList } from "./historyList"
 import { Review } from "./review"
-import { Window } from "../../components/surface"
 /*
 
 
@@ -47,7 +47,7 @@ export function resetHistoryUI() {
 
 
 */
-export default function History() {
+export function History() {
   const location = useLocation()
   const historyUIState = useHistoryUI((state) => state)
   const path = location.pathname
@@ -58,9 +58,11 @@ export default function History() {
       featurePath={path}
       state={{ featureUI: { ...historyUIState } }}
     >
-      <Outer>
-        <HistoryBody />
-      </Outer>
+      <Fade>
+        <Outer>
+          <HistoryBody />
+        </Outer>
+      </Fade>
     </ErrorBoundary>
   )
 }

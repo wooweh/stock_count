@@ -1,5 +1,6 @@
 import { Stack, Typography } from "@mui/material"
 import _ from "lodash"
+import React from "react"
 import { useLocation } from "react-router-dom"
 import { useAppSelector } from "../../app/hooks"
 import useTheme, { ThemeColors } from "../../common/useTheme"
@@ -8,12 +9,14 @@ import {
   formatDuration,
   formatLongDate,
 } from "../../common/utils"
+import { Divider } from "../../components/divider"
 import { ErrorBoundary } from "../../components/errorBoundary"
+import { Fade } from "../../components/fade"
 import Icon, { IconNames } from "../../components/icon"
 import Modal, { ModalActionProps } from "../../components/modal"
+import { Slot, Window } from "../../components/surface"
 import { getMemberShortName } from "../org/orgUtils"
 import {
-  CountUIState,
   addCountUIArrayItem,
   editCountUIArrayItem,
   removeCountUIArrayItem,
@@ -34,9 +37,6 @@ import {
   PreparationItem as FinalizationItem,
   PreparationItemProps,
 } from "./preparation"
-import { Slot, Window } from "../../components/surface"
-import React from "react"
-import { Divider } from "../../components/divider"
 /*
 
 
@@ -54,10 +54,12 @@ export function FinalizationBody() {
       featurePath={path}
       state={{ featureUI: { ...countUIState } }}
     >
-      <Outer>
-        <FinalizationItems />
-        <FinalizeCountConfirmation />
-      </Outer>
+      <Fade>
+        <Outer>
+          <FinalizationItems />
+          <FinalizeCountConfirmation />
+        </Outer>
+      </Fade>
     </ErrorBoundary>
   )
 }

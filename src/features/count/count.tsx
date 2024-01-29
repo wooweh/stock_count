@@ -10,6 +10,7 @@ import { Window } from "../../components/surface"
 import { CountTypes } from "./countSlice"
 import { leaveCount, removeCount } from "./countSliceUtils"
 import { Steps } from "./steps"
+import { Fade } from "../../components/fade"
 /*
 
 
@@ -183,7 +184,7 @@ export function resetCountUI() {
 
 
 */
-export default function Count() {
+export function Count() {
   const location = useLocation()
   const countUIState = useCountUI((state) => state)
   const path = location.pathname
@@ -195,9 +196,11 @@ export default function Count() {
         featurePath={path}
         state={{ featureUI: { ...countUIState } }}
       >
-        <Steps />
-        <LeaveCountConfirmation />
-        <DeleteCountConfirmation />
+        <Fade>
+          <Steps />
+          <LeaveCountConfirmation />
+          <DeleteCountConfirmation />
+        </Fade>
       </ErrorBoundary>
     </>
   )

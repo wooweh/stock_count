@@ -1,33 +1,26 @@
-import { ReactElement, Suspense, lazy, useEffect } from "react"
+import { ReactElement, useEffect } from "react"
 import { useResizeDetector } from "react-resize-detector"
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom"
 import { useAppSelector } from "../../app/hooks"
+import useTheme from "../../common/useTheme"
 import Container from "../../components/container"
 import { ErrorBoundary } from "../../components/errorBoundary"
-import { Loader } from "../../components/loader"
-import { resetCountUI } from "../count/count"
+import { Window } from "../../components/surface"
+import { Count, resetCountUI } from "../count/count"
 import { selectIsUserCounting } from "../count/countSliceSelectors"
-import { resetHistoryUI } from "../history/history"
-import { resetOrgUI } from "../org/org"
-import { resetStockUI } from "../stock/stock"
-import { AuthWrapper, resetAuthUI } from "../user/authentication"
-import { resetUserUI } from "../user/user"
+import { History, resetHistoryUI } from "../history/history"
+import { Org, resetOrgUI } from "../org/org"
+import { Stock, resetStockUI } from "../stock/stock"
+import {
+  AuthWrapper,
+  Authentication,
+  resetAuthUI,
+} from "../user/authentication"
+import { UserProfile, resetUserUI } from "../user/user"
+import { selectIsMobile } from "./coreSliceSelectors"
 import { toggleMobile } from "./coreSliceUtils"
 import { getRoutePaths } from "./coreUtils"
-// import { Authentication } from "../user/authentication"
-// import { Home } from "./home"
-// import { Stock } from "../stock/stock"
-// import { Count } from "../count/count"
-// import { History } from "../history/history"
-// import { Org } from "../org/org"
-// import { UserProfile } from "../user/user"
-const Authentication = lazy(() => import("../user/authentication"))
-const Home = lazy(() => import("./home"))
-const Stock = lazy(() => import("../stock/stock"))
-const Count = lazy(() => import("../count/count"))
-const History = lazy(() => import("../history/history"))
-const Org = lazy(() => import("../org/org"))
-const UserProfile = lazy(() => import("../user/user"))
+import { Home } from "./home"
 /*
 
 
@@ -104,10 +97,12 @@ export const routePaths = getRoutePaths(routes)
 
 */
 export function Pages() {
+  const theme = useTheme()
   const location = useLocation()
   const navigate = useNavigate()
   const { width, ref } = useResizeDetector()
 
+  const isMobile = useAppSelector(selectIsMobile)
   const isUserCounting = useAppSelector(selectIsUserCounting)
 
   const path = location.pathname
@@ -140,19 +135,28 @@ export function Pages() {
 
   return (
     <Container resizeRef={ref}>
-      <ErrorBoundary componentName={"Pages"} featurePath={path}>
-        <Routes>
-          {routes.map((route: any, index: number) => {
-            return (
-              <Route
-                path={route.path}
-                element={<AuthWrapper route={route} />}
-                key={index}
-              />
-            )
-          })}
-        </Routes>
-      </ErrorBoundary>
+      <Window
+        minWidth={"350px"}
+        maxWidth={"700px"}
+        justifyContent={"center"}
+        borderRadius={isMobile ? 0 : theme.module[4]}
+        margin={isMobile ? 0 : theme.module[4]}
+        overflow={"hidden"}
+      >
+        <ErrorBoundary componentName={"Pages"} featurePath={path}>
+          <Routes>
+            {routes.map((route: any, index: number) => {
+              return (
+                <Route
+                  path={route.path}
+                  element={<AuthWrapper route={route} />}
+                  key={index}
+                />
+              )
+            })}
+          </Routes>
+        </ErrorBoundary>
+      </Window>
     </Container>
   )
 }

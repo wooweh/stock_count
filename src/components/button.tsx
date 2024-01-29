@@ -43,7 +43,6 @@ type ButtonVariationProps = {
   sx?: any
 }
 export function Button(props: ButtonProps) {
-  const theme = useTheme()
   const duration = props.animationDuration ? props.animationDuration : 0
   const throttleDuration = duration + 250
 
@@ -60,7 +59,6 @@ export function Button(props: ButtonProps) {
     ...props,
     sx: {
       ...props.sx,
-      maxWidth: "450px",
     },
     onClick: handleClick,
   }
@@ -190,10 +188,9 @@ function HomeButton(props: ButtonVariationProps) {
     borderRadius: theme.module[3],
     overflow: "visible",
     justifyContent: "flex-start",
-    outline: `2px solid ${
+    outline: `3px solid ${
       props.outlineColor ?? theme.scale.gray[6]
     } !important`,
-    outlineOffset: "-2px",
     ...props.sx,
   }
 
@@ -208,7 +205,7 @@ function HomeButton(props: ButtonVariationProps) {
       <Window height={"min-content"} gap={0}>
         <Window
           height={"min-content"}
-          bgcolor={props.bgColor ?? theme.scale.gray[9]}
+          bgcolor={theme.scale.gray[9]}
           borderRadius={`${theme.module[3]} ${theme.module[3]} 0 0`}
           padding={theme.module[5]}
         >
@@ -226,7 +223,8 @@ function HomeButton(props: ButtonVariationProps) {
           bgcolor={theme.scale.gray[8]}
           height={"min-content"}
           borderRadius={`0 0 ${theme.module[3]} ${theme.module[3]}`}
-          borderTop={`2px solid ${theme.scale.gray[7]}`}
+          borderTop={`2px solid ${props.outlineColor}`}
+          boxShadow={theme.shadow.neo[1]}
         >
           <Typography color={props.color ?? theme.scale.gray[5]} variant="h5">
             {props.label}

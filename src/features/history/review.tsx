@@ -16,6 +16,8 @@ import {
 import { PieChart, PieChartDataProps } from "../../components/chart"
 import { downloadCSVTemplate } from "../../components/csvParser"
 import { ErrorBoundary } from "../../components/errorBoundary"
+import { Fade } from "../../components/fade"
+import { Slot, Window } from "../../components/surface"
 import VirtualizedTable from "../../components/table"
 import {
   prepareSoloResultsTableColumns,
@@ -43,7 +45,6 @@ import {
   HistoryItemResultsProps,
 } from "./historySlice"
 import { selectHistory } from "./historySliceSelectors"
-import { Slot, Window } from "../../components/surface"
 /*
 
 
@@ -61,11 +62,13 @@ export function Review() {
       featurePath={path}
       state={{ featureUI: { ...historyUIState } }}
     >
-      <Outer>
-        <Header />
-        <Body />
-        <ButtonTray />
-      </Outer>
+      <Fade>
+        <Outer>
+          <Header />
+          <Body />
+          <ButtonTray />
+        </Outer>
+      </Fade>
     </ErrorBoundary>
   )
 }
@@ -185,10 +188,12 @@ function Body() {
 */
 function Details(props: Required<HistoryItemMetadataProps>) {
   return (
-    <Window justifyContent={"space-evenly"}>
-      <DetailsList {...props} />
-      <DurationChart {...props} />
-    </Window>
+    <Fade>
+      <Window justifyContent={"space-evenly"}>
+        <DetailsList {...props} />
+        <DurationChart {...props} />
+      </Window>
+    </Fade>
   )
 }
 /*
@@ -308,18 +313,20 @@ function Comments(props: HistoryItemCommentsProps) {
   const theme = useTheme()
 
   return (
-    <Window padding={theme.module[2]} gap={theme.module[4]}>
-      <CommentBlock
-        label="Preparation"
-        color={theme.scale.blue[6]}
-        comments={props.preparation}
-      />
-      <CommentBlock
-        label="Finalization"
-        color={theme.scale.orange[6]}
-        comments={props.finalization}
-      />
-    </Window>
+    <Fade>
+      <Window padding={theme.module[2]} gap={theme.module[4]}>
+        <CommentBlock
+          label="Preparation"
+          color={theme.scale.blue[6]}
+          comments={props.preparation}
+        />
+        <CommentBlock
+          label="Finalization"
+          color={theme.scale.orange[6]}
+          comments={props.finalization}
+        />
+      </Window>
+    </Fade>
   )
 }
 /*
@@ -372,26 +379,28 @@ function Results(props: Required<HistoryItemResultsProps>) {
   const columns = prepareSoloResultsTableColumns()
 
   return (
-    <Window justifyContent={"space-between"}>
-      <Slot>
-        <VirtualizedTable rows={rows} columns={columns} />
-      </Slot>
-      <Slot padding={theme.module[1]}>
-        <Button
-          variation={"modal"}
-          label={"Download CSV"}
-          iconName={"download"}
-          outlineColor={theme.scale.gray[6]}
-          bgColor={theme.scale.gray[9]}
-          onClick={() => downloadCSVTemplate(rows)}
-          sx={{
-            borderRadius: theme.module[2],
-            boxShadow: "none",
-            padding: theme.module[4],
-          }}
-        />
-      </Slot>
-    </Window>
+    <Fade>
+      <Window justifyContent={"space-between"}>
+        <Slot>
+          <VirtualizedTable rows={rows} columns={columns} />
+        </Slot>
+        <Slot padding={theme.module[1]}>
+          <Button
+            variation={"modal"}
+            label={"Download CSV"}
+            iconName={"download"}
+            outlineColor={theme.scale.gray[6]}
+            bgColor={theme.scale.gray[9]}
+            onClick={() => downloadCSVTemplate(rows)}
+            sx={{
+              borderRadius: theme.module[2],
+              boxShadow: "none",
+              padding: theme.module[4],
+            }}
+          />
+        </Slot>
+      </Window>
+    </Fade>
   )
 }
 /*

@@ -1,4 +1,4 @@
-import { ClickAwayListener } from "@mui/material"
+import { ClickAwayListener, Fade } from "@mui/material"
 import ButtonBase from "@mui/material/ButtonBase"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
@@ -367,7 +367,7 @@ export function ListItemWithOptions(props: ListItemWithOptionsProps) {
 
   return (
     <ClickAwayListener onClickAway={() => setShowOptions(false)}>
-      <Stack position={"relative"}>
+      <Stack position={"relative"} width={"100%"}>
         <ListItem
           label={props.label}
           description={props.description}
@@ -427,38 +427,43 @@ function ItemOptions(props: ItemOptionsProps) {
 
   return (
     props.show && (
-      <Window
-        bgcolor={theme.scale.gray[9]}
-        position={"absolute"}
-        borderRadius={theme.module[2]}
-        sx={{
-          outline: `2px solid ${theme.scale.gray[6]}`,
-          outlineOffset: "-2px",
-        }}
-      >
-        <Slot
+      <Fade in appear>
+        <Stack
+          width={"100%"}
           height={"100%"}
-          position={"relative"}
-          borderRadius={theme.module[3]}
-          justifyContent={"space-evenly"}
+          bgcolor={theme.scale.gray[9]}
+          position={"absolute"}
+          borderRadius={theme.module[2]}
+          sx={{
+            outline: `2px solid ${theme.scale.gray[6]}`,
+            outlineOffset: "-2px",
+          }}
         >
-          <OptionButtons options={props.options} onClick={handleClick} />
-          <Button
-            variation={"pill"}
-            onClick={() => props.setShow(false)}
-            iconName={"cancel"}
-            key={"button_last"}
-          />
-          {showDeleteConfirmation && (
-            <ItemOptionDeleteConfirmation
-              setShowOptions={props.setShow}
-              setShow={setShowDeleteConfirmation}
-              onDelete={handleDelete.onDelete}
-              key={"delete_confirmation"}
+          <Slot
+            height={"100%"}
+            position={"relative"}
+            borderRadius={theme.module[3]}
+            justifyContent={"space-evenly"}
+          >
+            <OptionButtons options={props.options} onClick={handleClick} />
+            <Button
+              variation={"pill"}
+              onClick={() => props.setShow(false)}
+              iconName={"cancel"}
+              sx={{ width: "30%" }}
+              key={"button_last"}
             />
-          )}
-        </Slot>
-      </Window>
+            {showDeleteConfirmation && (
+              <ItemOptionDeleteConfirmation
+                setShowOptions={props.setShow}
+                setShow={setShowDeleteConfirmation}
+                onDelete={handleDelete.onDelete}
+                key={"delete_confirmation"}
+              />
+            )}
+          </Slot>
+        </Stack>
+      </Fade>
     )
   )
 }
@@ -482,6 +487,7 @@ function OptionButtons(props: OptionButtonsProps) {
           variation={"pill"}
           onClick={() => props.onClick(option)}
           iconName={option.iconName}
+          sx={{ width: "30%" }}
         />
         {index !== props.options.length && <Divider vertical />}
       </React.Fragment>

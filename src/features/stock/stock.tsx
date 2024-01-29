@@ -10,6 +10,7 @@ import { StockList } from "./stockList"
 import { StockItemProps } from "./stockSlice"
 import { UploadItems } from "./uploadItems"
 import { Window } from "../../components/surface"
+import { Fade } from "../../components/fade"
 /*
 
 
@@ -51,7 +52,7 @@ export function resetStockUI() {
 
 
 */
-export default function Stock() {
+export function Stock() {
   const location = useLocation()
   const stockUIState = useStockUI((state) => state)
   const path = location.pathname
@@ -62,12 +63,14 @@ export default function Stock() {
       featurePath={path}
       state={{ featureUI: { ...stockUIState } }}
     >
-      <Outer>
-        <StockList />
-        <AddItem />
-        <UploadItems />
-        <EditItem />
-      </Outer>
+      <Fade>
+        <Outer>
+          <StockList />
+          <AddItem />
+          <UploadItems />
+          <EditItem />
+        </Outer>
+      </Fade>
     </ErrorBoundary>
   )
 }

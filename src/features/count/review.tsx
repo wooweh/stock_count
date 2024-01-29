@@ -4,8 +4,10 @@ import { useLocation } from "react-router-dom"
 import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { ErrorBoundary } from "../../components/errorBoundary"
+import { Fade } from "../../components/fade"
 import Icon from "../../components/icon"
 import Modal, { ModalActionProps } from "../../components/modal"
+import { Slot, Window } from "../../components/surface"
 import VirtualizedTable from "../../components/table"
 import { MembersProps } from "../org/orgSlice"
 import { selectOrgMembers } from "../org/orgSliceSelectors"
@@ -39,7 +41,6 @@ import {
   prepareTeamResultsTableColumns,
   prepareTeamResultsTableRows,
 } from "./countUtils"
-import { Slot, Window } from "../../components/surface"
 /*
 
 
@@ -57,9 +58,11 @@ export function ReviewBody() {
       featurePath={path}
       state={{ featureUI: { ...countUIState } }}
     >
-      <Outer>
-        <Body />
-      </Outer>
+      <Fade>
+        <Outer>
+          <Body />
+        </Outer>
+      </Fade>
     </ErrorBoundary>
   )
 }

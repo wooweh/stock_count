@@ -168,6 +168,7 @@ function Search(props: SearchProps) {
               styling={{
                 border: `2px solid ${props.borderColor ?? theme.scale.gray[6]}`,
                 backgroundColor: theme.scale.gray[7],
+                hoverBackgroundColor: theme.scale.gray[6],
                 color: theme.scale.gray[4],
                 iconColor: theme.scale.gray[5],
                 lineColor: theme.scale.gray[5],

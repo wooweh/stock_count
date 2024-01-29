@@ -20,6 +20,7 @@ export function ProfileWrapper({
       borderRadius={theme.module[4]}
       maxWidth={"700px"}
       gap={theme.module[5]}
+      
     >
       {children}
     </Window>

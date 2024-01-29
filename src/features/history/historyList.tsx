@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom"
 import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { ErrorBoundary } from "../../components/errorBoundary"
+import { Fade } from "../../components/fade"
 import { ListItemOptionProps } from "../../components/listItem"
 import { ManagedList } from "../../components/managedList"
 import { SearchItemProps } from "../../components/searchBar"
@@ -32,9 +33,11 @@ export function HistoryList() {
       featurePath={path}
       state={{ featureUI: { ...historyUIState } }}
     >
-      <Outer>
-        <HistoryManagementList />
-      </Outer>
+      <Fade>
+        <Outer>
+          <HistoryManagementList />
+        </Outer>
+      </Fade>
     </ErrorBoundary>
   )
 }

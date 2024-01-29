@@ -37,6 +37,7 @@ import {
   updateCountStep,
   updateUserCountMember,
 } from "./countSliceUtils"
+import { Fade } from "../../components/fade"
 /*
 
 
@@ -54,11 +55,13 @@ export function DashboardBody() {
       featurePath={path}
       state={{ featureUI: { ...countUIState } }}
     >
-      <Outer>
-        <Body />
-        <ButtonTray />
-        <PrepCheckList />
-      </Outer>
+      <Fade>
+        <Outer>
+          <Body />
+          <ButtonTray />
+          <PrepCheckList />
+        </Outer>
+      </Fade>
     </ErrorBoundary>
   )
 }

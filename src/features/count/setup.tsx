@@ -6,11 +6,13 @@ import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
 import { Button, ToggleButtonGroup } from "../../components/button"
 import { ErrorBoundary } from "../../components/errorBoundary"
+import { Fade } from "../../components/fade"
 import Icon from "../../components/icon"
 import { List } from "../../components/list"
 import { ListItem } from "../../components/listItem"
 import Modal, { ModalActionProps } from "../../components/modal"
-import { Slot } from "../../components/surface"
+import { Slot, Window } from "../../components/surface"
+import { selectIsMobile } from "../core/coreSliceSelectors"
 import { generateCustomNotification } from "../core/coreUtils"
 import { MemberProps } from "../org/orgSlice"
 import { getMemberName, getMemberShortName } from "../org/orgUtils"
@@ -41,6 +43,7 @@ import {
 export function SetupBody() {
   const theme = useTheme()
   const location = useLocation()
+  const isMobile = useAppSelector(selectIsMobile)
   const countUIState = useCountUI((state) => state)
   const path = location.pathname
 
@@ -50,13 +53,15 @@ export function SetupBody() {
       featurePath={path}
       state={{ featureUI: { ...countUIState } }}
     >
-      <Outer>
-        <Stack width={"100%"} gap={theme.module[5]}>
-          <SetupOptions />
-          <AddMembers />
-        </Stack>
-        <WarningBox />
-      </Outer>
+      <Fade>
+        <Outer>
+          <Stack width={"100%"} gap={theme.module[isMobile ? 5 : 7]}>
+            <SetupOptions />
+            <AddMembers />
+          </Stack>
+          <WarningBox />
+        </Outer>
+      </Fade>
     </ErrorBoundary>
   )
 }
@@ -73,13 +78,9 @@ function Outer({
 }) {
   const theme = useTheme()
   return (
-    <Stack
-      height={"100%"}
-      justifyContent={"space-between"}
-      alignItems={"center"}
-    >
+    <Window justifyContent={"space-between"} alignItems={"center"}>
       {children}
-    </Stack>
+    </Window>
   )
 }
 /*
@@ -438,7 +439,10 @@ function CountersList() {
                     onClick={handleDelete}
                   />
                 }
-                sx={{ padding: theme.module[2], paddingLeft: theme.module[4] }}
+                sx={{
+                  padding: theme.module[2],
+                  paddingLeft: theme.module[4],
+                }}
                 key={name}
               />
             )

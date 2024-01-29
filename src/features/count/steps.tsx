@@ -8,6 +8,7 @@ import { getTimeStamp } from "../../common/utils"
 import Animation from "../../components/animation"
 import { Button } from "../../components/button"
 import { ErrorBoundary } from "../../components/errorBoundary"
+import { Fade } from "../../components/fade"
 import { IconNames } from "../../components/icon"
 import { Slot, Window } from "../../components/surface"
 import { resetCountUI, setCountUI, useCountUI } from "./count"
@@ -255,26 +256,28 @@ function StepLabel({ label }: { label: string }) {
   const isUserCounting = useAppSelector(selectIsUserCounting)
 
   return (
-    <Stack
-      direction={"row"}
-      gap={theme.module[2]}
-      alignItems={"center"}
-      paddingLeft={theme.module[4]}
-      paddingRight={isUserCounting ? 0 : theme.module[4]}
-      boxSizing={"border-box"}
-      height={STEP_LABEL_HEIGHT}
-    >
-      <Typography fontWeight={"bold"} variant={"subtitle1"} noWrap>
-        {label}
-      </Typography>
-      {isUserCounting && (
-        <Button
-          variation={"pill"}
-          iconName={"options"}
-          onClick={() => setCountUI("isCountOptionsOpen", true)}
-        />
-      )}
-    </Stack>
+    <Fade appear in>
+      <Stack
+        direction={"row"}
+        gap={theme.module[2]}
+        alignItems={"center"}
+        paddingLeft={theme.module[4]}
+        paddingRight={isUserCounting ? 0 : theme.module[4]}
+        boxSizing={"border-box"}
+        height={STEP_LABEL_HEIGHT}
+      >
+        <Typography fontWeight={"bold"} variant={"subtitle1"} noWrap>
+          {label}
+        </Typography>
+        {isUserCounting && (
+          <Button
+            variation={"pill"}
+            iconName={"options"}
+            onClick={() => setCountUI("isCountOptionsOpen", true)}
+          />
+        )}
+      </Stack>
+    </Fade>
   )
 }
 /*

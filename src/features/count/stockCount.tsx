@@ -9,10 +9,12 @@ import { formatCommaSeparatedNumber } from "../../common/utils"
 import { Button } from "../../components/button"
 import { Input } from "../../components/control"
 import { ErrorBoundary } from "../../components/errorBoundary"
+import { Fade } from "../../components/fade"
 import Icon, { IconNames } from "../../components/icon"
 import { ListItem } from "../../components/listItem"
 import Modal, { ModalActionProps } from "../../components/modal"
 import { SearchBar, SearchItemProps } from "../../components/searchBar"
+import { Slot, Window } from "../../components/surface"
 import { StockItemProps } from "../stock/stockSlice"
 import { prepareStockSearchList } from "../stock/stockUtils"
 import {
@@ -22,19 +24,17 @@ import {
 import { setCountUI, useCountUI } from "./count"
 import { CountItemProps, CountTypes } from "./countSlice"
 import {
-  selectCount,
   selectCountType,
   selectModifiedUserCountResults,
   selectModifiedUserCountResultsList,
   selectRemainingDualStockList,
-  selectRemainingStockList,
+  selectRemainingStockList
 } from "./countSliceSelectors"
 import {
   addCountResultItem,
   removeCountResultsItem,
   updateCountResultItem,
 } from "./countSliceUtils"
-import { Slot, Window } from "../../components/surface"
 /*
 
 
@@ -52,11 +52,13 @@ export function StockCountBody() {
       featurePath={path}
       state={{ featureUI: { ...countUIState } }}
     >
-      <Outer>
-        <Body />
-        <AddStockItemButton />
-        <RecordStockItemCount />
-      </Outer>
+      <Fade>
+        <Outer>
+          <Body />
+          <AddStockItemButton />
+          <RecordStockItemCount />
+        </Outer>
+      </Fade>
     </ErrorBoundary>
   )
 }

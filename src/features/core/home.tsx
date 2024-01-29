@@ -22,13 +22,14 @@ import {
 import { updateUserName } from "../user/userSliceUtils"
 import { generateCustomNotification } from "./coreUtils"
 import { routePaths } from "./pages"
+import { Fade } from "../../components/fade"
 /*
 
 
 
 
 */
-export default function Home() {
+export function Home() {
   const theme = useTheme()
   const location = useLocation()
 
@@ -50,17 +51,19 @@ export default function Home() {
 
   return (
     <ErrorBoundary componentName={"Home"} featurePath={path}>
-      <Window bgcolor={theme.scale.gray[9]}>
-        {!isEmailVerified ? (
-          <VerifyEmailPrompt />
-        ) : !isProfileComplete ? (
-          <CompleteProfilePrompt />
-        ) : !isOrgSetup ? (
-          <SetupOrgPrompt />
-        ) : (
-          <HomeButtons />
-        )}
-      </Window>
+      <Fade>
+        <Window bgcolor={theme.scale.gray[9]}>
+          {!isEmailVerified ? (
+            <VerifyEmailPrompt />
+          ) : !isProfileComplete ? (
+            <CompleteProfilePrompt />
+          ) : !isOrgSetup ? (
+            <SetupOrgPrompt />
+          ) : (
+            <HomeButtons />
+          )}
+        </Window>
+      </Fade>
     </ErrorBoundary>
   )
 }

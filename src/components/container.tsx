@@ -20,16 +20,19 @@ export default function Container(props: ContainerProps) {
       ref={props.resizeRef}
       width={"100vw"}
       height={"100vh"}
-      // minHeight={"710px"}
-      // minWidth={"350px"}
-      // maxWidth={"820px"}
       paddingTop={theme.module[6]}
       bgcolor={theme.scale.gray[9]}
       bottom={0}
       alignItems="center"
       justifyContent="center"
       boxSizing={"border-box"}
-      overflow={"auto"}
+      onTouchStart={(e: any) => {
+        e.stopPropagation()
+      }}
+      onTouchEnd={(e: any) => {
+        e.stopPropagation()
+      }}
+      // overflow={"auto"}
     >
       {props.children}
     </Stack>
