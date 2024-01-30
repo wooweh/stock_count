@@ -10,6 +10,7 @@ import Icon from "../../components/icon"
 import { Slot } from "../../components/surface"
 import { selectIsUserCounting } from "../count/countSliceSelectors"
 import { selectIsSystemBooted } from "./coreSliceSelectors"
+import { getNetworkStateAttributes } from "./coreUtils"
 import { Menu } from "./menu"
 import { routePaths, routes } from "./pages"
 /*
@@ -83,25 +84,9 @@ function NavigationBar() {
 function CountBanner() {
   const theme = useTheme()
   const networkState = useNetworkState()
-  const isWifi = networkState.type === "wifi"
-  const isOnline = networkState.online
-  const speed = networkState.downlink ?? 0
-  const slow = speed < 1
-  const medium = speed >= 1 && speed < 10
-  const color = slow
-    ? theme.scale.red[6]
-    : medium
-    ? theme.scale.orange[6]
-    : theme.scale.green[6]
-  const status = isOnline
-    ? slow
-      ? "Slow"
-      : medium
-      ? "Medium"
-      : "Fast"
-    : "Offline"
 
-  const iconName = isWifi ? "wifi" : "cellular"
+  const network = getNetworkStateAttributes(networkState)
+  const color = theme.scale[network.statusColor as keyof typeof theme.scale][5]
 
   return (
     <Slot
@@ -121,14 +106,14 @@ function CountBanner() {
         </Typography>
       </Stack>
       <Slot gap={theme.module[3]} justifyContent={"flex-end"}>
-        <Icon variation={iconName} color={color} fontSize="small" />
+        <Icon variation={network.iconName} color={color} fontSize="small" />
         <Typography
           fontWeight={"medium"}
           color={color}
           variant={"caption"}
           lineHeight={0}
         >
-          {status}
+          {network.status}
         </Typography>
       </Slot>
     </Slot>

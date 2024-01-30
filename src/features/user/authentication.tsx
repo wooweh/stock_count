@@ -167,6 +167,7 @@ function AuthenticationInput({ isRegistering }: { isRegistering: boolean }) {
 */
 function Outer({ children }: { children: any }) {
   const theme = useTheme()
+
   return (
     <Stack
       width={"100%"}
@@ -189,6 +190,7 @@ function Outer({ children }: { children: any }) {
 */
 function Logo() {
   const theme = useTheme()
+  
   return (
     <Slot gap={theme.module[2]} justifyContent={"flex-start"}>
       <Icon variation="stock" color={theme.scale.gray[5]} />

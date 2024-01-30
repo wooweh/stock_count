@@ -38,7 +38,6 @@ import {
   updateOrgName,
 } from "./orgSliceUtils"
 import { getMemberName } from "./orgUtils"
-import { selectIsMobile } from "../core/coreSliceSelectors"
 /*
 
 
@@ -76,7 +75,6 @@ export function OrgProfile() {
 function OrgNameHeader() {
   const theme = useTheme()
 
-  const isMobile = useAppSelector(selectIsMobile)
   const orgName = useAppSelector(selectOrgName) as string
   const isAdmin = useAppSelector(selectIsUserAdmin)
 
@@ -309,7 +307,6 @@ function MemberListItem({ member }: { member: MemberProps }) {
 
 */
 function InvitesList() {
-  const invites = useAppSelector(selectOrgInvitesList)
   const isViewingInvites = useOrgUI((state) => state.isViewingInvites)
 
   function handleClose() {

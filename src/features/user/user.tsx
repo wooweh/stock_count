@@ -11,9 +11,11 @@ import useTheme from "../../common/useTheme"
 import { Button } from "../../components/button"
 import { Input } from "../../components/control"
 import { ErrorBoundary } from "../../components/errorBoundary"
+import { Fade } from "../../components/fade"
 import { Loader } from "../../components/loader"
 import Modal, { ModalActionProps } from "../../components/modal"
 import { ProfileWrapper, Slot } from "../../components/surface"
+import { selectIsMobile } from "../core/coreSliceSelectors"
 import { generateNotification } from "../core/coreUtils"
 import { PasswordValidationCheck } from "./authentication"
 import { changeEmail, changePassword } from "./userAuth"
@@ -27,8 +29,6 @@ import {
 } from "./userSliceSelectors"
 import { removeUser, updateUserName } from "./userSliceUtils"
 import { checkNewPassword, getPasswordValidation } from "./userUtils"
-import { selectIsMobile } from "../core/coreSliceSelectors"
-import { Fade } from "../../components/fade"
 /*
 
 
@@ -351,6 +351,7 @@ function ChangeEmail() {
 
   const newEmail = useUserUI((state) => state.email)
   const isChangingEmail = useUserUI((state) => state.isChangingEmail)
+
   const [password, setPassword] = useState("")
 
   const isCredentialsComplete = !!newEmail && !!oldEmail && !!password

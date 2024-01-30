@@ -13,7 +13,10 @@ import { Fade } from "../../components/fade"
 import Icon, { IconNames } from "../../components/icon"
 import { Slot, Window } from "../../components/surface"
 import { auth } from "../../remote"
-import { selectIsCountInvitePending, selectIsUserOrganiser } from "../count/countSliceSelectors"
+import {
+  selectIsCountInvitePending,
+  selectIsUserOrganiser,
+} from "../count/countSliceSelectors"
 import { selectIsOrgSetup, selectOrgName } from "../org/orgSliceSelectors"
 import { SetupOrgPrompt } from "../org/setup"
 import { codeSettings, sendEmailVerification } from "../user/userAuth"
@@ -223,7 +226,6 @@ function HomeButtons() {
   const isAdmin = useAppSelector(selectIsUserAdmin)
   const isOrganiser = useAppSelector(selectIsUserOrganiser)
   const isInvitePending = useAppSelector(selectIsCountInvitePending)
-  console.log(isInvitePending)
 
   const adminButtons: HomeButton[] = [
     {

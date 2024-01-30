@@ -1,12 +1,14 @@
 import _ from "lodash"
 import "react-toastify/dist/ReactToastify.css"
+import { IUseNetworkState } from "react-use/lib/useNetworkState"
 import { v4 as uuidv4 } from "uuid"
 import { store } from "../../app/store"
+import { ThemeColors } from "../../common/useTheme"
+import { IconNames } from "../../components/icon"
 import { NotificationProps, NotificationTypes } from "./coreSlice"
 import { showNotification } from "./coreSliceUtils"
 import { Route } from "./pages"
 /*
-
 
 
 
@@ -34,6 +36,48 @@ export function getRoutePaths(routes: Route[]): GetRoutePathsReturnProps {
 }
 /*
 
+
+
+
+*/
+export type getNetworkStateAttributesReturnProps = {
+  isWifi: boolean
+  isOnline: boolean
+  status: "slow" | "medium" | "fast" | "offline"
+  statusColor: ThemeColors
+  iconName: IconNames
+}
+export function getNetworkStateAttributes(
+  networkState: IUseNetworkState,
+): getNetworkStateAttributesReturnProps {
+  const downlink = networkState.downlink ?? 0
+  const isWifi = networkState.type === "wifi"
+  const isOnline = networkState.online ?? false
+  const iconName = isWifi ? "wifi" : "cellular"
+  const status = isOnline
+    ? downlink < 1
+      ? "slow"
+      : downlink >= 1 && downlink < 10
+      ? "medium"
+      : "fast"
+    : "offline"
+  const statusColor = !isOnline
+    ? "gray"
+    : status === "slow"
+    ? "red"
+    : status === "medium"
+    ? "orange"
+    : "green"
+
+  return {
+    isWifi,
+    isOnline,
+    status,
+    statusColor,
+    iconName,
+  }
+}
+/*
 
 
 
@@ -142,7 +186,6 @@ export function generateNotification(notification: NotificationNames) {
 
 
 
-
 */
 export async function generateCustomNotification(
   type: NotificationTypes,
@@ -152,7 +195,6 @@ export async function generateCustomNotification(
   showNotification(payload)
 }
 /*
-
 
 
 
@@ -171,7 +213,6 @@ export function prepareNotificationPayload(
 
 
 
-
 */
 export async function generateErrorNotification(errorCode: string) {
   if (errorCode === "auth/wrong-password")
@@ -183,7 +224,6 @@ export async function generateErrorNotification(errorCode: string) {
     generateNotification("tooManyFailedAttempts")
 }
 /*
-
 
 
 

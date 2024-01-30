@@ -9,11 +9,11 @@ import { Switch } from "../../components/control"
 import { ErrorBoundary } from "../../components/errorBoundary"
 import Icon, { IconNames } from "../../components/icon"
 import { ListItem } from "../../components/listItem"
+import { Window } from "../../components/surface"
 import { signOut } from "../user/userAuth"
 import { selectIsDarkmode } from "./coreSliceSelectors"
 import { toggleDarkmode } from "./coreSliceUtils"
 import { routePaths } from "./pages"
-import { Window } from "../../components/surface"
 /*
 
 
