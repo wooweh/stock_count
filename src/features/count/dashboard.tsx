@@ -17,6 +17,7 @@ import { trimEmptyLines } from "../../common/utils"
 import { Button } from "../../components/button"
 import { Input } from "../../components/control"
 import { ErrorBoundary } from "../../components/errorBoundary"
+import { Fade } from "../../components/fade"
 import Icon from "../../components/icon"
 import Modal, { ModalActionProps } from "../../components/modal"
 import { Slot, Window } from "../../components/surface"
@@ -24,9 +25,11 @@ import { selectOrgCountChecksList } from "../org/orgSliceSelectors"
 import { selectIsUserAdmin } from "../user/userSliceSelectors"
 import { resetCountUI, setCountUI, useCountUI } from "./count"
 import {
+  selectCountMetadata,
   selectIsCountInProgress,
   selectIsCountInvitePending,
   selectIsUserAwayFromCount,
+  selectUserCountMember,
   selectUserCountMemberStep,
 } from "./countSliceSelectors"
 import {
@@ -37,7 +40,6 @@ import {
   updateCountStep,
   updateUserCountMember,
 } from "./countSliceUtils"
-import { Fade } from "../../components/fade"
 /*
 
 
@@ -90,6 +92,10 @@ function Body() {
   const isInvitePending = useAppSelector(selectIsCountInvitePending)
   const isAwayFromCount = useAppSelector(selectIsUserAwayFromCount)
   const isCountInProgress = useAppSelector(selectIsCountInProgress)
+  const userCountMember = useAppSelector(selectUserCountMember)
+
+  console.log(isInvitePending)
+  console.log(userCountMember)
 
   return (
     <Window
@@ -181,6 +187,7 @@ function CountPrompt() {
 
   const isAdmin = useAppSelector(selectIsUserAdmin)
   const isCountInProgress = useAppSelector(selectIsCountInProgress)
+  const countMetadata = useAppSelector(selectCountMetadata)
 
   const typographyProps: TypographyProps = {
     variant: "h6",

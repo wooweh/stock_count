@@ -28,7 +28,7 @@ import {
   selectModifiedUserCountResults,
   selectModifiedUserCountResultsList,
   selectRemainingDualStockList,
-  selectRemainingStockList
+  selectRemainingStockList,
 } from "./countSliceSelectors"
 import {
   addCountResultItem,

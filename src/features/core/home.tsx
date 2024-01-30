@@ -9,9 +9,11 @@ import useTheme from "../../common/useTheme"
 import { Button } from "../../components/button"
 import { Input } from "../../components/control"
 import { ErrorBoundary } from "../../components/errorBoundary"
+import { Fade } from "../../components/fade"
 import Icon, { IconNames } from "../../components/icon"
 import { Slot, Window } from "../../components/surface"
 import { auth } from "../../remote"
+import { selectIsCountInvitePending, selectIsUserOrganiser } from "../count/countSliceSelectors"
 import { selectIsOrgSetup, selectOrgName } from "../org/orgSliceSelectors"
 import { SetupOrgPrompt } from "../org/setup"
 import { codeSettings, sendEmailVerification } from "../user/userAuth"
@@ -22,7 +24,6 @@ import {
 import { updateUserName } from "../user/userSliceUtils"
 import { generateCustomNotification } from "./coreUtils"
 import { routePaths } from "./pages"
-import { Fade } from "../../components/fade"
 /*
 
 
@@ -211,6 +212,7 @@ type HomeButton = {
   iconColor?: string
   bgColor?: string
   outlineColor?: string
+  showBadge?: boolean
   path: string
 }
 function HomeButtons() {
@@ -219,6 +221,9 @@ function HomeButtons() {
 
   const orgName = useAppSelector(selectOrgName)
   const isAdmin = useAppSelector(selectIsUserAdmin)
+  const isOrganiser = useAppSelector(selectIsUserOrganiser)
+  const isInvitePending = useAppSelector(selectIsCountInvitePending)
+  console.log(isInvitePending)
 
   const adminButtons: HomeButton[] = [
     {
@@ -228,6 +233,7 @@ function HomeButtons() {
       outlineColor: theme.scale.blue[8],
       bgColor: theme.scale.gray[9],
       path: routePaths.count.path,
+      showBadge: isInvitePending && !isOrganiser,
     },
     {
       label: "Stock",
@@ -283,6 +289,7 @@ function HomeButtons() {
               iconName={button.icon}
               iconColor={button.iconColor}
               outlineColor={button.outlineColor}
+              showBadge={button.showBadge}
               onClick={() => navigate(button.path)}
             />
           )

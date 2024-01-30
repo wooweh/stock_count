@@ -1,4 +1,4 @@
-import { onValue, ref } from "firebase/database"
+import { onChildChanged, onChildRemoved, onValue, ref } from "firebase/database"
 import _ from "lodash"
 import { useEffect } from "react"
 import { useLocation } from "react-router-dom"
@@ -8,7 +8,7 @@ import { getDBPath } from "../../remote/dbPaths"
 import {
   CountCheckProps,
   CountCommentsProps,
-  CountMemberResultsProps,
+  CountItemProps,
   CountMembersProps,
   CountMetadataProps,
 } from "../count/countSlice"
@@ -17,15 +17,17 @@ import {
   selectCountMetadata,
   selectCountersUuidList,
   selectIsUserCountResultsEmpty,
+  selectIsUserCounter,
   selectIsUserOrganiser,
 } from "../count/countSliceSelectors"
 import {
   removeCount,
+  removeCountResultsItem,
   updateCountChecks,
   updateCountComments,
-  updateCountMemberResults,
   updateCountMembers,
   updateCountMetadata,
+  updateCountResultItem,
 } from "../count/countSliceUtils"
 import { HistoryProps } from "../history/historySlice"
 import { updateHistory } from "../history/historySliceUtils"
@@ -35,14 +37,17 @@ import { leaveOrg, updateMemberStatus, updateOrg } from "../org/orgSliceUtils"
 import { StockProps } from "../stock/stockSlice"
 import { updateStock } from "../stock/stockSliceUtils"
 import { UserProps } from "../user/userSlice"
-import { selectUserOrgUuid, selectUserUuid } from "../user/userSliceSelectors"
+import {
+  selectUserOrgUuid,
+  selectUserUuid,
+  selectUserUuidString,
+} from "../user/userSliceSelectors"
 import { updateUser } from "../user/userSliceUtils"
 import {
   selectIsSystemActive,
   selectIsSystemBooting,
 } from "./coreSliceSelectors"
 import { setSystemIsBooted } from "./coreSliceUtils"
-import { routePaths } from "./pages"
 /*
 
 
@@ -168,18 +173,18 @@ export function StockDBListener() {
 export function CountDBListener() {
   const location = useLocation()
 
-  const userUuid = useAppSelector(selectUserUuid)
+  const userUuid = useAppSelector(selectUserUuidString)
   const orgUuid = useAppSelector(selectUserOrgUuid)
   const isSystemActive = useAppSelector(selectIsSystemActive)
   const localCountMembers = useAppSelector(selectCountMembers)
   const localCountMetadata = useAppSelector(selectCountMetadata)
   const isOrganiser = useAppSelector(selectIsUserOrganiser)
   const counterUuids = useAppSelector(selectCountersUuidList)
+  const isCounter = useAppSelector(selectIsUserCounter)
   const isUserCountResultsEmpty = useAppSelector(selectIsUserCountResultsEmpty)
 
-  const pathName = location.pathname
-  const isCountPath = pathName === routePaths.count.path
-  const isSafeToSync = !!userUuid && !!orgUuid && isSystemActive && isCountPath
+  const isSafeToSync =
+    !!userUuid && !!orgUuid && isSystemActive && (isCounter || isOrganiser)
 
   useEffect(() => {
     if (isSafeToSync) {
@@ -228,27 +233,58 @@ export function CountDBListener() {
           updateCountMetadata(dbCountMetadata)
         } else if (!!localCountMetadata && !isOrganiser) {
           removeCount()
+        } else if (isOrganiser) {
+          removeCount()
         }
       })
     }
   }, [isSafeToSync])
 
+  // useEffect(() => {
+  //   if (isSafeToSync) {
+  //     _.forEach(counterUuids, (uuid) => {
+  //       if (userUuid !== uuid || isUserCountResultsEmpty) {
+  //         const dbCounterResultsRef = ref(
+  //           dbReal,
+  //           getDBPath.count(orgUuid).memberResults(uuid).results,
+  //         )
+  //         onValue(dbCounterResultsRef, (snapshot) => {
+  //           const dbCounterResults: CountMemberResultsProps = snapshot.val()
+  //           if (!!dbCounterResults) {
+  //             updateCountMemberResults(uuid, dbCounterResults)
+  //           } else {
+  //             updateCountMemberResults(uuid, {})
+  //           }
+  //         })
+  //       }
+  //     })
+  //   }
+  // }, [isSafeToSync, counterUuids])
+
   useEffect(() => {
     if (isSafeToSync) {
-      _.forEach(counterUuids, (uuid) => {
-        if (userUuid !== uuid || isUserCountResultsEmpty) {
-          const dbCounterResultsRef = ref(
-            dbReal,
-            getDBPath.count(orgUuid).memberResults(uuid).results,
+      _.forEach(counterUuids, (memberUuid) => {
+        if (userUuid !== memberUuid || isUserCountResultsEmpty) {
+          onChildChanged(
+            ref(
+              dbReal,
+              getDBPath.count(orgUuid).memberResults(memberUuid).results,
+            ),
+            (data) => {
+              const result: CountItemProps = data.val()
+              updateCountResultItem(result, memberUuid)
+            },
           )
-          onValue(dbCounterResultsRef, (snapshot) => {
-            const dbCounterResults: CountMemberResultsProps = snapshot.val()
-            if (!!dbCounterResults) {
-              updateCountMemberResults(uuid, dbCounterResults)
-            } else {
-              updateCountMemberResults(uuid, {})
-            }
-          })
+          onChildRemoved(
+            ref(
+              dbReal,
+              getDBPath.count(orgUuid).memberResults(memberUuid).results,
+            ),
+            (data) => {
+              const result: CountItemProps = data.val()
+              removeCountResultsItem(result.id, memberUuid)
+            },
+          )
         }
       })
     }

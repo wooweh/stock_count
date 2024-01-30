@@ -46,18 +46,24 @@ export function prepareDualResultsTableRows(
 
   _.forIn(results, (value, key) => {
     const counterUuid = key
-    _.forIn(value, (value: CountItemProps, key) => {
+    const counterResults = value
+    _.forIn(counterResults, (value: CountItemProps, key) => {
+      const defaultItem: CountItemProps = {
+        id: "",
+        useableCount: 0,
+        damagedCount: 0,
+        obsoleteCount: 0,
+      }
+      const memberOneItem = memberCountList[0][key] ?? defaultItem
+      const memberTwoItem = memberCountList[1][key] ?? defaultItem
       const useableDiff = Math.abs(
-        memberCountList[0][key].useableCount -
-          memberCountList[1][key].useableCount,
+        memberOneItem.useableCount - memberTwoItem.useableCount,
       )
       const damagedDiff = Math.abs(
-        memberCountList[0][key].damagedCount -
-          memberCountList[1][key].damagedCount,
+        memberOneItem.damagedCount - memberTwoItem.damagedCount,
       )
       const obsoleteDiff = Math.abs(
-        memberCountList[0][key].obsoleteCount -
-          memberCountList[1][key].obsoleteCount,
+        memberOneItem.obsoleteCount - memberTwoItem.obsoleteCount,
       )
       const setInstructions = {
         [`${key}.id`]: key,

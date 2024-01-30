@@ -1,4 +1,4 @@
-import { Typography } from "@mui/material"
+import { Badge, Typography } from "@mui/material"
 import ButtonBase from "@mui/material/ButtonBase"
 import MuiToggleButton from "@mui/material/ToggleButton"
 import MuiToggleButtonGroup from "@mui/material/ToggleButtonGroup"
@@ -40,6 +40,7 @@ type ButtonVariationProps = {
   iconSize?: "small" | "medium" | "large"
   outlineColor?: string
   boxShadowScale?: number
+  showBadge?: boolean
   sx?: any
 }
 export function Button(props: ButtonProps) {
@@ -181,6 +182,7 @@ function ModalButton(props: ButtonVariationProps) {
 */
 function HomeButton(props: ButtonVariationProps) {
   const theme = useTheme()
+
   const styles = {
     opacity: props.disabled ? 0.5 : 1,
     background: theme.scale.gray[9],
@@ -209,14 +211,25 @@ function HomeButton(props: ButtonVariationProps) {
           borderRadius={`${theme.module[3]} ${theme.module[3]} 0 0`}
           padding={theme.module[5]}
         >
-          <Icon
-            color={props.iconColor ?? theme.scale.gray[5]}
-            variation={props.iconName as IconNames}
-            fontSize="large"
+          <Badge
+            badgeContent=" "
+            invisible={!props.showBadge}
             sx={{
-              transform: `scale(1.5)`,
+              "& .MuiBadge-badge": {
+                background: theme.scale.blue[5],
+                right: "-5px",
+              },
             }}
-          />
+          >
+            <Icon
+              color={props.iconColor ?? theme.scale.gray[5]}
+              variation={props.iconName as IconNames}
+              fontSize="large"
+              sx={{
+                transform: `scale(1.5)`,
+              }}
+            />
+          </Badge>
         </Window>
         <Window
           padding={theme.module[3]}

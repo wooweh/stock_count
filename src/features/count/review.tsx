@@ -137,7 +137,7 @@ function CounterReviewBody() {
 */
 function CounterSummary() {
   const theme = useTheme()
-  const results = useAppSelector(selectCountResults)!
+  const results = useAppSelector(selectCountResults)
   const counterUuids = useAppSelector(selectCountersUuidList)
 
   return (
@@ -157,9 +157,12 @@ function CounterSummary() {
       >
         {counterUuids.length ? (
           counterUuids.map((uuid) => {
+            const resultsCount = results?.[uuid]
+              ? Object.keys(results[uuid]).length
+              : 0
             return (
               <CounterSummaryItem
-                results={results[uuid]}
+                resultsCount={resultsCount}
                 uuid={uuid}
                 key={uuid}
               />
@@ -182,16 +185,16 @@ function CounterSummary() {
 */
 function CounterSummaryItem({
   uuid,
-  results,
+  resultsCount,
 }: {
   uuid: string
-  results: CountMemberResultsProps
+  resultsCount: number
 }) {
   const theme = useTheme()
 
   const members = useAppSelector(selectCountMembers) as CountMembersProps
 
-  const countValue = `${_.keys(results).length} items`
+  const countValue = `${resultsCount} items`
   const name = getMemberShortName(members[uuid])
   const step = members[uuid].step
   const isCounting = members[uuid].isCounting

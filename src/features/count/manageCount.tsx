@@ -207,10 +207,10 @@ function CountTeamDescription() {
   }
   return (
     <Typography variant="body2" color={theme.scale.gray[4]}>
-      <Action action={"Add"} color={"blue"} /> or{" "}
-      <Action action={"remove"} color={"red"} /> counters and{" "}
-      <Action action={"transfer"} color={"yellow"} /> counters{" "}
-      <Action action={"results"} color={"green"} /> to another counter.
+      Select members for {" "}
+      <Action action={"removal"} color={"red"} /> and/or {" "}
+      <Action action={"results transfer"} color={"yellow"} /> and{" "}
+      <Action action={"add"} color={"blue"} /> replacement members.
     </Typography>
   )
 }
