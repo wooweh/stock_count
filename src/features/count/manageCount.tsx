@@ -36,6 +36,7 @@ import {
   selectIsUserOrganiser,
 } from "./countSliceSelectors"
 import { updateCountStep, updateManagedCount } from "./countSliceUtils"
+import { getCountHeadCountRequirement } from "./countUtils"
 import { DataPill } from "./finalization"
 import { CountTypeToggleButtons, WarningBox } from "./setup"
 /*
@@ -541,27 +542,15 @@ function AddTempMembers() {
     tempAddedMemberUuids.length -
     tempRemovedMemberUuids.length
 
-  console.log(totalPotentialMembers)
-  console.log(tempRemovedMemberUuids.length)
-  console.log(selectedMemberUuids.length)
-  console.log(selectedMemberUuids)
-
-  //TODO: Refactor into Count utils function to reuse in Manage feature
-  const counterRequirements = {
-    solo: {
-      isMet: totalPotentialMembers === 1,
-      verbose: "1 Counter",
-    },
-    dual: {
-      isMet: totalPotentialMembers === 2,
-      verbose: "2 Counters",
-    },
-    team: {
-      isMet: totalPotentialMembers > 1,
-      verbose: "At least 2 Counters",
-    },
-  }
-  const requirement = counterRequirements[countType]
+  const requirement = getCountHeadCountRequirement(
+    [
+      ...selectedMemberUuids,
+      ...tempAddedMemberUuids,
+      ...selectedMemberUuids,
+      ..._.keys(countMembers),
+    ],
+    countType,
+  )
   const isRequirementMet = requirement.isMet
   const verbose = requirement.verbose
   const warningMessage = `${verbose} required for ${countType} count.`
