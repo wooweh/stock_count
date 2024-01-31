@@ -20,7 +20,7 @@ export function EditItem() {
     if (!!isEditing) {
       setId(isEditing.id)
       setName(isEditing.name)
-      setUnit(isEditing.description)
+      setUnit(isEditing.unit)
     }
   }, [isEditing])
 

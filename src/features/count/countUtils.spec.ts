@@ -2,8 +2,11 @@ import { describe, expect, expectTypeOf, it } from "vitest"
 import { ColumnData, ColumnGroupData, RowData } from "../../components/table"
 import { MembersProps } from "../org/orgSlice"
 import { StockProps } from "../stock/stockSlice"
-import { CountResultsProps } from "./countSlice"
+import { CountMembersProps, CountResultsProps, CountTypes } from "./countSlice"
 import {
+  getCountHeadCountRequirement,
+  getCountMember,
+  getReviewTableData,
   prepareDualResultsTableColumnGroups,
   prepareDualResultsTableColumns,
   prepareDualResultsTableRows,
@@ -57,12 +60,12 @@ describe("Count Utils", () => {
     mockStockId1: {
       id: "mockStockId1",
       name: "mockName1",
-      description: "mockDescription1",
+      unit: "mockDescription1",
     },
     mockStockId2: {
       id: "mockStockId2",
       name: "mockName2",
-      description: "mockDescription2",
+      unit: "mockDescription2",
     },
   }
 
@@ -141,4 +144,93 @@ describe("Count Utils", () => {
     expect(columnGroups[0].label).toEqual("Stock Item")
     expectTypeOf(columnGroups).toEqualTypeOf<ColumnGroupData[]>()
   })
+
+  it("should handle getCountHeadCountRequirement", () => {
+    const mockMemberUuids: string[] = ["mockCounterUuid1", "mockCounterUuid2"]
+    const mockCountType: CountTypes = "solo"
+    const headCountRequirement = getCountHeadCountRequirement(
+      mockMemberUuids,
+      mockCountType,
+    )
+    expect(headCountRequirement.verbose).toEqual("1 Counter")
+    expect(headCountRequirement.isMet).toEqual(false)
+  })
+
+  it("should handle getReviewTableData", () => {
+    const mockResults: CountResultsProps = {
+      mockCounterUuid1: {
+        mockStockId1: {
+          id: "mockStockId1",
+          useableCount: 1,
+          damagedCount: 2,
+          obsoleteCount: 3,
+        },
+      },
+      mockCounterUuid2: {
+        mockStockId2: {
+          id: "mockStockId2",
+          useableCount: 1,
+          damagedCount: 2,
+          obsoleteCount: 3,
+        },
+      },
+    }
+    const mockStock: StockProps = {
+      mockStockId1: {
+        id: "mockStockId1",
+        name: "mockName1",
+        unit: "mockDescription1",
+      },
+      mockStockId2: {
+        id: "mockStockId2",
+        name: "mockName2",
+        unit: "mockDescription2",
+      },
+    }
+    const mockCountType: CountTypes = "solo"
+    const tableData = getReviewTableData(
+      mockResults,
+      mockStock,
+      mockMembers,
+      mockCountType,
+    )
+    expect(tableData.rows[0].useable).toEqual("1")
+    expectTypeOf(tableData.rows).toEqualTypeOf<RowData[]>()
+  })
+
+  it("should handle getCountMember", () => {
+    const mockMembers: CountMembersProps = {
+      mockCounterUuid1: {
+        uuid: "mockCounterUuid1",
+        firstName: "John",
+        lastName: "Doe",
+        step: "dashboard",
+        isJoined: true,
+        isCounter: true,
+        isCounting: true,
+        isOrganiser: true,
+        isDeclined: false,
+      },
+      mockCounterUuid2: {
+        uuid: "mockCounterUuid2",
+        firstName: "Dane",
+        lastName: "Doe",
+        step: "dashboard",
+        isJoined: true,
+        isCounter: true,
+        isCounting: true,
+        isOrganiser: true,
+        isDeclined: false,
+      },
+    }
+    const member = getCountMember(mockMembers, "mockCounterUuid1")
+    expect(member.firstName).toEqual("John")
+    expect(member.lastName).toEqual("Doe")
+  })
 })
+/*
+
+
+
+
+*/

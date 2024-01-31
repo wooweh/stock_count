@@ -360,7 +360,7 @@ export const selectModifiedUserCountResultsList = createSelector(
                                     
                                     
 */
-export const selectRemainingStockList = createSelector(
+export const selectRemainingDefaultStockList = createSelector(
   [selectStock, selectCountResultsStockIdsList],
   (stock, ids) => _.filter(stock, (value, key) => !ids.includes(key)),
 )
@@ -384,6 +384,22 @@ export const selectRemainingDualStockList = createSelector(
   [selectStock, selectUserCountResultsIdsList],
   (stock, ids) => {
     return _.filter(stock, (value, key) => !ids.includes(key))
+  },
+)
+/*
+                                            
+                                            
+                                            
+                                            
+*/
+export const selectRemainingStockList = createSelector(
+  [
+    selectCountType,
+    selectRemainingDefaultStockList,
+    selectRemainingDualStockList,
+  ],
+  (countType, defaultList, dualList) => {
+    return countType === "dual" ? defaultList : dualList
   },
 )
 /*

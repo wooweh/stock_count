@@ -135,6 +135,7 @@ function Header() {
 */
 function Body() {
   const theme = useTheme()
+
   return (
     <Window height={"70%"} gap={theme.module[5]}>
       <CountType />
@@ -150,6 +151,7 @@ function Body() {
 */
 function CountType() {
   const theme = useTheme()
+
   return (
     <Stack width={"100%"} gap={theme.module[3]}>
       <Typography variant="h6">Count Type</Typography>
@@ -207,8 +209,7 @@ function CountTeamDescription() {
   }
   return (
     <Typography variant="body2" color={theme.scale.gray[4]}>
-      Select members for {" "}
-      <Action action={"removal"} color={"red"} /> and/or {" "}
+      Select members for <Action action={"removal"} color={"red"} /> and/or{" "}
       <Action action={"results transfer"} color={"yellow"} /> and{" "}
       <Action action={"add"} color={"blue"} /> replacement members.
     </Typography>
@@ -439,11 +440,13 @@ type CountTeamControlSlotProps = {
 }
 function CountTeamSlot(props: CountTeamControlSlotProps) {
   const theme = useTheme()
+
   const styles = {
     outline: `1px solid ${theme.scale.gray[8]}`,
     outlineOffset: "-1px",
     ...props.sx,
   }
+
   return (
     <Slot
       justifyContent={"space-between"}
@@ -465,6 +468,7 @@ function CountTeamSlot(props: CountTeamControlSlotProps) {
 */
 function CountTeamRightSlot({ children }: { children: React.ReactElement[] }) {
   const theme = useTheme()
+
   return (
     <Stack
       direction={"row"}
@@ -915,8 +919,6 @@ function UpdateCountButton() {
 
 */
 function UpdateCountConfirmation() {
-  const theme = useTheme()
-
   const userUuid = useAppSelector(selectUserUuidString)
   const isUserOrganiser = useAppSelector(selectIsUserOrganiser)
 
@@ -978,6 +980,9 @@ function UpdateCountConfirmationBody() {
   const summaryProps = { addedUuids, removedUuids, transferUuids }
   const path = location.pathname
 
+  const CONFIRMATION_MESSAGE =
+    "You are about to update the count. Confirm your changes before proceeding."
+
   return (
     <ErrorBoundary
       componentName="UpdateCountConfirmationBody"
@@ -985,10 +990,7 @@ function UpdateCountConfirmationBody() {
       state={{ featureUI: { ...countUIState }, component: { ...summaryProps } }}
     >
       <Stack width={"100%"} gap={theme.module[3]}>
-        <Typography textAlign={"center"}>
-          You are about to update the count. Confirm your changes before
-          proceeding.
-        </Typography>
+        <Typography textAlign={"center"}>{CONFIRMATION_MESSAGE}</Typography>
         <Typography
           fontWeight={"bold"}
           color={theme.scale.blue[6]}

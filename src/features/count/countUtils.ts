@@ -2,8 +2,14 @@ import _ from "lodash"
 import { formatCommaSeparatedNumber } from "../../common/utils"
 import { ColumnData, ColumnGroupData, RowData } from "../../components/table"
 import { MembersProps } from "../org/orgSlice"
+import { getMemberName, getMemberShortName } from "../org/orgUtils"
 import { StockProps } from "../stock/stockSlice"
-import { CountItemProps, CountResultsProps } from "./countSlice"
+import {
+  CountItemProps,
+  CountMembersProps,
+  CountResultsProps,
+  CountTypes,
+} from "./countSlice"
 /*
 
 
@@ -247,6 +253,97 @@ export function prepareTeamResultsTableColumnGroups(): ColumnGroupData[] {
     { label: "Counters", colSpan: 1 },
   ]
   return columnGroups
+}
+/*
+
+
+
+
+*/
+export function getCountMember(members: CountMembersProps, memberUuid: string) {
+  const shortName = getMemberShortName(members[memberUuid])
+  const longName = getMemberName(members[memberUuid])
+  const member = { ...members[memberUuid] }
+  const countStatus =
+    member.step === "review" && member.isCounting
+      ? "reviewing"
+      : member.step === "stockCount" && member.isCounting
+      ? "counting"
+      : member.isDeclined
+      ? "declined"
+      : "away"
+
+  return { ...member, shortName, longName, countStatus }
+}
+/*
+
+
+
+
+*/
+export function getReviewTableData(
+  results: CountResultsProps,
+  stock: StockProps,
+  members: MembersProps,
+  countType: CountTypes,
+) {
+  const tableData = {
+    solo: {
+      rows: () => prepareSoloResultsTableRows(results, stock),
+      columns: () => prepareSoloResultsTableColumns(),
+      columnGroups: () => prepareSoloResultsTableColumnGroups(),
+    },
+    dual: {
+      rows: () => prepareDualResultsTableRows(results, stock),
+      columns: () => prepareDualResultsTableColumns(results),
+      columnGroups: () => prepareDualResultsTableColumnGroups(results, members),
+    },
+    team: {
+      rows: () => prepareTeamResultsTableRows(results, stock, members),
+      columns: () => prepareTeamResultsTableColumns(),
+      columnGroups: () => prepareTeamResultsTableColumnGroups(),
+    },
+  }
+
+  const rows = tableData[countType].rows()
+  const columns = tableData[countType].columns()
+  const columnGroups = tableData[countType].columnGroups()
+
+  return {
+    rows,
+    columns,
+    columnGroups,
+  }
+}
+/*
+
+
+
+
+*/
+export function getCountHeadCountRequirement(
+  memberUuids: string[],
+  countType: CountTypes,
+) {
+  const counterRequirements = {
+    solo: {
+      isMet: memberUuids.length === 1,
+      verbose: "1 Counter",
+    },
+    dual: {
+      isMet: memberUuids.length === 2,
+      verbose: "2 Counters",
+    },
+    team: {
+      isMet: memberUuids.length > 1,
+      verbose: "At least 2 Counters",
+    },
+  }
+  const requirement = counterRequirements[countType]
+  const isMet = requirement.isMet
+  const verbose = requirement.verbose
+
+  return { isMet, verbose }
 }
 /*
 

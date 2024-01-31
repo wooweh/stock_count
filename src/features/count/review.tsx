@@ -1,5 +1,6 @@
 import { Stack, Typography } from "@mui/material"
 import _ from "lodash"
+import { useMemo } from "react"
 import { useLocation } from "react-router-dom"
 import { useAppSelector } from "../../app/hooks"
 import useTheme from "../../common/useTheme"
@@ -11,15 +12,9 @@ import { Slot, Window } from "../../components/surface"
 import VirtualizedTable from "../../components/table"
 import { MembersProps } from "../org/orgSlice"
 import { selectOrgMembers } from "../org/orgSliceSelectors"
-import { getMemberShortName } from "../org/orgUtils"
 import { selectStock } from "../stock/stockSliceSelectors"
 import { setCountUI, useCountUI } from "./count"
-import {
-  CountMemberResultsProps,
-  CountMembersProps,
-  CountResultsProps,
-  CountTypes,
-} from "./countSlice"
+import { CountMembersProps, CountResultsProps, CountTypes } from "./countSlice"
 import {
   selectCountMembers,
   selectCountResults,
@@ -30,17 +25,7 @@ import {
   selectIsUserOrganiser,
 } from "./countSliceSelectors"
 import { completeReview } from "./countSliceUtils"
-import {
-  prepareDualResultsTableColumnGroups,
-  prepareDualResultsTableColumns,
-  prepareDualResultsTableRows,
-  prepareSoloResultsTableColumnGroups,
-  prepareSoloResultsTableColumns,
-  prepareSoloResultsTableRows,
-  prepareTeamResultsTableColumnGroups,
-  prepareTeamResultsTableColumns,
-  prepareTeamResultsTableRows,
-} from "./countUtils"
+import { getCountMember, getReviewTableData } from "./countUtils"
 /*
 
 
@@ -137,7 +122,7 @@ function CounterReviewBody() {
 */
 function CounterSummary() {
   const theme = useTheme()
-  const results = useAppSelector(selectCountResults)
+  const results = useAppSelector(selectCountResults) ?? {}
   const counterUuids = useAppSelector(selectCountersUuidList)
 
   return (
@@ -156,18 +141,7 @@ function CounterSummary() {
         maxHeight={theme.module[8]}
       >
         {counterUuids.length ? (
-          counterUuids.map((uuid) => {
-            const resultsCount = results?.[uuid]
-              ? Object.keys(results[uuid]).length
-              : 0
-            return (
-              <CounterSummaryItem
-                resultsCount={resultsCount}
-                uuid={uuid}
-                key={uuid}
-              />
-            )
-          })
+          <CounterSummaryItems counterUuids={counterUuids} results={results} />
         ) : (
           <Typography color={theme.scale.gray[5]} textAlign={"center"}>
             No data
@@ -176,6 +150,26 @@ function CounterSummary() {
       </Stack>
     </Stack>
   )
+}
+/*
+
+
+
+
+*/
+type CounterSummaryItemsProps = {
+  counterUuids: string[]
+  results: CountResultsProps
+}
+function CounterSummaryItems(props: CounterSummaryItemsProps) {
+  return props.counterUuids.map((uuid) => {
+    const resultsCount = props.results?.[uuid]
+      ? _.keys(props.results[uuid]).length
+      : 0
+    return (
+      <CounterSummaryItem resultsCount={resultsCount} uuid={uuid} key={uuid} />
+    )
+  })
 }
 /*
 
@@ -195,26 +189,16 @@ function CounterSummaryItem({
   const members = useAppSelector(selectCountMembers) as CountMembersProps
 
   const countValue = `${resultsCount} items`
-  const name = getMemberShortName(members[uuid])
-  const step = members[uuid].step
-  const isCounting = members[uuid].isCounting
-  const isDeclined = members[uuid].isDeclined
-
+  const member = getCountMember(members, uuid)
+  const action = member.countStatus
+  const name = member.shortName
   const actionColors = {
     reviewing: theme.scale.green[6],
     counting: theme.scale.orange[6],
     away: theme.scale.gray[5],
     declined: theme.scale.red[5],
   }
-  const action =
-    step === "review" && isCounting
-      ? "reviewing"
-      : step === "stockCount" && isCounting
-      ? "counting"
-      : isDeclined
-      ? "declined"
-      : "away"
-  const actionColor = actionColors[action]
+  const actionColor = actionColors[action as keyof typeof actionColors]
 
   return (
     <Stack
@@ -302,27 +286,14 @@ function ReviewResultsTable() {
   const countType = useAppSelector(selectCountType) as CountTypes
   const stock = useAppSelector(selectStock)
 
-  const tableData = {
-    solo: {
-      rows: () => prepareSoloResultsTableRows(results, stock),
-      columns: () => prepareSoloResultsTableColumns(),
-      columnGroups: () => prepareSoloResultsTableColumnGroups(),
-    },
-    dual: {
-      rows: () => prepareDualResultsTableRows(results, stock),
-      columns: () => prepareDualResultsTableColumns(results),
-      columnGroups: () => prepareDualResultsTableColumnGroups(results, members),
-    },
-    team: {
-      rows: () => prepareTeamResultsTableRows(results, stock, members),
-      columns: () => prepareTeamResultsTableColumns(),
-      columnGroups: () => prepareTeamResultsTableColumnGroups(),
-    },
-  }
+  const tableData = useMemo(
+    () => getReviewTableData(results, stock, members, countType),
+    [results, stock, members, countType],
+  )
 
-  const rows = tableData[countType].rows()
-  const columns = tableData[countType].columns()
-  const columnGroups = tableData[countType].columnGroups()
+  const rows = tableData.rows
+  const columns = tableData.columns
+  const columnGroups = tableData.columnGroups
 
   return (
     <Stack

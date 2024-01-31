@@ -93,9 +93,11 @@ function Outer({ children }: { children: any }) {
 
 */
 function HistoryBody() {
-  const isReviewing = !!useHistoryUI(
+  const itemViewed = useHistoryUI(
     (state: HistoryUIState) => state.reviewItemUuid,
   )
+  const isReviewing = !!itemViewed
+
   return isReviewing ? <Review /> : <HistoryList />
 }
 /*

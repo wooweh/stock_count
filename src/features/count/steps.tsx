@@ -256,7 +256,7 @@ function StepLabel({ label }: { label: string }) {
   const isUserCounting = useAppSelector(selectIsUserCounting)
 
   return (
-    <Fade appear in>
+    <Fade>
       <Stack
         direction={"row"}
         gap={theme.module[2]}
@@ -348,8 +348,6 @@ function OptionsTray() {
   }
 
   const isFinalizing = step === "finalization"
-  console.log(isFinalizing)
-  console.log(step)
 
   if (isOrganiser && !isFinalizing) {
     options.unshift({

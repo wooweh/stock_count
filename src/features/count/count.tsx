@@ -5,12 +5,12 @@ import { create } from "zustand"
 import { createJSONStorage, persist } from "zustand/middleware"
 import useTheme from "../../common/useTheme"
 import { ErrorBoundary } from "../../components/errorBoundary"
+import { Fade } from "../../components/fade"
 import Modal, { ModalActionProps } from "../../components/modal"
 import { Window } from "../../components/surface"
 import { CountTypes } from "./countSlice"
 import { leaveCount, removeCount } from "./countSliceUtils"
 import { Steps } from "./steps"
-import { Fade } from "../../components/fade"
 /*
 
 
@@ -312,12 +312,14 @@ function DeleteCountConfirmation() {
 function DeleteCountConfirmationBody() {
   const theme = useTheme()
 
+  const WARNING_MESSAGE =
+    "You are about to delete the count. All count data will be lost."
+  const CONFIRMATION_MESSAGE = "Are you sure you want to continue?"
+
   return (
     <Window gap={theme.module[3]}>
-      <Typography textAlign={"center"}>
-        You are about to delete the count. All count data will be lost.
-      </Typography>
-      <Typography>Are you sure you want to continue?</Typography>
+      <Typography textAlign={"center"}>{WARNING_MESSAGE}</Typography>
+      <Typography>{CONFIRMATION_MESSAGE}</Typography>
     </Window>
   )
 }

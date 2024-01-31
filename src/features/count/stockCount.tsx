@@ -22,12 +22,10 @@ import {
   selectUserUuidString,
 } from "../user/userSliceSelectors"
 import { setCountUI, useCountUI } from "./count"
-import { CountItemProps, CountTypes } from "./countSlice"
+import { CountItemProps } from "./countSlice"
 import {
-  selectCountType,
   selectModifiedUserCountResults,
   selectModifiedUserCountResultsList,
-  selectRemainingDualStockList,
   selectRemainingStockList,
 } from "./countSliceSelectors"
 import {
@@ -145,9 +143,7 @@ function AddStockItemSearchBar() {
   const theme = useTheme()
 
   const userUuid = useAppSelector(selectUserUuid) as string
-  const remainingStockList = useAppSelector(selectRemainingStockList)
-  const remainingDualStockList = useAppSelector(selectRemainingDualStockList)
-  const countType = useAppSelector(selectCountType) as CountTypes
+  const stockList = useAppSelector(selectRemainingStockList)
 
   function handleSelect(item: SearchItemProps) {
     const id = item.id
@@ -160,8 +156,6 @@ function AddStockItemSearchBar() {
     setCountUI("isAddingStockItem", false)
   }
 
-  const stockList =
-    countType === "dual" ? remainingDualStockList : remainingStockList
   const list = prepareStockSearchList(stockList)
 
   return (

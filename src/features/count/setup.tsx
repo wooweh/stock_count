@@ -34,6 +34,7 @@ import {
   removeCountMember,
   removeCountMembers,
 } from "./countSliceUtils"
+import { getCountHeadCountRequirement } from "./countUtils"
 /*
 
 
@@ -76,7 +77,6 @@ function Outer({
 }: {
   children: React.ReactElement | React.ReactElement[]
 }) {
-  const theme = useTheme()
   return (
     <Window justifyContent={"space-between"} alignItems={"center"}>
       {children}
@@ -126,6 +126,7 @@ function SetupOptions() {
       control: <CountersList />,
     },
   ]
+
   return options.map((option: SetupOptionProps) => (
     <SetupOption
       label={option.label}
@@ -249,22 +250,10 @@ function AddMembers() {
   const isAddingMembers = useCountUI((state) => state.isAddingMembers)
   const selectedMemberUuids = useCountUI((state) => state.selectedMemberUuids)
 
-  //TODO: Refactor into Count utils function to reuse in Manage feature
-  const counterRequirements = {
-    solo: {
-      isMet: selectedMemberUuids.length === 1,
-      verbose: "1 Counter",
-    },
-    dual: {
-      isMet: selectedMemberUuids.length === 2,
-      verbose: "2 Counters",
-    },
-    team: {
-      isMet: selectedMemberUuids.length > 1,
-      verbose: "At least 2 Counters",
-    },
-  }
-  const requirement = counterRequirements[countType]
+  const requirement = getCountHeadCountRequirement(
+    selectedMemberUuids,
+    countType,
+  )
   const isRequirementMet = requirement.isMet
   const verbose = requirement.verbose
   const warningMessage = `${verbose} required for ${countType} count.`

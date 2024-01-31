@@ -75,6 +75,7 @@ function Outer({
   children: React.ReactElement | React.ReactElement[]
 }) {
   const theme = useTheme()
+
   return <Window gap={theme.module[4]}>{children}</Window>
 }
 /*
@@ -106,6 +107,7 @@ function FinalizationItems() {
       item: <CommentsList {...props} />,
     },
   ]
+
   return (
     <>
       {finalItems.map((item: FinalizationItemsProps, index: number) => (

@@ -25,11 +25,9 @@ import { selectOrgCountChecksList } from "../org/orgSliceSelectors"
 import { selectIsUserAdmin } from "../user/userSliceSelectors"
 import { resetCountUI, setCountUI, useCountUI } from "./count"
 import {
-  selectCountMetadata,
   selectIsCountInProgress,
   selectIsCountInvitePending,
   selectIsUserAwayFromCount,
-  selectUserCountMember,
   selectUserCountMemberStep,
 } from "./countSliceSelectors"
 import {
@@ -92,10 +90,6 @@ function Body() {
   const isInvitePending = useAppSelector(selectIsCountInvitePending)
   const isAwayFromCount = useAppSelector(selectIsUserAwayFromCount)
   const isCountInProgress = useAppSelector(selectIsCountInProgress)
-  const userCountMember = useAppSelector(selectUserCountMember)
-
-  console.log(isInvitePending)
-  console.log(userCountMember)
 
   return (
     <Window
@@ -131,7 +125,6 @@ function Invite() {
     updateUserCountMember({ isDeclined: true })
   }
 
-  const MESSAGE = "You are invited to count"
   const actions: NotificationActionProps[] = [
     {
       label: "Accept",
@@ -146,6 +139,7 @@ function Invite() {
       color: theme.scale.red[5],
     },
   ]
+  const MESSAGE = "You are invited to count"
 
   return <Notification message={MESSAGE} actions={actions} />
 }
@@ -164,7 +158,6 @@ function Rejoin() {
     updateCountStep(step, true)
   }
 
-  const MESSAGE = "You have left a count"
   const actions: NotificationActionProps[] = [
     {
       label: "Rejoin",
@@ -173,6 +166,7 @@ function Rejoin() {
       color: theme.scale.green[6],
     },
   ]
+  const MESSAGE = "You have left a count"
 
   return <Notification message={MESSAGE} actions={actions} />
 }
@@ -187,7 +181,6 @@ function CountPrompt() {
 
   const isAdmin = useAppSelector(selectIsUserAdmin)
   const isCountInProgress = useAppSelector(selectIsCountInProgress)
-  const countMetadata = useAppSelector(selectCountMetadata)
 
   const typographyProps: TypographyProps = {
     variant: "h6",
@@ -286,9 +279,10 @@ function ButtonTray() {
     resetCountUI()
   }
 
+  const showButtons = isAdmin && !isCountInProgress
+
   return (
-    isAdmin &&
-    !isCountInProgress && (
+    showButtons && (
       <Window
         gap={theme.module[4]}
         height={"min-content"}
@@ -407,8 +401,8 @@ type CountCheckProps = {
 function CheckListItem({ countCheck }: { countCheck: CountCheckProps }) {
   const theme = useTheme()
 
-  const [check, setCheck] = useState(countCheck.check)
   const [isEditing, setIsEditing] = useState(!!countCheck.check ? false : true)
+  const [check, setCheck] = useState(countCheck.check)
 
   const isDisabled = !isEditing && !!countCheck.check
   const id = countCheck.id
@@ -508,13 +502,6 @@ function CheckListItemInput(props: CheckListItemInputProps) {
     }
   }
 
-  const buttonStyles = {
-    width: "100%",
-    height: "105%",
-    position: "absolute",
-    zIndex: 100,
-  }
-
   const inputStyles = {
     background: theme.scale.gray[props.isDisabled ? 7 : 8],
     color: theme.scale.gray[props.isDisabled ? 8 : 4],
@@ -522,38 +509,47 @@ function CheckListItemInput(props: CheckListItemInputProps) {
     padding: theme.module[2],
     borderLeft: `${theme.module[2]} solid ${theme.scale.blue[7]}`,
   }
-
-  function EndAdornment() {
-    return !props.isEditing ? (
-      <Icon
-        variation="edit"
-        color={theme.scale.blue[6]}
-        sx={{ fontSize: 15 }}
-      />
-    ) : undefined
+  const buttonStyles = {
+    width: "100%",
+    height: "105%",
+    position: "absolute",
+    zIndex: 100,
   }
 
   return (
     <Stack width={"100%"} position={"relative"}>
       {!props.isEditing && (
         <ButtonBase
-          disableRipple
+          onClick={handleEdit}
           disableTouchRipple
           sx={buttonStyles}
-          onClick={handleEdit}
+          disableRipple
         />
       )}
       <Input
+        onChange={(e: any) => props.setCheck(trimEmptyLines(e.target.value))}
+        endAdornment={<EndAdornment show={props.isEditing} />}
+        value={_.capitalize(props.check)}
         key={String(props.isDisabled)}
         disabled={props.isDisabled}
-        autoFocus
-        value={_.capitalize(props.check)}
-        onChange={(e: any) => props.setCheck(trimEmptyLines(e.target.value))}
-        multiline
-        endAdornment={<EndAdornment />}
         sx={inputStyles}
+        autoFocus
+        multiline
       />
     </Stack>
+  )
+}
+/*
+
+
+
+
+*/
+function EndAdornment({ show }: { show: boolean }) {
+  const theme = useTheme()
+
+  return (
+    <Icon variation="edit" color={theme.scale.blue[6]} sx={{ fontSize: 15 }} />
   )
 }
 /*
