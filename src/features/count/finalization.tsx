@@ -234,6 +234,12 @@ type DataPillProps = {
 }
 export function DataPill(props: DataPillProps) {
   const theme = useTheme()
+  const styles = {
+    outline: `2px solid ${
+      props.color ? theme.scale[props.color][7] : theme.scale.gray[7]
+    }`,
+    outlineOffset: "-2px",
+  }
 
   return (
     <Stack
@@ -243,12 +249,7 @@ export function DataPill(props: DataPillProps) {
       borderRadius={theme.module[2]}
       bgcolor={theme.scale.gray[9]}
       boxSizing={"border-box"}
-      sx={{
-        outline: `2px solid ${
-          props.color ? theme.scale[props.color][7] : theme.scale.gray[7]
-        }`,
-        outlineOffset: "-2px",
-      }}
+      sx={styles}
     >
       <Typography
         color={props.color ? theme.scale[props.color][5] : theme.scale.gray[4]}

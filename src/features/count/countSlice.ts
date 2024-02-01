@@ -76,7 +76,7 @@ export type SetCountStep = { step: CountSteps; updateMember: boolean }
 export type SetCountResultsItemProps = {
   item: CountItemProps
   memberUuid: string
-}
+} & UpdateDB
 export type SetCountMemberResultsProps = {
   results: CountMemberResultsProps
   memberUuid: string
@@ -136,7 +136,7 @@ export const countSlice = createSlice({
       const memberUuid = action.payload.memberUuid
       const stockId = action.payload.id
       const results = state.count.results
-      if (results) delete results[memberUuid][stockId]
+      if (!!results) delete results[memberUuid][stockId]
     },
     setCountMembers: (state, action: PayloadAction<SetCountMembersProps>) => {
       state.count.members = action.payload.members

@@ -95,7 +95,8 @@ countListenerMiddleware.startListening({
   actionCreator: setCountResultsItem,
   effect: async (action) => {
     const payload = action.payload
-    setCountResultsItemOnDB(payload)
+    const updateDB = payload.updateDB
+    if (updateDB) setCountResultsItemOnDB(payload)
   },
 })
 /*

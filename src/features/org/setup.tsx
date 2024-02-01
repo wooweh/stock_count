@@ -58,6 +58,11 @@ export function SetupOrgPrompt() {
   }
 
   const isInviteKeyValid = getInviteKeyValidation(inviteKey)
+  const dividerStyles = {
+    width: "100%",
+    borderColor: theme.scale.gray[7],
+    paddingTop: theme.module[3],
+  }
 
   return (
     <Window
@@ -81,13 +86,7 @@ export function SetupOrgPrompt() {
           disabled={!orgName}
           key={"create"}
         />
-        <Divider
-          sx={{
-            width: "100%",
-            borderColor: theme.scale.gray[7],
-            paddingTop: theme.module[3],
-          }}
-        />
+        <Divider sx={dividerStyles} />
         <Typography color={theme.scale.green[7]} variant="h5">
           Join Org
         </Typography>

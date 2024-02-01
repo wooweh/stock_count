@@ -96,7 +96,7 @@ export function addCountResultItem(id: string, memberUuid: string) {
     obsoleteCount: 0,
     memberUuid,
   }
-  store.dispatch(setCountResultsItem({ item, memberUuid }))
+  store.dispatch(setCountResultsItem({ item, memberUuid, updateDB: true }))
 }
 /*
 
@@ -107,8 +107,9 @@ export function addCountResultItem(id: string, memberUuid: string) {
 export function updateCountResultItem(
   item: CountItemProps,
   memberUuid: string,
+  updateDB: boolean = true,
 ) {
-  store.dispatch(setCountResultsItem({ item, memberUuid }))
+  store.dispatch(setCountResultsItem({ item, memberUuid, updateDB }))
 }
 /*
 
@@ -127,7 +128,9 @@ export function removeCountResultsItem(id: string, memberUuid: string) {
 */
 export function createCountMembers() {
   const members = store.getState().count.count.members
-  if (members) store.dispatch(setCountMembers({ members, updateDB: true }))
+  if (members) {
+    store.dispatch(setCountMembers({ members, updateDB: true }))
+  }
 }
 /*
 
@@ -461,6 +464,9 @@ export function updateManagedCount(
   transferredMembers: { [key: string]: string },
 ) {
   const count = store.getState().count.count
+  const currentCountType = count.metadata?.type
+  const isCurrentCountTypeChangedFromDualtoTeam =
+    currentCountType === "dual" && countType !== "team"
   const members = count.members!
   const results = count.results!
   const orgMembers = store.getState().org.org.members!
@@ -484,7 +490,9 @@ export function updateManagedCount(
     addedMembers,
     removedMembers,
     transferredMembers,
+    isCurrentCountTypeChangedFromDualtoTeam,
   )
+  console.log(updatedResults)
   updateCountResults(updatedResults)
 }
 /*
@@ -541,8 +549,20 @@ export function prepareManagedCountResults(
   addedMembers: string[] = [],
   removedMembers: string[] = [],
   transferredMembers: { [key: string]: string } = {},
+  isCurrentCountTypeChangedFromDualtoTeam: boolean,
 ) {
   const updatedResults: CountResultsProps = { ...results }
+  if (isCurrentCountTypeChangedFromDualtoTeam) {
+    const memberUuidList = _.keys(results)
+    const memberOneResults = { ...results[memberUuidList[0]] }
+    const memberTwoResults = { ...results[memberUuidList[1]] }
+    _.forEach(memberTwoResults, (item, itemId) => {
+      if (itemId in memberOneResults) {
+        _.unset(memberTwoResults, itemId)
+      }
+    })
+    _.set(updatedResults, memberUuidList[1], memberTwoResults)
+  }
   _.forEach(addedMembers, (memberUuid) => {
     _.set(updatedResults, memberUuid, {})
   })
@@ -552,6 +572,7 @@ export function prepareManagedCountResults(
   _.forEach(transferredMembers, (newMemberUuid, oldMemberUuid) => {
     _.set(updatedResults, newMemberUuid, _.get(results, oldMemberUuid))
   })
+  console.log(updatedResults)
   return updatedResults
 }
 /*

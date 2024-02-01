@@ -69,6 +69,12 @@ function ListItemOuterWrapper(props: {
 }) {
   const theme = useTheme()
   const groupContext = useContext(ListGroupContext)
+  const styles = {
+    outline: `2px solid ${theme.scale.gray[7]}`,
+    outlineOffset: "-2px",
+    ...props.sx,
+  }
+
   return (
     <Stack
       position={"relative"}
@@ -81,11 +87,7 @@ function ListItemOuterWrapper(props: {
       minHeight={theme.module[6]}
       width={"100%"}
       padding={theme.module[4]}
-      sx={{
-        outline: `2px solid ${theme.scale.gray[7]}`,
-        outlineOffset: "-2px",
-        ...props.sx,
-      }}
+      sx={styles}
     >
       {props.children}
     </Stack>
@@ -185,6 +187,11 @@ function SecondarySlot(props: {
   children: SecondarySlotProps
 }) {
   const theme = useTheme()
+  const styles = {
+    "&: hover": {
+      filter: "brightness(1.15)",
+    },
+  }
   return !!props.children ? (
     <Stack
       boxSizing={"border-box"}
@@ -192,11 +199,7 @@ function SecondarySlot(props: {
       alignItems={"flex-end"}
       justifyContent={"center"}
       minWidth={theme.module[7]}
-      sx={{
-        "&: hover": {
-          filter: "brightness(1.15)",
-        },
-      }}
+      sx={styles}
     >
       {props.children}
     </Stack>
@@ -320,6 +323,10 @@ export function SelectableListItemWithOptions(
     if (props.isSelecting) _.delay(() => setIsLongPressing(false), 500)
   }, [props.isSelecting])
 
+  const styles = {
+    outline: props.isSelected ? `2px solid ${theme.scale.blue[8]}` : "none",
+  }
+
   return props.isSelecting ? (
     <Stack position={"relative"}>
       <ListItem
@@ -333,12 +340,7 @@ export function SelectableListItemWithOptions(
       />
     </Stack>
   ) : (
-    <Stack
-      borderRadius={3}
-      sx={{
-        outline: props.isSelected ? `2px solid ${theme.scale.blue[8]}` : "none",
-      }}
-    >
+    <Stack borderRadius={3} sx={styles}>
       <ListItemWithOptions
         label={props.label}
         description={props.description}

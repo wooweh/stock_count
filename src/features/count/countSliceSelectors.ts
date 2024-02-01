@@ -399,7 +399,7 @@ export const selectRemainingStockList = createSelector(
     selectRemainingDualStockList,
   ],
   (countType, defaultList, dualList) => {
-    return countType === "dual" ? defaultList : dualList
+    return countType === "dual" ? dualList : defaultList
   },
 )
 /*

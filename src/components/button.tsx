@@ -183,7 +183,7 @@ function ModalButton(props: ButtonVariationProps) {
 function HomeButton(props: ButtonVariationProps) {
   const theme = useTheme()
 
-  const styles = {
+  const buttonStyles = {
     opacity: props.disabled ? 0.5 : 1,
     background: theme.scale.gray[9],
     width: "100%",
@@ -195,6 +195,12 @@ function HomeButton(props: ButtonVariationProps) {
     } !important`,
     ...props.sx,
   }
+  const badgeStyles = {
+    "& .MuiBadge-badge": {
+      background: theme.scale.blue[5],
+      right: "-5px",
+    },
+  }
 
   return (
     <ButtonBase
@@ -202,7 +208,7 @@ function HomeButton(props: ButtonVariationProps) {
       disabled={props.disabled ?? false}
       disableTouchRipple={props.disableTouchRipple ?? false}
       disableRipple={props.disableRipple ?? false}
-      sx={styles}
+      sx={buttonStyles}
     >
       <Window height={"min-content"} gap={0}>
         <Window
@@ -211,23 +217,12 @@ function HomeButton(props: ButtonVariationProps) {
           borderRadius={`${theme.module[3]} ${theme.module[3]} 0 0`}
           padding={theme.module[5]}
         >
-          <Badge
-            badgeContent=" "
-            invisible={!props.showBadge}
-            sx={{
-              "& .MuiBadge-badge": {
-                background: theme.scale.blue[5],
-                right: "-5px",
-              },
-            }}
-          >
+          <Badge badgeContent=" " invisible={!props.showBadge} sx={badgeStyles}>
             <Icon
               color={props.iconColor ?? theme.scale.gray[5]}
               variation={props.iconName as IconNames}
               fontSize="large"
-              sx={{
-                transform: `scale(1.5)`,
-              }}
+              sx={{ transform: `scale(1.5)` }}
             />
           </Badge>
         </Window>

@@ -5,6 +5,7 @@ import AdminIcon from "@mui/icons-material/AdminPanelSettingsRounded"
 import ArrowLeftIcon from "@mui/icons-material/ArrowBackIosNewRounded"
 import ArrowBackIcon from "@mui/icons-material/ArrowBackRounded"
 import ArrowRightIcon from "@mui/icons-material/ArrowForwardIosRounded"
+import DeclineIcon from "@mui/icons-material/BlockRounded"
 import DamagedIcon from "@mui/icons-material/BrokenImageRounded"
 import CalendarIcon from "@mui/icons-material/CalendarTodayRounded"
 import CellularIcon from "@mui/icons-material/CellTowerRounded"
@@ -36,7 +37,6 @@ import NotificationIcon from "@mui/icons-material/NotificationsActive"
 import ProfileIcon from "@mui/icons-material/PersonRounded"
 import SubmitIcon from "@mui/icons-material/Publish"
 import RetryIcon from "@mui/icons-material/ReplayRounded"
-import DeclineIcon from "@mui/icons-material/BlockRounded"
 import ObsoleteIcon from "@mui/icons-material/ScheduleRounded"
 import SearchIcon from "@mui/icons-material/SearchRounded"
 import UseableIcon from "@mui/icons-material/SellRounded"
@@ -135,60 +135,45 @@ export default function Icon(props: IconProps) {
     color: theme.scale.gray[4],
     transition: props.transition ? props.transition : "none",
   }
+  const iconStyles = {
+    ...styles,
+    ...props.sx,
+    color: props.color ? props.color : theme.scale.gray[4],
+  }
   const fontSize = props.fontSize ? props.fontSize : "medium"
   const VARIATIONS = {
     settings: (
       <SettingsIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     colorTheme: isDarkmode ? (
       <DarkModeIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ) : (
       <LightModeIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     home: (
       <HomeIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     retry: (
       <RetryIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     decline: (
@@ -196,8 +181,7 @@ export default function Icon(props: IconProps) {
         fontSize={fontSize}
         fontWeight={props.fontWeight}
         sx={{
-          ...styles,
-          ...props.sx,
+          ...iconStyles,
           color: props.color ? props.color : theme.scale.red[5],
         }}
       />
@@ -206,418 +190,266 @@ export default function Icon(props: IconProps) {
       <TransferIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     stock: (
       <StockIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     menu: (
       <MenuIcon
         fontSize={props.fontSize ? props.fontSize : "medium"}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     add: (
       <AddIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     history: (
       <HistoryIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     timeline: (
       <TimelineIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     list: (
       <ListIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     cellular: (
       <CellularIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     profile: (
       <ProfileIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     signOut: (
       <SignOutIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     invite: (
       <InviteIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     wifi: (
       <WifiIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     edit: (
       <EditIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     options: (
       <OptionsIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     copy: (
       <CopyIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     key: (
       <KeyIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     admin: (
       <AdminIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     visible: (
       <VisibilityIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     notVisible: (
       <VisibilityOffIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     upload: (
       <UploadIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     search: (
       <SearchIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     backArrow: (
       <ArrowBackIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     org: (
       <OrgIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     group: (
       <GroupIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     download: (
       <DownloadIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     arrowRight: (
       <ArrowRightIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     arrowLeft: (
       <ArrowLeftIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     submit: (
       <SubmitIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     notification: (
       <NotificationIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     addMembers: (
       <AddMembersIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     obsolete: (
       <ObsoleteIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     step: (
       <StepIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     dual: (
       <DualIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     date: (
       <CalendarIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     time: (
       <TimeIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     clipboard: (
       <ClipboardIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     checklist: (
       <ChecklistIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     comments: (
       <CommentsIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
-        sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
-        }}
+        sx={iconStyles}
       />
     ),
     scrollToTop: (
@@ -625,9 +457,7 @@ export default function Icon(props: IconProps) {
         fontSize={fontSize}
         fontWeight={props.fontWeight}
         sx={{
-          ...styles,
-          ...props.sx,
-          color: props.color ? props.color : theme.scale.gray[4],
+          ...iconStyles,
           transform: "rotate(90deg)",
         }}
       />
@@ -637,8 +467,7 @@ export default function Icon(props: IconProps) {
         fontSize={fontSize}
         fontWeight={props.fontWeight}
         sx={{
-          ...styles,
-          ...props.sx,
+          ...iconStyles,
           color: props.color ? props.color : theme.scale.green[5],
         }}
       />
@@ -648,8 +477,7 @@ export default function Icon(props: IconProps) {
         fontSize={fontSize}
         fontWeight={props.fontWeight}
         sx={{
-          ...styles,
-          ...props.sx,
+          ...iconStyles,
           color: props.color ? props.color : theme.scale.red[5],
         }}
       />
@@ -659,8 +487,7 @@ export default function Icon(props: IconProps) {
         fontSize={fontSize}
         fontWeight={props.fontWeight}
         sx={{
-          ...styles,
-          ...props.sx,
+          ...iconStyles,
           color: props.color ? props.color : theme.scale.orange[5],
         }}
       />
@@ -670,8 +497,7 @@ export default function Icon(props: IconProps) {
         fontSize={fontSize}
         fontWeight={props.fontWeight}
         sx={{
-          ...styles,
-          ...props.sx,
+          ...iconStyles,
           color: props.color ? props.color : theme.scale.green[6],
         }}
       />
@@ -681,8 +507,7 @@ export default function Icon(props: IconProps) {
         fontSize={fontSize}
         fontWeight={props.fontWeight}
         sx={{
-          ...styles,
-          ...props.sx,
+          ...iconStyles,
           color: props.color ? props.color : theme.scale.green[6],
         }}
       />
@@ -692,8 +517,7 @@ export default function Icon(props: IconProps) {
         fontSize={fontSize}
         fontWeight={props.fontWeight}
         sx={{
-          ...styles,
-          ...props.sx,
+          ...iconStyles,
           color: props.color ? props.color : theme.scale.blue[6],
         }}
       />
@@ -703,8 +527,7 @@ export default function Icon(props: IconProps) {
         fontSize={fontSize}
         fontWeight={props.fontWeight}
         sx={{
-          ...styles,
-          ...props.sx,
+          ...iconStyles,
           color: props.color ? props.color : theme.scale.blue[8],
         }}
       />
@@ -714,8 +537,7 @@ export default function Icon(props: IconProps) {
         fontSize={fontSize}
         fontWeight={props.fontWeight}
         sx={{
-          ...styles,
-          ...props.sx,
+          ...iconStyles,
           color: props.color ? props.color : theme.scale.green[6],
         }}
       />
@@ -725,8 +547,7 @@ export default function Icon(props: IconProps) {
         fontSize={fontSize}
         fontWeight={props.fontWeight}
         sx={{
-          ...styles,
-          ...props.sx,
+          ...iconStyles,
           color: props.color ? props.color : theme.scale.red[6],
         }}
       />
@@ -736,8 +557,7 @@ export default function Icon(props: IconProps) {
         fontSize={fontSize}
         fontWeight={props.fontWeight}
         sx={{
-          ...styles,
-          ...props.sx,
+          ...iconStyles,
           color: props.color ? props.color : theme.scale.red[6],
         }}
       />
@@ -747,8 +567,7 @@ export default function Icon(props: IconProps) {
         fontSize={fontSize}
         fontWeight={props.fontWeight}
         sx={{
-          ...styles,
-          ...props.sx,
+          ...iconStyles,
           color: props.color ? props.color : theme.scale.red[6],
         }}
       />

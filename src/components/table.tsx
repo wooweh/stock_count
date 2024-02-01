@@ -37,29 +37,23 @@ export default function VirtualizedTable(props: VirtualizedTableProps) {
 
   const path = location.pathname
 
+  const tableStyles = {
+    borderCollapse: "separate",
+    tableLayout: "auto",
+    background: theme.scale.gray[8],
+  }
+  const tableBodyStyles = {
+    paddingTop: theme.module[0],
+    overflow: "hidden",
+    background: theme.scale.gray[9],
+  }
+
   const VirtuosoTableComponents: TableComponents<RowData> = {
-    Table: (props) => (
-      <Table
-        {...props}
-        sx={{
-          borderCollapse: "separate",
-          tableLayout: "auto",
-          background: theme.scale.gray[8],
-        }}
-      />
-    ),
+    Table: (props) => <Table {...props} sx={tableStyles} />,
     TableHead,
     TableRow: ({ item: _item, ...props }) => <TableRow {...props} />,
     TableBody: React.forwardRef<HTMLTableSectionElement>((props, ref) => (
-      <TableBody
-        {...props}
-        sx={{
-          paddingTop: theme.module[0],
-          overflow: "hidden",
-          background: theme.scale.gray[9],
-        }}
-        ref={ref}
-      />
+      <TableBody {...props} sx={tableBodyStyles} ref={ref} />
     )),
   }
 
@@ -110,6 +104,14 @@ export default function VirtualizedTable(props: VirtualizedTableProps) {
     )
   }
 
+  const tableCellStyles = {
+    whiteSpace: "nowrap",
+    color: theme.scale.gray[4],
+    outline: `1px solid ${theme.scale.gray[7]}`,
+    padding: theme.module[2],
+    border: 0,
+  }
+
   function rowContent(_index: number, row: RowData) {
     return (
       <React.Fragment>
@@ -120,13 +122,7 @@ export default function VirtualizedTable(props: VirtualizedTableProps) {
             padding={"none"}
             width={"min-content"}
             size={"small"}
-            sx={{
-              whiteSpace: "nowrap",
-              color: theme.scale.gray[4],
-              outline: `1px solid ${theme.scale.gray[7]}`,
-              padding: theme.module[2],
-              border: 0,
-            }}
+            sx={tableCellStyles}
           >
             {row[column.dataKey]}
           </TableCell>
@@ -135,17 +131,17 @@ export default function VirtualizedTable(props: VirtualizedTableProps) {
     )
   }
 
+  const paperStyles = {
+    minHeight: 100,
+    height: "60vh",
+    width: "100%",
+    background: theme.scale.gray[9],
+    outline: `1px solid ${theme.scale.gray[9]}`,
+    overflow: "hidden",
+  }
+
   return (
-    <Paper
-      style={{
-        minHeight: 100,
-        height: "60vh",
-        width: "100%",
-        background: theme.scale.gray[9],
-        outline: `1px solid ${theme.scale.gray[9]}`,
-        overflow: "hidden",
-      }}
-    >
+    <Paper style={paperStyles}>
       <ErrorBoundary
         componentName={"Table"}
         featurePath={path}

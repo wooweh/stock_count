@@ -82,6 +82,12 @@ export function Menu() {
     borderRadius: theme.module[5],
     padding: theme.module[2],
   }
+  const menuStyles = {
+    "& .MuiPaper-root": {
+      borderRadius: theme.module[3],
+      outline: `2px solid ${theme.scale.gray[6]}`,
+    },
+  }
 
   return (
     <>
@@ -94,12 +100,7 @@ export function Menu() {
         onClose={handleClose}
         anchorOrigin={origin}
         transformOrigin={origin}
-        sx={{
-          "& .MuiPaper-root": {
-            borderRadius: theme.module[3],
-            outline: `2px solid ${theme.scale.gray[6]}`,
-          },
-        }}
+        sx={menuStyles}
       >
         <Window padding={theme.module[2]} justifyContent={"flex-start"}>
           <ErrorBoundary componentName={"Menu"} featurePath={path}>

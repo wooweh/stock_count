@@ -106,6 +106,11 @@ export function Input(props: InputProps) {
     : "text"
 
   const placeholder = showPlaceholder ? props.placeholder : ""
+  const adornmentStyles = {
+    position: "absolute",
+    bottom: theme.module[3],
+    right: theme.module[2],
+  }
 
   return (
     <MuiInput
@@ -125,14 +130,7 @@ export function Input(props: InputProps) {
       sx={{ ...props.sx, position: "relative" }}
       endAdornment={
         !!props.endAdornment ? (
-          <InputAdornment
-            position="end"
-            sx={{
-              position: "absolute",
-              bottom: theme.module[3],
-              right: theme.module[2],
-            }}
-          >
+          <InputAdornment position="end" sx={adornmentStyles}>
             {props.endAdornment}
           </InputAdornment>
         ) : (

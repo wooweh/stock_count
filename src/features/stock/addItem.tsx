@@ -1,15 +1,15 @@
 import { Stack, Typography } from "@mui/material"
 import _ from "lodash"
 import { useState } from "react"
+import { useLocation } from "react-router-dom"
 import useTheme from "../../common/useTheme"
 import { Input } from "../../components/control"
+import { ErrorBoundary } from "../../components/errorBoundary"
 import Modal, { ModalActionProps } from "../../components/modal"
+import { Slot } from "../../components/surface"
 import { generateCustomNotification } from "../core/coreUtils"
 import { setStockUI, useStockUI } from "./stock"
 import { updateStockItem } from "./stockSliceUtils"
-import { useLocation } from "react-router-dom"
-import { ErrorBoundary } from "../../components/errorBoundary"
-import { Slot } from "../../components/surface"
 /*
 
 
@@ -148,9 +148,7 @@ function StockItemInputField(props: StockItemInputFieldProps) {
         onChange={props.onChange}
         value={props.value}
         placeholder={props.placeholder}
-        sx={{
-          background: theme.scale.gray[8],
-        }}
+        sx={{ background: theme.scale.gray[8] }}
       />
     </Slot>
   )

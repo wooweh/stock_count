@@ -143,9 +143,10 @@ function AuthenticationInput({ isRegistering }: { isRegistering: boolean }) {
   const isVerifying = useAuthUI((state) => state.isVerifying)
   const validationReport = useAuthUI((state) => state.passwordValidation)
 
+  const showInputs = !isSigningIn && !isVerifying
+
   return (
-    !isSigningIn &&
-    !isVerifying && (
+    showInputs && (
       <Outer>
         <Logo />
         <CredentialInputs />
@@ -190,7 +191,7 @@ function Outer({ children }: { children: any }) {
 */
 function Logo() {
   const theme = useTheme()
-  
+
   return (
     <Slot gap={theme.module[2]} justifyContent={"flex-start"}>
       <Icon variation="stock" color={theme.scale.gray[5]} />

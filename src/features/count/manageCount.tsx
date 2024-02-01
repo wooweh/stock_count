@@ -31,6 +31,7 @@ import { CountTypes } from "./countSlice"
 import {
   selectAvailableCountersList,
   selectCountMembersCountValueList,
+  selectCountType,
   selectCountersList,
   selectCountersUuidList,
   selectIsUserOrganiser,
@@ -530,25 +531,19 @@ function AddTempMembers() {
   const tempRemovedMemberUuids = useCountUI(
     (state) => state.tempRemovedMemberUuids,
   )
-  const tempResultsTransfers = useCountUI((state) => state.tempResultsTransfers)
 
   const availableTempMembers = _.remove(
     [...availableMembers],
     (member: MemberProps) => !tempAddedMemberUuids.includes(member.uuid),
   )
-  const totalPotentialMembers =
+  const potentialHeadCount =
     countMembers.length +
     selectedMemberUuids.length +
     tempAddedMemberUuids.length -
     tempRemovedMemberUuids.length
 
   const requirement = getCountHeadCountRequirement(
-    [
-      ...selectedMemberUuids,
-      ...tempAddedMemberUuids,
-      ...selectedMemberUuids,
-      ..._.keys(countMembers),
-    ],
+    potentialHeadCount,
     countType,
   )
   const isRequirementMet = requirement.isMet
@@ -869,21 +864,36 @@ function TransferControl(props: TransferControlProps) {
 function UpdateCountButton() {
   const theme = useTheme()
 
-  const isCounterRequirement = useCountUI(
-    (state) => state.isCounterRequirementMet,
-  )
+  const countMembers = useAppSelector(selectCountersList)
+  const countType = useAppSelector(selectCountType)
+
+  const tempCountType = useCountUI((state) => state.tempCountType)
+  const selectedMemberUuids = useCountUI((state) => state.selectedMemberUuids)
   const tempAddedMemberUuids = useCountUI((state) => state.tempAddedMemberUuids)
+  const tempResultsTransfers = useCountUI((state) => state.tempResultsTransfers)
   const tempRemovedMemberUuids = useCountUI(
     (state) => state.tempRemovedMemberUuids,
   )
-  const tempResultsTransfers = useCountUI((state) => state.tempResultsTransfers)
+
   const isAllTransfersAllocated = !_.values(tempResultsTransfers).includes("")
-  const isDataSafe =
-    !!tempAddedMemberUuids.length &&
-    !!tempRemovedMemberUuids.length &&
-    !!_.keys(tempResultsTransfers).length &&
-    isAllTransfersAllocated
-  const isDisabled = !isCounterRequirement || !isDataSafe
+  const potentialHeadCount =
+    countMembers.length +
+    selectedMemberUuids.length +
+    tempAddedMemberUuids.length -
+    tempRemovedMemberUuids.length
+
+  const requirement = getCountHeadCountRequirement(
+    potentialHeadCount,
+    tempCountType,
+  )
+  const isDataSafe = !!_.keys(tempResultsTransfers).length
+    ? isAllTransfersAllocated
+    : true
+  const noChanges =
+    !tempAddedMemberUuids.length &&
+    !tempRemovedMemberUuids.length &&
+    countType === tempCountType
+  const isDisabled = !requirement.isMet || !isDataSafe || noChanges
 
   return (
     <Window flexShrink={0} height={"min-content"}>
@@ -965,8 +975,14 @@ function UpdateCountConfirmationBody() {
   const addedUuids = useCountUI((state) => state.tempAddedMemberUuids)
   const removedUuids = useCountUI((state) => state.tempRemovedMemberUuids)
   const transferUuids = useCountUI((state) => state.tempResultsTransfers)
+  const countType = useCountUI((state) => state.tempCountType)
 
-  const summaryProps = { addedUuids, removedUuids, transferUuids }
+  const summaryProps = {
+    addedUuids,
+    removedUuids,
+    transferUuids,
+    countType,
+  }
   const path = location.pathname
 
   const CONFIRMATION_MESSAGE =
@@ -1002,10 +1018,13 @@ type SummaryProps = {
   addedUuids: string[]
   removedUuids: string[]
   transferUuids: { [key: string]: string }
+  countType: CountTypes
 }
 function ChangeSummary(props: SummaryProps) {
   const theme = useTheme()
   const members = useAppSelector(selectOrgMembers) as MembersProps
+  const currentCountType = useAppSelector(selectCountType)
+  const isCountTypeChanged = currentCountType !== props.countType
 
   return (
     <Stack
@@ -1016,54 +1035,71 @@ function ChangeSummary(props: SummaryProps) {
       boxShadow={theme.shadow.neo[1]}
       sx={{ outline: `1px solid ${theme.scale.gray[6]}` }}
     >
-      <Stack gap={theme.module[2]}>
-        <Title icon={"addMembers"} color={"green"}>
-          Added:
-        </Title>
-        <Slot
-          justifyContent={"flex-start"}
-          overflow={"scroll"}
-          gap={theme.module[3]}
-        >
-          {_.map(props.addedUuids, (uuid) => (
-            <DataPill key={uuid} label={getMemberShortName(members[uuid])} />
-          ))}
-        </Slot>
-      </Stack>
-      <Stack gap={theme.module[2]}>
-        <Title icon={"delete"} color={"red"}>
-          Removed:
-        </Title>
-        <Slot
-          justifyContent={"flex-start"}
-          overflow={"scroll"}
-          gap={theme.module[3]}
-        >
-          {_.map(props.removedUuids, (uuid) => (
-            <DataPill key={uuid} label={getMemberShortName(members[uuid])} />
-          ))}
-        </Slot>
-      </Stack>
-      <Stack gap={theme.module[2]}>
-        <Title icon={"transfer"} color={"yellow"}>
-          Transferred:
-        </Title>
-        {_.toPairs(props.transferUuids).map(([key, value]) => (
-          <Slot justifyContent={"flex-start"} gap={theme.module[3]} key={key}>
-            <DataPill key={key} label={getMemberShortName(members[key])} />
+      {!!isCountTypeChanged && (
+        <Stack gap={theme.module[2]}>
+          <Title icon={"transfer"} color={"yellow"}>
+            Count Type:
+          </Title>
+          <Slot justifyContent={"flex-start"} gap={theme.module[3]}>
+            <DataPill key={1} label={_.capitalize(currentCountType)} />
             <Typography fontWeight={"bold"}>to</Typography>
-            <DataPill
-              key={value}
-              label={
-                !!members[value]
-                  ? getMemberShortName(members[value])
-                  : "None selected"
-              }
-            />
+            <DataPill key={2} label={_.capitalize(props.countType)} />
           </Slot>
-        ))}
-        <Slot overflow={"scroll"}></Slot>
-      </Stack>
+        </Stack>
+      )}
+      {!!props.addedUuids.length && (
+        <Stack gap={theme.module[2]}>
+          <Title icon={"addMembers"} color={"green"}>
+            Added:
+          </Title>
+          <Slot
+            justifyContent={"flex-start"}
+            overflow={"scroll"}
+            gap={theme.module[3]}
+          >
+            {_.map(props.addedUuids, (uuid) => (
+              <DataPill key={uuid} label={getMemberShortName(members[uuid])} />
+            ))}
+          </Slot>
+        </Stack>
+      )}
+      {!!props.removedUuids.length && (
+        <Stack gap={theme.module[2]}>
+          <Title icon={"delete"} color={"red"}>
+            Removed:
+          </Title>
+          <Slot
+            justifyContent={"flex-start"}
+            overflow={"scroll"}
+            gap={theme.module[3]}
+          >
+            {_.map(props.removedUuids, (uuid) => (
+              <DataPill key={uuid} label={getMemberShortName(members[uuid])} />
+            ))}
+          </Slot>
+        </Stack>
+      )}
+      {!!props.transferUuids.length && (
+        <Stack gap={theme.module[2]}>
+          <Title icon={"transfer"} color={"yellow"}>
+            Transferred:
+          </Title>
+          {_.toPairs(props.transferUuids).map(([key, value]) => (
+            <Slot justifyContent={"flex-start"} gap={theme.module[3]} key={key}>
+              <DataPill key={key} label={getMemberShortName(members[key])} />
+              <Typography fontWeight={"bold"}>to</Typography>
+              <DataPill
+                key={value}
+                label={
+                  !!members[value]
+                    ? getMemberShortName(members[value])
+                    : "None selected"
+                }
+              />
+            </Slot>
+          ))}
+        </Stack>
+      )}
     </Stack>
   )
 }

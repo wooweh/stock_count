@@ -162,9 +162,7 @@ export async function register(email: string, password: string) {
 export async function reauthenticate(user: User, password: string) {
   const email = user.email as string
   const credentials = EmailAuthProvider.credential(email, password)
-  return reauthenticateOnAuth(user, credentials).catch((error) =>
-    generateErrorNotification(error.code),
-  )
+  return reauthenticateOnAuth(user, credentials)
 }
 /*
 

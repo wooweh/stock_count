@@ -322,20 +322,20 @@ export function getReviewTableData(
 
 */
 export function getCountHeadCountRequirement(
-  memberUuids: string[],
+  headCount: number,
   countType: CountTypes,
 ) {
   const counterRequirements = {
     solo: {
-      isMet: memberUuids.length === 1,
+      isMet: headCount === 1,
       verbose: "1 Counter",
     },
     dual: {
-      isMet: memberUuids.length === 2,
+      isMet: headCount === 2,
       verbose: "2 Counters",
     },
     team: {
-      isMet: memberUuids.length > 1,
+      isMet: headCount > 1,
       verbose: "At least 2 Counters",
     },
   }

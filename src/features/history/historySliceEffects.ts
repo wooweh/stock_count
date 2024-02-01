@@ -1,4 +1,5 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit"
+import { store } from "../../app/store"
 import {
   deleteHistory,
   deleteHistoryItem,
@@ -27,7 +28,8 @@ export const historyListenerMiddleware = createListenerMiddleware()
 historyListenerMiddleware.startListening({
   actionCreator: deleteHistory,
   effect: async () => {
-    deleteHistoryOnDB()
+    const orgUuid = store.getState().org.org.uuid
+    if (orgUuid) deleteHistoryOnDB(orgUuid)
   },
 })
 /*

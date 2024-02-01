@@ -103,6 +103,7 @@ export async function setCountResultsItemOnDB(
 export async function deleteCountResultsItemOnDB(
   payload: DeleteCountItemProps,
 ) {
+  console.log(payload)
   const orgUuid = store.getState().org.org.uuid
   const memberUuid = payload.memberUuid
   const stockId = payload.id

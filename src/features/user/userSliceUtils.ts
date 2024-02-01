@@ -3,14 +3,20 @@ import _ from "lodash"
 import { store } from "../../app/store"
 import { auth } from "../../remote"
 import { generateErrorNotification } from "../core/coreUtils"
+import { deleteHistoryOnDB } from "../history/historySliceRemote"
 import { setOrgMember } from "../org/orgSlice"
+import {
+  deleteOrgInvitesOnDB,
+  deleteOrgMemberOnDB,
+  deleteOrgOnDB,
+} from "../org/orgSliceRemote"
+import { deleteStockOnDB } from "../stock/stockSliceRemote"
 import { reauthenticate, signOut } from "./userAuth"
 import {
   EmailChangeStatuses,
   PasswordChangeStatuses,
   UserOrgRoles,
   UserProps,
-  deleteUser,
   deleteUserOrgDetails,
   setEmailChangeStatus,
   setIsSignedIn,
@@ -20,6 +26,7 @@ import {
   setUserName,
   setUserOrgDetails,
 } from "./userSlice"
+import { deleteUserOnDB } from "./userSliceRemote"
 /*
 
 
@@ -156,16 +163,26 @@ export function resetUser() {
 
 
 */
-export function removeUser(password: string) {
+export function removeUser(password: string, isOnlyAdmin: boolean) {
+  const invites = store.getState().org.org.invites
+  const orgUuid = store.getState().org.org.uuid
   const user = auth.currentUser as User
   const uuid = user.uid
   if (!!uuid) {
     reauthenticate(user, password)
       .then(() => signOut())
+      .then(() => {
+        if (isOnlyAdmin && !!orgUuid) {
+          deleteOrgOnDB(orgUuid)
+          deleteStockOnDB(orgUuid)
+          deleteHistoryOnDB(orgUuid)
+          if (!!invites) deleteOrgInvitesOnDB(invites)
+        } else if (!!orgUuid) {
+          deleteOrgMemberOnDB(orgUuid, uuid)
+        }
+      })
+      .then(() => deleteUserOnDB(uuid))
       .then(() => deleteUserOnAuth(user))
-      .then(() => store.dispatch(deleteUser({ uuid, password })))
-      // TODO: If only admin then delete org
-      // TODO: If not only admin then delete orgMember
       .catch((error) => generateErrorNotification(error.code))
   }
 }

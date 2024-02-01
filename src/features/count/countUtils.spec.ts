@@ -148,10 +148,7 @@ describe("Count Utils", () => {
   it("should handle getCountHeadCountRequirement", () => {
     const mockMemberUuids: string[] = ["mockCounterUuid1", "mockCounterUuid2"]
     const mockCountType: CountTypes = "solo"
-    const headCountRequirement = getCountHeadCountRequirement(
-      mockMemberUuids,
-      mockCountType,
-    )
+    const headCountRequirement = getCountHeadCountRequirement(1, mockCountType)
     expect(headCountRequirement.verbose).toEqual("1 Counter")
     expect(headCountRequirement.isMet).toEqual(false)
   })

@@ -215,6 +215,7 @@ export function prepareNotificationPayload(
 
 */
 export async function generateErrorNotification(errorCode: string) {
+  console.log("error", errorCode)
   if (errorCode === "auth/wrong-password")
     generateNotification("incorrectPassword")
   if (errorCode === "auth/user-not-found")

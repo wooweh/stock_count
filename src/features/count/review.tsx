@@ -131,9 +131,7 @@ function CounterSummary() {
       boxSizing={"border-box"}
       borderRadius={theme.module[2]}
       boxShadow={theme.shadow.neo[1]}
-      sx={{
-        outline: `2px solid ${theme.scale.gray[7]}`,
-      }}
+      sx={{ outline: `2px solid ${theme.scale.gray[7]}` }}
     >
       <Stack
         gap={theme.module[0]}

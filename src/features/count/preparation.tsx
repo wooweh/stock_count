@@ -19,6 +19,7 @@ import {
   addCountUIArrayItem,
   editCountUIArrayItem,
   removeCountUIArrayItem,
+  resetCountUI,
   setCountUI,
   useCountUI,
 } from "./count"
@@ -367,7 +368,7 @@ function StartCountConfirmation() {
 
   function handleAccept() {
     startCount(checkUuids, comments, step)
-    setCountUI("isStartingCount", false)
+    resetCountUI()
   }
 
   function handleClose() {
@@ -405,9 +406,7 @@ function StartCountConfirmation() {
             boxSizing={"border-box"}
             bgcolor={theme.scale.red[7]}
             boxShadow={theme.shadow.neo[2]}
-            sx={{
-              outline: `1px solid ${theme.scale.red[5]}`,
-            }}
+            sx={{ outline: `1px solid ${theme.scale.red[5]}` }}
           >
             <Typography
               variant={"body2"}

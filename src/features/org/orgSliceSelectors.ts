@@ -1,6 +1,9 @@
 import { createSelector } from "@reduxjs/toolkit"
 import _ from "lodash"
-import { selectUserUuidString } from "../user/userSliceSelectors"
+import {
+  selectIsUserAdmin,
+  selectUserUuidString,
+} from "../user/userSliceSelectors"
 import { CountChecksProps, InvitesProps, orgSelector } from "./orgSlice"
 /*
 
@@ -131,6 +134,22 @@ function getOrgInvites(invites: InvitesProps | undefined) {
 export const selectOrgInvitesList = createSelector(
   [selectOrgInvites],
   (invites) => _.values(invites) ?? [],
+)
+/*
+                    
+                    
+                    
+                    
+*/
+export const selectIsUserOnlyAdmin = createSelector(
+  [selectOrgMembers, selectIsUserAdmin],
+  (members, isAdmin) => {
+    let adminCount = 0
+    _.forEach(members, (member) => {
+      if (member.role === "admin") adminCount += 1
+    })
+    return adminCount === 1 && isAdmin
+  },
 )
 /*
                     

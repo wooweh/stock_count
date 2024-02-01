@@ -19,9 +19,7 @@ export function List(props: ListProps) {
       maxHeight={props.maxHeight ?? "100%"}
       justifyContent={"flex-start"}
       gap={theme.module[props.gapScale ?? 3]}
-      sx={{
-        overflowY: "scroll",
-      }}
+      sx={{ overflowY: "scroll" }}
     >
       {props.children}
     </Window>

@@ -17,6 +17,7 @@ import Modal, { ModalActionProps } from "../../components/modal"
 import { ProfileWrapper, Slot } from "../../components/surface"
 import { selectIsMobile } from "../core/coreSliceSelectors"
 import { generateNotification } from "../core/coreUtils"
+import { selectIsUserOnlyAdmin } from "../org/orgSliceSelectors"
 import { PasswordValidationCheck } from "./authentication"
 import { changeEmail, changePassword } from "./userAuth"
 import {
@@ -186,10 +187,16 @@ function ProfileField(props: ProfileFieldProps) {
   const theme = useTheme()
 
   const isEditing = useUserUI((state) => state.isEditing)
+
   const placeholder =
     props.value === "" && !isEditing
       ? `Fill in your ${props.label.toLowerCase()}`
       : undefined
+  const inputStyles = {
+    fontSize: "1.125rem",
+    fontWeight: "medium",
+    background: isEditing ? theme.scale.gray[8] : theme.scale.gray[9],
+  }
 
   return (
     <Stack width={"100%"} alignItems={"flex-start"}>
@@ -205,11 +212,7 @@ function ProfileField(props: ProfileFieldProps) {
           placeholder={placeholder}
           onChange={props.handleChange}
           disabled={isEditing ? false : true}
-          sx={{
-            fontSize: "1.125rem",
-            fontWeight: "medium",
-            background: isEditing ? theme.scale.gray[8] : theme.scale.gray[9],
-          }}
+          sx={inputStyles}
         />
       </Slot>
     </Stack>
@@ -296,11 +299,12 @@ function ButtonTray() {
 */
 function DeleteProfileConfirmation() {
   const theme = useTheme()
+  const isOnlyAdmin = useAppSelector(selectIsUserOnlyAdmin)
   const isDeleting = useUserUI((state) => state.isDeleting)
   const [password, setPassword] = useState("")
 
   function handleAccept() {
-    removeUser(password)
+    removeUser(password, isOnlyAdmin)
   }
 
   function handleClose() {
@@ -315,6 +319,7 @@ function DeleteProfileConfirmation() {
     {
       iconName: "done",
       handleClick: handleAccept,
+      isDisabled: !password,
     },
   ]
 

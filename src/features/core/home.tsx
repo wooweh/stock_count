@@ -14,6 +14,7 @@ import Icon, { IconNames } from "../../components/icon"
 import { Slot, Window } from "../../components/surface"
 import { auth } from "../../remote"
 import {
+  selectCount,
   selectIsCountInvitePending,
   selectIsUserOrganiser,
 } from "../count/countSliceSelectors"
@@ -36,6 +37,8 @@ import { routePaths } from "./pages"
 export function Home() {
   const theme = useTheme()
   const location = useLocation()
+  const count = useAppSelector(selectCount)
+  console.log(count)
 
   const isProfileComplete = useAppSelector(selectIsProfileComplete)
   const isOrgSetup = useAppSelector(selectIsOrgSetup)

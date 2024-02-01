@@ -172,7 +172,6 @@ type CountTypeToggleButtonsProps = {
 }
 export function CountTypeToggleButtons(props: CountTypeToggleButtonsProps) {
   const countType = useAppSelector(selectCountType)
-  const tempCountType = useCountUI((state) => state.tempCountType)
 
   useEffect(() => {
     setCountUI("tempCountType", countType)
@@ -186,7 +185,7 @@ export function CountTypeToggleButtons(props: CountTypeToggleButtonsProps) {
 
   return (
     <ToggleButtonGroup
-      initialAlignment={_.capitalize(tempCountType)}
+      initialAlignment={_.capitalize(countType)}
       options={[
         {
           label: "Solo",
@@ -220,10 +219,10 @@ export function WarningBox() {
   const isCounterRequirementMet = useCountUI(
     (state) => state.isCounterRequirementMet,
   )
+  const notMet = !isCounterRequirementMet && countType
 
   return (
-    !isCounterRequirementMet &&
-    countType && (
+    notMet && (
       <Slot
         gap={theme.module[3]}
         paddingBottom={theme.module[4]}
@@ -251,7 +250,7 @@ function AddMembers() {
   const selectedMemberUuids = useCountUI((state) => state.selectedMemberUuids)
 
   const requirement = getCountHeadCountRequirement(
-    selectedMemberUuids,
+    selectedMemberUuids.length,
     countType,
   )
   const isRequirementMet = requirement.isMet
@@ -419,8 +418,9 @@ function CountersList() {
               <ListItem
                 label={name}
                 noWrap
-                primarySlot={<Icon variation={"profile"} />}
                 bgColor={theme.scale.gray[9]}
+                sx={{ padding: theme.module[2], paddingLeft: theme.module[4] }}
+                primarySlot={<Icon variation={"profile"} />}
                 secondarySlot={
                   <Button
                     variation={"pill"}
@@ -428,10 +428,6 @@ function CountersList() {
                     onClick={handleDelete}
                   />
                 }
-                sx={{
-                  padding: theme.module[2],
-                  paddingLeft: theme.module[4],
-                }}
                 key={name}
               />
             )

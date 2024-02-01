@@ -217,6 +217,10 @@ type NotificationProps = {
 }
 function Notification(props: NotificationProps) {
   const theme = useTheme()
+  const styles = {
+    outline: `2px solid ${theme.scale.blue[7]}`,
+    outlineOffset: "-2px",
+  }
 
   return (
     <Stack
@@ -226,10 +230,7 @@ function Notification(props: NotificationProps) {
       boxSizing={"border-box"}
       bgcolor={theme.scale.blue[9]}
       width={"100%"}
-      sx={{
-        outline: `2px solid ${theme.scale.blue[7]}`,
-        outlineOffset: "-2px",
-      }}
+      sx={styles}
     >
       <Slot gap={theme.module[4]} padding={theme.module[3]}>
         <Icon
@@ -577,15 +578,14 @@ function ActionButtonDropdown(props: ActionButtonDropdownProps) {
     }
   }
 
+  const styles = {
+    margin: 0 + "!important",
+    paddingRight: theme.module[6],
+    boxSizing: "border-box",
+  }
+
   return (
-    <Accordion
-      expanded={props.isActive}
-      sx={{
-        margin: 0 + "!important",
-        paddingRight: theme.module[6],
-        boxSizing: "border-box",
-      }}
-    >
+    <Accordion expanded={props.isActive} sx={styles}>
       <AccordionSummary />
       <AccordionDetails>
         <Slot justifyContent={"space-evenly"}>

@@ -1,7 +1,13 @@
-import { onChildChanged, onChildRemoved, onValue, ref } from "firebase/database"
+import {
+  child,
+  get,
+  onChildChanged,
+  onChildRemoved,
+  onValue,
+  ref,
+} from "firebase/database"
 import _ from "lodash"
 import { useEffect } from "react"
-import { useLocation } from "react-router-dom"
 import { useAppSelector } from "../../app/hooks"
 import { dbReal } from "../../remote"
 import { getDBPath } from "../../remote/dbPaths"
@@ -9,12 +15,13 @@ import {
   CountCheckProps,
   CountCommentsProps,
   CountItemProps,
+  CountMemberResultsProps,
   CountMembersProps,
   CountMetadataProps,
 } from "../count/countSlice"
 import {
-  selectCountMembers,
   selectCountMetadata,
+  selectCountType,
   selectCountersUuidList,
   selectIsUserCountResultsEmpty,
   selectIsUserCounter,
@@ -25,6 +32,7 @@ import {
   removeCountResultsItem,
   updateCountChecks,
   updateCountComments,
+  updateCountMemberResults,
   updateCountMembers,
   updateCountMetadata,
   updateCountResultItem,
@@ -171,23 +179,41 @@ export function StockDBListener() {
 
 */
 export function CountDBListener() {
-  const location = useLocation()
-
   const userUuid = useAppSelector(selectUserUuidString)
   const orgUuid = useAppSelector(selectUserOrgUuid)
   const isSystemActive = useAppSelector(selectIsSystemActive)
-  const localCountMembers = useAppSelector(selectCountMembers)
   const localCountMetadata = useAppSelector(selectCountMetadata)
   const isOrganiser = useAppSelector(selectIsUserOrganiser)
   const counterUuids = useAppSelector(selectCountersUuidList)
   const isCounter = useAppSelector(selectIsUserCounter)
+  const countType = useAppSelector(selectCountType)
   const isUserCountResultsEmpty = useAppSelector(selectIsUserCountResultsEmpty)
 
-  const isSafeToSync =
-    !!userUuid && !!orgUuid && isSystemActive && (isCounter || isOrganiser)
+  const isSafeToSyncCountMetaData = !!userUuid && !!orgUuid && isSystemActive
+  const isSafeToSyncCountData =
+    isSafeToSyncCountMetaData && (isCounter || isOrganiser)
 
   useEffect(() => {
-    if (isSafeToSync) {
+    if (isSafeToSyncCountMetaData) {
+      const dbCountMetadataRef = ref(dbReal, getDBPath.count(orgUuid).metadata)
+      onValue(dbCountMetadataRef, (snapshot) => {
+        const dbCountMetadata: CountMetadataProps = snapshot.val()
+        console.log(dbCountMetadata)
+        if (!!dbCountMetadata) {
+          updateCountMetadata(dbCountMetadata)
+          const isRemoved =
+            !dbCountMetadata.counters.includes(userUuid) &&
+            !(dbCountMetadata.organiser === userUuid)
+          if (isRemoved) removeCount()
+        } else {
+          removeCount()
+        }
+      })
+    }
+  }, [isSafeToSyncCountData])
+
+  useEffect(() => {
+    if (isSafeToSyncCountData) {
       const dbCountChecksRef = ref(dbReal, getDBPath.count(orgUuid).checks)
       onValue(dbCountChecksRef, (snapshot) => {
         const dbCountChecks: CountCheckProps[] = snapshot.val()
@@ -196,10 +222,10 @@ export function CountDBListener() {
         }
       })
     }
-  }, [isSafeToSync])
+  }, [isSafeToSyncCountData])
 
   useEffect(() => {
-    if (isSafeToSync) {
+    if (isSafeToSyncCountData) {
       const dbCountCommentsRef = ref(dbReal, getDBPath.count(orgUuid).comments)
       onValue(dbCountCommentsRef, (snapshot) => {
         const dbCountComments: CountCommentsProps = snapshot.val()
@@ -208,61 +234,39 @@ export function CountDBListener() {
         }
       })
     }
-  }, [isSafeToSync])
+  }, [isSafeToSyncCountData])
 
   useEffect(() => {
-    if (isSafeToSync) {
+    if (isSafeToSyncCountData) {
       const dbCountMembersRef = ref(dbReal, getDBPath.count(orgUuid).members)
       onValue(dbCountMembersRef, (snapshot) => {
         const dbCountMembers: CountMembersProps = snapshot.val()
         if (!!dbCountMembers) {
           updateCountMembers(dbCountMembers)
-        } else if (!!localCountMembers && !isOrganiser) {
-          removeCount()
         }
       })
     }
-  }, [isSafeToSync])
+  }, [isSafeToSyncCountData])
 
   useEffect(() => {
-    if (isSafeToSync) {
-      const dbCountMetadataRef = ref(dbReal, getDBPath.count(orgUuid).metadata)
-      onValue(dbCountMetadataRef, (snapshot) => {
-        const dbCountMetadata: CountMetadataProps = snapshot.val()
-        if (!!dbCountMetadata) {
-          updateCountMetadata(dbCountMetadata)
-        } else if (!!localCountMetadata && !isOrganiser) {
-          removeCount()
-        } else if (isOrganiser) {
-          removeCount()
+    if (isSafeToSyncCountData) {
+      get(
+        child(
+          ref(dbReal),
+          getDBPath.count(orgUuid).memberResults(userUuid).results,
+        ),
+      ).then((snapshot) => {
+        const memberResults: CountMemberResultsProps = snapshot.val()
+        if (!!memberResults) {
+          updateCountMemberResults(userUuid, memberResults)
         }
       })
     }
-  }, [isSafeToSync])
-
-  // useEffect(() => {
-  //   if (isSafeToSync) {
-  //     _.forEach(counterUuids, (uuid) => {
-  //       if (userUuid !== uuid || isUserCountResultsEmpty) {
-  //         const dbCounterResultsRef = ref(
-  //           dbReal,
-  //           getDBPath.count(orgUuid).memberResults(uuid).results,
-  //         )
-  //         onValue(dbCounterResultsRef, (snapshot) => {
-  //           const dbCounterResults: CountMemberResultsProps = snapshot.val()
-  //           if (!!dbCounterResults) {
-  //             updateCountMemberResults(uuid, dbCounterResults)
-  //           } else {
-  //             updateCountMemberResults(uuid, {})
-  //           }
-  //         })
-  //       }
-  //     })
-  //   }
-  // }, [isSafeToSync, counterUuids])
+    console.log("fired")
+  }, [counterUuids.length, isSafeToSyncCountData, countType])
 
   useEffect(() => {
-    if (isSafeToSync) {
+    if (isSafeToSyncCountData) {
       _.forEach(counterUuids, (memberUuid) => {
         if (userUuid !== memberUuid || isUserCountResultsEmpty) {
           onChildChanged(
@@ -272,7 +276,7 @@ export function CountDBListener() {
             ),
             (data) => {
               const result: CountItemProps = data.val()
-              updateCountResultItem(result, memberUuid)
+              if (!!result) updateCountResultItem(result, memberUuid, false)
             },
           )
           onChildRemoved(
@@ -282,13 +286,15 @@ export function CountDBListener() {
             ),
             (data) => {
               const result: CountItemProps = data.val()
-              removeCountResultsItem(result.id, memberUuid)
+              console.log(result)
+              if (!!result && !!result.id)
+                removeCountResultsItem(result.id, memberUuid)
             },
           )
         }
       })
     }
-  }, [isSafeToSync, counterUuids])
+  }, [isSafeToSyncCountData])
 
   return undefined
 }
