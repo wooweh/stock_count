@@ -4,6 +4,7 @@ import {
   deleteCount,
   deleteCountMember,
   deleteCountResultsItem,
+  setCount,
   setCountComments,
   setCountMember,
   setCountMembers,
@@ -20,6 +21,7 @@ import {
   setCountMemberOnDB,
   setCountMembersOnDB,
   setCountMetaDataOnDB,
+  setCountOnDB,
   setCountResultsItemOnDB,
   setCountResultsOnDB,
 } from "./countSliceRemote"
@@ -31,6 +33,20 @@ import { updateUserCountMember } from "./countSliceUtils"
 
 */
 export const countListenerMiddleware = createListenerMiddleware()
+/*
+
+
+
+
+*/
+countListenerMiddleware.startListening({
+  actionCreator: setCount,
+  effect: async (action) => {
+    const updateDB = action.payload.updateDB
+    const count = action.payload.count
+    if (updateDB) setCountOnDB(count)
+  },
+})
 /*
 
 
@@ -109,7 +125,8 @@ countListenerMiddleware.startListening({
   actionCreator: deleteCountResultsItem,
   effect: async (action) => {
     const payload = action.payload
-    deleteCountResultsItemOnDB(payload)
+    const updateDB = payload.updateDB
+    if (updateDB) deleteCountResultsItemOnDB(payload)
   },
 })
 /*
@@ -162,9 +179,10 @@ countListenerMiddleware.startListening({
 */
 countListenerMiddleware.startListening({
   actionCreator: deleteCount,
-  effect: async () => {
+  effect: async (action) => {
     const orgUuid = store.getState().org.org.uuid
-    if (!!orgUuid) deleteCountOnDB(orgUuid)
+    const updateDB = action.payload.updateDB
+    if (!!orgUuid && !!updateDB) deleteCountOnDB(orgUuid)
   },
 })
 /*

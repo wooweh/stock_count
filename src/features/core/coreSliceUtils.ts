@@ -96,7 +96,7 @@ export function resetSystem() {
   store.dispatch(setUser({ user: {}, updateDB: false }))
   store.dispatch(setOrg({ org: {}, updateDB: false }))
   store.dispatch(setStock({ stock: {}, updateDB: false }))
-  store.dispatch(setCount({}))
+  store.dispatch(setCount({ count: {}, updateDB: false }))
 }
 /*
 

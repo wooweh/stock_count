@@ -1,5 +1,4 @@
-import { ref, remove, set } from "firebase/database"
-import _ from "lodash"
+import { get, ref, remove, set } from "firebase/database"
 import { store } from "../../app/store"
 import { dbReal } from "../../remote"
 import { getDBPath } from "../../remote/dbPaths"
@@ -9,6 +8,7 @@ import {
   CountMemberProps,
   CountMembersProps,
   CountMetadataProps,
+  CountProps,
   CountResultsProps,
   DeleteCountItemProps,
   SetCountResultsItemProps,
@@ -45,6 +45,41 @@ export async function deleteCountMemberOnDB(memberUuid: string) {
     remove(
       ref(dbReal, getDBPath.count(orgUuid).member(memberUuid).member),
     ).catch((error) => {
+      console.log(error)
+    })
+  }
+}
+/*
+
+
+
+
+
+*/
+export async function getCountFromDB() {
+  const orgUuid = store.getState().org.org.uuid
+  if (orgUuid) {
+    return get(ref(dbReal, getDBPath.count(orgUuid).count))
+      .then((snapshot) => {
+        const count = snapshot.val()
+        return count
+      })
+      .catch((error) => {
+        console.error(error)
+      })
+  }
+}
+/*
+
+
+
+
+
+*/
+export async function setCountOnDB(payload: CountProps) {
+  const orgUuid = store.getState().org.org.uuid
+  if (orgUuid) {
+    set(ref(dbReal, getDBPath.count(orgUuid).count), payload).catch((error) => {
       console.log(error)
     })
   }
@@ -107,7 +142,7 @@ export async function deleteCountResultsItemOnDB(
   const orgUuid = store.getState().org.org.uuid
   const memberUuid = payload.memberUuid
   const stockId = payload.id
-  if (orgUuid) {
+  if (!!orgUuid && !!memberUuid && !!stockId) {
     remove(
       ref(
         dbReal,

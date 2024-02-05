@@ -24,6 +24,8 @@ import { Slot, Window } from "../../components/surface"
 import { selectOrgCountChecksList } from "../org/orgSliceSelectors"
 import { selectIsUserAdmin } from "../user/userSliceSelectors"
 import { resetCountUI, setCountUI, useCountUI } from "./count"
+import { CountProps } from "./countSlice"
+import { getCountFromDB } from "./countSliceRemote"
 import {
   selectIsCountInProgress,
   selectIsCountInvitePending,
@@ -34,6 +36,7 @@ import {
   createCountCheck,
   removeCountCheck,
   removeCountMembers,
+  updateCount,
   updateCountCheck,
   updateCountStep,
   updateUserCountMember,
@@ -117,8 +120,15 @@ function Invite() {
   const theme = useTheme()
 
   function handleAccept() {
-    updateUserCountMember({ isCounting: true, isJoined: true })
-    updateCountStep("stockCount", true)
+    getCountFromDB()
+      .then((count) => {
+        const updatedCount: CountProps = count
+        if (!!updatedCount) updateCount(updatedCount)
+      })
+      .then(() => {
+        updateUserCountMember({ isCounting: true, isJoined: true })
+        updateCountStep("stockCount", true)
+      })
   }
 
   function handleDecline() {
@@ -582,6 +592,8 @@ function ActionButtonDropdown(props: ActionButtonDropdownProps) {
     margin: 0 + "!important",
     paddingRight: theme.module[6],
     boxSizing: "border-box",
+    opacity: props.isActive ? 1 : 0,
+    transition: `opacity ${props.isActive ? 250 : 750}ms ease-out`,
   }
 
   return (

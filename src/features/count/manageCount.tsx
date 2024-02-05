@@ -36,7 +36,11 @@ import {
   selectCountersUuidList,
   selectIsUserOrganiser,
 } from "./countSliceSelectors"
-import { updateCountStep, updateManagedCount } from "./countSliceUtils"
+import {
+  updateCountMetadata,
+  updateCountStep,
+  updateManagedCount,
+} from "./countSliceUtils"
 import { getCountHeadCountRequirement } from "./countUtils"
 import { DataPill } from "./finalization"
 import { CountTypeToggleButtons, WarningBox } from "./setup"
@@ -895,12 +899,17 @@ function UpdateCountButton() {
     countType === tempCountType
   const isDisabled = !requirement.isMet || !isDataSafe || noChanges
 
+  function handleClick() {
+    setCountUI("isUpdatingCount", true)
+    updateCountMetadata({ isManaging: true }, true)
+  }
+
   return (
     <Window flexShrink={0} height={"min-content"}>
       <WarningBox />
       <Button
         variation={"profile"}
-        onClick={() => setCountUI("isUpdatingCount", true)}
+        onClick={handleClick}
         iconName={"done"}
         label="Update Count"
         color={theme.scale.green[6]}

@@ -24,6 +24,7 @@ export type CountProps = {
   checks?: CountCheckProps[]
 }
 export type CountMetadataProps = {
+  isManaging: boolean
   type?: CountTypes
   prepStartTime?: number
   countStartTime?: number
@@ -67,6 +68,7 @@ export type CountMemberProps = {
   isDeclined?: boolean
   step: CountSteps
 }
+export type SetCountProps = UpdateDB & { count: CountProps }
 export type SetCountMemberProps = UpdateDB & { member: CountMemberProps }
 export type SetCountMembersProps = UpdateDB & { members: CountMembersProps }
 export type SetCountChecksProps = UpdateDB & { checks: CountCheckProps[] }
@@ -84,7 +86,7 @@ export type SetCountMemberResultsProps = {
 export type DeleteCountMemberProps = {
   uuid: string
 }
-export type DeleteCountItemProps = {
+export type DeleteCountItemProps = UpdateDB & {
   memberUuid: string
   id: string
 }
@@ -127,7 +129,8 @@ export const countSlice = createSlice({
       const memberUuid = action.payload.memberUuid
       const countItem = action.payload.item
       const stockId = countItem.id
-      if (count) _.set(count, `results.${memberUuid}.${stockId}`, countItem)
+      if (!_.isEmpty(count))
+        _.set(count, `results.${memberUuid}.${stockId}`, countItem)
     },
     deleteCountResultsItem: (
       state,
@@ -136,7 +139,8 @@ export const countSlice = createSlice({
       const memberUuid = action.payload.memberUuid
       const stockId = action.payload.id
       const results = state.count.results
-      if (!!results) delete results[memberUuid][stockId]
+      if (!_.isEmpty(results) && !!memberUuid && !!stockId)
+        _.unset(results, `${memberUuid}.${stockId}`)
     },
     setCountMembers: (state, action: PayloadAction<SetCountMembersProps>) => {
       state.count.members = action.payload.members
@@ -162,10 +166,10 @@ export const countSlice = createSlice({
       const results = action.payload.results
       if (count) _.set(count, `results.${uuid}`, results)
     },
-    setCount: (state, action: PayloadAction<CountProps>) => {
-      state.count = action.payload
+    setCount: (state, action: PayloadAction<SetCountProps>) => {
+      state.count = action.payload.count
     },
-    deleteCount: (state) => {
+    deleteCount: (state, action: PayloadAction<UpdateDB>) => {
       state.count = {}
       state.step = "dashboard"
     },

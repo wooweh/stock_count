@@ -22,12 +22,14 @@ import {
   CountMemberResultsProps,
   CountMembersProps,
   CountMetadataProps,
+  CountProps,
   CountResultsProps,
   CountSteps,
   CountTypes,
   deleteCount,
   deleteCountMember,
   deleteCountResultsItem,
+  setCount,
   setCountChecks,
   setCountComments,
   setCountMember,
@@ -117,8 +119,12 @@ export function updateCountResultItem(
 
 
 */
-export function removeCountResultsItem(id: string, memberUuid: string) {
-  store.dispatch(deleteCountResultsItem({ id, memberUuid }))
+export function removeCountResultsItem(
+  id: string,
+  memberUuid: string,
+  updateDB: boolean = true,
+) {
+  store.dispatch(deleteCountResultsItem({ id, memberUuid, updateDB }))
 }
 /*
 
@@ -251,6 +257,7 @@ export function createCountMetadata(
   const organiserUuid = store.getState().user.user.uuid as string
   const prepStartTime = getTimeStamp()
   const metadata = {
+    isManaging: false,
     type: countType,
     organiser: organiserUuid,
     counters: counterUuids,
@@ -409,8 +416,8 @@ export function prepareFinalMembers(
 
 
 */
-export function removeCount() {
-  store.dispatch(deleteCount())
+export function removeCount(updateDB: boolean = true) {
+  store.dispatch(deleteCount({ updateDB }))
   store.dispatch(setCountStep({ step: "dashboard", updateMember: false }))
 }
 /*
@@ -457,6 +464,15 @@ export function completeReview() {
 
 
 */
+export function updateCount(count: CountProps, updateDB: boolean = false) {
+  store.dispatch(setCount({ count, updateDB }))
+}
+/*
+
+
+
+
+*/
 export function updateManagedCount(
   countType: CountTypes,
   addedMembers: string[],
@@ -464,36 +480,40 @@ export function updateManagedCount(
   transferredMembers: { [key: string]: string },
 ) {
   const count = store.getState().count.count
-  const currentCountType = count.metadata?.type
-  const isCurrentCountTypeChangedFromDualtoTeam =
-    currentCountType === "dual" && countType !== "team"
+  const orgMembers = store.getState().org.org.members!
   const members = count.members!
   const results = count.results!
-  const orgMembers = store.getState().org.org.members!
+  const metadata = count.metadata!
+  const currentCountType = metadata.type
+  const isCurrentCountTypeChangedFromDualtoTeam =
+    currentCountType === "dual" && countType !== "team"
 
-  const updatedMembers = prepareManagedCountMembers(
+  const updatedMembers: CountMembersProps = prepareManagedCountMembers(
     members,
     orgMembers,
     addedMembers,
     removedMembers,
   )
-  updateCountMembers(updatedMembers, true)
-
-  const counters = _.keys(
-    _.omitBy(updatedMembers, (member) => !member.isCounter),
-  )
-  const type = countType
-  updateCountMetadata({ type, counters }, true)
-
-  const updatedResults = prepareManagedCountResults(
+  const updatedResults: CountResultsProps = prepareManagedCountResults(
     results,
     addedMembers,
     removedMembers,
     transferredMembers,
     isCurrentCountTypeChangedFromDualtoTeam,
   )
-  console.log(updatedResults)
-  updateCountResults(updatedResults)
+  const updatedMetadata: CountMetadataProps = prepareManagedCountMetatdata(
+    metadata,
+    updatedMembers,
+    countType,
+  )
+  const updatedCount: CountProps = {
+    ...count,
+    results: updatedResults,
+    members: updatedMembers,
+    metadata: updatedMetadata,
+  }
+
+  store.dispatch(setCount({ count: updatedCount, updateDB: true }))
 }
 /*
 
@@ -508,34 +528,38 @@ export function prepareManagedCountMembers(
   removedMembers: string[],
 ) {
   const updatedMembers: CountMembersProps = { ...members }
-  _.forEach(addedMembers, (memberUuid) => {
-    const isOrganiser = !!members[memberUuid]?.isOrganiser
-    const orgMember = orgMembers![memberUuid]
-    const member = _.omit(orgMember, "role")
-    const countMember: CountMemberProps = {
-      ...member,
-      isOrganiser: isOrganiser,
-      isCounter: true,
-      isJoined: isOrganiser,
-      isCounting: isOrganiser,
-      step: isOrganiser ? "review" : "dashboard",
-    }
-    _.set(updatedMembers, memberUuid, countMember)
-  })
-  _.forEach(removedMembers, (memberUuid) => {
-    const isOrganiser = members[memberUuid].isOrganiser
-    if (isOrganiser) {
-      const member = members[memberUuid]
+  if (!!addedMembers.length) {
+    _.forEach(addedMembers, (memberUuid) => {
+      const isOrganiser = !!members[memberUuid]?.isOrganiser
+      const orgMember = orgMembers![memberUuid]
+      const member = _.omit(orgMember, "role")
       const countMember: CountMemberProps = {
         ...member,
-        isCounter: false,
-        step: "review",
+        isOrganiser: isOrganiser,
+        isCounter: true,
+        isJoined: isOrganiser,
+        isCounting: isOrganiser,
+        step: isOrganiser ? "review" : "dashboard",
       }
       _.set(updatedMembers, memberUuid, countMember)
-    } else {
-      _.unset(updatedMembers, memberUuid)
-    }
-  })
+    })
+  }
+  if (!!removedMembers.length) {
+    _.forEach(removedMembers, (memberUuid) => {
+      const isOrganiser = members[memberUuid].isOrganiser
+      if (isOrganiser) {
+        const member = members[memberUuid]
+        const countMember: CountMemberProps = {
+          ...member,
+          isCounter: false,
+          step: "review",
+        }
+        _.set(updatedMembers, memberUuid, countMember)
+      } else {
+        _.unset(updatedMembers, memberUuid)
+      }
+    })
+  }
   return updatedMembers
 }
 /*
@@ -563,17 +587,46 @@ export function prepareManagedCountResults(
     })
     _.set(updatedResults, memberUuidList[1], memberTwoResults)
   }
-  _.forEach(addedMembers, (memberUuid) => {
-    _.set(updatedResults, memberUuid, {})
-  })
-  _.forEach(removedMembers, (memberUuid) => {
-    _.unset(updatedResults, memberUuid)
-  })
-  _.forEach(transferredMembers, (newMemberUuid, oldMemberUuid) => {
-    _.set(updatedResults, newMemberUuid, _.get(results, oldMemberUuid))
-  })
-  console.log(updatedResults)
+  if (!!addedMembers.length) {
+    _.forEach(addedMembers, (memberUuid) => {
+      _.set(updatedResults, memberUuid, {})
+    })
+  }
+  if (removedMembers.length) {
+    _.forEach(removedMembers, (memberUuid) => {
+      _.unset(updatedResults, memberUuid)
+    })
+  }
+  if (!_.isEmpty(transferredMembers)) {
+    _.forEach(transferredMembers, (newMemberUuid, oldMemberUuid) => {
+      _.set(updatedResults, newMemberUuid, _.get(results, oldMemberUuid))
+    })
+  }
   return updatedResults
+}
+/*
+
+
+
+
+*/
+export function prepareManagedCountMetatdata(
+  metadata: CountMetadataProps,
+  updatedMembers: CountMembersProps,
+  countType: CountTypes,
+) {
+  const counters = _.keys(
+    _.pickBy(updatedMembers, (member) => member.isCounter),
+  )
+  const type = countType
+  const updatedMetadata: CountMetadataProps = {
+    ...metadata,
+    type,
+    counters,
+    isManaging: false,
+  }
+
+  return updatedMetadata
 }
 /*
 

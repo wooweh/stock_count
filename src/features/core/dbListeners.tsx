@@ -1,6 +1,5 @@
 import {
-  child,
-  get,
+  off,
   onChildChanged,
   onChildRemoved,
   onValue,
@@ -15,14 +14,12 @@ import {
   CountCheckProps,
   CountCommentsProps,
   CountItemProps,
-  CountMemberResultsProps,
   CountMembersProps,
   CountMetadataProps,
 } from "../count/countSlice"
 import {
-  selectCountMetadata,
-  selectCountType,
   selectCountersUuidList,
+  selectIsManagingCount,
   selectIsUserCountResultsEmpty,
   selectIsUserCounter,
   selectIsUserOrganiser,
@@ -32,7 +29,6 @@ import {
   removeCountResultsItem,
   updateCountChecks,
   updateCountComments,
-  updateCountMemberResults,
   updateCountMembers,
   updateCountMetadata,
   updateCountResultItem,
@@ -142,6 +138,8 @@ export function OrgDBListener() {
           leaveOrg()
         }
       })
+    } else {
+      if (!!userOrgUuid) off(ref(dbReal, getDBPath.org(userOrgUuid).org))
     }
   }, [isSafeToSync])
 
@@ -167,6 +165,8 @@ export function StockDBListener() {
         const dbStock: StockProps = snapshot.val()
         updateStock(dbStock)
       })
+    } else {
+      if (!!orgUuid) off(ref(dbReal, getDBPath.stock(orgUuid).stock))
     }
   }, [isSafeToSync])
 
@@ -179,34 +179,34 @@ export function StockDBListener() {
 
 */
 export function CountDBListener() {
+  const isUserCountResultsEmpty = useAppSelector(selectIsUserCountResultsEmpty)
   const userUuid = useAppSelector(selectUserUuidString)
   const orgUuid = useAppSelector(selectUserOrgUuid)
   const isSystemActive = useAppSelector(selectIsSystemActive)
-  const localCountMetadata = useAppSelector(selectCountMetadata)
   const isOrganiser = useAppSelector(selectIsUserOrganiser)
   const counterUuids = useAppSelector(selectCountersUuidList)
   const isCounter = useAppSelector(selectIsUserCounter)
-  const countType = useAppSelector(selectCountType)
-  const isUserCountResultsEmpty = useAppSelector(selectIsUserCountResultsEmpty)
+  const isManaging = useAppSelector(selectIsManagingCount)
 
   const isSafeToSyncCountMetaData = !!userUuid && !!orgUuid && isSystemActive
   const isSafeToSyncCountData =
-    isSafeToSyncCountMetaData && (isCounter || isOrganiser)
+    isSafeToSyncCountMetaData && !isManaging && (isCounter || isOrganiser)
 
   useEffect(() => {
     if (isSafeToSyncCountMetaData) {
       const dbCountMetadataRef = ref(dbReal, getDBPath.count(orgUuid).metadata)
       onValue(dbCountMetadataRef, (snapshot) => {
         const dbCountMetadata: CountMetadataProps = snapshot.val()
-        console.log(dbCountMetadata)
         if (!!dbCountMetadata) {
           updateCountMetadata(dbCountMetadata)
           const isRemoved =
             !dbCountMetadata.counters.includes(userUuid) &&
             !(dbCountMetadata.organiser === userUuid)
-          if (isRemoved) removeCount()
+          if (isRemoved) removeCount(false)
+        } else if (!dbCountMetadata && !isOrganiser) {
+          removeCount(false)
         } else {
-          removeCount()
+          if (!!orgUuid) off(ref(dbReal, getDBPath.count(orgUuid).metadata))
         }
       })
     }
@@ -221,6 +221,8 @@ export function CountDBListener() {
           updateCountChecks(dbCountChecks)
         }
       })
+    } else {
+      if (!!orgUuid) off(ref(dbReal, getDBPath.count(orgUuid).checks))
     }
   }, [isSafeToSyncCountData])
 
@@ -233,6 +235,8 @@ export function CountDBListener() {
           updateCountComments(dbCountComments)
         }
       })
+    } else {
+      if (!!orgUuid) off(ref(dbReal, getDBPath.count(orgUuid).comments))
     }
   }, [isSafeToSyncCountData])
 
@@ -245,25 +249,10 @@ export function CountDBListener() {
           updateCountMembers(dbCountMembers)
         }
       })
+    } else {
+      if (!!orgUuid) off(ref(dbReal, getDBPath.count(orgUuid).members))
     }
   }, [isSafeToSyncCountData])
-
-  useEffect(() => {
-    if (isSafeToSyncCountData) {
-      get(
-        child(
-          ref(dbReal),
-          getDBPath.count(orgUuid).memberResults(userUuid).results,
-        ),
-      ).then((snapshot) => {
-        const memberResults: CountMemberResultsProps = snapshot.val()
-        if (!!memberResults) {
-          updateCountMemberResults(userUuid, memberResults)
-        }
-      })
-    }
-    console.log("fired")
-  }, [counterUuids.length, isSafeToSyncCountData, countType])
 
   useEffect(() => {
     if (isSafeToSyncCountData) {
@@ -286,13 +275,13 @@ export function CountDBListener() {
             ),
             (data) => {
               const result: CountItemProps = data.val()
-              console.log(result)
-              if (!!result && !!result.id)
-                removeCountResultsItem(result.id, memberUuid)
+              if (!!result) removeCountResultsItem(result.id, memberUuid, false)
             },
           )
         }
       })
+    } else {
+      if (!!orgUuid) off(ref(dbReal, getDBPath.count(orgUuid).results))
     }
   }, [isSafeToSyncCountData])
 
@@ -322,6 +311,8 @@ export function HistoryDBListener() {
           updateHistory({})
         }
       })
+    } else {
+      if (!!orgUuid) off(ref(dbReal, getDBPath.history(orgUuid).history))
     }
   }, [isSafeToSync])
 

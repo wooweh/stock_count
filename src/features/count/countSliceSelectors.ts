@@ -50,6 +50,16 @@ export const selectCountMetadata = createSelector(
 
 
 */
+export const selectIsManagingCount = createSelector(
+  [selectCount],
+  (count) => !!count.metadata?.isManaging,
+)
+/*
+
+
+
+
+*/
 export const selectCountType = createSelector(
   [selectCount],
   (count) => count.metadata?.type ?? "solo",
