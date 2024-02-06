@@ -27,6 +27,7 @@ type ModalProps = {
   outlineColor?: ThemeColors
   actions?: ModalActionProps[]
   onClose?: Function
+  sx?: any
 }
 export default function Modal(props: ModalProps) {
   const theme = useTheme()
@@ -47,6 +48,7 @@ export default function Modal(props: ModalProps) {
       theme.scale[props.outlineColor ?? "gray"][props.outlineColor ? 7 : 6]
     } !important`,
     outlineOffset: "-2px",
+    ...props.sx,
   }
 
   return (
@@ -74,6 +76,7 @@ export default function Modal(props: ModalProps) {
           boxSizing={"border-box"}
           bgcolor={theme.scale.gray[7]}
           borderRadius={theme.module[3]}
+          justifyContent={"space-between"}
           overflow={"hidden"}
           sx={styles}
         >
@@ -90,6 +93,7 @@ export default function Modal(props: ModalProps) {
             </Typography>
           </Stack>
           <Stack
+            height={"100%"}
             alignItems={"center"}
             padding={`${theme.module[3]} ${theme.module[3]}`}
             boxSizing={"border-box"}

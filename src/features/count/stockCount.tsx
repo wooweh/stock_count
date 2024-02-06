@@ -443,6 +443,9 @@ function RecordStockItemCount() {
       body={<RecordStockItemCountBody handleClose={handleClose} />}
       actions={actions}
       onClose={handleClose}
+      sx={{
+        height: "100%",
+      }}
     />
   )
 }
@@ -477,9 +480,10 @@ function RecordStockItemCountBody({ handleClose }: { handleClose: Function }) {
       state={{ featureUI: { ...countUIState } }}
     >
       <Stack
+        height={"100%"}
         width={"100%"}
-        gap={theme.module[4]}
-        justifyContent={"flex-start"}
+        gap={theme.module[5]}
+        justifyContent={"space-between"}
         paddingBottom={theme.module[3]}
         boxSizing={"border-box"}
       >
@@ -518,29 +522,37 @@ function StockDetails({
 
   return (
     <Stack
-      gap={theme.module[2]}
+      gap={theme.module[3]}
       paddingLeft={theme.module[0]}
       boxSizing={"border-box"}
     >
-      <Stack direction={"row"} gap={theme.module[3]}>
+      <Stack direction={"row"} gap={theme.module[5]}>
         <Typography
+          variant={"h6"}
           fontWeight={"bold"}
           width={theme.module[6]}
           color={theme.scale.gray[5]}
         >
           Name:
         </Typography>
-        <Typography fontWeight={"bold"}>{stockItem.name}</Typography>
+        <Typography variant={"h6"} fontWeight={"bold"}>
+          {stockItem.name}
+        </Typography>
       </Stack>
-      <Stack direction={"row"} gap={theme.module[3]}>
+      <Stack direction={"row"} gap={theme.module[5]}>
         <Typography
+          variant={"h6"}
           fontWeight={"bold"}
           width={theme.module[6]}
           color={theme.scale.gray[5]}
         >
           Unit:
         </Typography>
-        <Typography fontWeight={"bold"} color={theme.scale.gray[4]}>
+        <Typography
+          variant={"h6"}
+          fontWeight={"bold"}
+          color={theme.scale.gray[4]}
+        >
           {stockItem.unit}
         </Typography>
       </Stack>
@@ -610,6 +622,7 @@ function CountData() {
   return (
     <Stack
       width={"100%"}
+      height={"100%"}
       boxShadow={theme.shadow.neo[4]}
       borderRadius={theme.module[3]}
       sx={{
@@ -625,15 +638,21 @@ function CountData() {
         borderRadius={`${theme.module[3]} ${theme.module[3]} 0 0`}
         boxShadow={theme.shadow.neo[3]}
       >
-        <Typography color={theme.scale.gray[4]} fontWeight={"bold"}>
+        <Typography
+          variant={"h6"}
+          color={theme.scale.gray[4]}
+          fontWeight={"bold"}
+        >
           Count Data
         </Typography>
       </Stack>
       <Stack
         width={"100%"}
         padding={theme.module[4]}
+        justifyContent={"space-evenly"}
+        height={"100%"}
         boxSizing={"border-box"}
-        gap={theme.module[3]}
+        gap={theme.module[5]}
       >
         {inputs.map((input: StockItemCountInputProps) => (
           <StockItemCountInput {...input} key={input.label} />
@@ -661,6 +680,11 @@ function StockItemCountInput(props: StockItemCountInputProps) {
 
   const [isEditing, setIsEditing] = useState(false)
 
+  const commonStyles = {
+    paddingRight: theme.module[3],
+    outline: `2px solid ${props.outlineColor}`,
+    fontSize: "large",
+  }
   const inputProps = isEditing
     ? {
         key: "isEditing",
@@ -669,10 +693,7 @@ function StockItemCountInput(props: StockItemCountInputProps) {
         onChange: (e: any) => props.setCount(Number(e.target.value)),
         onBlur: () => setIsEditing(false),
         isNumber: true,
-        sx: {
-          paddingRight: theme.module[3],
-          outline: `2px solid ${props.outlineColor}`,
-        },
+        sx: { ...commonStyles },
       }
     : {
         key: "notEditing",
@@ -681,10 +702,9 @@ function StockItemCountInput(props: StockItemCountInputProps) {
         onFocus: () => setIsEditing(true),
         readOnly: true,
         sx: {
+          ...commonStyles,
           color: `${props.color} !important`,
           background: theme.scale.gray[8],
-          outline: `2px solid ${props.outlineColor}`,
-          paddingRight: theme.module[3],
           fontWeight: "bold",
         },
       }
@@ -698,18 +718,21 @@ function StockItemCountInput(props: StockItemCountInputProps) {
 
   return (
     <Slot justifyContent={"space-between"}>
-      <Stack
-        direction={"row"}
+      <Slot
         gap={theme.module[4]}
-        width={"100%"}
         height={"100%"}
+        justifyContent={"flex-start"}
         flexShrink={2}
       >
-        <Icon variation={props.iconName} />
-        <Typography fontWeight={"bold"} color={theme.scale.gray[4]}>
+        <Icon fontSize="large" variation={props.iconName} />
+        <Typography
+          variant={"h6"}
+          fontWeight={"bold"}
+          color={theme.scale.gray[4]}
+        >
           {props.label}:
         </Typography>
-      </Stack>
+      </Slot>
       <Stack width={inputWidth}>
         <Input {...inputProps} />
       </Stack>

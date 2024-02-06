@@ -326,7 +326,7 @@ function ForgotPassword({ isRegistering }: { isRegistering: boolean }) {
       <Button
         variation={"pill"}
         label={`Forgot password ${
-          isDisabled ? "(Enter your email address)" : ""
+          isDisabled ? "(Fill your email)" : ""
         }`}
         onClick={handleClick}
         disabled={isDisabled}

@@ -1,5 +1,4 @@
 import { Typography } from "@mui/material"
-import Stack from "@mui/material/Stack"
 import { getAuth, onAuthStateChanged } from "firebase/auth"
 import _ from "lodash"
 import { useEffect, useState } from "react"
@@ -261,13 +260,18 @@ function HomeButtons() {
   const buttons = isAdmin ? adminButtons : memberButtons
 
   return (
-    <Window padding={theme.module[4]} paddingBottom={theme.module[5]}>
-      <Slot height={"18.75%"} minHeight={theme.module[8]}>
+    <Window
+      padding={theme.module[4]}
+      paddingBottom={theme.module[0]}
+      justifyContent={"flex-start"}
+      gap={theme.module[2]}
+    >
+      <Slot>
         <Button
           variation="profile"
           label={orgName}
           iconName="org"
-          bgColor={theme.scale.gray[7]}
+          bgColor={theme.scale.gray[8]}
           iconColor={theme.scale.gray[5]}
           color={theme.scale.gray[4]}
           outlineColor={theme.scale.gray[6]}
@@ -276,30 +280,30 @@ function HomeButtons() {
           justifyCenter
         />
       </Slot>
-      <Stack
-        width={"100%"}
-        alignItems={"center"}
-        height={"75%"}
-        justifyItems={"flex-start"}
-        gap={theme.module[4]}
-      >
-        {buttons.map((button: HomeButton) => {
-          return (
-            <Button
-              key={button.label}
-              variation={"home"}
-              label={button.label}
-              bgColor={button.bgColor}
-              color={button.color}
-              iconName={button.icon}
-              iconColor={button.iconColor}
-              outlineColor={button.outlineColor}
-              showBadge={button.showBadge}
-              onClick={() => navigate(button.path)}
-            />
-          )
-        })}
-      </Stack>
+      <Window justifyContent={"center"}>
+        <Window
+          justifyContent={"space-evenly"}
+          maxHeight={"90%"}
+          gap={theme.module[2]}
+        >
+          {buttons.map((button: HomeButton) => {
+            return (
+              <Button
+                key={button.label}
+                variation={"home"}
+                label={button.label}
+                bgColor={button.bgColor}
+                color={button.color}
+                iconName={button.icon}
+                iconColor={button.iconColor}
+                outlineColor={button.outlineColor}
+                showBadge={button.showBadge}
+                onClick={() => navigate(button.path)}
+              />
+            )
+          })}
+        </Window>
+      </Window>
     </Window>
   )
 }

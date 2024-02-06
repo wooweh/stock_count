@@ -190,6 +190,7 @@ function HomeButton(props: ButtonVariationProps) {
     borderRadius: theme.module[3],
     overflow: "visible",
     justifyContent: "flex-start",
+    outlineOffset: "-3px",
     outline: `3px solid ${
       props.outlineColor ?? theme.scale.gray[6]
     } !important`,

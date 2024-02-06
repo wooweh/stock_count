@@ -215,9 +215,9 @@ function CountTeamDescription() {
   }
   return (
     <Typography variant="body2" color={theme.scale.gray[4]}>
-      Select members for <Action action={"removal"} color={"red"} /> and/or{" "}
-      <Action action={"results transfer"} color={"yellow"} /> and{" "}
-      <Action action={"add"} color={"blue"} /> replacement members.
+      <Action action={"Remove"} color={"red"} /> members,{" "}
+      <Action action={"transfer results"} color={"yellow"} />, and{" "}
+      <Action action={"add"} color={"blue"} /> new members.
     </Typography>
   )
 }
@@ -366,6 +366,8 @@ function TeamMemberControls(props: TeamMemberControlsProps) {
     }
   }
 
+  const isTransferDisabled = !props.count
+
   return (
     <CountTeamSlot
       left={<Typography fontWeight={"bold"}>{props.name}</Typography>}
@@ -381,6 +383,7 @@ function TeamMemberControls(props: TeamMemberControlsProps) {
             onClick={handleToggleDelete}
           />
           <Button
+            disabled={isTransferDisabled}
             variation={"pill"}
             iconName={isTransferred ? "checked" : "unchecked"}
             iconColor={theme.scale.yellow[6]}
@@ -499,12 +502,34 @@ function CountTeamRightSlot({ children }: { children: React.ReactElement[] }) {
 function AddMembersButton() {
   const theme = useTheme()
 
+  const countMembers = useAppSelector(selectCountersList)
+
+  const tempCountType = useCountUI((state) => state.tempCountType)
+  const selectedMemberUuids = useCountUI((state) => state.selectedMemberUuids)
+  const tempAddedMemberUuids = useCountUI((state) => state.tempAddedMemberUuids)
+  const tempRemovedMemberUuids = useCountUI(
+    (state) => state.tempRemovedMemberUuids,
+  )
+
+  const potentialHeadCount =
+    countMembers.length +
+    selectedMemberUuids.length +
+    tempAddedMemberUuids.length -
+    tempRemovedMemberUuids.length
+
+  const requirement = getCountHeadCountRequirement(
+    potentialHeadCount,
+    tempCountType,
+  )
+  const isDisabled = requirement.isMet
+
   function handleAdd() {
     setCountUI("isAddingTempMembers", true)
   }
 
   return (
     <Button
+      disabled={isDisabled}
       variation={"pill"}
       onClick={handleAdd}
       iconName={"addMembers"}
