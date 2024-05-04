@@ -58,30 +58,31 @@ The data flow follows the unidirectional pattern commonly associated with Redux 
 
 ### 🗂️ File Structure
 Notable aspects of the file structure:
-
-- `src/`
-  - `app/` 
-    - `store.ts` - Redux store configuration.
-    - `hooks.ts` - Custom Redux hooks for dispatch and selector.
-  - `common/` 
-    - `theme.ts` - Global theme hook.
-    - `utils.ts` - Global utility functions.
-  - `components/`
-    - Global components used across multiple features.
-  - `features/`
-    - `feature/`
-      - `feature.tsx` - Main UI component for feature.
-      - `featureSlice.ts` - Redux slice for feature.
-      - `featureSlice.spec.ts` - Unit testing for reducer functions.
-      - `featureSliceSelectors.ts` - Redux selectors for feature.
-      - `featureSliceEffects.ts` - Middleware listeners triggered by redux reducers.
-      - `featureSliceUtils.ts` - Business logic functions.
-      - `featureSliceRemote/Auth.ts` - DB and Auth API wrapper functions.
-      - `featureUtils.ts` - Utility functions for UI presentation.
-      - `featureUtils.spec.ts` - Unit tests for feature utility functions.
-  - `remote/` - Firebase configuration and DB paths.
-- `tests/`
+```
+src/
+  app/ 
+    store.ts - Redux store configuration.
+    hooks.ts - Custom Redux hooks for dispatch and selector.
+  common/ 
+    theme.ts - Global theme hook.
+    utils.ts - Global utility functions.
+  components/ - Global components used across multiple features.
+  features/
+    feature/
+      feature.tsx - Main UI component for feature.
+      subFeature.tsx - Sub feature UI component.
+      featureSlice.ts - Redux slice for feature.
+      featureSlice.spec.ts - Unit testing for reducer functions.
+      featureSliceSelectors.ts - Redux selectors for feature.
+      featureSliceEffects.ts - Middleware listeners triggered by redux reducers.
+      featureSliceUtils.ts - Business logic functions.
+      featureSliceRemote/Auth.ts - DB and Auth API wrapper functions.
+      featureUtils.ts - Utility functions for UI presentation.
+      featureUtils.spec.ts - Unit tests for feature utility functions.
+  remote/ - Firebase configuration and DB paths.
+tests/
   - Playwright UI tests for end-to-end scenarios.
+```
 
 ## 🔥 Backend Integration
 The application integrates with Firebase for backend services:
