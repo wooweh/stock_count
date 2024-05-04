@@ -29,3 +29,7 @@ build
 # Miscellaneous
 /src/zTodo.txt
 *.local*
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
