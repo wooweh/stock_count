@@ -6,7 +6,7 @@ The idea was inspired by the need to provide a simple, effective tool to my wife
 
 Feel free to use the code, or to contribute to this repo.
 
-## 📋 Project Overview
+## 📋 Application Overview
 
 The application has the following features:
 - **User Authentication**: Users can sign up, login, and sign out.
@@ -56,18 +56,7 @@ The data flow follows the unidirectional pattern commonly associated with Redux 
     - `users:`
       - `userUuid:` `userData`
 
-### 🔥 Backend Integration
-The application integrates with Firebase for backend services:
-- **Firebase Realtime DB Web**: Stores application data.
-- **Firebase Authentication Web**: Manages user authentication and authorization.
-- **Firebase Hosting**: Domain and hosting configuration.
-
-### 🧪 Testing
-Testing is conducted at 2 levels:
-- **Unit Testing**: Implemented with Vitest for utility functions.
-- **UI Testing**: Conducted with Playwright for end-to-end user interface testing.
-
-## 🗂️ File Structure
+### 🗂️ File Structure
 Notable aspects of the file structure:
 
 - `src/`
@@ -94,8 +83,20 @@ Notable aspects of the file structure:
 - `tests/`
   - Playwright UI tests for end-to-end scenarios.
 
+## 🔥 Backend Integration
+The application integrates with Firebase for backend services:
+- **Firebase Realtime DB Web**: Stores application data.
+- **Firebase Authentication Web**: Manages user authentication and authorization.
+- **Firebase Hosting**: Domain and hosting configuration.
+
+## 🧪 Testing
+Testing is conducted at 2 levels:
+- **Unit Testing**: Implemented with Vitest for utility functions.
+- **UI Testing**: Conducted with Playwright for end-to-end user interface testing.
+
+
 ## 🏁 Getting Started
-You will need to set up a new Firebase project to make use of the hosting, authentication and database SDKs.
+You will need to set up a new Firebase project to get credentials to make use of the hosting, authentication and database SDKs.
 
 To set up and run the Stock Counting Application, follow these steps:
 
