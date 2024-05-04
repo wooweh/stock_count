@@ -65,6 +65,7 @@ describe("Count Reducer", () => {
         countStartTime: COUNT_START_TIME,
         reviewStartTime: REVIEW_START_TIME,
         finalSubmissionTime: FINAL_SUBMIT_TIME,
+        isManaging: true,
         organiser: "mockUuid",
         counters: ["mockUuid"],
       },
@@ -146,10 +147,11 @@ describe("Count Reducer", () => {
       damagedCount: 2,
       obsoleteCount: 3,
     }
+    const updateDB = true
     const stockId = item.id
     const actual = countReducer(
       mockState,
-      setCountResultsItem({ memberUuid, item }),
+      setCountResultsItem({ memberUuid, item, updateDB }),
     )
     const results = actual.count.results as CountResultsProps
     expect(results[memberUuid][stockId].useableCount).toEqual(1)
@@ -161,6 +163,7 @@ describe("Count Reducer", () => {
     const mockPayload: DeleteCountItemProps = {
       memberUuid,
       id,
+      updateDB: true,
     }
     const actual = countReducer(mockState, deleteCountResultsItem(mockPayload))
     const results = actual.count.results as CountResultsProps
@@ -196,6 +199,7 @@ describe("Count Reducer", () => {
       countStartTime: COUNT_START_TIME,
       reviewStartTime: REVIEW_START_TIME,
       finalSubmissionTime: FINAL_SUBMIT_TIME,
+      isManaging: false,
       organiser: "mockUuid",
       counters: ["mockUuid"],
     }
@@ -259,13 +263,13 @@ describe("Count Reducer", () => {
   })
 
   it("should handle setCount", () => {
-    const mockPayload = mockState.count
+    const mockPayload = { count: mockState.count, updateDB: true }
     const actual = countReducer(initialState, setCount(mockPayload))
-    expect(actual.count).toEqual(mockPayload)
+    expect(actual.count).toEqual(mockPayload.count)
   })
 
   it("should handle deleteCount", () => {
-    const actual = countReducer(mockState, deleteCount())
+    const actual = countReducer(mockState, deleteCount({ updateDB: true }))
     expect(actual.count).toEqual({})
   })
 })
@@ -426,6 +430,7 @@ describe("Count SliceUtils", () => {
       addedMembers,
       removedMembers,
       transferredMembers,
+      false,
     )
     expectTypeOf(managedCountResults).toEqualTypeOf<CountResultsProps>()
     expect(managedCountResults.mockUuid1).toEqual(undefined)

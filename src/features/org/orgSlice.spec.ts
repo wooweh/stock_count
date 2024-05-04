@@ -56,7 +56,7 @@ describe("org reducer", () => {
   it("should handle setMemberStatus", () => {
     const mockData = "isJoined"
     const actual = orgReducer(initialState, setMemberStatus(mockData))
-    expect(actual.org.name).toEqual(mockData)
+    expect(actual.memberStatus).toEqual(mockData)
     expectTypeOf(actual.memberStatus).toEqualTypeOf<MemberStatuses>()
   })
 

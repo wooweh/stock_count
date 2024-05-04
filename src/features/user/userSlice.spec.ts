@@ -23,12 +23,14 @@ describe("user reducer", () => {
   const initialState: UserState = {
     isSignedIn: false,
     passwordChangeStatus: "notChanged",
+    emailChangeStatus: "notChanged",
     user: {},
   }
 
   const mockState: UserState = {
     isSignedIn: true,
     passwordChangeStatus: "notChanged",
+    emailChangeStatus: "notChanged",
     user: {
       uuid: "uuid",
       email: "email",
@@ -44,6 +46,7 @@ describe("user reducer", () => {
     expect(userReducer(undefined, { type: "unknown" })).toEqual({
       isSignedIn: false,
       passwordChangeStatus: "notChanged",
+      emailChangeStatus: "notChanged",
       user: {},
     })
   })

@@ -150,7 +150,7 @@ describe("Count Utils", () => {
     const mockCountType: CountTypes = "solo"
     const headCountRequirement = getCountHeadCountRequirement(1, mockCountType)
     expect(headCountRequirement.verbose).toEqual("1 Counter")
-    expect(headCountRequirement.isMet).toEqual(false)
+    expect(headCountRequirement.isMet).toEqual(true)
   })
 
   it("should handle getReviewTableData", () => {
