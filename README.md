@@ -36,6 +36,12 @@ The data flow follows the unidirectional pattern commonly associated with Redux 
 3. **Middleware**: Middleware (listeners) handles asynchronous operations, often interacting with Firebase Realtime DB.
 4. **Component Update**: Components connected to Redux re-render based on the new state. state is memoized.
 
+### 🔥 Backend Integration
+The application integrates with Firebase for backend services:
+- **Firebase Realtime DB Web**: Stores application data.
+- **Firebase Authentication Web**: Manages user authentication and authorization.
+- **Firebase Hosting**: Domain and hosting configuration.
+
 ### 🗄️ Database Structure
 
 - `databse:`
@@ -55,6 +61,11 @@ The data flow follows the unidirectional pattern commonly associated with Redux 
       - `orgUuid:` `stockData`
     - `users:`
       - `userUuid:` `userData`
+
+### 🧪 Testing
+Testing is conducted at 2 levels:
+- **Unit Testing**: Implemented with Vitest for utility functions.
+- **UI Testing**: Conducted with Playwright for end-to-end user interface testing.
 
 ### 🗂️ File Structure
 Notable aspects of the file structure:
@@ -83,18 +94,6 @@ src/
 tests/
   - Playwright UI tests for end-to-end scenarios.
 ```
-
-## 🔥 Backend Integration
-The application integrates with Firebase for backend services:
-- **Firebase Realtime DB Web**: Stores application data.
-- **Firebase Authentication Web**: Manages user authentication and authorization.
-- **Firebase Hosting**: Domain and hosting configuration.
-
-## 🧪 Testing
-Testing is conducted at 2 levels:
-- **Unit Testing**: Implemented with Vitest for utility functions.
-- **UI Testing**: Conducted with Playwright for end-to-end user interface testing.
-
 
 ## 🏁 Getting Started
 You will need to set up a new Firebase project to get credentials to make use of the hosting, authentication and database SDKs.
