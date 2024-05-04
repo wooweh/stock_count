@@ -268,6 +268,7 @@ function HomeButtons() {
     >
       <Slot>
         <Button
+          data-test-id="home-org-button"
           variation="profile"
           label={orgName}
           iconName="org"
@@ -289,6 +290,7 @@ function HomeButtons() {
           {buttons.map((button: HomeButton) => {
             return (
               <Button
+                data-test-id={`home-${_.lowerCase(button.label)}-button`}
                 key={button.label}
                 variation={"home"}
                 label={button.label}
