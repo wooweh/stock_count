@@ -5,8 +5,7 @@
 
 
 */
-const DEV_ROOT_PATH = "test"
-const rootPath = import.meta.env.VITE_DB_ROOT_PATH ?? DEV_ROOT_PATH
+const rootPath = import.meta.env.VITE_DB_ROOT_PATH
 /*
 
 
