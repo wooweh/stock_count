@@ -67,7 +67,12 @@ function NavigationBar() {
 
   return (
     <>
-      <Button variation={"pill"} onClick={handleClick} iconName={"home"} />
+      <Button
+        id="home-button"
+        variation={"pill"}
+        onClick={handleClick}
+        iconName={"home"}
+      />
       <Typography fontWeight={"bold"} color={theme.scale.gray[4]}>
         {locationName}
       </Typography>

@@ -12,7 +12,6 @@ import { Slot, Window } from "../../components/surface"
 import VirtualizedTable from "../../components/table"
 import { MembersProps } from "../org/orgSlice"
 import { selectOrgMembers } from "../org/orgSliceSelectors"
-import { selectStock } from "../stock/stockSliceSelectors"
 import { setCountUI, useCountUI } from "./count"
 import { CountMembersProps, CountResultsProps, CountTypes } from "./countSlice"
 import {
@@ -25,7 +24,12 @@ import {
   selectIsUserOrganiser,
 } from "./countSliceSelectors"
 import { completeReview } from "./countSliceUtils"
-import { getCountMember, getReviewTableData } from "./countUtils"
+import {
+  getCountMember,
+  getCountReviewDisclaimer,
+  getCountReviewProceedMessage,
+  getReviewTableData,
+} from "./countUtils"
 /*
 
 
@@ -282,16 +286,13 @@ function ReviewResultsTable() {
   const results = useAppSelector(selectCountResults) as CountResultsProps
   const members = useAppSelector(selectOrgMembers) as MembersProps
   const countType = useAppSelector(selectCountType) as CountTypes
-  const stock = useAppSelector(selectStock)
 
   const tableData = useMemo(
-    () => getReviewTableData(results, stock, members, countType),
-    [results, stock, members, countType],
+    () => getReviewTableData(results, members, countType),
+    [results, members, countType],
   )
 
-  const rows = tableData.rows
-  const columns = tableData.columns
-  const columnGroups = tableData.columnGroups
+  const { rows, columns, columnGroups } = tableData
 
   return (
     <Stack
@@ -336,14 +337,14 @@ function ReviewCompletionConirmation() {
       handleClick: handleClose,
     },
     {
+      id: "count-finalize-accept-button",
       iconName: "done",
       handleClick: handleAccept,
     },
   ]
 
-  const DISCLAIMER =
-    "You are about to enter count finalization. You will not be able to go back to the review stage or change count results."
-  const PROCEED_MESSAGE = "Are you sure you want to proceed?"
+  const DISCLAIMER = getCountReviewDisclaimer()
+  const PROCEED_MESSAGE = getCountReviewProceedMessage()
 
   return (
     <Modal

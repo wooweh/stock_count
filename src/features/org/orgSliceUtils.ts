@@ -126,7 +126,7 @@ export function removeOrg() {
   if (!!uuid) {
     store.dispatch(deleteInvites())
     store.dispatch(deleteStock())
-    store.dispatch(deleteCount())
+    store.dispatch(deleteCount({ updateDB: true }))
     store.dispatch(deleteHistory())
     store.dispatch(deleteUserOrgDetails())
     store.dispatch(deleteOrg({ uuid }))

@@ -21,6 +21,7 @@ import { routePaths } from "./pages"
 
 */
 type MenuItemProps = {
+  id?: string
   label: string
   iconName: IconNames
   onChange: () => void
@@ -61,16 +62,19 @@ export function Menu() {
       onChange: () => toggleDarkmode(),
     },
     {
+      id: "menu-org-button",
       label: "Org",
       iconName: "org",
       onChange: () => handleMenuItemClick(routePaths.org.path),
     },
     {
+      id: "menu-profile-button",
       label: "Profile",
       iconName: "profile",
       onChange: () => handleMenuItemClick(routePaths.profile.path),
     },
     {
+      id: "menu-sign-out-button",
       label: "Sign out",
       iconName: "signOut",
       onChange: handleSignOut,
@@ -91,7 +95,12 @@ export function Menu() {
 
   return (
     <>
-      <ButtonBase disableRipple sx={buttonStyles} onClick={handleOpenMenu}>
+      <ButtonBase
+        id="menu-button"
+        disableRipple
+        sx={buttonStyles}
+        onClick={handleOpenMenu}
+      >
         <Icon variation="menu" />
       </ButtonBase>
       <MuiMenu
@@ -144,6 +153,7 @@ function MenuListitem(props: MenuListitemProps) {
       gap={theme.module[2]}
     >
       <ListItem
+        id={props.item.id}
         label={props.item.label}
         primarySlot={<Icon variation={props.item.iconName} />}
         secondarySlot={props.control}

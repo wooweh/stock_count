@@ -112,6 +112,7 @@ function OrgNameHeader() {
           gap={theme.module[5]}
         >
           <Input
+            id="org-name-input"
             disabled={!isEditing}
             value={newOrgName}
             onChange={(event: any) => setNewOrgName(event.target.value)}
@@ -124,6 +125,7 @@ function OrgNameHeader() {
           />
           {isAdmin && (
             <Button
+              id={isEditing ? "org-edit-accept-button" : "org-edit-button"}
               variation={"pill"}
               onClick={isEditing ? handleAccept : handleEdit}
               iconName={isEditing ? "done" : "edit"}

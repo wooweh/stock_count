@@ -40,6 +40,7 @@ import {
   setCountResultsItem,
   setCountStep,
 } from "./countSlice"
+import { StockItemProps } from "../stock/stockSlice"
 /*
 
 
@@ -90,13 +91,15 @@ export function updateCountMemberResults(
 
 
 */
-export function addCountResultItem(id: string, memberUuid: string) {
+export function addCountResultItem(
+  stockItem: StockItemProps,
+  memberUuid: string,
+) {
   const item = {
-    id,
+    ...stockItem,
     useableCount: 0,
     damagedCount: 0,
     obsoleteCount: 0,
-    memberUuid,
   }
   store.dispatch(setCountResultsItem({ item, memberUuid, updateDB: true }))
 }
@@ -375,7 +378,7 @@ export function submitCount() {
       setHistoryItem({ uuid, metadata, results, comments, members }),
     )
     store.dispatch(setCountStep({ step: "dashboard", updateMember: false }))
-    store.dispatch(deleteCount())
+    store.dispatch(deleteCount({ updateDB: true }))
     generateCustomNotification("success", "Count submitted to History.")
   } else {
     generateCustomNotification("error", "No results to submit.")

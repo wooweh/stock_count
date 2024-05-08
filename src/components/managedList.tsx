@@ -373,7 +373,11 @@ function Body(props: BodyProps) {
             )
 
             return (
-              <Stack padding={theme.module[0]} boxSizing={"border-box"}>
+              <Stack
+                id={`history-list-item-${index}`}
+                padding={theme.module[0]}
+                boxSizing={"border-box"}
+              >
                 <SelectableListItemWithOptions
                   label={item.name}
                   description={item.description}

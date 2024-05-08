@@ -2,6 +2,7 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit"
 import _ from "lodash"
 import { RootState } from "../../app/store"
 import { UpdateDB } from "../user/userSlice"
+import { StockItemProps } from "../stock/stockSlice"
 /*
 
 
@@ -44,8 +45,7 @@ export type CountResultsProps = {
 export type CountMemberResultsProps = {
   [key: string]: CountItemProps
 }
-export type CountItemProps = {
-  id: string
+export type CountItemProps = StockItemProps & {
   useableCount: number
   damagedCount: number
   obsoleteCount: number

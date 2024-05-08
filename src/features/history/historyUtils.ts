@@ -1,7 +1,11 @@
-import { formatLongDate } from "../../common/utils"
+import _ from "lodash"
+import { formatCommaSeparatedNumber, formatLongDate } from "../../common/utils"
 import { SearchItemProps, SearchListProps } from "../../components/searchBar"
+import { RowData } from "../../components/table"
+import { CountItemProps, CountResultsProps } from "../count/countSlice"
 import { getMemberName } from "../org/orgUtils"
-import { HistoryItemProps } from "./historySlice"
+import { HistoryItemProps, HistoryItemResultsProps } from "./historySlice"
+import { prepareSoloResultsTableColumns } from "../count/countUtils"
 /*
 
 
@@ -21,6 +25,39 @@ export function prepareHistorySearchList(
     const searchItem: SearchItemProps = { id, name, description }
     return searchItem
   })
+}
+/*
+
+
+
+
+*/
+export function prepareHistoryResultsTableRows(results: CountResultsProps) {
+  const rows: RowData[] = []
+
+  _.forIn(results, (value, key) => {
+    _.forIn(value, (value: CountItemProps, key) => {
+      rows.push({
+        id: key,
+        name: value.name,
+        unit: value.unit,
+        useable: formatCommaSeparatedNumber(value.useableCount),
+        damaged: formatCommaSeparatedNumber(value.damagedCount),
+        obsolete: formatCommaSeparatedNumber(value.obsoleteCount),
+      })
+    })
+  })
+
+  return rows
+}
+/*
+
+
+
+
+*/
+export function prepareHistoryResultsTableColumns() {
+  return prepareSoloResultsTableColumns()
 }
 /*
 

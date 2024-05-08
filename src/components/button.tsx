@@ -27,6 +27,7 @@ type ButtonVariations =
   | "navNext"
   | "navPrev"
 type ButtonVariationProps = {
+  id?: string
   label?: string
   iconName?: IconNames
   onClick: any
@@ -106,6 +107,7 @@ function ProfileButton(props: ButtonVariationProps) {
 
   return (
     <ButtonBase
+      id={props.id ?? "no-id"}
       onClick={props.onClick}
       disabled={props.disabled ?? false}
       disableTouchRipple={props.disableTouchRipple ?? false}
@@ -160,6 +162,7 @@ function ModalButton(props: ButtonVariationProps) {
 
   return (
     <ButtonBase
+      id={props.id ?? "no-id"}
       onClick={props.onClick}
       disabled={props.disabled ?? false}
       disableTouchRipple={props.disableTouchRipple ?? false}
@@ -205,6 +208,7 @@ function HomeButton(props: ButtonVariationProps) {
 
   return (
     <ButtonBase
+      id={props.id ?? "no-id"}
       onClick={props.onClick}
       disabled={props.disabled ?? false}
       disableTouchRipple={props.disableTouchRipple ?? false}
@@ -274,6 +278,7 @@ function PillButton(props: ButtonVariationProps) {
 
   return (
     <ButtonBase
+      id={props.id ?? "no-id"}
       onClick={props.onClick}
       disabled={props.disabled ?? false}
       disableTouchRipple={props.disableTouchRipple ?? false}
@@ -350,6 +355,7 @@ export function NavigationButton(props: NavigationButtonProps) {
 
   return (
     <ButtonBase
+      id={props.id ?? "no-id"}
       onClick={props.onClick}
       disabled={props.disabled ?? false}
       disableTouchRipple={props.disableTouchRipple ?? false}
@@ -368,10 +374,12 @@ export function NavigationButton(props: NavigationButtonProps) {
 
 */
 export type ToggleButtonGroupProps = {
+  id?: string
   options: ToggleButtonGroupOptionsProps[]
   initialAlignment?: string
 }
 export type ToggleButtonGroupOptionsProps = {
+  id?: string
   label: string
   iconName: IconNames
   onClick: () => void
@@ -389,6 +397,7 @@ export function ToggleButtonGroup(props: ToggleButtonGroupProps) {
   return (
     <Slot>
       <MuiToggleButtonGroup
+        id={props.id ?? "no-id"}
         value={alignment}
         onChange={handleAlignment}
         exclusive
@@ -396,6 +405,7 @@ export function ToggleButtonGroup(props: ToggleButtonGroupProps) {
       >
         {props.options.map((option) => (
           <MuiToggleButton
+            id={option.id ?? "no-id"}
             value={option.label}
             onClick={option.onClick}
             disableFocusRipple

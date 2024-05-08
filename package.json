@@ -21,6 +21,7 @@
     "@react-spring/web": "^9.7.3",
     "@reduxjs/toolkit": "^1.8.1",
     "@vitejs/plugin-react-swc": "^3.3.2",
+    "dotenv": "^16.4.5",
     "firebase": "^9.22.2",
     "lodash": "^4.17.21",
     "papaparse": "^5.4.1",

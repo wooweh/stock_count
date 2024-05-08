@@ -310,6 +310,7 @@ function ButtonTray() {
           onClick={() => setCountUI("isManagingCheckList", true)}
         />
         <Button
+          id="count-new-count-button"
           variation={"profile"}
           label={"New Count"}
           iconName={"add"}

@@ -55,6 +55,7 @@ export function Switch(props: SwitchProps) {
 
 */
 type InputProps = {
+  id?: string
   value: string | number
   onChange: any
   placeholder?: string
@@ -114,6 +115,7 @@ export function Input(props: InputProps) {
 
   return (
     <MuiInput
+      id={props.id ?? "no-id"}
       fullWidth={true}
       autoFocus={props.autoFocus}
       type={type}

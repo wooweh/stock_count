@@ -28,6 +28,7 @@ type SecondarySlotProps = React.ReactElement | undefined
 type onChangeProps = any
 type TappableProps = boolean
 export type ListItemProps = {
+  id?: string
   label: LabelProps
   description?: DescriptionProps
   primarySlot?: PrimarySlotProps
@@ -252,6 +253,7 @@ function ItemBody(props: {
 
 */
 function TappableSurface(props: {
+  id?: string
   tappable?: TappableProps
   onChange?: onChangeProps
   onLongPress?: any
@@ -263,6 +265,7 @@ function TappableSurface(props: {
   })
   return !!props.tappable ? (
     <ButtonBase
+      id={props.id ?? "no-id"}
       onClick={props.onChange}
       disableRipple
       {...bind()}

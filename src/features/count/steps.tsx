@@ -129,6 +129,7 @@ export function Steps() {
       body: <SetupBody />,
       prevButton: { label: "Dashboard", onClick: handleSetupPrev },
       nextButton: {
+        id: "count-preparation-button",
         label: "Preparation",
         onClick: handleSetupNext,
         disabled: isSetupNextButtonDisabled,
@@ -138,12 +139,20 @@ export function Steps() {
       label: "Preparation",
       body: <PreparationBody />,
       prevButton: { label: "Setup", onClick: handlePreparationPrev },
-      nextButton: { label: "Count", onClick: handlePreparationNext },
+      nextButton: {
+        id: "count-start-count-button",
+        label: "Count",
+        onClick: handlePreparationNext,
+      },
     },
     stockCount: {
       label: "Stock Count",
       body: <StockCountBody />,
-      nextButton: { label: "Review", onClick: handleStockCountNext },
+      nextButton: {
+        id: "count-review-button",
+        label: "Review",
+        onClick: handleStockCountNext,
+      },
     },
     review: {
       label: "Review",
@@ -164,6 +173,7 @@ export function Steps() {
 
   if (isOrganiser)
     _.set(countSteps, "review.nextButton", {
+      id: "count-finalize-button",
       label: "Finalize",
       onClick: handleReviewNext,
       disabled: !isCountCompleted,
@@ -201,6 +211,7 @@ type CountStepProps = {
   submitButton?: ButtonProps
 }
 type ButtonProps = {
+  id?: string
   label: string
   onClick: any
   disabled?: boolean
@@ -419,6 +430,7 @@ function ButtonTray(props: CountStepProps) {
       <Slot gap={theme.module[4]}>
         {props.prevButton && (
           <Button
+            id={props.prevButton.id}
             variation={"navPrev"}
             label={props.prevButton.label}
             onClick={props.prevButton.onClick}
@@ -427,6 +439,7 @@ function ButtonTray(props: CountStepProps) {
         )}
         {props.nextButton && (
           <Button
+            id={props.nextButton.id}
             variation={"navNext"}
             label={props.nextButton.label}
             onClick={props.nextButton.onClick}
@@ -435,6 +448,7 @@ function ButtonTray(props: CountStepProps) {
         )}
         {props.submitButton && (
           <Button
+            id="count-finalize-submit-button"
             variation={"profile"}
             label={props.submitButton.label}
             onClick={props.submitButton.onClick}

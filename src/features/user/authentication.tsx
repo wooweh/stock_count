@@ -280,6 +280,7 @@ function ButtonTray({ isRegistering }: { isRegistering: boolean }) {
   return (
     <Slot justifyContent={"space-between"}>
       <Button
+        id={_.kebabCase(actionLabel)}
         variation={"pill"}
         label={actionLabel}
         onClick={handleClick}
@@ -325,9 +326,7 @@ function ForgotPassword({ isRegistering }: { isRegistering: boolean }) {
     >
       <Button
         variation={"pill"}
-        label={`Forgot password ${
-          isDisabled ? "(Fill your email)" : ""
-        }`}
+        label={`Forgot password ${isDisabled ? "(Fill your email)" : ""}`}
         onClick={handleClick}
         disabled={isDisabled}
         color={theme.scale.orange[6]}

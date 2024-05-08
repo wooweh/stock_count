@@ -381,6 +381,7 @@ function StartCountConfirmation() {
       handleClick: handleClose,
     },
     {
+      id: "count-start-confirmation-accept-button",
       iconName: "done",
       handleClick: handleAccept,
     },

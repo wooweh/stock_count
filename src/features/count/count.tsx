@@ -8,7 +8,7 @@ import { ErrorBoundary } from "../../components/errorBoundary"
 import { Fade } from "../../components/fade"
 import Modal, { ModalActionProps } from "../../components/modal"
 import { Window } from "../../components/surface"
-import { CountTypes } from "./countSlice"
+import { CountItemProps, CountTypes } from "./countSlice"
 import { leaveCount, removeCount } from "./countSliceUtils"
 import { Steps } from "./steps"
 /*
@@ -35,10 +35,7 @@ export type CountUIState = {
   isLeavingCount: boolean
   isStartingFinalization: boolean
   isSubmittingFinalization: boolean
-  currentStockItemId: false | string
-  currentStockItemUseableCount: number
-  currentStockItemDamagedCount: number
-  currentStockItemObsoleteCount: number
+  currentStockItem: CountItemProps
   scrollIndex: number
   selectedMemberUuids: string[]
   satisfiedCheckUuids: string[]
@@ -71,6 +68,15 @@ export type ArrayWithEditableItemsUIState = ConstructStringUnionFromKeyMatch<
   ["finalComments", "prepComments"]
 >
 
+export const COUNT_STOCK_ITEM_DEFAULT: CountItemProps = {
+  id: "",
+  name: "",
+  unit: "",
+  useableCount: 0,
+  damagedCount: 0,
+  obsoleteCount: 0,
+}
+
 const initialState: CountUIState = {
   isSettingUp: false,
   isManagingCheckList: false,
@@ -89,10 +95,7 @@ const initialState: CountUIState = {
   isLeavingCount: false,
   isStartingFinalization: false,
   isSubmittingFinalization: false,
-  currentStockItemId: false,
-  currentStockItemUseableCount: 0,
-  currentStockItemDamagedCount: 0,
-  currentStockItemObsoleteCount: 0,
+  currentStockItem: COUNT_STOCK_ITEM_DEFAULT,
   scrollIndex: 0,
   tempCountType: "solo",
   selectedMemberUuids: [],

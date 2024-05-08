@@ -14,15 +14,11 @@ import {
   ToggleButtonGroupOptionsProps,
 } from "../../components/button"
 import { PieChart, PieChartDataProps } from "../../components/chart"
-import { downloadCSVTemplate } from "../../components/csvParser"
+import { downloadCSV } from "../../components/csvParser"
 import { ErrorBoundary } from "../../components/errorBoundary"
 import { Fade } from "../../components/fade"
 import { Slot, Window } from "../../components/surface"
 import VirtualizedTable from "../../components/table"
-import {
-  prepareSoloResultsTableColumns,
-  prepareSoloResultsTableRows,
-} from "../count/countUtils"
 import {
   DataLineItem,
   DataLineItemProps,
@@ -31,7 +27,6 @@ import {
 import { MembersProps } from "../org/orgSlice"
 import { selectOrgMembers } from "../org/orgSliceSelectors"
 import { getMemberShortName, getMembersShortNames } from "../org/orgUtils"
-import { selectStock } from "../stock/stockSliceSelectors"
 import {
   HistoryUIState,
   resetHistoryUI,
@@ -45,6 +40,10 @@ import {
   HistoryItemResultsProps,
 } from "./historySlice"
 import { selectHistory } from "./historySliceSelectors"
+import {
+  prepareHistoryResultsTableColumns,
+  prepareHistoryResultsTableRows,
+} from "./historyUtils"
 /*
 
 
@@ -152,7 +151,6 @@ function Body() {
       gap={theme.module[2]}
       borderRadius={theme.module[3]}
       bgcolor={theme.scale.gray[9]}
-      flexShrink={10}
       padding={theme.module[2]}
       sx={{
         outline: `1px solid ${theme.scale.gray[7]}`,
@@ -189,7 +187,7 @@ function Body() {
 function Details(props: Required<HistoryItemMetadataProps>) {
   return (
     <Fade>
-      <Window justifyContent={"space-evenly"}>
+      <Window justifyContent={"space-around"}>
         <DetailsList {...props} />
         <DurationChart {...props} />
       </Window>
@@ -251,7 +249,6 @@ function DetailsList(props: Required<HistoryItemMetadataProps>) {
   return (
     <Stack
       width={"100%"}
-      height={"45%"}
       justifyContent={"flex-start"}
       padding={theme.module[2]}
       gap={theme.module[2]}
@@ -298,7 +295,7 @@ function DurationChart(props: Required<HistoryItemMetadataProps>) {
   ]
 
   return (
-    <Window height={"55%"} paddingBottom={theme.module[2]}>
+    <Window height={"50%"} paddingBottom={theme.module[2]}>
       <PieChart data={data} />
     </Window>
   )
@@ -373,10 +370,14 @@ function Results(props: Required<HistoryItemResultsProps>) {
   const theme = useTheme()
 
   const results = { results: props }
-  const stock = useAppSelector(selectStock)
+  const rows = prepareHistoryResultsTableRows(results)
+  const columns = prepareHistoryResultsTableColumns()
 
-  const rows = prepareSoloResultsTableRows(results, stock)
-  const columns = prepareSoloResultsTableColumns()
+  const buttonStyles = {
+    borderRadius: theme.module[2],
+    boxShadow: "none",
+    padding: theme.module[4],
+  }
 
   return (
     <Fade>
@@ -386,17 +387,14 @@ function Results(props: Required<HistoryItemResultsProps>) {
         </Slot>
         <Slot padding={theme.module[1]}>
           <Button
+            id="history-count-review-results-download-button"
             variation={"modal"}
             label={"Download CSV"}
             iconName={"download"}
             outlineColor={theme.scale.gray[6]}
             bgColor={theme.scale.gray[9]}
-            onClick={() => downloadCSVTemplate(rows)}
-            sx={{
-              borderRadius: theme.module[2],
-              boxShadow: "none",
-              padding: theme.module[4],
-            }}
+            onClick={() => downloadCSV(rows, "count_results")}
+            sx={buttonStyles}
           />
         </Slot>
       </Window>
@@ -428,6 +426,7 @@ function ButtonTray() {
       onClick: () => handleClick("comments"),
     },
     {
+      id: "history-count-review-results-button",
       label: "Resuls",
       iconName: "checklist",
       onClick: () => handleClick("results"),

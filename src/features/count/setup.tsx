@@ -12,7 +12,6 @@ import { List } from "../../components/list"
 import { ListItem } from "../../components/listItem"
 import Modal, { ModalActionProps } from "../../components/modal"
 import { Slot, Window } from "../../components/surface"
-import { selectIsMobile } from "../core/coreSliceSelectors"
 import { generateCustomNotification } from "../core/coreUtils"
 import { MemberProps } from "../org/orgSlice"
 import { getMemberName, getMemberShortName } from "../org/orgUtils"
@@ -44,7 +43,6 @@ import { getCountHeadCountRequirement } from "./countUtils"
 export function SetupBody() {
   const theme = useTheme()
   const location = useLocation()
-  const isMobile = useAppSelector(selectIsMobile)
   const countUIState = useCountUI((state) => state)
   const path = location.pathname
 
@@ -56,7 +54,7 @@ export function SetupBody() {
     >
       <Fade>
         <Outer>
-          <Stack width={"100%"} gap={theme.module[isMobile ? 5 : 7]}>
+          <Stack width={"100%"} gap={theme.module[5]}>
             <SetupOptions />
             <AddMembers />
           </Stack>
@@ -150,6 +148,7 @@ function ChooseTeamButton(props: ChooseTeamButtonProps) {
 
   return (
     <Button
+      id="count-setup-choose-team-button"
       variation={"profile"}
       label={`Add ${props.isSolo ? "Counter" : "Counters"}`}
       iconName={"addMembers"}
@@ -286,6 +285,7 @@ function AddMembers() {
       handleClick: handleClose,
     },
     {
+      id: "count-setup-add-counters-accept-button",
       iconName: "done",
       handleClick: handleAccept,
     },
@@ -371,6 +371,7 @@ function MembersList({
 
         return (
           <ListItem
+            id={`count-setup-available-counters-${_.kebabCase(name)}`}
             label={name}
             primarySlot={
               <Icon variation={isSelected ? "checked" : "unchecked"} />

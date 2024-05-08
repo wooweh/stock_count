@@ -3,7 +3,6 @@ import { formatCommaSeparatedNumber } from "../../common/utils"
 import { ColumnData, ColumnGroupData, RowData } from "../../components/table"
 import { MembersProps } from "../org/orgSlice"
 import { getMemberName, getMemberShortName } from "../org/orgUtils"
-import { StockProps } from "../stock/stockSlice"
 import {
   CountItemProps,
   CountMembersProps,
@@ -18,7 +17,6 @@ import {
 */
 export function prepareSoloResultsTableRows(
   results: CountResultsProps,
-  stock: StockProps,
 ): RowData[] {
   const rows: RowData[] = []
 
@@ -26,8 +24,8 @@ export function prepareSoloResultsTableRows(
     _.forIn(value, (value: CountItemProps, key) => {
       rows.push({
         id: key,
-        name: stock[key].name,
-        unit: stock[key].unit,
+        name: value.name,
+        unit: value.unit,
         useable: formatCommaSeparatedNumber(value.useableCount),
         damaged: formatCommaSeparatedNumber(value.damagedCount),
         obsolete: formatCommaSeparatedNumber(value.obsoleteCount),
@@ -45,7 +43,6 @@ export function prepareSoloResultsTableRows(
 */
 export function prepareDualResultsTableRows(
   results: CountResultsProps,
-  stock: StockProps,
 ): RowData[] {
   const rowsObject = {}
   const memberCountList = _.values(results)
@@ -56,6 +53,8 @@ export function prepareDualResultsTableRows(
     _.forIn(counterResults, (value: CountItemProps, key) => {
       const defaultItem: CountItemProps = {
         id: "",
+        name: "",
+        unit: "",
         useableCount: 0,
         damagedCount: 0,
         obsoleteCount: 0,
@@ -73,8 +72,8 @@ export function prepareDualResultsTableRows(
       )
       const setInstructions = {
         [`${key}.id`]: key,
-        [`${key}.name`]: stock[key].name,
-        [`${key}.unit`]: stock[key].unit,
+        [`${key}.name`]: value.name,
+        [`${key}.unit`]: value.unit,
         [`${key}.useable_${counterUuid}`]: formatCommaSeparatedNumber(
           value.useableCount,
         ),
@@ -104,7 +103,6 @@ export function prepareDualResultsTableRows(
 */
 export function prepareTeamResultsTableRows(
   results: CountResultsProps,
-  stock: StockProps,
   members: MembersProps,
 ): RowData[] {
   const rows: RowData[] = []
@@ -113,9 +111,7 @@ export function prepareTeamResultsTableRows(
     const counterName = `${members[key].firstName[0]}. ${members[key].lastName}`
     _.forIn(value, (value: CountItemProps, key) => {
       rows.push({
-        id: key,
-        name: stock[key].name,
-        unit: stock[key].unit,
+        ..._.omit(value, "useableCount", "damagedCount", "obsoleteCount"),
         useable: formatCommaSeparatedNumber(value.useableCount),
         damaged: formatCommaSeparatedNumber(value.damagedCount),
         obsolete: formatCommaSeparatedNumber(value.obsoleteCount),
@@ -283,23 +279,22 @@ export function getCountMember(members: CountMembersProps, memberUuid: string) {
 */
 export function getReviewTableData(
   results: CountResultsProps,
-  stock: StockProps,
   members: MembersProps,
   countType: CountTypes,
 ) {
   const tableData = {
     solo: {
-      rows: () => prepareSoloResultsTableRows(results, stock),
+      rows: () => prepareSoloResultsTableRows(results),
       columns: () => prepareSoloResultsTableColumns(),
       columnGroups: () => prepareSoloResultsTableColumnGroups(),
     },
     dual: {
-      rows: () => prepareDualResultsTableRows(results, stock),
+      rows: () => prepareDualResultsTableRows(results),
       columns: () => prepareDualResultsTableColumns(results),
       columnGroups: () => prepareDualResultsTableColumnGroups(results, members),
     },
     team: {
-      rows: () => prepareTeamResultsTableRows(results, stock, members),
+      rows: () => prepareTeamResultsTableRows(results, members),
       columns: () => prepareTeamResultsTableColumns(),
       columnGroups: () => prepareTeamResultsTableColumnGroups(),
     },
@@ -344,6 +339,24 @@ export function getCountHeadCountRequirement(
   const verbose = requirement.verbose
 
   return { isMet, verbose }
+}
+/*
+
+
+
+
+*/
+export function getCountReviewDisclaimer() {
+  return "You are about to enter count finalization. You will not be able to go back to the review stage or change count results."
+}
+/*
+
+
+
+
+*/
+export function getCountReviewProceedMessage() {
+  return "Are you sure you want to proceed?"
 }
 /*
 

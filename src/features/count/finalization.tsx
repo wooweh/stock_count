@@ -174,7 +174,7 @@ function CountSummary() {
   ]
 
   return (
-    <Window width={"100%"} height={"100%"}>
+    <Window width={"100%"} height={"100%"} overflow={"auto"}>
       {dataItems.map((item: DataLineItemProps) => (
         <DataLineItem
           label={item.label}
@@ -202,18 +202,23 @@ export function DataLineItem(props: DataLineItemProps) {
 
   return (
     <Slot
-      gap={theme.module[4]}
+      gap={theme.module[5]}
       padding={`${theme.module[0]} 0 ${theme.module[0]} ${theme.module[3]}`}
     >
-      <Icon variation={props.iconName} />
-      <Typography width={"50%"} flexShrink={1}>
-        {props.label}
-        {":"}
-      </Typography>
+      <Slot
+        gap={theme.module[3]}
+        width={theme.module[9]}
+        justifyContent={"flex-start"}
+      >
+        <Icon variation={props.iconName} />
+        <Typography width={"50%"} flexShrink={1}>
+          {props.label}
+          {":"}
+        </Typography>
+      </Slot>
       <Slot
         gap={theme.module[3]}
         justifyContent={"flex-start"}
-        overflow={"scroll"}
         padding={theme.module[0]}
         sx={{ overflowX: "scroll", overflowY: "visible" }}
       >
@@ -289,6 +294,7 @@ function FinalizeCountConfirmation() {
       handleClick: handleClose,
     },
     {
+      id: "count-finalize-submit-accept-button",
       iconName: "done",
       handleClick: handleAccept,
     },

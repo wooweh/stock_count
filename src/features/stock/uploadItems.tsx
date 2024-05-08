@@ -1,10 +1,10 @@
 import { Stack, Typography } from "@mui/material"
-import _ from "lodash"
+import _, { template } from "lodash"
 import { useEffect, useState } from "react"
 import { useLocation } from "react-router-dom"
 import useTheme from "../../common/useTheme"
 import { Button } from "../../components/button"
-import { CSVParser, downloadCSVTemplate } from "../../components/csvParser"
+import { CSVParser, downloadCSV } from "../../components/csvParser"
 import { ErrorBoundary } from "../../components/errorBoundary"
 import Modal, { ModalActionProps } from "../../components/modal"
 import VirtualizedTable, { ColumnData, RowData } from "../../components/table"
@@ -48,7 +48,11 @@ export function UploadItems() {
   ]
 
   if (!!data.length)
-    actions.push({ iconName: "done", handleClick: handleAccept })
+    actions.push({
+      id: "stock-upload-accept-button",
+      iconName: "done",
+      handleClick: handleAccept,
+    })
 
   return (
     <Modal
@@ -126,7 +130,7 @@ function ChooseFile({ setData }: { setData: any }) {
 
   function handleDownload() {
     const data = [{ id: "", name: "", unit: "" }]
-    downloadCSVTemplate(data)
+    downloadCSV(data, "stock_upload_template")
   }
 
   return (
@@ -161,7 +165,7 @@ function ReviewTable({
   const theme = useTheme()
 
   return (
-    <Stack width={"100%"} gap={theme.module[3]} justifyContent={"flex-start"}>
+    <Stack id="stock-upload-table" width={"100%"} gap={theme.module[3]} justifyContent={"flex-start"}>
       <Typography fontWeight={"bold"} color={theme.scale.gray[5]}>
         Item count: {rows.length}
       </Typography>

@@ -13,7 +13,6 @@ import Icon, { IconNames } from "../../components/icon"
 import { Slot, Window } from "../../components/surface"
 import { auth } from "../../remote"
 import {
-  selectCount,
   selectIsCountInvitePending,
   selectIsUserOrganiser,
 } from "../count/countSliceSelectors"
@@ -36,8 +35,6 @@ import { routePaths } from "./pages"
 export function Home() {
   const theme = useTheme()
   const location = useLocation()
-  const count = useAppSelector(selectCount)
-  console.log(count)
 
   const isProfileComplete = useAppSelector(selectIsProfileComplete)
   const isOrgSetup = useAppSelector(selectIsOrgSetup)
@@ -211,6 +208,7 @@ export function PromptInput(props: PromptInputProps) {
 
 */
 type HomeButton = {
+  id?: string
   label: string
   color?: string
   icon: IconNames
@@ -231,6 +229,7 @@ function HomeButtons() {
 
   const adminButtons: HomeButton[] = [
     {
+      id: "home-count-button",
       label: "Count",
       icon: "list",
       iconColor: theme.scale.blue[7],
@@ -240,6 +239,7 @@ function HomeButtons() {
       showBadge: isInvitePending && !isOrganiser,
     },
     {
+      id: "home-stock-button",
       label: "Stock",
       icon: "stock",
       iconColor: theme.scale.green[7],
@@ -248,6 +248,7 @@ function HomeButtons() {
       path: routePaths.stock.path,
     },
     {
+      id: "home-history-button",
       label: "History",
       icon: "history",
       iconColor: theme.scale.yellow[7],
@@ -268,7 +269,7 @@ function HomeButtons() {
     >
       <Slot>
         <Button
-          data-test-id="home-org-button"
+          id="home-org-button"
           variation="profile"
           label={orgName}
           iconName="org"
@@ -290,7 +291,7 @@ function HomeButtons() {
           {buttons.map((button: HomeButton) => {
             return (
               <Button
-                data-test-id={`home-${_.lowerCase(button.label)}-button`}
+                id={button.id}
                 key={button.label}
                 variation={"home"}
                 label={button.label}

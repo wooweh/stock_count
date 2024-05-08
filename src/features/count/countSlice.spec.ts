@@ -77,6 +77,8 @@ describe("Count Reducer", () => {
         mockUuid: {
           mockStockId: {
             id: "mockStockId",
+            name: "mockName",
+            unit: "mockUnit",
             useableCount: 1,
             damagedCount: 2,
             obsoleteCount: 3,
@@ -143,6 +145,8 @@ describe("Count Reducer", () => {
     const memberUuid = "mockUuid"
     const item: CountItemProps = {
       id: "mockStockId1",
+      name: "mockName",
+      unit: "mockUnit",
       useableCount: 1,
       damagedCount: 2,
       obsoleteCount: 3,
@@ -248,6 +252,8 @@ describe("Count Reducer", () => {
     const results = {
       mockStockId: {
         id: "mockStockId",
+        name: "mockName",
+        unit: "mockUnit",
         useableCount: 1,
         damagedCount: 2,
         obsoleteCount: 4,
@@ -328,6 +334,8 @@ describe("Count SliceUtils", () => {
       mockCounterUuid1: {
         mockStockId1: {
           id: "mockStockId1",
+          name: "mockName1",
+          unit: "mockUnit1",
           useableCount: 2,
           damagedCount: 3,
           obsoleteCount: 4,
@@ -336,6 +344,8 @@ describe("Count SliceUtils", () => {
       mockCounterUuid2: {
         mockStockId2: {
           id: "mockStockId2",
+          name: "mockName2",
+          unit: "mockUnit2",
           useableCount: 2,
           damagedCount: 3,
           obsoleteCount: 4,
@@ -406,6 +416,8 @@ describe("Count SliceUtils", () => {
       mockUuid1: {
         mockStockId1: {
           id: "mockStockId1",
+          name: "mockName1",
+          unit: "mockUnit1",
           useableCount: 2,
           damagedCount: 3,
           obsoleteCount: 4,
@@ -414,6 +426,8 @@ describe("Count SliceUtils", () => {
       mockUuid2: {
         mockStockId2: {
           id: "mockStockId2",
+          name: "mockName2",
+          unit: "mockUnit2",
           useableCount: 2,
           damagedCount: 3,
           obsoleteCount: 4,

@@ -16,6 +16,7 @@ import { Slot } from "./surface"
 
 */
 export type ModalActionProps = {
+  id?: string
   iconName: IconNames
   handleClick: Function
   isDisabled?: boolean
@@ -109,6 +110,7 @@ export default function Modal(props: ModalProps) {
             {props.actions &&
               props.actions.map((action, index) => (
                 <Button
+                  id={action.id ?? "no-id"}
                   variation={"modal"}
                   disabled={action.isDisabled}
                   iconName={action.iconName}

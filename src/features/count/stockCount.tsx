@@ -16,12 +16,13 @@ import Modal, { ModalActionProps } from "../../components/modal"
 import { SearchBar, SearchItemProps } from "../../components/searchBar"
 import { Slot, Window } from "../../components/surface"
 import { StockItemProps } from "../stock/stockSlice"
+import { selectStock } from "../stock/stockSliceSelectors"
 import { prepareStockSearchList } from "../stock/stockUtils"
 import {
   selectUserUuid,
   selectUserUuidString,
 } from "../user/userSliceSelectors"
-import { setCountUI, useCountUI } from "./count"
+import { COUNT_STOCK_ITEM_DEFAULT, setCountUI, useCountUI } from "./count"
 import { CountItemProps } from "./countSlice"
 import {
   selectModifiedUserCountResults,
@@ -144,11 +145,18 @@ function AddStockItemSearchBar() {
 
   const userUuid = useAppSelector(selectUserUuid) as string
   const stockList = useAppSelector(selectRemainingStockList)
+  const stock = useAppSelector(selectStock)
 
   function handleSelect(item: SearchItemProps) {
     const id = item.id
-    addCountResultItem(id, userUuid)
-    setCountUI("currentStockItemId", id)
+    const stockItem: StockItemProps = {
+      ...stock[id],
+    }
+    addCountResultItem(stockItem, userUuid)
+    setCountUI("currentStockItem", {
+      ...COUNT_STOCK_ITEM_DEFAULT,
+      ...stockItem,
+    })
     setCountUI("isAddingStockItem", false)
   }
 
@@ -252,19 +260,23 @@ function CountSheet() {
 
 
 */
-function CountSheetListItem({
-  item,
-}: {
-  item: StockItemProps & CountItemProps
-}) {
+function CountSheetListItem({ item }: { item: CountItemProps }) {
   const theme = useTheme()
 
   function handleOptionsClick() {
-    setCountUI("currentStockItemId", item.id)
+    setCountUI("currentStockItem", item)
   }
 
   const countData =
     !!item.damagedCount || !!item.useableCount || !!item.obsoleteCount
+
+  const listItemStyles = {
+    padding: theme.module[4],
+    paddingRight: theme.module[2],
+    outline: countData ? "none" : `3px solid ${theme.scale.red[8]}`,
+    outlineOffset: countData ? 0 : -3,
+    boxShadow: countData ? "none" : `0 0 45px -5px ${theme.scale.red[8]} inset`,
+  }
 
   return (
     <Stack padding={theme.module[0]} boxSizing={"border-box"}>
@@ -280,17 +292,9 @@ function CountSheetListItem({
           />
         }
         tertiarySlot={<CountItemInfoDisplay item={item} />}
-        tappable
         onChange={handleOptionsClick}
-        sx={{
-          padding: theme.module[4],
-          paddingRight: theme.module[2],
-          outline: countData ? "none" : `3px solid ${theme.scale.red[8]}`,
-          outlineOffset: countData ? 0 : -3,
-          boxShadow: countData
-            ? "none"
-            : `0 0 45px -5px ${theme.scale.red[8]} inset`,
-        }}
+        sx={listItemStyles}
+        tappable
       />
     </Stack>
   )
@@ -301,11 +305,7 @@ function CountSheetListItem({
 
 
 */
-function CountItemInfoDisplay({
-  item,
-}: {
-  item: StockItemProps & CountItemProps
-}) {
+function CountItemInfoDisplay({ item }: { item: CountItemProps }) {
   const theme = useTheme()
   const isZeroCount =
     !item.useableCount && !item.damagedCount && !item.obsoleteCount
@@ -373,6 +373,7 @@ function AddStockItemButton() {
 
   return (
     <Button
+      id="count-add-item-button"
       disabled={isAddingStockItem}
       variation={"profile"}
       label={"Add Item"}
@@ -394,35 +395,23 @@ function AddStockItemButton() {
 */
 function RecordStockItemCount() {
   const memberUuid = useAppSelector(selectUserUuid) as string
-
-  const useableCount = useCountUI((state) => state.currentStockItemUseableCount)
-  const damagedCount = useCountUI((state) => state.currentStockItemDamagedCount)
-  const obsoleteCount = useCountUI(
-    (state) => state.currentStockItemObsoleteCount,
-  )
-  const id = useCountUI((state) => state.currentStockItemId) as string
-
+  const currentStockItem = useCountUI((state) => state.currentStockItem)
   const [isOpen, setIsOpen] = useState(false)
+
+  const id = currentStockItem.id
 
   useEffect(() => {
     if (!!id) setIsOpen(true)
   }, [id])
 
-  const item = {
-    id,
-    useableCount,
-    damagedCount,
-    obsoleteCount,
-  }
-
   function handleAccept() {
-    updateCountResultItem(item, memberUuid)
+    updateCountResultItem(currentStockItem, memberUuid)
     handleClose()
   }
 
   function handleClose() {
     setIsOpen(false)
-    _.delay(() => setCountUI("currentStockItemId", false), 250)
+    _.delay(() => setCountUI("currentStockItem", COUNT_STOCK_ITEM_DEFAULT), 250)
   }
 
   const actions: ModalActionProps[] = [
@@ -431,6 +420,7 @@ function RecordStockItemCount() {
       handleClick: handleClose,
     },
     {
+      id: "count-item-record-accept-button",
       iconName: "done",
       handleClick: handleAccept,
     },
@@ -463,14 +453,13 @@ function RecordStockItemCountBody({ handleClose }: { handleClose: Function }) {
   const stock = useAppSelector(selectModifiedUserCountResults)
 
   const countUIState = useCountUI((state) => state)
-  const id = useCountUI((state) => state.currentStockItemId) as string
+  const currentStockItem = useCountUI((state) => state.currentStockItem)
 
-  const stockItem = stock[id as string]
   const path = location.pathname
 
   function handleDelete() {
     handleClose()
-    _.delay(() => removeCountResultsItem(id, userUuid), 250)
+    _.delay(() => removeCountResultsItem(currentStockItem.id, userUuid), 250)
   }
 
   return (
@@ -487,9 +476,9 @@ function RecordStockItemCountBody({ handleClose }: { handleClose: Function }) {
         paddingBottom={theme.module[3]}
         boxSizing={"border-box"}
       >
-        {!!stockItem && (
+        {!!currentStockItem.id && (
           <>
-            <StockDetails stockItem={stockItem} />
+            <StockItemDetails stockItem={currentStockItem} />
             <CountData />
             <Button
               variation={"profile"}
@@ -513,11 +502,7 @@ function RecordStockItemCountBody({ handleClose }: { handleClose: Function }) {
 
 
 */
-function StockDetails({
-  stockItem,
-}: {
-  stockItem: CountItemProps & StockItemProps
-}) {
+function StockItemDetails({ stockItem }: { stockItem: CountItemProps }) {
   const theme = useTheme()
 
   return (
@@ -570,31 +555,32 @@ function CountData() {
 
   const stock = useAppSelector(selectModifiedUserCountResults)
 
-  const id = useCountUI((state) => state.currentStockItemId) as string
-  const useableCount = useCountUI((state) => state.currentStockItemUseableCount)
-  const damagedCount = useCountUI((state) => state.currentStockItemDamagedCount)
-  const obsoleteCount = useCountUI(
-    (state) => state.currentStockItemObsoleteCount,
-  )
+  const currentStockItem = useCountUI((state) => state.currentStockItem)
 
-  const stockItem = stock[id as string]
+  const { id, useableCount, damagedCount, obsoleteCount } = currentStockItem
+
+  function updateCurrentStockItem(
+    countCatagory: keyof CountItemProps,
+    count: number,
+  ) {
+    setCountUI("currentStockItem", {
+      ...currentStockItem,
+      [countCatagory]: count,
+    })
+  }
+
+  const stockItem = stock[id]
 
   useEffect(() => {
-    if (!!stockItem) setExistingCountValues()
+    if (!!id) setCountUI("currentStockItem", stockItem)
   }, [stockItem])
-
-  function setExistingCountValues() {
-    setCountUI("currentStockItemUseableCount", stockItem.useableCount)
-    setCountUI("currentStockItemDamagedCount", stockItem.damagedCount)
-    setCountUI("currentStockItemObsoleteCount", stockItem.obsoleteCount)
-  }
 
   const inputs: StockItemCountInputProps[] = [
     {
       label: "Useable",
       count: useableCount,
       setCount: (count: number) =>
-        setCountUI("currentStockItemUseableCount", count),
+        updateCurrentStockItem("useableCount", count),
       iconName: "useable",
       color: theme.scale.green[5],
       outlineColor: theme.scale.green[7],
@@ -603,7 +589,7 @@ function CountData() {
       label: "Damaged",
       count: damagedCount,
       setCount: (count: number) =>
-        setCountUI("currentStockItemDamagedCount", count),
+        updateCurrentStockItem("damagedCount", count),
       iconName: "damaged",
       color: theme.scale.red[4],
       outlineColor: theme.scale.red[6],
@@ -612,7 +598,7 @@ function CountData() {
       label: "Obsolete",
       count: obsoleteCount,
       setCount: (count: number) =>
-        setCountUI("currentStockItemObsoleteCount", count),
+        updateCurrentStockItem("obsoleteCount", count),
       iconName: "obsolete",
       color: theme.scale.gray[3],
       outlineColor: theme.scale.gray[5],
@@ -687,6 +673,7 @@ function StockItemCountInput(props: StockItemCountInputProps) {
   }
   const inputProps = isEditing
     ? {
+        id: `count-item-${_.lowerCase(props.label)}-editable-input`,
         key: "isEditing",
         autoFocus: true,
         value: !!props.count ? props.count : "",
@@ -696,6 +683,7 @@ function StockItemCountInput(props: StockItemCountInputProps) {
         sx: { ...commonStyles },
       }
     : {
+        id: `count-item-${_.lowerCase(props.label)}-readonly-input`,
         key: "notEditing",
         value: formatCommaSeparatedNumber(props.count),
         onChange: () => undefined,

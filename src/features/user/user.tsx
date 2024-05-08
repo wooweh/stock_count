@@ -131,6 +131,7 @@ function ProfileFields() {
 
   const fields: ProfileFieldProps[] = [
     {
+      id: "profile-name-input",
       label: "Name",
       value: isEditing ? editableName : name?.first!,
       handleChange: (event: any) => setUserUI("name", event.target.value),
@@ -162,6 +163,7 @@ function ProfileFields() {
       >
         {fields.map((field: ProfileFieldProps, index: number) => (
           <ProfileField
+            id={field.id}
             label={field.label}
             value={field.value ?? ""}
             handleChange={field.handleChange}
@@ -179,6 +181,7 @@ function ProfileFields() {
 
 */
 type ProfileFieldProps = {
+  id?: string
   label: string
   value: string
   handleChange: Function
@@ -208,6 +211,7 @@ function ProfileField(props: ProfileFieldProps) {
       </Typography>
       <Slot justifyContent={"space-between"} gap={theme.module[3]}>
         <Input
+          id={props.id}
           value={props.value}
           placeholder={placeholder}
           onChange={props.handleChange}
@@ -277,6 +281,7 @@ function ButtonTray() {
         />
       )}
       <Button
+        id={isEditing ? "profile-edit-accept-button" : "profile-edit-button"}
         variation={"profile"}
         iconName={isEditing ? "done" : "edit"}
         onClick={isEditing ? handleAccept : handleEdit}

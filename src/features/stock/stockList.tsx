@@ -147,6 +147,7 @@ function ButtonTray() {
         justifyCenter
       />
       <Button
+        id="stock-upload-button"
         variation={"profile"}
         iconName={"upload"}
         onClick={handleUpload}
