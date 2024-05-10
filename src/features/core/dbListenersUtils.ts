@@ -1,10 +1,4 @@
 import { DataSnapshot } from "firebase/database"
-import { UserProps } from "../user/userSlice"
-import { updateUser } from "../user/userSliceUtils"
-import { OrgProps } from "../org/orgSlice"
-import { leaveOrg, updateMemberStatus, updateOrg } from "../org/orgSliceUtils"
-import { StockProps } from "../stock/stockSlice"
-import { updateStock } from "../stock/stockSliceUtils"
 import {
   CountCheckProps,
   CountCommentsProps,
@@ -23,6 +17,12 @@ import {
 } from "../count/countSliceUtils"
 import { HistoryProps } from "../history/historySlice"
 import { updateHistory } from "../history/historySliceUtils"
+import { OrgProps } from "../org/orgSlice"
+import { leaveOrg, updateOrg } from "../org/orgSliceUtils"
+import { StockProps } from "../stock/stockSlice"
+import { updateStock } from "../stock/stockSliceUtils"
+import { UserProps } from "../user/userSlice"
+import { updateUser } from "../user/userSliceUtils"
 
 /*
 
