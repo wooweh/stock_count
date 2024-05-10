@@ -11,14 +11,14 @@ Feel free to use the code, or to contribute to this repo.
 The application has the following features:
 - **User Authentication**: Users can sign up, login, and sign out.
 - **User Profile Management**: Users can create, update, and delete their profile.
-- **Business Profile Management**: Small businesses can create, update, and delete their profile.
-- **Business Team Management**: Small businesses can create, update, and delete team members, as well as assign member roles.
-- **Inventory Management**: Small businesses can create, update, and delete inventory items.
-- **Stock Counting**: Solo, dual or team count conducted by a user or team of users in real-time, with ability to record counts of usable, damaged and obselete items.
-- **Stock Analysis**: An admin member can access, and view, business stock count history and export stock count data in CSV format.
+- **Organisation Profile Management**: Users can create, update, and delete an org profile.
+- **Organisation Team Management**: Org admin users can create, update, and delete team members, as well as assign member roles.
+- **Inventory Management**: Org admin users can upload, create, update, and delete inventory items.
+- **Stock Counting**: Org admin users can setup a solo, dual or team count, with ability to record usable, damaged and obselete item counts.
+- **Stock Analysis**: Org admin can access and view org stock count history and export stock count data in CSV format.
 
 ## 🏗️ Architecture Overview
-The application utilises a three-layer architecture with features organised in feature-slice structure.
+The application utilises a three-layer architecture with features organised in feature-slices.
 
 ### 📚 Components and utilities
 The application is structured with a feature-based approach, with components and utilities classified into:
@@ -33,7 +33,7 @@ The application is structured with a feature-based approach, with components and
 The data flow follows the unidirectional pattern commonly associated with Redux applications:
 1. **Action Dispatch**: Actions are dispatched to Redux slices.
 2. **Reducer Processing**: Reducers update the state based on the dispatched actions.
-3. **Middleware**: Middleware (listeners) handles asynchronous operations, often interacting with Firebase Realtime DB.
+3. **Middleware**: Middleware (listeners) handle asynchronous operations, often interacting with Firebase Realtime DB.
 4. **Component Update**: Components connected to Redux re-render based on the new state. state is memoized.
 
 ### 🔥 Backend Integration
@@ -44,7 +44,7 @@ The application integrates with Firebase for backend services:
 
 ### 🗄️ Database Structure
 
-- `databse:`
+- `database:`
   - `test:`
     - Same as main, used in dev mode.
   - `main:`
