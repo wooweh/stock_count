@@ -53,6 +53,8 @@ import WarningIcon from "@mui/icons-material/WarningRounded"
 import LightModeIcon from "@mui/icons-material/WbSunnyRounded"
 import StockIcon from "@mui/icons-material/WidgetsRounded"
 import WifiIcon from "@mui/icons-material/WifiRounded"
+import EmailIcon from "@mui/icons-material/Email"
+import CellphoneIcon from "@mui/icons-material/PhoneAndroid"
 import { useAppSelector } from "../app/hooks"
 import useTheme from "../common/useTheme"
 import { selectIsDarkmode } from "../features/core/coreSliceSelectors"
@@ -119,6 +121,8 @@ export type IconNames =
   | "scrollToTop"
   | "comments"
   | "transfer"
+  | "cellphone"
+  | "email"
 
 type IconProps = {
   variation: IconNames
@@ -188,6 +192,20 @@ export default function Icon(props: IconProps) {
     ),
     transfer: (
       <TransferIcon
+        fontSize={fontSize}
+        fontWeight={props.fontWeight}
+        sx={iconStyles}
+      />
+    ),
+    email: (
+      <EmailIcon
+        fontSize={fontSize}
+        fontWeight={props.fontWeight}
+        sx={iconStyles}
+      />
+    ),
+    cellphone: (
+      <CellphoneIcon
         fontSize={fontSize}
         fontWeight={props.fontWeight}
         sx={iconStyles}

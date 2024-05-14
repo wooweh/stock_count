@@ -32,19 +32,23 @@ import {
 
 */
 type AuthUIState = {
+  isEmailAuth: boolean
   isSigningIn: boolean
   isVerifying: boolean
   email: string
   password: string
   passwordValidation: PasswordValidationReturnProps
+  cellNumber: string
 }
 type AuthUIKeys = keyof AuthUIState
 const initialState: AuthUIState = {
+  isEmailAuth: true,
   isSigningIn: false,
   isVerifying: false,
   email: "",
   password: "",
   passwordValidation: {} as PasswordValidationReturnProps,
+  cellNumber: "",
 }
 const useAuthUI = create<AuthUIState>()(
   persist(
@@ -109,9 +113,12 @@ export function Authentication({
 }: {
   isRegistering?: boolean
 }) {
+  const theme = useTheme()
   const location = useLocation()
   const authUIState = useAuthUI((state) => state)
   const path = location.pathname
+
+  const isEailAuth = authUIState.isEmailAuth
 
   return (
     <ErrorBoundary
@@ -124,10 +131,19 @@ export function Authentication({
         height={"100%"}
         justifyContent={"center"}
         alignItems={"center"}
+        gap={theme.module[4]}
       >
-        <AuthenticationInput isRegistering={isRegistering} />
-        <SigningInLoader />
-        <VerifyEmailPrompt />
+        <Outer>
+          <Logo />
+          {isEailAuth ? (
+            <EmailAuthenticationInput isRegistering={isRegistering} />
+          ) : (
+            <CellNumberAuthenticationInput />
+          )}
+          {!isRegistering && <AuthInputToggle />}
+          <SigningInLoader />
+          <VerifyEmailPrompt />
+        </Outer>
       </Stack>
     </ErrorBoundary>
   )
@@ -138,7 +154,11 @@ export function Authentication({
 
 
 */
-function AuthenticationInput({ isRegistering }: { isRegistering: boolean }) {
+function EmailAuthenticationInput({
+  isRegistering,
+}: {
+  isRegistering: boolean
+}) {
   const isSigningIn = useAuthUI((state) => state.isSigningIn)
   const isVerifying = useAuthUI((state) => state.isVerifying)
   const validationReport = useAuthUI((state) => state.passwordValidation)
@@ -147,16 +167,17 @@ function AuthenticationInput({ isRegistering }: { isRegistering: boolean }) {
 
   return (
     showInputs && (
-      <Outer>
-        <Logo />
+      <>
         <CredentialInputs />
         <ButtonTray isRegistering={isRegistering} />
-        <PasswordValidationCheck
-          isActive={isRegistering}
-          validationReport={validationReport}
-        />
-        <ForgotPassword isRegistering={isRegistering} />
-      </Outer>
+        <Stack>
+          <PasswordValidationCheck
+            isActive={isRegistering}
+            validationReport={validationReport}
+          />
+          <ForgotPassword isRegistering={isRegistering} />
+        </Stack>
+      </>
     )
   )
 }
@@ -288,12 +309,16 @@ function ButtonTray({ isRegistering }: { isRegistering: boolean }) {
         color={theme.scale.green[6]}
         outlineColor={theme.scale.green[8]}
         bgColor={theme.scale.gray[8]}
+        disableRipple
+        disableTouchRipple
       />
       <Button
         variation={"pill"}
         label={navigationLabel}
         onClick={() => navigate(path)}
         color={theme.scale.blue[6]}
+        disableRipple
+        disableTouchRipple
       />
     </Slot>
   )
@@ -318,7 +343,6 @@ function ForgotPassword({ isRegistering }: { isRegistering: boolean }) {
     <Stack
       width={"100%"}
       alignItems={"flex-start"}
-      paddingLeft={theme.module[0]}
       sx={{
         opacity: isRegistering ? 0 : 1,
         transition: `opacity ${isRegistering ? 0 : 350}ms`,
@@ -326,7 +350,7 @@ function ForgotPassword({ isRegistering }: { isRegistering: boolean }) {
     >
       <Button
         variation={"pill"}
-        label={`Forgot password ${isDisabled ? "(Fill your email)" : ""}`}
+        label={`Forgot password ${isDisabled ? "(Fill email)" : ""}`}
         onClick={handleClick}
         disabled={isDisabled}
         color={theme.scale.orange[6]}
@@ -428,6 +452,89 @@ function CheckLineItem({ check }: { check: PasswordCheckProps }) {
       <Typography color={theme.scale.gray[4]} variant="body2">
         {check.description}
       </Typography>
+    </Slot>
+  )
+}
+/*
+
+
+
+
+*/
+function CellNumberAuthenticationInput() {
+  const cellNumber = useAuthUI((state) => state.cellNumber)
+
+  function handleCellNumberChange(event: any) {
+    setAuthUI("cellNumber", _.trim(event.target.value))
+  }
+
+  return (
+    <>
+      <Input
+        placeholder={"Cellphone Number"}
+        onChange={handleCellNumberChange}
+        value={cellNumber}
+      />
+      <CellphoneSendCodeButton />
+    </>
+  )
+}
+/*
+
+
+
+
+*/
+function CellphoneSendCodeButton() {
+  const theme = useTheme()
+  const cellNumber = useAuthUI((state) => state.cellNumber)
+
+  function handleClick() {
+    // TODO: handle cell number auth
+  }
+
+  const isDisabled = !cellNumber.length
+
+  return (
+    <Slot justifyContent={"flex-start"}>
+      <Button
+        variation="pill"
+        disabled={isDisabled}
+        label="Send code"
+        onClick={handleClick}
+        outlineColor={theme.scale.green[8]}
+        color={theme.scale.green[6]}
+        bgColor={theme.scale.gray[8]}
+        disableRipple
+        disableTouchRipple
+      />
+    </Slot>
+  )
+}
+/*
+
+
+
+
+*/
+function AuthInputToggle() {
+  const theme = useTheme()
+  const isEmailAuth = useAuthUI((state) => state.isEmailAuth)
+
+  const iconName = isEmailAuth ? "cellphone" : "email"
+
+  return (
+    <Slot paddingTop={theme.module[4]} position={"absolute"} bottom={"20%"}>
+      <Button
+        variation="pill"
+        label={isEmailAuth ? "Use cellphone sign in" : "Use email sign in"}
+        onClick={() => setAuthUI("isEmailAuth", !isEmailAuth)}
+        iconName={iconName}
+        iconColor={theme.scale.blue[8]}
+        color={theme.scale.blue[7]}
+        disableRipple
+        disableTouchRipple
+      />
     </Slot>
   )
 }
