@@ -103,5 +103,5 @@ To set up and run the Stock Counting Application, follow these steps:
 1. **Clone the Repository**: `git clone https://github.com/wooweh/stock_count`
 2. **Install Dependencies**: `npm install`
 3. **Start the Development Server**: `npm run dev`
-4. **Open the App**: Visit `http://localhost:3000/` in your browser.
+4. **Open the App**: Visit `http://localhost:5173/` in your browser.
 5. **Run unit tests**: `npm run test`
